@@ -50,9 +50,13 @@ The original brief, and where each requirement is satisfied.
 
 Getting a real provider's content into the app. Nothing else can be tested until this works.
 
-- [ ] **`PanopXtream`** *(asked for)*. Client behind `HTTPTransport`, covering
+- [x] **`PanopXtream`** *(asked for)*. Client behind `HTTPTransport`, covering
       `get_live_streams`, `get_vod_streams`, `get_series`, `get_series_info`, `get_short_epg`,
       and the stream URL builders. Tests use a stub transport, no network.
+      Big lists come back as pull-based batches (`XtreamBatches`) so a slow database write
+      slows the download. A truncated body throws `truncatedResponse`; the reconciler must
+      treat that as a failed import and never prune against it. Not yet verified: the
+      `URLSessionTransport` against a real panel, and the off-Apple transport branch (CI only).
 - [ ] **`PanopEPG`** *(surfaced)*. XMLTV pull parser emitting batches, gzip support, and a
       rolling window rather than the whole guide. Guides exceed 100 MB.
 - [ ] **`PanopCatalog`** *(surfaced)*. Import and reconcile orchestration behind `CatalogStore`,

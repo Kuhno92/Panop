@@ -258,9 +258,10 @@ post-clone command.
 | Stage | State |
 |---|---|
 | Repo scaffolding, docs, vendored tooling | Done |
-| `PanopKit`: PanopCore, PanopPlaylist, PanopPlayback | Done, 31 tests passing |
+| `PanopKit`: PanopCore, PanopPlaylist, PanopPlayback | Done |
+| `PanopXtream` (client, streaming list reader, `HTTPTransport`) | Done, 67 tests passing across the package |
 | Xcode project and app target | Builds and launches on macOS, iOS and tvOS |
-| `PanopXtream`, `PanopEPG`, `PanopCatalog` | Planned |
+| `PanopEPG`, `PanopCatalog` | Planned |
 | Engines: AVPlayer, then VLCKit, then LumeEngine | Planned |
 | Playlist import wired to the catalog container | Planned |
 

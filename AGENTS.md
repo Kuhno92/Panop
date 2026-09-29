@@ -15,9 +15,9 @@ The repo is being built up in stages. **Only check off what actually exists**; d
 command works because it is documented below.
 
 - [x] Repo skeleton, docs, lint tooling, ADRs
-- [x] `Packages/PanopKit`: PanopCore, PanopPlaylist, PanopPlayback (24 tests passing)
+- [x] `Packages/PanopKit`: PanopCore, PanopPlaylist, PanopPlayback, PanopXtream (67 tests passing)
 - [x] `Panop.xcodeproj` and the app target (builds and launches on **macOS and iOS**)
-- [ ] PanopXtream, PanopEPG, PanopCatalog
+- [ ] PanopEPG, PanopCatalog (PanopXtream is done)
 - [ ] Engines: AVPlayer, then VLCKit, then LumeEngine (KSPlayer stays unlinked)
 - [ ] Playlist import wired to the catalog container
 
