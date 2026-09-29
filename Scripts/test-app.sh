@@ -4,7 +4,8 @@
 #
 #   Scripts/test-app.sh                 macOS, the fast one
 #   Scripts/test-app.sh ios|tvos        an available simulator
-#   Scripts/test-app.sh --benchmark     catalog benchmarks: macOS, Release build
+#   Scripts/test-app.sh --benchmark [catalog|playback]
+#                                       benchmarks: macOS, Release build. Both by default
 #
 # These are the tests that need SwiftData, so they cannot live in the portable
 # package. The logic tests are much faster: swift test --package-path Packages/PanopKit
@@ -22,11 +23,14 @@ DD_BASE="${PANOP_DD:-/tmp/panop-dd}"
 
 platform="macos"
 benchmark=0
+suites=(CatalogBenchmarks PlaybackBenchmarks)
 for arg in "$@"; do
     case "$arg" in
         macos | ios | tvos) platform="$arg" ;;
         --benchmark) benchmark=1 ;;
-        -h | --help) sed -n '2,12p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+        catalog) suites=(CatalogBenchmarks) ;;
+        playback) suites=(PlaybackBenchmarks) ;;
+        -h | --help) sed -n '2,13p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
         *) echo "unknown argument: $arg (see --help)" >&2; exit 2 ;;
     esac
 done
@@ -51,8 +55,10 @@ if [[ $benchmark -eq 1 ]]; then
     # for @testable import, and the hardened runtime refuses to load the
     # ad-hoc-signed package frameworks in a local Release build.
     platform="macos"
-    flags=(-configuration Release ENABLE_TESTABILITY=YES ENABLE_HARDENED_RUNTIME=NO
-        -only-testing:PanopTests/CatalogBenchmarks)
+    flags=(-configuration Release ENABLE_TESTABILITY=YES ENABLE_HARDENED_RUNTIME=NO)
+    for suite in "${suites[@]}"; do
+        flags+=("-only-testing:PanopTests/$suite")
+    done
     export TEST_RUNNER_PANOP_BENCHMARK=1
     rm -f /tmp/panop-bench-results.txt
 fi

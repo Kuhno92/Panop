@@ -263,7 +263,8 @@ post-clone command.
 | `PanopEPG` (XMLTV parser, gzip, rolling window) | Done |
 | `PanopCatalog` (importer, `CatalogStore` protocol, in-memory store) | Done, 175 tests passing across the package |
 | Xcode project and app target | Builds and launches on macOS, iOS and tvOS |
-| Engines: AVPlayer, then VLCKit, then LumeEngine | Planned |
+| Playback coordinator and the AVPlayer adapter | Done: 23 coordinator tests in 0.2 s, and the adapter tested against real AVFoundation on macOS, iOS and tvOS |
+| Engines: VLCKit, then LumeEngine | Planned |
 | `SwiftDataCatalogStore`, `PanopTests` target | Done, 22 tests passing on macOS, iOS and tvOS |
 | Playlist import flow: add, Keychain credentials, background sync, playlists screen | Done at the service level (43 app tests); screens launch but are not yet driven by UI tests |
 

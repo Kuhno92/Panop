@@ -27,17 +27,20 @@ struct SettingsView: View {
 
             Section {
                 Picker("Engine", selection: selectedEngine) {
-                    // `available` rather than `allCases`: KSPlayer is GPL-3.0
-                    // and is not linked, so offering it would select an engine
-                    // that cannot play anything. See docs/adr/0002.
-                    ForEach(PlaybackEngineKind.available) { kind in
+                    // `selectable`: only engines with a working adapter. KSPlayer is
+                    // GPL-3.0 and not linked (docs/adr/0002), and VLC and LumeEngine
+                    // are not built yet, so offering them would select a player that
+                    // cannot play anything.
+                    ForEach(EngineRegistry.selectable) { kind in
                         Text(kind.displayName).tag(kind)
                     }
                 }
             } header: {
                 Text("Playback")
             } footer: {
-                Text("Panop falls back through the other engines when a stream refuses to start.")
+                Text(
+                    "Panop falls back through the other players when a stream refuses to start. More players are on the way."
+                )
             }
         }
         .navigationTitle("Settings")

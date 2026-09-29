@@ -40,6 +40,7 @@ struct ChannelListView: View {
 
     @Environment(SyncStatusCenter.self) private var status
     @State private var showingAdd = false
+    @State private var playing: PlaybackTarget?
 
     var body: some View {
         Group {
@@ -61,10 +62,15 @@ struct ChannelListView: View {
                 }
             } else {
                 List(channels) { channel in
-                    LabeledContent(channel.name) {
-                        Text(channel.groupName ?? "")
-                            .foregroundStyle(.secondary)
+                    Button {
+                        playing = PlaybackTarget(entry: channel)
+                    } label: {
+                        LabeledContent(channel.name) {
+                            Text(channel.groupName ?? "")
+                                .foregroundStyle(.secondary)
+                        }
                     }
+                    .buttonStyle(.plain)
                 }
             }
         }
@@ -72,6 +78,39 @@ struct ChannelListView: View {
         .sheet(isPresented: $showingAdd) {
             NavigationStack { AddPlaylistView() }
         }
+        .modifier(PlayerPresentation(target: $playing))
+    }
+}
+
+extension PlaybackTarget {
+    /// A snapshot of a catalog row, so the player never holds the live record.
+    init(entry: CatalogEntryRecord) {
+        self.init(
+            playlist: entry.playlist,
+            entryID: entry.id,
+            kind: entry.kind,
+            name: entry.name,
+            streamURL: entry.streamURL,
+            remoteID: entry.remoteID,
+            containerExtension: entry.containerExtension
+        )
+    }
+}
+
+/// Full screen where the platform has it; a sheet on the Mac.
+private struct PlayerPresentation: ViewModifier {
+    @Binding var target: PlaybackTarget?
+
+    func body(content: Content) -> some View {
+        #if os(macOS)
+            content.sheet(item: $target) { target in
+                PlayerScreen(target: target).frame(minWidth: 880, minHeight: 520)
+            }
+        #else
+            content.fullScreenCover(item: $target) { target in
+                PlayerScreen(target: target)
+            }
+        #endif
     }
 }
 

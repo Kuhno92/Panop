@@ -161,9 +161,25 @@ The first milestone where Panop is usable.
 - [ ] **Movies and Series** browsing, including episode lists *(asked for, VOD)*
 - [ ] **Search** across the catalog. Needs SQLite FTS or bounded predicates with a fetch limit;
       an unbounded sort defeats the limit entirely.
-- [ ] **Engine coordinator** *(surfaced)*: owns the ordered fallback list, reconnect and
-      backoff. Never inside an adapter (ADR 0002).
-- [ ] **AVPlayer adapter**. First real engine.
+- [x] **Engine coordinator** *(surfaced)*: owns the ordered fallback list, reconnect and
+      backoff. Never inside an adapter (ADR 0002). Portable (`PanopPlayback`), tested with a
+      scripted fake engine in 0.2 s. A format rejection moves to the next engine without a retry;
+      a recoverable failure retries on a *fresh* engine with backoff; load, first frame and
+      stalls all have timeouts, because a stream that neither plays nor fails is otherwise
+      invisible; a reconnect budget refills after stable playback; VOD resumes where it stopped;
+      every fallback carries its reason; a superseded session (fast zapping) cannot disturb the
+      new one. The item is chosen per engine (HLS for AVPlayer, raw `.ts` for the others).
+- [x] **AVPlayer adapter**. First real engine. Reports only; no retry or fallback. Tested against
+      real AVFoundation on macOS, iOS and tvOS, including real H.264 video reaching the layer.
+      **Measured:** AVFoundation reports an unreadable stream with a different code per
+      container (-11829 malformed MP4, -11828 MKV, an *unnamed* -11849 for MP3 and transport
+      streams), so a list of known codes is always one behind. The adapter therefore maps any
+      AVFoundation error that is not clearly network, authorization or decode to
+      `unsupportedFormat` (next engine, no retry). A garbage `.m3u8` never fails at all: the item
+      stays "unknown" forever, which is why the coordinator's timeouts are not optional.
+      Floor for zapping, no network, warm: ~4 ms to first frame (cold ~80 ms). Not yet verified:
+      any real provider stream. **Practical limit today:** AVPlayer cannot read raw MPEG-TS, so
+      most M3U live streams fail until VLCKit or LumeEngine exists; Xtream live works (HLS).
 - [ ] **VLCKit adapter**. LGPL, must stay dynamically linked.
 - [ ] **LumeEngine adapter**, vendored as a pinned submodule, never a URL dependency.
 - [ ] **App-side facade over LumeEngine's `PlayerSession`** *(surfaced)*. Its `LumePlayer` facade
