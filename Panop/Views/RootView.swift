@@ -2,7 +2,18 @@ import SwiftData
 import SwiftUI
 
 struct RootView: View {
-    @Query(sort: \Channel.sortIndex) private var channels: [Channel]
+    @Query(RootView.liveChannels) private var channels: [CatalogEntryRecord]
+
+    /// Placeholder until the browse screens. It is bounded and unsorted on
+    /// purpose: a sort with no index behind it would defeat the limit and read
+    /// the whole table, which is exactly what this rule exists to prevent.
+    private static var liveChannels: FetchDescriptor<CatalogEntryRecord> {
+        var descriptor = FetchDescriptor<CatalogEntryRecord>(
+            predicate: #Predicate { $0.kindRaw == "live" }
+        )
+        descriptor.fetchLimit = 200
+        return descriptor
+    }
 
     var body: some View {
         TabView {
@@ -21,7 +32,7 @@ struct RootView: View {
 }
 
 struct ChannelListView: View {
-    let channels: [Channel]
+    let channels: [CatalogEntryRecord]
 
     var body: some View {
         Group {
@@ -34,7 +45,7 @@ struct ChannelListView: View {
             } else {
                 List(channels) { channel in
                     LabeledContent(channel.name) {
-                        Text(channel.groupTitle ?? "")
+                        Text(channel.groupName ?? "")
                             .foregroundStyle(.secondary)
                     }
                 }
@@ -46,5 +57,5 @@ struct ChannelListView: View {
 
 #Preview {
     RootView()
-        .modelContainer(for: Channel.self, inMemory: true)
+        .modelContainer(for: CatalogEntryRecord.self, inMemory: true)
 }

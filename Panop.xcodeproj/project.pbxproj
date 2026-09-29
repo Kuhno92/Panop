@@ -10,14 +10,42 @@
 		AAAA000000000000000000D2 /* PanopCore in Frameworks */ = {isa = PBXBuildFile; productRef = AAAA000000000000000000C2 /* PanopCore */; };
 		AAAA000000000000000000D3 /* PanopPlaylist in Frameworks */ = {isa = PBXBuildFile; productRef = AAAA000000000000000000C3 /* PanopPlaylist */; };
 		AAAA000000000000000000D4 /* PanopPlayback in Frameworks */ = {isa = PBXBuildFile; productRef = AAAA000000000000000000C4 /* PanopPlayback */; };
+		AAAA000000000000000000D5 /* PanopXtream in Frameworks */ = {isa = PBXBuildFile; productRef = AAAA000000000000000000C5 /* PanopXtream */; };
+		AAAA000000000000000000D6 /* PanopEPG in Frameworks */ = {isa = PBXBuildFile; productRef = AAAA000000000000000000C6 /* PanopEPG */; };
+		AAAA000000000000000000D7 /* PanopCatalog in Frameworks */ = {isa = PBXBuildFile; productRef = AAAA000000000000000000C7 /* PanopCatalog */; };
+		AAAA000000000000000000F1 /* PanopCore in Frameworks */ = {isa = PBXBuildFile; productRef = AAAA000000000000000000C2 /* PanopCore */; };
+		AAAA000000000000000000F2 /* PanopPlaylist in Frameworks */ = {isa = PBXBuildFile; productRef = AAAA000000000000000000C3 /* PanopPlaylist */; };
+		AAAA000000000000000000F3 /* PanopXtream in Frameworks */ = {isa = PBXBuildFile; productRef = AAAA000000000000000000C5 /* PanopXtream */; };
+		AAAA000000000000000000F4 /* PanopEPG in Frameworks */ = {isa = PBXBuildFile; productRef = AAAA000000000000000000C6 /* PanopEPG */; };
+		AAAA000000000000000000F5 /* PanopCatalog in Frameworks */ = {isa = PBXBuildFile; productRef = AAAA000000000000000000C7 /* PanopCatalog */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		AAAA000000000000000000E7 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AAAA000000000000000000A1 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = AAAA000000000000000000A4;
+			remoteInfo = Panop;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		AAAA000000000000000000A5 /* Panop.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Panop.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		AAAA000000000000000000E1 /* PanopTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PanopTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		AAAA000000000000000000A6 /* Panop */ = {isa = PBXFileSystemSynchronizedRootGroup; path = Panop; sourceTree = "<group>"; };
+		AAAA000000000000000000A6 /* Panop */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Panop;
+			sourceTree = "<group>";
+		};
+		AAAA000000000000000000E2 /* PanopTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = PanopTests;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -28,6 +56,21 @@
 				AAAA000000000000000000D2 /* PanopCore in Frameworks */,
 				AAAA000000000000000000D3 /* PanopPlaylist in Frameworks */,
 				AAAA000000000000000000D4 /* PanopPlayback in Frameworks */,
+				AAAA000000000000000000D5 /* PanopXtream in Frameworks */,
+				AAAA000000000000000000D6 /* PanopEPG in Frameworks */,
+				AAAA000000000000000000D7 /* PanopCatalog in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AAAA000000000000000000E5 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AAAA000000000000000000F1 /* PanopCore in Frameworks */,
+				AAAA000000000000000000F2 /* PanopPlaylist in Frameworks */,
+				AAAA000000000000000000F3 /* PanopXtream in Frameworks */,
+				AAAA000000000000000000F4 /* PanopEPG in Frameworks */,
+				AAAA000000000000000000F5 /* PanopCatalog in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -38,6 +81,7 @@
 			isa = PBXGroup;
 			children = (
 				AAAA000000000000000000A6 /* Panop */,
+				AAAA000000000000000000E2 /* PanopTests */,
 				AAAA000000000000000000A3 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -46,6 +90,7 @@
 			isa = PBXGroup;
 			children = (
 				AAAA000000000000000000A5 /* Panop.app */,
+				AAAA000000000000000000E1 /* PanopTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -73,10 +118,40 @@
 				AAAA000000000000000000C2 /* PanopCore */,
 				AAAA000000000000000000C3 /* PanopPlaylist */,
 				AAAA000000000000000000C4 /* PanopPlayback */,
+				AAAA000000000000000000C5 /* PanopXtream */,
+				AAAA000000000000000000C6 /* PanopEPG */,
+				AAAA000000000000000000C7 /* PanopCatalog */,
 			);
 			productName = Panop;
 			productReference = AAAA000000000000000000A5 /* Panop.app */;
 			productType = "com.apple.product-type.application";
+		};
+		AAAA000000000000000000E3 /* PanopTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AAAA000000000000000000E9 /* Build configuration list for PBXNativeTarget "PanopTests" */;
+			buildPhases = (
+				AAAA000000000000000000E4 /* Sources */,
+				AAAA000000000000000000E5 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				AAAA000000000000000000E8 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				AAAA000000000000000000E2 /* PanopTests */,
+			);
+			name = PanopTests;
+			packageProductDependencies = (
+				AAAA000000000000000000C2 /* PanopCore */,
+				AAAA000000000000000000C3 /* PanopPlaylist */,
+				AAAA000000000000000000C5 /* PanopXtream */,
+				AAAA000000000000000000C6 /* PanopEPG */,
+				AAAA000000000000000000C7 /* PanopCatalog */,
+			);
+			productName = PanopTests;
+			productReference = AAAA000000000000000000E1 /* PanopTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
 
@@ -90,6 +165,10 @@
 				TargetAttributes = {
 					AAAA000000000000000000A4 = {
 						CreatedOnToolsVersion = 26.6;
+					};
+					AAAA000000000000000000E3 = {
+						CreatedOnToolsVersion = 26.6;
+						TestTargetID = AAAA000000000000000000A4;
 					};
 				};
 			};
@@ -111,6 +190,7 @@
 			projectRoot = "";
 			targets = (
 				AAAA000000000000000000A4 /* Panop */,
+				AAAA000000000000000000E3 /* PanopTests */,
 			);
 		};
 /* End PBXProject section */
@@ -133,7 +213,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		AAAA000000000000000000E4 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		AAAA000000000000000000E8 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = AAAA000000000000000000A4 /* Panop */;
+			targetProxy = AAAA000000000000000000E7 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		AAAA000000000000000000B2 /* Debug */ = {
@@ -259,6 +354,44 @@
 			};
 			name = Release;
 		};
+		AAAA000000000000000000EA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.panop.PanopTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "appletvos appletvsimulator iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
+				TARGETED_DEVICE_FAMILY = "1,2,3";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Panop.app/Panop";
+				"TEST_HOST[sdk=macosx*]" = "$(BUILT_PRODUCTS_DIR)/Panop.app/Contents/MacOS/Panop";
+			};
+			name = Debug;
+		};
+		AAAA000000000000000000EB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.panop.PanopTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "appletvos appletvsimulator iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
+				TARGETED_DEVICE_FAMILY = "1,2,3";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Panop.app/Panop";
+				"TEST_HOST[sdk=macosx*]" = "$(BUILT_PRODUCTS_DIR)/Panop.app/Contents/MacOS/Panop";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -276,6 +409,15 @@
 			buildConfigurations = (
 				AAAA000000000000000000B5 /* Debug */,
 				AAAA000000000000000000B6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AAAA000000000000000000E9 /* Build configuration list for PBXNativeTarget "PanopTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AAAA000000000000000000EA /* Debug */,
+				AAAA000000000000000000EB /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -301,6 +443,18 @@
 		AAAA000000000000000000C4 /* PanopPlayback */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = PanopPlayback;
+		};
+		AAAA000000000000000000C5 /* PanopXtream */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PanopXtream;
+		};
+		AAAA000000000000000000C6 /* PanopEPG */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PanopEPG;
+		};
+		AAAA000000000000000000C7 /* PanopCatalog */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PanopCatalog;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

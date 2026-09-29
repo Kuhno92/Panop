@@ -8,15 +8,23 @@ import SwiftData
 /// mirroring forbids the uniqueness and relationships a catalogue needs, and a
 /// mirrored container re-runs every live `@Query` during import, which is
 /// enough to freeze tvOS on a large catalogue.
-enum PanopContainers {
+nonisolated enum PanopContainers {
     /// Local-only catalogue. Every `@Query` in the app targets this.
-    static func makeCatalog(inMemory: Bool = false) throws -> ModelContainer {
-        let configuration = ModelConfiguration(
-            "Catalog",
-            schema: catalogSchema,
-            isStoredInMemoryOnly: inMemory,
-            cloudKitDatabase: .none
-        )
+    ///
+    /// Pass `storeURL` for a store at a specific file. Tests that depend on how
+    /// SQLite orders and compares (paging, collation) need one: an in-memory
+    /// store evaluates those in Swift and hides the difference.
+    static func makeCatalog(inMemory: Bool = false, storeURL: URL? = nil) throws -> ModelContainer {
+        let configuration = if let storeURL {
+            ModelConfiguration("Catalog", schema: catalogSchema, url: storeURL, cloudKitDatabase: .none)
+        } else {
+            ModelConfiguration(
+                "Catalog",
+                schema: catalogSchema,
+                isStoredInMemoryOnly: inMemory,
+                cloudKitDatabase: .none
+            )
+        }
         return try ModelContainer(for: catalogSchema, configurations: configuration)
     }
 
@@ -38,6 +46,12 @@ enum PanopContainers {
         return try ModelContainer(for: cloudSchema, configurations: configuration)
     }
 
-    static let catalogSchema = Schema([Channel.self])
+    static let catalogSchema = Schema([
+        CatalogEntryRecord.self,
+        CatalogCategoryRecord.self,
+        EPGChannelRecord.self,
+        EPGProgrammeRecord.self,
+        SyncStateRecord.self
+    ])
     static let cloudSchema = Schema([UserContentState.self])
 }

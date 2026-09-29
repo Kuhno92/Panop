@@ -30,6 +30,7 @@ public extension CatalogImporter {
 
         var report = EPGImportReport()
         var seen = Set<UInt64>()
+        var seenChannels = Set<String>()
         var processed = 0
 
         for try await batch in batches {
@@ -45,7 +46,9 @@ public extension CatalogImporter {
             report.channels += channels.count
             report.programmes += try await store.upsertProgrammes(programmes, playlist: playlist)
             for programme in programmes {
-                seen.insert(ProgrammeKey(programme).hash64)
+                let key = ProgrammeKey(programme)
+                seen.insert(key.hash64)
+                seenChannels.insert(key.channelKey)
             }
             processed += programmes.count
             progress?(ImportProgress(kind: nil, processed: processed))
@@ -53,7 +56,13 @@ public extension CatalogImporter {
 
         // Only reached when the guide read cleanly to `</tv>`.
         report.removedExpired = try await store.removeProgrammes(endedBefore: window.lowerBound, playlist: playlist)
-        let sweep = try await sweepProgrammes(seen: seen, before: before, playlist: playlist, from: window.lowerBound)
+        let sweep = try await sweepProgrammes(
+            seen: seen,
+            seenChannels: seenChannels,
+            before: before,
+            playlist: playlist,
+            from: window.lowerBound
+        )
         report.removedStale = sweep.removed
         report.deferredStale = sweep.deferred
         return report

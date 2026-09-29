@@ -48,3 +48,17 @@ jobs:
       # Apple-only import slips in and nobody notices until the port starts.
       - name: Build and test on Linux
         run: swift test --package-path Packages/PanopKit
+
+  app:
+    name: App tests (macOS)
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      # The store and importer tests need SwiftData, so they cannot run in the
+      # portable package. They use real on-disk SQLite, which is what catches
+      # collation and paging bugs that an in-memory store hides.
+      - name: Test
+        run: Scripts/test-app.sh macos

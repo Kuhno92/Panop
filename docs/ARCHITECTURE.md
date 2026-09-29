@@ -235,7 +235,7 @@ Package.swift          Vendors SwiftLint/SwiftFormat/lefthook. Builds nothing.
 Packages/PanopKit/     The portable core.
 Panop/                 App target sources. A synchronized Xcode group.
 Panop.xcodeproj/       Hand-authored, ~330 lines.
-Scripts/               setup.sh, build-all-platforms.sh, check-portability.sh
+Scripts/               setup.sh, build-all-platforms.sh, check-portability.sh, test-app.sh, ...
 docs/adr/              Decision records.
 reference/             Gitignored third-party clones, design reference only.
 vendor/LumeEngine/     Planned: git submodule, path dependency.
@@ -264,7 +264,8 @@ post-clone command.
 | `PanopCatalog` (importer, `CatalogStore` protocol, in-memory store) | Done, 175 tests passing across the package |
 | Xcode project and app target | Builds and launches on macOS, iOS and tvOS |
 | Engines: AVPlayer, then VLCKit, then LumeEngine | Planned |
-| Playlist import wired to the catalog container | Planned |
+| `SwiftDataCatalogStore`, `PanopTests` target | Done, 22 tests passing on macOS, iOS and tvOS |
+| Playlist import wired to the catalog container (UI, credentials) | Planned |
 
 Two verification gaps worth knowing about, both environmental rather than design problems:
 

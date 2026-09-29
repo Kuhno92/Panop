@@ -36,7 +36,7 @@ public actor InMemoryCatalogStore: CatalogStore {
     }
 
     public func allProgrammes(playlist: String) -> [EPGProgramme] {
-        (programmes[playlist] ?? [:]).values.sorted { ProgrammeKey($0) < ProgrammeKey($1) }
+        (programmes[playlist] ?? [:]).values.sorted { ($0.channelID, $0.start) < ($1.channelID, $1.start) }
     }
 
     public func allEPGChannels(playlist: String) -> [EPGChannel] {
@@ -135,20 +135,20 @@ public actor InMemoryCatalogStore: CatalogStore {
         (programmes[playlist] ?? [:]).values.filter { $0.stop > endingAfter }.count
     }
 
-    public func programmeKeys(
-        playlist: String,
-        endingAfter: Date,
-        after: ProgrammeKey?,
-        limit: Int
-    ) -> [ProgrammeKey] {
-        let keys = (programmes[playlist] ?? [:]).filter { $0.value.stop > endingAfter }.keys.sorted()
-        let remaining = after.map { cursor in keys.filter { $0 > cursor } } ?? keys
-        return Array(remaining.prefix(limit))
+    public func epgChannelIDs(playlist: String) -> [String] {
+        (channels[playlist] ?? [:]).keys.sorted()
     }
 
-    public func removeProgrammes(keys: [ProgrammeKey], playlist: String) {
-        for key in keys {
-            programmes[playlist]?[key] = nil
+    public func programmeStarts(playlist: String, channelKey: String, endingAfter: Date) -> [Date] {
+        (programmes[playlist] ?? [:])
+            .filter { $0.key.channelKey == channelKey && $0.value.stop > endingAfter }
+            .map(\.key.start)
+            .sorted()
+    }
+
+    public func removeProgrammes(playlist: String, channelKey: String, starts: [Date]) {
+        for start in starts {
+            programmes[playlist]?[ProgrammeKey(channelKey: channelKey, start: start)] = nil
         }
     }
 

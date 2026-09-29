@@ -13,9 +13,9 @@ import PanopEPG
 /// - `upsert*` is keyed by `(playlist, id)` and must not write a row whose
 ///   content did not change. Re-importing an unchanged 80,000-row catalog is
 ///   the common case, and it should cost reads, not 80,000 writes.
-/// - Paged id and key listings use **binary** ordering (code-unit order),
-///   never a localised collation. The importer resumes a page from the last
-///   value it saw, which is only sound if the store orders the way it compares.
+/// - Paged id listings use **binary** ordering (code-unit order), never a
+///   localised collation. The importer resumes a page from the last id it saw,
+///   which is only sound if the store orders the way it compares.
 /// - Removals are by explicit id or key. The store never decides on its own what
 ///   is stale; that decision, and the safety checks around it, live in
 ///   ``CatalogImporter``.
@@ -48,16 +48,18 @@ public protocol CatalogStore: Sendable {
 
     func programmeCount(playlist: String, endingAfter: Date) async throws -> Int
 
-    /// Keys of programmes ending after `endingAfter`, ascending, strictly after
-    /// `after`, at most `limit`.
-    func programmeKeys(
-        playlist: String,
-        endingAfter: Date,
-        after: ProgrammeKey?,
-        limit: Int
-    ) async throws -> [ProgrammeKey]
+    /// Channel ids of the guide channels stored for this playlist, as written.
+    func epgChannelIDs(playlist: String) async throws -> [String]
 
-    func removeProgrammes(keys: [ProgrammeKey], playlist: String) async throws
+    /// Start times of one channel's programmes ending after `endingAfter`.
+    ///
+    /// One indexed range read per channel. The importer sweeps a guide channel by
+    /// channel because a single ordered listing of every programme cannot use
+    /// an index for its resume cursor: it re-scans and re-sorts on every page,
+    /// which measured at 47 seconds for 200,000 rows.
+    func programmeStarts(playlist: String, channelKey: String, endingAfter: Date) async throws -> [Date]
+
+    func removeProgrammes(playlist: String, channelKey: String, starts: [Date]) async throws
 
     /// Drops everything that ended at or before `date`. Purely time-based, so
     /// safe whatever the latest guide contained. "At or before" matches

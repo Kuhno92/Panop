@@ -13,6 +13,16 @@ extension CatalogImporter {
     ///
     /// Call only after the import ran to completion.
     func sweepEntries(_ tracker: KindTracker, playlist: String, importCounter: Int) async throws -> SweepResult {
+        // Every id this import saw was written, so if the store holds exactly
+        // that many, nothing else is in it. That is the steady state of a
+        // refresh, and it skips reading every id back. The check errs safe: a
+        // collision in the seen set makes `seen.count` smaller than the id
+        // count, which forces the full scan, and a row that changed kind
+        // mid-import can only make a stale row survive one more import.
+        if try await store.entryCount(kind: tracker.kind, playlist: playlist) == tracker.seen.count {
+            return SweepResult()
+        }
+
         var stale: [String] = []
         var cursor: String?
         while true {
@@ -48,31 +58,49 @@ extension CatalogImporter {
 
     /// Guide sweep. Stale programmes age out by time anyway, so there is no
     /// confirmation path: a held-back sweep just reports how many it left.
+    ///
+    /// Works channel by channel, over the channels this guide mentioned plus
+    /// every guide channel already stored. A channel that appears in neither
+    /// (programmes stored without a `<channel>` entry, then dropped) is not
+    /// swept; its rows expire by time.
     func sweepProgrammes(
         seen: Set<UInt64>,
+        seenChannels: Set<String>,
         before: Int,
         playlist: String,
         from windowStart: Date
     ) async throws -> (removed: Int, deferred: Int) {
-        var stale: [ProgrammeKey] = []
-        var cursor: ProgrammeKey?
-        while true {
-            let page = try await store.programmeKeys(
-                playlist: playlist,
-                endingAfter: windowStart,
-                after: cursor,
-                limit: Self.sweepPageSize
-            )
-            guard let last = page.last else { break }
-            stale += page.filter { !seen.contains($0.hash64) }
-            cursor = last
+        // As with entries: if the store holds exactly what was seen, nothing
+        // is stale, and no per-channel reads are needed.
+        if try await store.programmeCount(playlist: playlist, endingAfter: windowStart) == seen.count {
+            return (0, 0)
         }
-        guard !stale.isEmpty else { return (0, 0) }
-        guard policy.allows(removing: stale.count, of: before) else { return (0, stale.count) }
 
-        for chunk in stale.chunked(into: Self.removeChunkSize) {
-            try await store.removeProgrammes(keys: chunk, playlist: playlist)
+        let stored = try await store.epgChannelIDs(playlist: playlist).map(EPGKey.normalize)
+        let channels = seenChannels.union(stored).sorted()
+
+        var stale: [(channelKey: String, starts: [Date])] = []
+        var staleCount = 0
+        for channelKey in channels {
+            let starts = try await store.programmeStarts(
+                playlist: playlist,
+                channelKey: channelKey,
+                endingAfter: windowStart
+            )
+            let missing = starts.filter { !seen.contains(ProgrammeKey(channelKey: channelKey, start: $0).hash64) }
+            if !missing.isEmpty {
+                stale.append((channelKey, missing))
+                staleCount += missing.count
+            }
         }
-        return (stale.count, 0)
+        guard staleCount > 0 else { return (0, 0) }
+        guard policy.allows(removing: staleCount, of: before) else { return (0, staleCount) }
+
+        for (channelKey, starts) in stale {
+            for chunk in starts.chunked(into: Self.removeChunkSize) {
+                try await store.removeProgrammes(playlist: playlist, channelKey: channelKey, starts: chunk)
+            }
+        }
+        return (staleCount, 0)
     }
 }

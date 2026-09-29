@@ -111,9 +111,7 @@ public struct UpsertSummary: Sendable, Equatable {
 }
 
 /// Identifies one guide row: a channel at a start time.
-///
-/// Ordered so a store can page through keys without holding them all.
-public struct ProgrammeKey: Sendable, Hashable, Comparable {
+public struct ProgrammeKey: Sendable, Hashable {
     /// Lower-cased channel id, so `ARD.de` and `ard.de` are the same channel.
     public var channelKey: String
     public var start: Date
@@ -125,15 +123,6 @@ public struct ProgrammeKey: Sendable, Hashable, Comparable {
 
     public init(_ programme: EPGProgramme) {
         self.init(channelKey: EPGKey.normalize(programme.channelID), start: programme.start)
-    }
-
-    /// Orders by binary comparison of the channel key, never localised, so a
-    /// store's own ordering can agree with it.
-    public static func < (lhs: ProgrammeKey, rhs: ProgrammeKey) -> Bool {
-        if lhs.channelKey != rhs.channelKey {
-            return lhs.channelKey.utf8.lexicographicallyPrecedes(rhs.channelKey.utf8)
-        }
-        return lhs.start < rhs.start
     }
 }
 

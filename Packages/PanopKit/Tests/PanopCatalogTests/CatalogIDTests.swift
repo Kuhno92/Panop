@@ -40,22 +40,6 @@ struct CatalogIDTests {
     }
 
     @Test
-    func `programme keys order by channel then time`() {
-        let early = Date(timeIntervalSince1970: 100)
-        let late = Date(timeIntervalSince1970: 200)
-        let keys = [
-            ProgrammeKey(channelKey: "b", start: early),
-            ProgrammeKey(channelKey: "a", start: late),
-            ProgrammeKey(channelKey: "a", start: early)
-        ]
-        #expect(keys.sorted() == [
-            ProgrammeKey(channelKey: "a", start: early),
-            ProgrammeKey(channelKey: "a", start: late),
-            ProgrammeKey(channelKey: "b", start: early)
-        ])
-    }
-
-    @Test
     func `different times give different hashes`() {
         let first = ProgrammeKey(channelKey: "x", start: Date(timeIntervalSince1970: 1000))
         let second = ProgrammeKey(channelKey: "x", start: Date(timeIntervalSince1970: 1001))

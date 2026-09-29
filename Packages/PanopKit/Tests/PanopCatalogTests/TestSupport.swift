@@ -118,17 +118,16 @@ actor FlakyStore: CatalogStore {
         await base.programmeCount(playlist: playlist, endingAfter: endingAfter)
     }
 
-    func programmeKeys(
-        playlist: String,
-        endingAfter: Date,
-        after: ProgrammeKey?,
-        limit: Int
-    ) async throws -> [ProgrammeKey] {
-        await base.programmeKeys(playlist: playlist, endingAfter: endingAfter, after: after, limit: limit)
+    func epgChannelIDs(playlist: String) async throws -> [String] {
+        await base.epgChannelIDs(playlist: playlist)
     }
 
-    func removeProgrammes(keys: [ProgrammeKey], playlist: String) async throws {
-        await base.removeProgrammes(keys: keys, playlist: playlist)
+    func programmeStarts(playlist: String, channelKey: String, endingAfter: Date) async throws -> [Date] {
+        await base.programmeStarts(playlist: playlist, channelKey: channelKey, endingAfter: endingAfter)
+    }
+
+    func removeProgrammes(playlist: String, channelKey: String, starts: [Date]) async throws {
+        await base.removeProgrammes(playlist: playlist, channelKey: channelKey, starts: starts)
     }
 
     func removeProgrammes(endedBefore date: Date, playlist: String) async throws -> Int {

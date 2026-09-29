@@ -15,8 +15,9 @@ The repo is being built up in stages. **Only check off what actually exists**; d
 command works because it is documented below.
 
 - [x] Repo skeleton, docs, lint tooling, ADRs
-- [x] `Packages/PanopKit`: PanopCore, PanopPlaylist, PanopPlayback, PanopXtream, PanopEPG, PanopCatalog (175 tests passing)
+- [x] `Packages/PanopKit`: PanopCore, PanopPlaylist, PanopPlayback, PanopXtream, PanopEPG, PanopCatalog (174 tests passing)
 - [x] `Panop.xcodeproj` and the app target (builds and launches on **macOS and iOS**)
+- [x] `SwiftDataCatalogStore` and the `PanopTests` target (22 tests, passing on macOS, iOS and tvOS)
 - [ ] Engines: AVPlayer, then VLCKit, then LumeEngine (KSPlayer stays unlinked)
 - [ ] Playlist import wired to the catalog container
 
@@ -85,6 +86,12 @@ Scripts/build-all-platforms.sh
 # Parallel work: a worktree wired for hooks, submodules and a private DerivedData
 Scripts/worktree.sh add feat/epg-parser
 Scripts/worktree.sh remove feat/epg-parser
+
+# App tests (SwiftData, so they cannot live in the portable package). ~10 s on macOS
+Scripts/test-app.sh [macos|ios|tvos]
+
+# Catalog import benchmarks: Release build, macOS, prints a results table
+Scripts/test-app.sh --benchmark
 
 # Reclaim disk from build caches. Dry run by default; keeps the hook tooling
 Scripts/clean-caches.sh [--apply]
@@ -203,8 +210,10 @@ dependency" looks like tidying and is a build break. Do not do it. See `docs/eng
 
 ### Every test ModelConfiguration sets `cloudKitDatabase: .none`
 
-**Why:** the catalog models use `@Attribute(.unique)`, which CloudKit forbids. With the default
-`.automatic`, tests crash on any host that carries iCloud entitlements.
+**Why:** the catalog container is local-only and uses uniqueness constraints on its small tables,
+which CloudKit forbids. With the default `.automatic`, tests crash on any host that carries
+iCloud entitlements. `PanopContainers.makeCatalog` already sets `.none`; build test containers
+through it.
 
 ### Never bind `@Query` against the cloud container
 
