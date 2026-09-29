@@ -1,0 +1,87 @@
+name: Bug report
+description: Something does not work the way it should.
+title: "bug: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Panop is a player. It ships no channels and never needs your provider details to
+        diagnose a bug. **Redact server URLs, usernames, passwords and stream links** in
+        everything you paste, including logs and screenshots.
+  - type: checkboxes
+    id: preflight
+    attributes:
+      label: Before you submit
+      options:
+        - label: I searched existing issues and found no duplicate.
+          required: true
+        - label: Nothing I am posting contains credentials, playlist URLs or stream links.
+          required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: What you saw, and what you expected instead.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Open ...
+        2. Tap ...
+        3. Observe ...
+    validations:
+      required: true
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      multiple: true
+      options:
+        - iOS
+        - iPadOS
+        - macOS
+        - tvOS
+    validations:
+      required: true
+  - type: input
+    id: os-version
+    attributes:
+      label: OS version and device
+      placeholder: "e.g. tvOS 26.4 on Apple TV 4K (3rd gen)"
+  - type: dropdown
+    id: engine
+    attributes:
+      label: Playback engine
+      description: The engine selected in Settings. Skip if the bug is not about playback.
+      options:
+        - Not a playback bug
+        - AVPlayer
+        - VLCKit
+        - LumeEngine
+        - Happens with more than one
+        - Not sure
+  - type: dropdown
+    id: source
+    attributes:
+      label: Playlist source
+      description: Skip if the bug is not about importing or browsing a catalog.
+      options:
+        - Not a catalog bug
+        - M3U / M3U8 URL
+        - M3U / M3U8 file
+        - Xtream Codes
+  - type: input
+    id: catalog-size
+    attributes:
+      label: Approximate catalog size
+      description: Performance bugs often only appear at scale.
+      placeholder: "e.g. 60,000 entries, 120 MB guide"
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs, screenshots or recordings
+      description: Redact first.

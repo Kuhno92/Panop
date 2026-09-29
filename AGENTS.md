@@ -74,6 +74,13 @@ Scripts/check-portability.sh
 
 # App build, all three platforms
 Scripts/build-all-platforms.sh
+
+# Parallel work: a worktree wired for hooks, submodules and a private DerivedData
+Scripts/worktree.sh add feat/epg-parser
+Scripts/worktree.sh remove feat/epg-parser
+
+# Reclaim disk from build caches. Dry run by default; keeps the hook tooling
+Scripts/clean-caches.sh [--apply]
 ```
 
 No tvOS simulator runtime is installed on this machine, so the tvOS step in

@@ -1,0 +1,39 @@
+name: Feature request
+description: Suggest something Panop should do.
+title: "feat: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please open an issue before writing code for anything larger than a small fix, so
+        the approach can be agreed first. Panop is a player only: requests to bundle or
+        link to content will be closed.
+  - type: textarea
+    id: problem
+    attributes:
+      label: The problem
+      description: What are you trying to do that Panop makes hard or impossible?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What you would like
+      description: Include how it should behave on tvOS with a remote, if that differs.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives you considered
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platforms it matters on
+      multiple: true
+      options:
+        - iOS
+        - iPadOS
+        - macOS
+        - tvOS
