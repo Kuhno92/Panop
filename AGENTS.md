@@ -21,6 +21,10 @@ command works because it is documented below.
 - [ ] Engines: AVPlayer, then VLCKit, then LumeEngine (KSPlayer stays unlinked)
 - [ ] Playlist import wired to the catalog container
 
+`docs/ROADMAP.md` is the full feature list, ordered into milestones and traced back to the
+original requirements. **Check it before starting work**, and tick items there as they land.
+It exists so that features raised once in conversation are not lost between sessions.
+
 ### iOS and tvOS cannot be built on this machine yet
 
 `xcodebuild -showdestinations` offers **macOS only**. The iOS 26.5 and tvOS 26.5 platform

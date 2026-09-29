@@ -99,17 +99,23 @@ Full detail in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), with decisions reco
 
 ## Roadmap
 
-- [x] Repo scaffolding, docs, vendored tooling
-- [ ] `PanopKit`: M3U parser and Xtream client with tests
-- [ ] App target building on iOS, tvOS, and macOS
-- [ ] Catalog browsing backed by SwiftData
-- [ ] Playback: AVPlayer, then VLCKit, then LumeEngine
-- [ ] EPG and TV guide
-- [ ] CloudKit sync for favourites and watch progress
+| Milestone | What it delivers | State |
+|---|---|---|
+| M0 | Foundations: core package, Xcode project, tooling | Done |
+| M1 | Xtream client, EPG parser, catalog import | Next |
+| M2 | Browse and play, all three engines | Planned |
+| M3 | Streaming performance and fast channel zapping | Planned |
+| M4 | The interface pass | Planned |
+| M5 | CloudKit sync | Planned |
+| M6 | EPG guide, catch-up, profiles, parental controls | Planned |
+| M7 | Release readiness | Planned |
+
+Full detail, including requirements traceability and open decisions, is in
+[docs/ROADMAP.md](docs/ROADMAP.md).
 
 Not planned for v1: VPN integration (see
-[ADR 0006](docs/adr/0006-no-vpn-in-v1.md) for why auto-enabling a VPN is not possible on Apple
-platforms), and non-Apple UIs.
+[ADR 0006](docs/adr/0006-no-vpn-in-v1.md) for why auto-enabling a third-party VPN is not
+possible on Apple platforms), and non-Apple UIs.
 
 ---
 
