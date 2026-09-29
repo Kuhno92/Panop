@@ -2,12 +2,17 @@
 
 Panop is a native IPTV player for Apple platforms. It connects to a user's own Xtream Codes
 provider or M3U playlist, indexes the catalog locally for instant browsing, and plays streams
-through one of four interchangeable playback engines.
+through one of three interchangeable playback engines.
 
 Panop ships no content. Users bring their own provider credentials.
 
 **Status:** in development. This document describes the target architecture and the reasoning
 behind it. `docs/adr/` records individual decisions; where the two disagree, the ADRs win.
+The final section records what actually exists today.
+
+This file is the source of truth. A shareable web version is published at
+<https://claude.ai/code/artifact/4d498ded-c71c-4e45-bc29-84f306decb61>; when the two disagree,
+this one wins.
 
 ---
 
@@ -37,7 +42,7 @@ decision below follows from that.
 │  Panop/ (Xcode app target)          Apple-only               │
 │                                                              │
 │  Views/          SwiftUI, platform-adaptive                  │
-│  Views/Player/   Four engine adapters + shared overlay       │
+│  Views/Player/   Engine adapters + shared overlay            │
 │  Models/         SwiftData @Model types, two ModelContainers │
 │  Services/       Sync orchestration, image pipeline          │
 └───────────────────────────┬──────────────────────────────────┘
@@ -154,19 +159,23 @@ real streams, which is why a single-engine design does not survive contact with 
 `PanopPlayback` defines the `PlaybackEngine` protocol, the event and error types, and
 `PlaybackEngineKind` that drives the Settings picker. It contains **no view type and no
 AVFoundation import**, which is what keeps it portable. Video presentation is a separate
-app-target concern, and the four adapters live in `Panop/Views/Player/`.
+app-target concern, and the adapters live in `Panop/Views/Player/`.
+
+`PlaybackEngineKind.available` excludes any engine that is not linked, so a menu or fallback
+order built from it can never offer something that cannot play. Prefer it over `allCases`.
 
 Reconnect policy, backoff, and engine fallback live in the shared coordinator above the
-adapters, never inside one. Four engines report failure four different ways; duplicating
-policy across them guarantees drift.
+adapters, never inside one. Each engine reports failure differently; duplicating policy across
+them guarantees drift. An adapter that retries on its own also hides the failure from the
+coordinator, which then cannot fall back.
 
 ### The FFmpeg coexistence problem
 
-Three of the four engines each bundle their own FFmpeg. They coexist through packaging, not
-linker flags, and the mechanism differs per engine. This is subtle enough to have its own
-document: see `docs/engines.md`. The short version is that **LumeEngine must be vendored as a
-git submodule and referenced as a path dependency**, because consuming it by URL silently
-disables the library-evolution flag that isolates its FFmpeg symbols.
+The non-Apple engines each bundle their own FFmpeg. They coexist through packaging, not linker
+flags, and the mechanism differs per engine. This is subtle enough to have its own document:
+see `docs/engines.md`. The short version is that **LumeEngine is vendored as a git submodule
+and referenced as a path dependency**, because consuming it by URL silently disables the
+library-evolution flag that isolates its FFmpeg symbols.
 
 ---
 
@@ -182,7 +191,32 @@ well-defined enough to migrate later.
 
 ---
 
-## 7. Deliberately out of scope for v1
+## 7. Licensing shaped the build
+
+Panop is MIT and written clean-room. Licensing is not a footnote here, because it has already
+changed two decisions.
+
+**KSPlayer was dropped from the shipped build.** It is GPL-3.0 by default, with LGPL sold
+separately as a commercial license. Linking it would force the combined work to be GPL-3.0
+rather than MIT, and would forfeit App Store distribution, because GPLv3's terms conflict with
+the App Store's in a way only a copyright holder can resolve. The adapter is kept in source
+behind `PANOP_ENABLE_KSPLAYER`, with the dependency deliberately absent, so the option survives
+at near-zero cost if an LGPL license is bought later.
+
+**VLCKit is LGPL and must stay dynamically linked.** That is a standing constraint, not a
+one-off check.
+
+`reference/` holds third-party clones for occasional design reference. It is gitignored and
+contributes no code. One of them is AGPL-3.0: reading it to understand an approach is fine,
+reproducing its expression would make Panop undistributable.
+
+The practical rule: check a dependency's license before adding it, and record it in
+`THIRD-PARTY-NOTICES.md` in the same commit. See `docs/adr/0001-clean-room-mit.md` and
+`docs/adr/0002-four-playback-engines.md`.
+
+---
+
+## 8. Deliberately out of scope for v1
 
 - **VPN integration.** Auto-enabling a VPN on launch is not possible on Apple platforms for any
   tunnel the app does not itself provide, and shipping one requires a Network Extension, an
@@ -193,20 +227,52 @@ well-defined enough to migrate later.
 
 ---
 
-## 8. Repository layout
+## 9. Repository layout
 
 ```
 AGENTS.md              Agent and contributor guide. CLAUDE.md symlinks to it.
 Package.swift          Vendors SwiftLint/SwiftFormat/lefthook. Builds nothing.
 Packages/PanopKit/     The portable core.
-vendor/LumeEngine/     Git submodule, path dependency.
-reference/             Gitignored third-party clones, design reference only.
 Panop/                 App target sources. A synchronized Xcode group.
-Scripts/               setup.sh, build-all-platforms.sh, engine framework fixups.
+Panop.xcodeproj/       Hand-authored, ~330 lines.
+Scripts/               setup.sh, build-all-platforms.sh, check-portability.sh
 docs/adr/              Decision records.
+reference/             Gitignored third-party clones, design reference only.
+vendor/LumeEngine/     Planned: git submodule, path dependency.
 ```
 
 The Xcode project uses file-system-synchronized groups, so adding a source file means writing
 it to disk. There is no project file to edit and no `.pbxproj` merge conflict to resolve. This
 is a meaningful ergonomic win for both humans and coding agents, and it is why the project file
-stays small enough to review in a diff.
+stays small enough to review in a diff. See `docs/adr/0005-xcode-synchronized-groups.md`.
+
+Developer tooling is vendored through the root `Package.swift` as SwiftPM plugins, so a clone
+needs only Xcode's toolchain: no Homebrew, no Mint, no global installs, and every machine and
+CI runner gets the versions pinned in `Package.resolved`. `Scripts/setup.sh` is the one
+post-clone command.
+
+---
+
+## 10. Status
+
+| Stage | State |
+|---|---|
+| Repo scaffolding, docs, vendored tooling | Done |
+| `PanopKit`: PanopCore, PanopPlaylist, PanopPlayback | Done, 24 tests passing |
+| Xcode project and app target | Builds and launches on **macOS only** so far |
+| `PanopXtream`, `PanopEPG`, `PanopCatalog` | Planned |
+| Engines: AVPlayer, then VLCKit, then LumeEngine | Planned |
+| Playlist import wired to the catalog container | Planned |
+
+Two verification gaps worth knowing about, both environmental rather than design problems:
+
+- **iOS and tvOS are unbuilt.** The 26.5 platform components are not installed, so
+  `xcodebuild` offers macOS only. Fix with `xcodebuild -downloadPlatform iOS` and
+  `-downloadPlatform tvOS`, each a multi-GB download.
+- **The Linux portability check has not run locally.** It needs Docker. The SwiftLint custom
+  rule covers the common case (an Apple-only import) but not a Foundation API that is missing
+  off-Apple. The CI job covers it properly.
+
+CloudKit mirroring is currently disabled in `PanopContainers`. Turning it on needs a Developer
+Program team and a real iCloud container identifier; without those the app fails to launch
+rather than degrading, so the switch belongs in the same change that adds the entitlement.

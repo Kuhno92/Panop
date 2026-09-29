@@ -112,7 +112,7 @@ Packages/PanopKit/     PORTABLE core. Foundation only. No Apple-only frameworks.
 Panop/                 Apple app target. SwiftUI + SwiftData.
 ├── Models/            @Model types, the two ModelContainers, SwiftDataCatalogStore
 ├── Services/          Sync orchestration, image pipeline
-└── Views/Player/      The four engine adapters live here, not in PanopKit
+└── Views/Player/      The engine adapters live here, not in PanopKit
 ```
 
 `docs/ARCHITECTURE.md` is authoritative for design questions, and `docs/adr/` records why each
@@ -171,9 +171,10 @@ churn. On tvOS that is enough to freeze the UI. See `docs/adr/0003-two-model-con
 Reconnect policy, backoff, and engine fallback belong in the shared player coordinator, one
 level above the adapters.
 
-**Why:** each of the four engines reports failure differently, and duplicating policy four ways
-guarantees they drift. LumeEngine in particular is explicit that it never retries on its own
-schedule.
+**Why:** each engine reports failure differently, and duplicating policy across them guarantees
+they drift. An adapter that retries on its own also hides the failure from the coordinator,
+which then cannot fall back. LumeEngine in particular is explicit that it never retries on its
+own schedule.
 
 ---
 

@@ -1,12 +1,13 @@
 # Playback engines and the FFmpeg coexistence problem
 
-Panop links four playback engines. Three of them carry their own copy of FFmpeg. Getting them
-into one binary is the single most fragile part of the build, and the failure modes are
-obscure, so this document exists to save the next person a day.
+Panop ships three playback engines and carries a fourth adapter that is not linked. Two of the
+shipped engines bring their own copy of FFmpeg. Getting them into one binary is the single most
+fragile part of the build, and the failure modes are obscure, so this document exists to save
+the next person a day.
 
 ---
 
-## Why four engines
+## Why several engines
 
 IPTV is not just HLS. Providers serve:
 

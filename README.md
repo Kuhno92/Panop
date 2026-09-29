@@ -12,7 +12,7 @@ for instant browsing, and plays streams through one of four interchangeable play
 
 ---
 
-## Why four playback engines
+## Why several playback engines
 
 IPTV is not just HLS. Providers serve raw MPEG-TS over HTTP, MKV VOD, HEVC nearly everywhere,
 and occasionally RTSP. AVPlayer cannot play raw MPEG-TS at all, so any single-engine player
@@ -77,7 +77,7 @@ Packages/PanopKit/     Portable core. Foundation only, no Apple-only frameworks.
 
 Panop/                 Apple app target. SwiftUI + SwiftData.
   Models/              @Model types and the two ModelContainers
-  Views/Player/        The four engine adapters
+  Views/Player/        The engine adapters
 ```
 
 Two things are worth knowing up front:

@@ -22,7 +22,7 @@ A fourth adapter for **KSPlayer** exists in source but its dependency is not lin
 amendment below.
 
 `PanopPlayback` in the portable core defines the `PlaybackEngine` protocol, the event and error
-types, and `PlaybackEngineKind`. The four adapters live in the app target under
+types, and `PlaybackEngineKind`. The adapters live in the app target under
 `Panop/Views/Player/`, because they touch AVFoundation and UIKit/AppKit and the core must not.
 
 Reconnect policy, backoff, and fallback ordering live in a coordinator above the adapters,
@@ -30,7 +30,7 @@ never inside one.
 
 ## Consequences
 
-Significant integration cost, and three of the four engines bundle their own FFmpeg, which is
+Significant integration cost, and the non-Apple engines each bundle their own FFmpeg, which is
 the most fragile part of the build. That problem and its resolution are documented separately
 in `docs/engines.md`.
 
