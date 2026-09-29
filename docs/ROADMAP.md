@@ -57,8 +57,17 @@ Getting a real provider's content into the app. Nothing else can be tested until
       slows the download. A truncated body throws `truncatedResponse`; the reconciler must
       treat that as a failed import and never prune against it. Not yet verified: the
       `URLSessionTransport` against a real panel, and the off-Apple transport branch (CI only).
-- [ ] **`PanopEPG`** *(surfaced)*. XMLTV pull parser emitting batches, gzip support, and a
+- [x] **`PanopEPG`** *(surfaced)*. XMLTV pull parser emitting batches, gzip support, and a
       rolling window rather than the whole guide. Guides exceed 100 MB.
+      Own chunk-fed tokenizer rather than `XMLParser` (push-only, so no backpressure, and a
+      separate module off-Apple). `GzipDecoder` lives in `PanopCore`, verified against zlib
+      output at 1-byte chunks, and checks each member's CRC. A guide that never reaches
+      `</tv>` throws `truncated`, same rule as Xtream: never prune against it.
+      Measured in an optimized build: gzip decodes at ~165 MB/s. XMLTV parse speed is still to
+      be measured properly; a first run gave 40-50 MB/s on a badly generated guide, which is
+      not representative. **Follow-up:** benchmark on a realistic guide and cut per-tag
+      allocations if it is the bottleneck. Not yet verified: the whole guide reader against a
+      real provider, and the off-Apple branch (CI only).
 - [ ] **`PanopCatalog`** *(surfaced)*. Import and reconcile orchestration behind `CatalogStore`,
       so Android can reuse it later.
 - [ ] **`SwiftDataCatalogStore`** in the app target, implementing that protocol.

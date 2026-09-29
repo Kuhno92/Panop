@@ -22,17 +22,20 @@ let package = Package(
         .library(name: "PanopCore", targets: ["PanopCore"]),
         .library(name: "PanopPlaylist", targets: ["PanopPlaylist"]),
         .library(name: "PanopXtream", targets: ["PanopXtream"]),
+        .library(name: "PanopEPG", targets: ["PanopEPG"]),
         .library(name: "PanopPlayback", targets: ["PanopPlayback"])
     ],
     targets: [
         .target(name: "PanopCore"),
         .target(name: "PanopPlaylist", dependencies: ["PanopCore"]),
         .target(name: "PanopXtream", dependencies: ["PanopCore"]),
+        .target(name: "PanopEPG", dependencies: ["PanopCore"]),
         .target(name: "PanopPlayback", dependencies: ["PanopCore"]),
 
         .testTarget(name: "PanopCoreTests", dependencies: ["PanopCore"]),
         .testTarget(name: "PanopPlaylistTests", dependencies: ["PanopPlaylist"]),
         .testTarget(name: "PanopXtreamTests", dependencies: ["PanopXtream", "PanopCore"]),
+        .testTarget(name: "PanopEPGTests", dependencies: ["PanopEPG", "PanopCore"]),
         .testTarget(name: "PanopPlaybackTests", dependencies: ["PanopPlayback"])
     ],
     swiftLanguageModes: [.v6]
