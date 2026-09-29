@@ -63,11 +63,11 @@ Getting a real provider's content into the app. Nothing else can be tested until
       separate module off-Apple). `GzipDecoder` lives in `PanopCore`, verified against zlib
       output at 1-byte chunks, and checks each member's CRC. A guide that never reaches
       `</tv>` throws `truncated`, same rule as Xtream: never prune against it.
-      Measured in an optimized build: gzip decodes at ~165 MB/s. XMLTV parse speed is still to
-      be measured properly; a first run gave 40-50 MB/s on a badly generated guide, which is
-      not representative. **Follow-up:** benchmark on a realistic guide and cut per-tag
-      allocations if it is the bottleneck. Not yet verified: the whole guide reader against a
-      real provider, and the off-Apple branch (CI only).
+      Measured in an optimized build on a generated 311 MB / 600,000-programme guide: XMLTV
+      parses at ~80 MB/s (~155k programmes/s, so ~1.3 s for a typical 100 MB guide) and gzip
+      decodes at ~165 MB/s. Profiling found two cheap wins (ASCII fast path for string
+      conversion, no grapheme walk in the length cap), worth 1.7x. Not yet verified: the
+      whole guide reader against a real provider, and the off-Apple branch (CI only).
 - [ ] **`PanopCatalog`** *(surfaced)*. Import and reconcile orchestration behind `CatalogStore`,
       so Android can reuse it later.
 - [ ] **`SwiftDataCatalogStore`** in the app target, implementing that protocol.

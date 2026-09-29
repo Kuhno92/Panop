@@ -303,6 +303,13 @@ struct XMLTokenizer {
     /// declared `ISO-8859-1` encoding is common). Latin-1 maps every byte to
     /// a scalar, so this never fails and never drops text.
     static func utf8String(_ bytes: ArraySlice<UInt8>) -> String {
+        // Nearly all guide text is ASCII, which is always valid UTF-8. Skipping
+        // validation for it avoids the generic `String(validating:)` path, which
+        // profiled at a fifth of the whole parse.
+        if bytes.allSatisfy({ $0 < 0x80 }) {
+            // swiftlint:disable:next optional_data_string_conversion
+            return String(decoding: bytes, as: UTF8.self)
+        }
         if let text = String(validating: bytes, as: UTF8.self) {
             return text
         }

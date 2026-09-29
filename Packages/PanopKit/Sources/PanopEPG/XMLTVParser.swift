@@ -87,7 +87,11 @@ public struct XMLTVParser {
             // One event can carry the whole field, so cut it here. Characters
             // are at least a byte each, so the byte cap is never exceeded.
             let room = Self.maxTextLength - text.utf8.count
-            if room > 0 {
+            // `prefix` walks grapheme clusters, so only pay for it on the rare
+            // over-long field.
+            if value.utf8.count <= room {
+                text += value
+            } else if room > 0 {
                 text += value.prefix(room)
             }
         }
