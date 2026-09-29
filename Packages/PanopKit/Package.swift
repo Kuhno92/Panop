@@ -29,7 +29,8 @@ let package = Package(
         .target(name: "PanopPlayback", dependencies: ["PanopCore"]),
 
         .testTarget(name: "PanopCoreTests", dependencies: ["PanopCore"]),
-        .testTarget(name: "PanopPlaylistTests", dependencies: ["PanopPlaylist"])
+        .testTarget(name: "PanopPlaylistTests", dependencies: ["PanopPlaylist"]),
+        .testTarget(name: "PanopPlaybackTests", dependencies: ["PanopPlayback"])
     ],
     swiftLanguageModes: [.v6]
 )

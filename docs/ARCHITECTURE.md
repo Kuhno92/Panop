@@ -258,17 +258,16 @@ post-clone command.
 | Stage | State |
 |---|---|
 | Repo scaffolding, docs, vendored tooling | Done |
-| `PanopKit`: PanopCore, PanopPlaylist, PanopPlayback | Done, 24 tests passing |
-| Xcode project and app target | Builds and launches on **macOS only** so far |
+| `PanopKit`: PanopCore, PanopPlaylist, PanopPlayback | Done, 31 tests passing |
+| Xcode project and app target | Builds and launches on **macOS and iOS** |
 | `PanopXtream`, `PanopEPG`, `PanopCatalog` | Planned |
 | Engines: AVPlayer, then VLCKit, then LumeEngine | Planned |
 | Playlist import wired to the catalog container | Planned |
 
 Two verification gaps worth knowing about, both environmental rather than design problems:
 
-- **iOS and tvOS are unbuilt.** The 26.5 platform components are not installed, so
-  `xcodebuild` offers macOS only. Fix with `xcodebuild -downloadPlatform iOS` and
-  `-downloadPlatform tvOS`, each a multi-GB download.
+- **tvOS is unbuilt.** Its platform component is not installed yet
+  (`xcodebuild -downloadPlatform tvOS`). iOS was installed and verified on 2026-09-29.
 - **The Linux portability check has not run locally.** It needs Docker. The SwiftLint custom
   rule covers the common case (an Apple-only import) but not a Foundation API that is missing
   off-Apple. The CI job covers it properly.

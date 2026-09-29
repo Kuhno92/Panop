@@ -18,7 +18,7 @@ The original brief, and where each requirement is satisfied.
 
 | # | Requirement | Status | Where |
 |---|---|---|---|
-| 1 | iOS, iPadOS, tvOS, macOS | Partly done | M0. One adaptive target exists; only macOS is verified |
+| 1 | iOS, iPadOS, tvOS, macOS | Partly done | M0. Verified on macOS and iOS; tvOS not yet built |
 | 1b | Android, Windows, Linux | Deferred by design | Core kept portable (ADR 0007). No UI planned |
 | 2 | Very modern UI | Not started | M4 |
 | 3 | Snappy interface | Ongoing constraint | M1, M6. Streaming parser already done |
@@ -26,7 +26,7 @@ The original brief, and where each requirement is satisfied.
 | 5 | Settings sync across devices | Not started | M5. CloudKit, currently disabled |
 | 6 | VPN auto-enable on launch | **Cut from v1** | Not achievable as described. ADR 0006 |
 | 7 | Live TV and VOD | Not started | M2 |
-| 8 | M3U support | Done | M0. `PanopPlaylist`, 24 tests |
+| 8 | M3U support | Done | M0. `PanopPlaylist`, tested at 8 chunk sizes |
 | 8b | Xtream Codes API | Not started | M1 |
 
 ---
@@ -39,7 +39,7 @@ The original brief, and where each requirement is satisfied.
 - [x] Agent guide, architecture doc, seven ADRs, contributor guide
 - [x] Vendored SwiftLint, SwiftFormat, lefthook. No Homebrew needed
 - [x] `PanopCore`, `PanopPlaylist` (streaming M3U parser), `PanopPlayback` (engine protocol)
-- [x] 24 tests running in 0.002s with no simulator
+- [x] 31 tests running in 0.003s with no simulator
 - [x] Xcode project with synchronized groups (ADR 0005)
 - [x] Both SwiftData containers wired (ADR 0003)
 - [x] Linux CI job and portability script (ADR 0007)

@@ -16,7 +16,7 @@ command works because it is documented below.
 
 - [x] Repo skeleton, docs, lint tooling, ADRs
 - [x] `Packages/PanopKit`: PanopCore, PanopPlaylist, PanopPlayback (24 tests passing)
-- [x] `Panop.xcodeproj` and the app target (**builds and launches on macOS only so far**)
+- [x] `Panop.xcodeproj` and the app target (builds and launches on **macOS and iOS**)
 - [ ] PanopXtream, PanopEPG, PanopCatalog
 - [ ] Engines: AVPlayer, then VLCKit, then LumeEngine (KSPlayer stays unlinked)
 - [ ] Playlist import wired to the catalog container
@@ -25,22 +25,26 @@ command works because it is documented below.
 original requirements. **Check it before starting work**, and tick items there as they land.
 It exists so that features raised once in conversation are not lost between sessions.
 
-### iOS and tvOS cannot be built on this machine yet
+### Platform components and disk
 
-`xcodebuild -showdestinations` offers **macOS only**. The iOS 26.5 and tvOS 26.5 platform
-components are not installed, so any iOS or tvOS destination fails with "platform is not
-installed" before compiling anything. The iOS 26.2 simulator runtime being present is not
-enough; the platform itself is missing.
-
-Fix it once, then the destinations appear (each is a multi-GB download):
+iOS 26.5 is installed and verified. **tvOS is not yet**, so a tvOS destination still fails with
+"platform is not installed" before compiling anything. That is an environment gap, never a
+project fault. Install it once:
 
 ```bash
-xcodebuild -downloadPlatform iOS
-xcodebuild -downloadPlatform tvOS
+xcodebuild -downloadPlatform tvOS     # ~8 GB, and it needs room to expand
 ```
 
-Until that is done, a macOS build is the only real verification available. Do not interpret an
-iOS destination error as a project problem.
+Simulator runtimes are large. Before downloading a platform, check free space and drop runtimes
+older than the deployment target, since a runtime below iOS 18 cannot run Panop at all:
+
+```bash
+xcrun simctl runtime list                 # sizes and identifiers
+xcrun simctl runtime delete <identifier>  # proper removal; never rm -rf these
+```
+
+`~/Library/Developer/Xcode/iOS DeviceSupport` is also safe to delete and regenerates the next
+time a physical device is connected.
 
 ---
 
