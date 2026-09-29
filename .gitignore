@@ -1,0 +1,46 @@
+# Third-party clones kept purely for occasional design reference.
+# Never part of Panop's build graph, and never a source of copied code:
+# Lume is AGPL-3.0 and Panop is MIT.
+reference/
+
+# macOS
+.DS_Store
+
+# Xcode
+build/
+DerivedData/
+*.xcuserstate
+*.xcscmblueprint
+*.xccheckout
+xcuserdata/
+*.moved-aside
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# Xcode project files that are per-user, not per-project
+*.xcodeproj/project.xcworkspace/xcuserdata/
+*.xcodeproj/xcuserdata/
+*.xcworkspace/xcuserdata/
+*.xcodeproj/project.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist
+*.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/configuration/
+
+# Swift Package Manager
+.build/
+.swiftpm/
+Packages/*/.build/
+Package.resolved.bak
+
+# Secrets. Features degrade gracefully when absent; see .env.example
+.env
+
+# Generated test fixtures. Large playlists and media are never committed.
+Fixtures/generated/
+Packages/PanopKit/Tests/**/Generated/
+
+# Local agent + editor config
+.claude/settings.local.json
+.vscode/
+.idea/
+lefthook-local.yml

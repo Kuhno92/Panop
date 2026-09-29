@@ -1,0 +1,43 @@
+# Pre-commit hooks. Install with Scripts/setup.sh.
+#
+# Tools resolve to .build/tools/bin, populated by setup.sh from the vendored
+# SwiftPM plugins. If a tool is missing the step is skipped rather than failing
+# the commit, so a half-set-up clone stays usable.
+#
+# parallel: false is deliberate. SwiftFormat rewrites files and SwiftLint reads
+# them, so running them concurrently lints stale contents.
+
+pre-commit:
+  parallel: false
+  jobs:
+    - name: swiftformat
+      glob: "*.swift"
+      run: |
+        if [ -x .build/tools/bin/swiftformat ]; then
+          .build/tools/bin/swiftformat {staged_files}
+        else
+          echo "swiftformat not installed, skipping (run Scripts/setup.sh)"
+        fi
+      stage_fixed: true
+
+    - name: swiftlint
+      glob: "*.swift"
+      run: |
+        if [ -x .build/tools/bin/swiftlint ]; then
+          .build/tools/bin/swiftlint lint --strict --quiet -- {staged_files}
+        else
+          echo "swiftlint not installed, skipping (run Scripts/setup.sh)"
+        fi
+
+    - name: no-large-files
+      # Media and playlist fixtures must never enter git history. Once a 100 MB
+      # xmltv guide is committed it is in the pack forever.
+      run: |
+        for f in {staged_files}; do
+          [ -f "$f" ] || continue
+          size=$(wc -c < "$f" | tr -d ' ')
+          if [ "$size" -gt 2000000 ]; then
+            echo "error: $f is ${size} bytes. Fixtures and media are generated, not committed."
+            exit 1
+          fi
+        done

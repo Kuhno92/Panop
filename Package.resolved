@@ -1,0 +1,33 @@
+{
+  "originHash" : "4f9f1eb95a13038500a0c872a8f3e1b5479872f7154f0260cf08f6ec9537cc6d",
+  "pins" : [
+    {
+      "identity" : "lefthook-plugin",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/csjones/lefthook-plugin.git",
+      "state" : {
+        "revision" : "a41b84856480ae8f3dfa4964f2cd926c3c9e573d",
+        "version" : "1.13.6"
+      }
+    },
+    {
+      "identity" : "swiftformat",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/nicklockwood/SwiftFormat.git",
+      "state" : {
+        "revision" : "0256422f1a5e967c68dc923f1905c0a155dca188",
+        "version" : "0.63.0"
+      }
+    },
+    {
+      "identity" : "swiftlintplugins",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/SimplyDanny/SwiftLintPlugins.git",
+      "state" : {
+        "revision" : "ef7d692fc6706e8f5628e26bcafaefa445c58a97",
+        "version" : "0.65.1"
+      }
+    }
+  ],
+  "version" : 3
+}

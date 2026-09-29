@@ -1,0 +1,70 @@
+included:
+  - Panop
+  - PanopTests
+  - PanopUITests
+  - Packages/PanopKit/Sources
+  - Packages/PanopKit/Tests
+
+excluded:
+  - .build
+  - reference
+  - vendor
+  - Packages/PanopKit/.build
+
+disabled_rules:
+  # SwiftFormat owns brace placement and runs first in the hook. Leaving this
+  # enabled makes the two tools revert each other's work on every commit.
+  - opening_brace
+  - todo
+
+opt_in_rules:
+  - array_init
+  - closure_spacing
+  - collection_alignment
+  - empty_count
+  - first_where
+  - last_where
+  - literal_expression_end_indentation
+  - modifier_order
+  - overridden_super_call
+  - redundant_nil_coalescing
+  - sorted_first_last
+  - toggle_bool
+  - unneeded_parentheses_in_closure_argument
+
+line_length:
+  warning: 140
+  error: 200
+  ignores_comments: true
+  ignores_urls: true
+
+file_length:
+  warning: 600
+  error: 900
+
+type_body_length:
+  warning: 400
+  error: 600
+
+function_body_length:
+  warning: 80
+  error: 150
+
+cyclomatic_complexity:
+  warning: 15
+  error: 25
+
+identifier_name:
+  excluded: [id, up, to, at, x, y, z, ok]
+
+type_name:
+  allowed_symbols: ["_"]
+
+custom_rules:
+  no_apple_framework_in_kit:
+    name: "Apple framework in PanopKit"
+    # PanopKit must compile on Linux, Windows and Android. See docs/adr/0007.
+    regex: '^\s*import\s+(UIKit|AppKit|SwiftUI|SwiftData|AVFoundation|AVKit|CoreMedia|VideoToolbox)\b'
+    included: "Packages/PanopKit/Sources/.*\\.swift"
+    message: "PanopKit is the portable core and must not import Apple-only frameworks. Put this in the app target instead."
+    severity: error
