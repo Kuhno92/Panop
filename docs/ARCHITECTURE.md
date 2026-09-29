@@ -259,15 +259,17 @@ post-clone command.
 |---|---|
 | Repo scaffolding, docs, vendored tooling | Done |
 | `PanopKit`: PanopCore, PanopPlaylist, PanopPlayback | Done, 31 tests passing |
-| Xcode project and app target | Builds and launches on **macOS and iOS** |
+| Xcode project and app target | Builds and launches on macOS, iOS and tvOS |
 | `PanopXtream`, `PanopEPG`, `PanopCatalog` | Planned |
 | Engines: AVPlayer, then VLCKit, then LumeEngine | Planned |
 | Playlist import wired to the catalog container | Planned |
 
 Two verification gaps worth knowing about, both environmental rather than design problems:
 
-- **tvOS is unbuilt.** Its platform component is not installed yet
-  (`xcodebuild -downloadPlatform tvOS`). iOS was installed and verified on 2026-09-29.
+- **The Settings screen is visually unverified.** Both simulators render the Live TV tab
+  correctly, but `simctl` has no tap command and macOS blocks synthetic keystrokes without an
+  accessibility grant, so the engine picker has only been verified by unit test. A UI test
+  target would close this.
 - **The Linux portability check has not run locally.** It needs Docker. The SwiftLint custom
   rule covers the common case (an Apple-only import) but not a Foundation API that is missing
   off-Apple. The CI job covers it properly.

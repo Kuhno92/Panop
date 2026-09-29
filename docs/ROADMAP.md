@@ -18,7 +18,7 @@ The original brief, and where each requirement is satisfied.
 
 | # | Requirement | Status | Where |
 |---|---|---|---|
-| 1 | iOS, iPadOS, tvOS, macOS | Partly done | M0. Verified on macOS and iOS; tvOS not yet built |
+| 1 | iOS, iPadOS, tvOS, macOS | Done | M0. Builds and launches on all three |
 | 1b | Android, Windows, Linux | Deferred by design | Core kept portable (ADR 0007). No UI planned |
 | 2 | Very modern UI | Not started | M4 |
 | 3 | Snappy interface | Ongoing constraint | M1, M6. Streaming parser already done |
@@ -119,6 +119,8 @@ The brief called performance a key concept. For IPTV this concentrates in one nu
 - [ ] **Image pipeline** *(surfaced)*. Thousands of channel logos need disk caching and
       downsampling, plus a memory purge on backgrounding to avoid jetsam.
 - [ ] **Empty, loading and error states** that explain what to do next.
+- [ ] **UI test target** *(surfaced)*. Needed to verify screens past the launch screen at all;
+      `simctl` has no tap command.
 
 ---
 
