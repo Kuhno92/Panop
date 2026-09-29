@@ -11,8 +11,20 @@ struct SettingsView: View {
         )
     }
 
+    @Environment(PlaylistLibrary.self) private var library
+
     var body: some View {
         Form {
+            Section {
+                NavigationLink {
+                    PlaylistsView()
+                } label: {
+                    LabeledContent("Playlists", value: library.playlists.count.formatted())
+                }
+            } header: {
+                Text("Library")
+            }
+
             Section {
                 Picker("Engine", selection: selectedEngine) {
                     // `available` rather than `allCases`: KSPlayer is GPL-3.0

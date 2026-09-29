@@ -15,11 +15,11 @@ The repo is being built up in stages. **Only check off what actually exists**; d
 command works because it is documented below.
 
 - [x] Repo skeleton, docs, lint tooling, ADRs
-- [x] `Packages/PanopKit`: PanopCore, PanopPlaylist, PanopPlayback, PanopXtream, PanopEPG, PanopCatalog (174 tests passing)
+- [x] `Packages/PanopKit`: PanopCore, PanopPlaylist, PanopPlayback, PanopXtream, PanopEPG, PanopCatalog (188 tests passing)
 - [x] `Panop.xcodeproj` and the app target (builds and launches on **macOS and iOS**)
-- [x] `SwiftDataCatalogStore` and the `PanopTests` target (22 tests, passing on macOS, iOS and tvOS)
+- [x] `SwiftDataCatalogStore` and the `PanopTests` target (43 tests, passing on macOS, iOS and tvOS)
 - [ ] Engines: AVPlayer, then VLCKit, then LumeEngine (KSPlayer stays unlinked)
-- [ ] Playlist import wired to the catalog container
+- [x] Playlist import wired to the catalog container: add by Xtream login, M3U link or M3U file, Keychain credentials, background sync. The screens launch and are covered by service-level tests, but have not been driven by hand or by UI tests yet
 
 `docs/ROADMAP.md` is the full feature list, ordered into milestones and traced back to the
 original requirements. **Check it before starting work**, and tick items there as they land.

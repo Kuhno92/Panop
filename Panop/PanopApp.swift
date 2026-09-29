@@ -6,14 +6,23 @@ import SwiftUI
 struct PanopApp: App {
     private let catalogContainer: ModelContainer
     private let cloudContainer: ModelContainer
+    private let services: AppServices
 
     init() {
         // A hosted test run launches this app first. It must not open, or worse
         // migrate, the developer's real stores.
         let underTest = ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
         do {
-            catalogContainer = try PanopContainers.makeCatalog(inMemory: underTest)
-            cloudContainer = try PanopContainers.makeCloud(inMemory: underTest)
+            let catalog = try PanopContainers.makeCatalog(inMemory: underTest)
+            let cloud = try PanopContainers.makeCloud(inMemory: underTest)
+            catalogContainer = catalog
+            cloudContainer = cloud
+            services = AppServices(
+                catalog: catalog,
+                cloud: cloud,
+                // Tests and previews must never write to the developer's real Keychain.
+                credentials: underTest ? InMemoryCredentialStore() : KeychainCredentialStore()
+            )
         } catch {
             // A container that cannot open means the store is unusable. There
             // is no sensible degraded mode, and continuing would only fail
@@ -26,6 +35,8 @@ struct PanopApp: App {
         WindowGroup {
             RootView()
                 .environment(\.cloudModelContext, ModelContext(cloudContainer))
+                .environment(services.library)
+                .environment(services.syncStatus)
         }
         .modelContainer(catalogContainer)
     }

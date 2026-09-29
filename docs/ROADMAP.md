@@ -131,10 +131,22 @@ Getting a real provider's content into the app. Nothing else can be tested until
       every old row look stale, which the removal gate then (correctly) holds back, but
       favourites would still be orphaned. Needs a decision on which query parameters to strip
       before hashing. Check real playlists before choosing.
-- [ ] **Playlist import flow**: add a playlist by URL, file, or Xtream credentials.
-- [ ] **Incremental re-import**. Skip unchanged playlists by digest rather than reparsing 80,000
+- [x] **Playlist import flow**: add a playlist by URL, file, or Xtream credentials. Xtream logins
+      are checked against the panel before anything is stored, so a typo fails at the form. The
+      playlist record (cloud container) holds only a display host; the whole source URL counts as a
+      secret because M3U links usually embed the login. `CatalogImporter.sync` imports the catalog
+      then the guide, and a broken guide never fails or undoes the catalog. Playlists refresh
+      themselves at launch when older than 12 hours. The screens launch (checked on macOS) but no
+      UI test has driven them, so the add form, the swipe/context actions and the "review missing
+      items" prompt are unexercised by a person or a test.
+- [x] **Incremental re-import**. Skip unchanged playlists by digest rather than reparsing 80,000
       entries every launch.
-- [ ] **Credential storage in Keychain**, with `kSecUseDataProtectionKeychain` for macOS parity.
+- [x] **Credential storage in Keychain**, with `kSecUseDataProtectionKeychain` for macOS parity.
+      Falls back to the file-based keychain when the entitlement is missing, as it is in every
+      locally signed dev build. Worth knowing: without the entitlement, *reads* report "not found"
+      rather than "missing entitlement", so reads and deletes must fall back on not-found too.
+      Items are `AfterFirstUnlockThisDeviceOnly`: background refresh needs them while locked, and
+      cross-device credentials belong to the CloudKit container (M5), not iCloud Keychain.
 
 > Watch out: iCloud Keychain does not sync to tvOS. Anything that must reach an Apple TV goes
 > through the CloudKit container instead.

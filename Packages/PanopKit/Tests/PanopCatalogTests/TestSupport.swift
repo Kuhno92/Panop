@@ -134,6 +134,10 @@ actor FlakyStore: CatalogStore {
         await base.removeProgrammes(endedBefore: date, playlist: playlist)
     }
 
+    func removePlaylist(_ playlist: String) async throws {
+        await base.removePlaylist(playlist)
+    }
+
     func syncState(playlist: String) async throws -> SyncState? {
         await base.syncState(playlist: playlist)
     }

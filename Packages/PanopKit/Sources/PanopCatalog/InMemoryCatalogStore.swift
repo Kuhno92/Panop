@@ -160,6 +160,16 @@ public actor InMemoryCatalogStore: CatalogStore {
         return expired.count
     }
 
+    // MARK: - Removal
+
+    public func removePlaylist(_ playlist: String) {
+        entries[playlist] = nil
+        categories[playlist] = nil
+        channels[playlist] = nil
+        programmes[playlist] = nil
+        states[playlist] = nil
+    }
+
     // MARK: - State
 
     public func syncState(playlist: String) -> SyncState? {

@@ -286,6 +286,19 @@ actor SwiftDataCatalogStore: CatalogStore, ModelActor {
         return count
     }
 
+    // MARK: - Removal
+
+    func removePlaylist(_ playlist: String) throws {
+        // No cascade exists from a playlist to its rows (the catalog has no
+        // relationships), so each table is cleared by its playlist column.
+        try modelContext.delete(model: CatalogEntryRecord.self, where: #Predicate { $0.playlist == playlist })
+        try modelContext.delete(model: CatalogCategoryRecord.self, where: #Predicate { $0.playlist == playlist })
+        try modelContext.delete(model: EPGChannelRecord.self, where: #Predicate { $0.playlist == playlist })
+        try modelContext.delete(model: EPGProgrammeRecord.self, where: #Predicate { $0.playlist == playlist })
+        try modelContext.delete(model: SyncStateRecord.self, where: #Predicate { $0.playlist == playlist })
+        try saveIfNeeded()
+    }
+
     // MARK: - State
 
     func syncState(playlist: String) throws -> SyncState? {

@@ -3,6 +3,7 @@ import SwiftUI
 
 struct RootView: View {
     @Query(RootView.liveChannels) private var channels: [CatalogEntryRecord]
+    @Environment(PlaylistLibrary.self) private var library
 
     /// Placeholder until the browse screens. It is bounded and unsorted on
     /// purpose: a sort with no index behind it would defeat the limit and read
@@ -28,20 +29,36 @@ struct RootView: View {
                 }
             }
         }
+        // Playlists the user added keep themselves current without being asked.
+        // The work runs on the sync service's actor, not here.
+        .task { await library.refreshStale(maxAge: 12 * 3600) }
     }
 }
 
 struct ChannelListView: View {
     let channels: [CatalogEntryRecord]
 
+    @Environment(SyncStatusCenter.self) private var status
+    @State private var showingAdd = false
+
     var body: some View {
         Group {
             if channels.isEmpty {
-                ContentUnavailableView(
-                    "No playlist yet",
-                    systemImage: "antenna.radiowaves.left.and.right",
-                    description: Text("Add an M3U playlist or Xtream provider to get started.")
-                )
+                if status.isAnySyncing {
+                    ContentUnavailableView {
+                        ProgressView()
+                    } description: {
+                        Text("Getting your channels…")
+                    }
+                } else {
+                    ContentUnavailableView {
+                        Label("No playlist yet", systemImage: "antenna.radiowaves.left.and.right")
+                    } description: {
+                        Text("Add an M3U playlist or Xtream provider to get started.")
+                    } actions: {
+                        Button("Add playlist") { showingAdd = true }
+                    }
+                }
             } else {
                 List(channels) { channel in
                     LabeledContent(channel.name) {
@@ -52,10 +69,16 @@ struct ChannelListView: View {
             }
         }
         .navigationTitle("Live TV")
+        .sheet(isPresented: $showingAdd) {
+            NavigationStack { AddPlaylistView() }
+        }
     }
 }
 
 #Preview {
+    let services = AppServices.preview()
     RootView()
-        .modelContainer(for: CatalogEntryRecord.self, inMemory: true)
+        .modelContainer(services.catalogContainer)
+        .environment(services.library)
+        .environment(services.syncStatus)
 }

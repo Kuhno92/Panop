@@ -104,6 +104,18 @@ public struct XtreamClient: Sendable {
         }
     }
 
+    // MARK: - Guide
+
+    /// The panel's XMLTV guide. The credentials are in the query string, so
+    /// treat the URL as a secret: never log it or put it in an error.
+    public func guideURL() -> URL? {
+        let query = ["username": credentials.username, "password": credentials.password]
+            .sorted { $0.key < $1.key }
+            .map { "\(Self.encodeQuery($0.key))=\(Self.encodeQuery($0.value))" }
+            .joined(separator: "&")
+        return URL(string: root.absoluteString + "/xmltv.php?" + query)
+    }
+
     // MARK: - Stream URLs
 
     public enum LiveFormat: String, Sendable {

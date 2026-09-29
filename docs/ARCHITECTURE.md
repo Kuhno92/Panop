@@ -265,7 +265,7 @@ post-clone command.
 | Xcode project and app target | Builds and launches on macOS, iOS and tvOS |
 | Engines: AVPlayer, then VLCKit, then LumeEngine | Planned |
 | `SwiftDataCatalogStore`, `PanopTests` target | Done, 22 tests passing on macOS, iOS and tvOS |
-| Playlist import wired to the catalog container (UI, credentials) | Planned |
+| Playlist import flow: add, Keychain credentials, background sync, playlists screen | Done at the service level (43 app tests); screens launch but are not yet driven by UI tests |
 
 Two verification gaps worth knowing about, both environmental rather than design problems:
 

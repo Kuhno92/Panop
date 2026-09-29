@@ -53,5 +53,5 @@ nonisolated enum PanopContainers {
         EPGProgrammeRecord.self,
         SyncStateRecord.self
     ])
-    static let cloudSchema = Schema([UserContentState.self])
+    static let cloudSchema = Schema([UserContentState.self, PlaylistRecord.self])
 }

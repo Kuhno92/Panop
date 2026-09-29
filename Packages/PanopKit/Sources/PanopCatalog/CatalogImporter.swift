@@ -75,7 +75,10 @@ public struct CatalogImporter: Sendable {
 
         var state = try await store.syncState(playlist: playlist) ?? SyncState()
         if !force, state.digest == file.digest {
-            return ImportReport(outcome: .unchanged)
+            // Nothing to import, but the guide is refreshed independently and
+            // still needs the URLs the header advertises.
+            let header = try? M3UFileReader.readHeader(contentsOfFile: file.path)
+            return ImportReport(outcome: .unchanged, epgURLs: header?.epgURLs ?? [])
         }
         state.importCounter += 1
         try await store.saveSyncState(state, playlist: playlist)

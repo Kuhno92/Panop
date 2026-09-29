@@ -79,3 +79,75 @@ func playlistText(live: Range<Int>, movies: Range<Int> = 0 ..< 0, group: String 
     }
     return lines.joined(separator: "\n") + "\n"
 }
+
+// MARK: - App services
+
+/// An Xtream panel that answers the given lists.
+struct FakePanel {
+    var live = 3
+    var movies = 2
+    var series = 0
+    var loginBody = #"{"user_info":{"auth":1,"status":"Active"}}"#
+    var guideBody: String?
+    var unreachable = false
+
+    func transport() -> StubTransport {
+        let panel = self
+        return StubTransport { request in
+            if panel.unreachable {
+                throw URLError(.notConnectedToInternet)
+            }
+            if request.url.path.hasSuffix("xmltv.php") {
+                return panel.guideBody.map { (200, $0) } ?? (404, "")
+            }
+            switch URLComponents(url: request.url, resolvingAgainstBaseURL: false)?
+                .queryItems?.first(where: { $0.name == "action" })?.value
+            {
+            case nil: return (200, panel.loginBody)
+            case "get_live_streams": return (200, panel.list(panel.live, id: "stream_id", name: "Live"))
+            case "get_vod_streams": return (200, panel.list(panel.movies, id: "stream_id", name: "Movie"))
+            case "get_series": return (200, panel.list(panel.series, id: "series_id", name: "Show"))
+            default: return (200, "[]")
+            }
+        }
+    }
+
+    private func list(_ count: Int, id: String, name: String) -> String {
+        "[" + (0 ..< count).map { #"{"\#(id)":\#($0),"name":"\#(name) \#($0)"}"# }.joined(separator: ",") + "]"
+    }
+}
+
+/// The whole service graph over an on-disk catalog and an in-memory cloud
+/// container, with credentials that never touch the real Keychain.
+@MainActor
+struct TestApp {
+    let services: AppServices
+    let catalog: OnDiskCatalog
+    let cloud: ModelContainer
+    let credentials: InMemoryCredentialStore
+    let directory: URL
+
+    init(transport: any HTTPTransport, credentials: InMemoryCredentialStore = InMemoryCredentialStore()) throws {
+        catalog = try OnDiskCatalog()
+        cloud = try PanopContainers.makeCloud(inMemory: true)
+        self.credentials = credentials
+        directory = catalog.directory.appendingPathComponent("Playlists")
+        services = AppServices(
+            catalog: catalog.container,
+            cloud: cloud,
+            credentials: credentials,
+            transport: transport,
+            playlistsDirectory: directory
+        )
+    }
+
+    /// The persisted playlist records, read through a context of their own, so
+    /// tests see what was actually stored rather than what the library reports.
+    func storedRecords() throws -> [PlaylistRecord] {
+        try ModelContext(cloud).fetch(FetchDescriptor<PlaylistRecord>())
+    }
+
+    func cleanUp() {
+        catalog.cleanUp()
+    }
+}

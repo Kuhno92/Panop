@@ -138,6 +138,9 @@ public enum CatalogError: Error, Equatable, Sendable {
     /// The download failed. Credentials are scrubbed from the message.
     case download(message: String)
     case cannotReadFile
+    /// The playlist's source is not something that can be fetched, such as a
+    /// malformed URL.
+    case invalidSource
     /// Every section of an Xtream import failed, so there is nothing to keep.
     case everySectionFailed(firstFailure: String)
     /// The confirmation refers to an import that is no longer the latest.

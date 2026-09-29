@@ -66,6 +66,15 @@ public protocol CatalogStore: Sendable {
     /// `endingAfter` above, so no row is ever in neither set.
     func removeProgrammes(endedBefore date: Date, playlist: String) async throws -> Int
 
+    // MARK: - Removal
+
+    /// Deletes everything stored for a playlist: entries, categories, guide
+    /// channels, programmes and sync state.
+    ///
+    /// There is no cascade from a playlist to its content (the catalog has no
+    /// relationships, see ADR 0003), so deleting a playlist means calling this.
+    func removePlaylist(_ playlist: String) async throws
+
     // MARK: - State
 
     func syncState(playlist: String) async throws -> SyncState?
