@@ -263,7 +263,162 @@ struct PlaylistLibraryTests {
         #expect(try #require(finishedAt(app, playlist.id)) > firstFinish)
     }
 
+    // MARK: - Refreshing, stopping and deleting
+
+    /// A refresh that cannot run must say so. Doing nothing looks like a broken button.
+    @Test
+    func `refreshing a playlist whose login is missing says so on its row`() async throws {
+        let app = try TestApp(transport: FakePanel().transport())
+        defer { app.cleanUp() }
+        let playlist = try await app.services.library.add(.xtream(
+            name: "",
+            baseURL: panel,
+            username: "a",
+            password: "b"
+        ))
+        await app.services.sync.waitForCompletion(playlist.id)
+        try app.credentials.delete(for: playlist.id)
+
+        await app.services.library.refresh(playlist.id)
+
+        guard case let .failed(message) = app.services.syncStatus.status(for: playlist.id) else {
+            Issue.record("expected a failed status, got \(app.services.syncStatus.status(for: playlist.id))")
+            return
+        }
+        #expect(message.contains("login details are missing"))
+    }
+
+    @Test
+    func `refresh all updates every playlist`() async throws {
+        let app = try TestApp(transport: FakePanel(live: 3).transport())
+        defer { app.cleanUp() }
+        var ids: [String] = []
+        for name in ["One", "Two"] {
+            let playlist = try await app.services.library.add(.xtream(
+                name: name,
+                baseURL: panel,
+                username: "a",
+                password: "b"
+            ))
+            await app.services.sync.waitForCompletion(playlist.id)
+            ids.append(playlist.id)
+        }
+        let before = ids.compactMap { finishedAt(app, $0) }
+        try await Task.sleep(for: .milliseconds(20))
+
+        await app.services.library.refreshAll()
+        for id in ids {
+            await app.services.sync.waitForCompletion(id)
+        }
+
+        let after = ids.compactMap { finishedAt(app, $0) }
+        #expect(before.count == 2 && after.count == 2)
+        #expect(zip(before, after).allSatisfy { $0 < $1 }, "not every playlist was refreshed")
+    }
+
+    /// Stopping is the user's choice. It must not read as a failure.
+    @Test
+    func `stopping a sync leaves the playlist idle, not failed`() async throws {
+        let transport = SwitchableTransport(FakePanel().transport())
+        let app = try TestApp(transport: transport)
+        defer { app.cleanUp() }
+        let playlist = try await app.services.library.add(.xtream(
+            name: "",
+            baseURL: panel,
+            username: "a",
+            password: "b"
+        ))
+        await app.services.sync.waitForCompletion(playlist.id)
+
+        transport.setHanging(true)
+        await app.services.library.refresh(playlist.id)
+        #expect(await waitFor { app.services.syncStatus.status(for: playlist.id) == .syncing(processed: 0) })
+
+        await app.services.library.stop(playlist.id)
+        await app.services.sync.waitForCompletion(playlist.id)
+
+        #expect(app.services.syncStatus.status(for: playlist.id) == .idle)
+    }
+
+    /// Delete has to work on a playlist that is busy: that is when a user reaches for it.
+    @Test
+    func `a playlist can be deleted while it is still syncing`() async throws {
+        let transport = SwitchableTransport(FakePanel(live: 5).transport())
+        let app = try TestApp(transport: transport)
+        defer { app.cleanUp() }
+        let playlist = try await app.services.library.add(.xtream(
+            name: "",
+            baseURL: panel,
+            username: "a",
+            password: "b"
+        ))
+        await app.services.sync.waitForCompletion(playlist.id)
+        #expect(try await app.services.catalogStore.entryCount(kind: .live, playlist: playlist.id) == 5)
+
+        transport.setHanging(true)
+        await app.services.library.refresh(playlist.id, force: true)
+        #expect(await waitFor { app.services.syncStatus.status(for: playlist.id) == .syncing(processed: 0) })
+
+        let problem = await app.services.library.remove(playlist.id)
+
+        #expect(problem == nil)
+        #expect(app.services.library.playlists.isEmpty)
+        #expect(app.services.library.removing.isEmpty)
+        #expect(try app.storedRecords().isEmpty)
+        #expect(app.credentials.isEmpty)
+        #expect(try await app.services.catalogStore.entryCount(kind: .live, playlist: playlist.id) == 0)
+    }
+
+    @Test
+    func `deleting the same playlist twice is harmless`() async throws {
+        let app = try TestApp(transport: FakePanel().transport())
+        defer { app.cleanUp() }
+        let playlist = try await app.services.library.add(.xtream(
+            name: "",
+            baseURL: panel,
+            username: "a",
+            password: "b"
+        ))
+        await app.services.sync.waitForCompletion(playlist.id)
+
+        async let first = app.services.library.remove(playlist.id)
+        async let second = app.services.library.remove(playlist.id)
+        let results = await [first, second]
+
+        #expect(results.allSatisfy { $0 == nil })
+        #expect(app.services.library.playlists.isEmpty)
+    }
+
+    @Test
+    func `a playlist that never synced can be deleted`() async throws {
+        let transport = SwitchableTransport(FakePanel().transport())
+        let app = try TestApp(transport: transport)
+        defer { app.cleanUp() }
+        let playlist = try await app.services.library.add(.xtream(
+            name: "",
+            baseURL: panel,
+            username: "a",
+            password: "b"
+        ))
+        await app.services.sync.waitForCompletion(playlist.id)
+        try await app.services.catalogStore.removePlaylist(playlist.id)
+
+        #expect(await app.services.library.remove(playlist.id) == nil)
+        #expect(app.services.library.playlists.isEmpty)
+    }
+
     // MARK: - Helpers
+
+    private func waitFor(_ condition: () -> Bool, seconds: Double = 5) async -> Bool {
+        let deadline = ContinuousClock.now + .seconds(seconds)
+        while ContinuousClock.now < deadline {
+            if condition() {
+                return true
+            }
+            try? await Task.sleep(for: .milliseconds(10))
+        }
+        return false
+    }
 
     private func finishedAt(_ app: TestApp, _ id: String) -> Date? {
         if case let .finished(summary) = app.services.syncStatus.status(for: id) {

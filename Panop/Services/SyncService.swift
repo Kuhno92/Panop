@@ -57,10 +57,22 @@ actor SyncService {
             } catch is CancellationError {
                 await center.set(.idle, for: id)
             } catch {
-                await center.set(.failed(SyncErrorMessage.text(for: error)), for: id)
+                // Cancelling a request surfaces as the networking layer's own
+                // error, not `CancellationError`. If the task was cancelled, the
+                // user stopped it; that is not a failure.
+                if Task.isCancelled {
+                    await center.set(.idle, for: id)
+                } else {
+                    await center.set(.failed(SyncErrorMessage.text(for: error)), for: id)
+                }
             }
             self.finished(id)
         }
+    }
+
+    /// Shows a failure on a playlist's row without running a sync.
+    func report(failure message: String, for playlist: String) async {
+        await center.set(.failed(message), for: playlist)
     }
 
     func isSyncing(_ playlist: String) -> Bool {

@@ -139,6 +139,14 @@ Getting a real provider's content into the app. Nothing else can be tested until
       themselves at launch when older than 12 hours. The screens launch (checked on macOS) but no
       UI test has driven them, so the add form, the swipe/context actions and the "review missing
       items" prompt are unexercised by a person or a test.
+      **Managing sources:** each row has a visible actions menu (Refresh, Re-import Everything,
+      Stop Updating while running, Delete), the same actions on right-click and swipe, and a
+      Refresh All button. Delete removes the catalog rows first and touches the login and record
+      only once that succeeded, so a failure leaves a retryable playlist instead of orphaned
+      channels; it works while a sync is running. A refresh that cannot run (missing login) says
+      so on the row. Measured: deleting 30k channels 0.22 s, 77k channels 0.78 s, off the main
+      thread. Checked by rendering the rows in a real window; the swipe and right-click paths
+      and the confirmation dialogs have not been driven by hand.
 - [x] **Incremental re-import**. Skip unchanged playlists by digest rather than reparsing 80,000
       entries every launch.
 - [x] **Credential storage in Keychain**, with `kSecUseDataProtectionKeychain` for macOS parity.

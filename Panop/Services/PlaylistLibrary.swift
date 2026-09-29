@@ -32,6 +32,8 @@ nonisolated struct PlaylistAddError: Error, LocalizedError, Equatable {
 @Observable
 final class PlaylistLibrary {
     private(set) var playlists: [PlaylistSummary] = []
+    /// Playlists being deleted right now, so the screen can show it and refuse a second tap.
+    private(set) var removing: Set<String> = []
 
     private let context: ModelContext
     private let credentials: any CredentialStore
@@ -235,30 +237,68 @@ final class PlaylistLibrary {
         }
     }
 
-    /// Deletes the playlist, its catalog rows, its stored credentials and any
-    /// local copy of its file.
-    func remove(_ id: String) async {
-        try? await sync.remove(id)
+    /// Deletes the playlist: its catalog rows, its stored login, any local copy of
+    /// its file, and its record.
+    ///
+    /// **Order matters.** The catalog rows go first, and if that fails nothing
+    /// else is touched, so the playlist stays in the list and the delete can be
+    /// retried. Deleting the record and login first would leave channels behind
+    /// that no screen can reach.
+    ///
+    /// - Returns: nil on success, or a message for the user.
+    @discardableResult
+    func remove(_ id: String) async -> String? {
+        guard !removing.contains(id) else { return nil }
+        removing.insert(id)
+        defer { removing.remove(id) }
+
+        do {
+            try await sync.remove(id)
+        } catch {
+            return "This playlist could not be deleted. Nothing was changed, so you can try again."
+        }
+
+        // The catalog is clean. A login that will not delete is not worth
+        // failing over: the playlist is already gone from every screen.
         try? credentials.delete(for: id)
         if let record = try? fetchRecord(id) {
-            if let file = record
-                .localFileName
-            {
+            if let file = record.localFileName {
                 try? FileManager.default.removeItem(at: directory.appendingPathComponent(file))
             }
             context.delete(record)
             try? context.save()
         }
         reload()
+        return nil
     }
 
     func confirm(_ removal: DeferredRemoval, playlist: String) async throws {
         try await sync.confirm(removal, playlist: playlist)
     }
 
+    /// Updates one playlist. `force` re-imports even a file that has not changed.
+    ///
+    /// A playlist that cannot be refreshed says why on its row, instead of doing nothing.
     func refresh(_ id: String, force: Bool = false) async {
-        guard let descriptor = try? descriptor(for: id) else { return }
+        guard let descriptor = try? descriptor(for: id) else {
+            await sync.report(
+                failure: "This playlist's login details are missing on this device. Delete it and add it again.",
+                for: id
+            )
+            return
+        }
         await sync.start(descriptor, force: force)
+    }
+
+    func refreshAll(force: Bool = false) async {
+        for playlist in playlists where !removing.contains(playlist.id) {
+            await refresh(playlist.id, force: force)
+        }
+    }
+
+    /// Stops a sync that is running. What was already imported stays.
+    func stop(_ id: String) async {
+        await sync.cancel(id)
     }
 
     /// Refreshes every playlist that has not completed a sync within `maxAge`.

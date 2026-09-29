@@ -140,6 +140,16 @@ struct CatalogBenchmarks {
         _ = try await timed("Live TV search matching nothing, all sources") {
             try context.fetch(LiveChannelQuery.descriptor(source: nil, search: "zzzzzz", limit: 300)).count
         }
+
+        // Deleting a source: the 30k-channel one, then the 77k one.
+        _ = try await timed("delete a 30k-channel source") {
+            try await store.removePlaylist("second")
+        }
+        #expect(try await store.entryCount(kind: .live, playlist: "second") == 0)
+        _ = try await timed("delete a 77k-channel source (with its categories and sync state)") {
+            try await store.removePlaylist(Self.playlist)
+        }
+        #expect(try await store.entryCount(kind: .live, playlist: Self.playlist) == 0)
     }
 
     @Test

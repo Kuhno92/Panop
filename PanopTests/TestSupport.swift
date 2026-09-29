@@ -151,3 +151,37 @@ struct TestApp {
         catalog.cleanUp()
     }
 }
+
+/// Wraps a transport that can be switched to hang, so a sync stays in flight
+/// (until cancelled) while a test acts on it.
+final class SwitchableTransport: HTTPTransport, @unchecked Sendable {
+    private let base: any HTTPTransport
+    private let lock = NSLock()
+    private var hanging = false
+
+    init(_ base: any HTTPTransport) {
+        self.base = base
+    }
+
+    func setHanging(_ value: Bool) {
+        lock.withLock { hanging = value }
+    }
+
+    private var isHanging: Bool {
+        lock.withLock { hanging }
+    }
+
+    func send(_ request: HTTPRequest) async throws -> HTTPResponse {
+        if isHanging {
+            try await Task.sleep(for: .seconds(3600))
+        }
+        return try await base.send(request)
+    }
+
+    func stream(_ request: HTTPRequest) async throws -> HTTPStreamResponse {
+        if isHanging {
+            try await Task.sleep(for: .seconds(3600))
+        }
+        return try await base.stream(request)
+    }
+}

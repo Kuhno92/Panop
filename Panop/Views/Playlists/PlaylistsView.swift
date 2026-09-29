@@ -1,13 +1,14 @@
 import PanopCatalog
 import SwiftUI
 
-/// The user's playlists and the state of each one's import.
+/// The user's playlists, the state of each one's import, and what can be done to it.
 struct PlaylistsView: View {
     @Environment(PlaylistLibrary.self) private var library
     @Environment(SyncStatusCenter.self) private var status
 
     @State private var showingAdd = false
     @State private var pendingDelete: PlaylistSummary?
+    @State private var deleteError: String?
 
     var body: some View {
         List {
@@ -15,20 +16,16 @@ struct PlaylistsView: View {
                 PlaylistRow(playlist: playlist, onDelete: { pendingDelete = playlist })
             }
         }
-        .overlay {
-            if library.playlists.isEmpty {
-                ContentUnavailableView {
-                    Label("No playlists", systemImage: "antenna.radiowaves.left.and.right")
-                } description: {
-                    Text("Add an M3U link or file, or an Xtream provider.")
-                } actions: {
-                    Button("Add playlist") { showingAdd = true }
-                }
-            }
-        }
+        .overlay { emptyState }
         .navigationTitle("Playlists")
         .toolbar {
-            Button("Add", systemImage: "plus") { showingAdd = true }
+            ToolbarItemGroup {
+                Button("Refresh All", systemImage: "arrow.clockwise") {
+                    Task { await library.refreshAll() }
+                }
+                .disabled(library.playlists.isEmpty)
+                Button("Add", systemImage: "plus") { showingAdd = true }
+            }
         }
         .sheet(isPresented: $showingAdd) {
             NavigationStack { AddPlaylistView() }
@@ -44,15 +41,46 @@ struct PlaylistsView: View {
             presenting: pendingDelete
         ) { playlist in
             Button("Delete", role: .destructive) {
-                Task { await library.remove(playlist.id) }
+                Task { deleteError = await library.remove(playlist.id) }
             }
         } message: { _ in
             Text("Its channels, movies, series and guide are removed from this device.")
         }
+        .alert(
+            "Couldn't delete",
+            isPresented: Binding(get: { deleteError != nil }, set: {
+                if !$0 {
+                    deleteError = nil
+                }
+            })
+        ) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(deleteError ?? "")
+        }
+    }
+
+    @ViewBuilder
+    private var emptyState: some View {
+        if library.playlists.isEmpty {
+            ContentUnavailableView {
+                Label("No playlists", systemImage: "antenna.radiowaves.left.and.right")
+            } description: {
+                Text("Add an M3U link or file, or an Xtream provider.")
+            } actions: {
+                Button("Add playlist") { showingAdd = true }
+            }
+        }
     }
 }
 
-private struct PlaylistRow: View {
+/// One playlist: its name, where it comes from, how its last update went, and a
+/// menu of what can be done to it.
+///
+/// The menu is a visible button on purpose. The same actions are on right-click
+/// and swipe, but neither can be discovered by looking, and swipe does not exist
+/// for a mouse.
+struct PlaylistRow: View {
     let playlist: PlaylistSummary
     let onDelete: () -> Void
 
@@ -60,55 +88,108 @@ private struct PlaylistRow: View {
     @Environment(SyncStatusCenter.self) private var statusCenter
     @State private var removalToReview: DeferredRemoval?
 
-    var body: some View {
-        let status = statusCenter.status(for: playlist.id)
-        VStack(alignment: .leading, spacing: 4) {
-            HStack {
-                Text(playlist.name).font(.headline)
-                Spacer()
-                if case .syncing = status {
-                    ProgressView()
-                }
-            }
-            Text(subtitle).font(.subheadline).foregroundStyle(.secondary)
-            statusLine(status)
-        }
-        .padding(.vertical, 4)
-        .contextMenu {
-            Button("Refresh", systemImage: "arrow.clockwise") { Task { await library.refresh(playlist.id) } }
-            Button("Re-import everything", systemImage: "arrow.triangle.2.circlepath") {
-                Task { await library.refresh(playlist.id, force: true) }
-            }
-            Button("Delete", systemImage: "trash", role: .destructive, action: onDelete)
-        }
-        #if !os(tvOS)
-        .swipeActions {
-            Button("Delete", systemImage: "trash", role: .destructive, action: onDelete)
-            Button("Refresh", systemImage: "arrow.clockwise") { Task { await library.refresh(playlist.id) } }
-                .tint(.blue)
-        }
-        #endif
-        .alert(
-            "Remove missing items?",
-            isPresented: Binding(get: { removalToReview != nil }, set: {
-                if !$0 {
-                    removalToReview = nil
-                }
-            }),
-            presenting: removalToReview
-        ) { removal in
-            Button("Remove \(removal.ids.count)", role: .destructive) {
-                Task { try? await library.confirm(removal, playlist: playlist.id) }
-            }
-            Button("Keep them", role: .cancel) {}
-        } message: { removal in
-            Text(
-                "The provider's latest list is missing \(removal.ids.count) items. "
-                    + "That can mean the download was cut off. "
-                    + "Removing them also removes any favourites and watch progress on them."
-            )
+    private var isRemoving: Bool {
+        library.removing.contains(playlist.id)
+    }
+
+    private var isSyncing: Bool {
+        if case .syncing = statusCenter.status(for: playlist.id) {
+            true
+        } else {
+            false
         }
     }
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 12) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(playlist.name).font(.headline)
+                Text(subtitle).font(.subheadline).foregroundStyle(.secondary)
+                if isRemoving {
+                    Text("Deleting…").font(.caption).foregroundStyle(.secondary)
+                } else {
+                    statusLine(statusCenter.status(for: playlist.id))
+                }
+            }
+            Spacer(minLength: 8)
+            trailing
+        }
+        .padding(.vertical, 4)
+        .opacity(isRemoving ? 0.5 : 1)
+        .disabled(isRemoving)
+        .contextMenu { actions }
+        #if !os(tvOS)
+            .swipeActions {
+                Button("Delete", systemImage: "trash", role: .destructive, action: onDelete)
+            }
+        #endif
+            .alert(
+                "Remove missing items?",
+                isPresented: Binding(get: { removalToReview != nil }, set: {
+                    if !$0 {
+                        removalToReview = nil
+                    }
+                }),
+                presenting: removalToReview
+            ) { removal in
+                Button("Remove \(removal.ids.count)", role: .destructive) {
+                    Task { try? await library.confirm(removal, playlist: playlist.id) }
+                }
+                Button("Keep them", role: .cancel) {}
+            } message: { removal in
+                Text(
+                    "The provider's latest list is missing \(removal.ids.count) items. "
+                        + "That can mean the download was cut off. "
+                        + "Removing them also removes any favourites and watch progress on them."
+                )
+            }
+    }
+
+    // MARK: - Actions
+
+    @ViewBuilder
+    private var trailing: some View {
+        if isRemoving {
+            ProgressView()
+        } else {
+            HStack(spacing: 8) {
+                if isSyncing {
+                    ProgressView()
+                }
+                Menu {
+                    actions
+                } label: {
+                    Image(systemName: "ellipsis.circle").font(.title3)
+                }
+                #if os(macOS)
+                .menuStyle(.borderlessButton)
+                #endif
+                .fixedSize()
+                .accessibilityLabel("Actions for \(playlist.name)")
+            }
+        }
+    }
+
+    /// Shared by the menu button and the right-click menu, so they cannot drift.
+    @ViewBuilder
+    private var actions: some View {
+        if isSyncing {
+            Button("Stop Updating", systemImage: "stop.circle") {
+                Task { await library.stop(playlist.id) }
+            }
+        } else {
+            Button("Refresh", systemImage: "arrow.clockwise") {
+                Task { await library.refresh(playlist.id) }
+            }
+            Button("Re-import Everything", systemImage: "arrow.triangle.2.circlepath") {
+                Task { await library.refresh(playlist.id, force: true) }
+            }
+        }
+        Divider()
+        Button("Delete…", systemImage: "trash", role: .destructive, action: onDelete)
+    }
+
+    // MARK: - Status
 
     private var subtitle: String {
         switch playlist.kind {
@@ -136,10 +217,7 @@ private struct PlaylistRow: View {
 
     @ViewBuilder
     private func finishedLines(_ summary: SyncSummary) -> some View {
-        Text(summary
-            .unchanged ? "Up to date" :
-            "\(summary.entries.formatted()) items · updated \(summary.finishedAt.formatted(.relative(presentation: .named)))")
-            .font(.caption).foregroundStyle(.secondary)
+        Text(finishedText(summary)).font(.caption).foregroundStyle(.secondary)
 
         ForEach(summary.failedSections, id: \.self) { failure in
             Label(failure, systemImage: "exclamationmark.triangle.fill").font(.caption).foregroundStyle(.orange)
@@ -160,5 +238,12 @@ private struct PlaylistRow: View {
             }
             .buttonStyle(.borderless)
         }
+    }
+
+    private func finishedText(_ summary: SyncSummary) -> String {
+        let when = summary.finishedAt.formatted(.relative(presentation: .named))
+        return summary.unchanged
+            ? "Up to date · checked \(when)"
+            : "\(summary.entries.formatted()) items · updated \(when)"
     }
 }
