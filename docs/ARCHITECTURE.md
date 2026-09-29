@@ -266,10 +266,11 @@ post-clone command.
 
 Two verification gaps worth knowing about, both environmental rather than design problems:
 
-- **The Settings screen is visually unverified.** Both simulators render the Live TV tab
-  correctly, but `simctl` has no tap command and macOS blocks synthetic keystrokes without an
-  accessibility grant, so the engine picker has only been verified by unit test. A UI test
-  target would close this.
+- **The engine picker is verified on tvOS only.** Driving the Apple TV simulator by keyboard
+  confirmed Settings renders and the picker lists exactly AVPlayer, VLC and LumeEngine, with
+  KSPlayer absent as ADR 0002 requires. The same screen on iOS has not been opened: `simctl`
+  has no tap command and synthetic clicks fail with System Events error -25204, so only the
+  launch screen is confirmed there. A UI test target would close this properly.
 - **The Linux portability check has not run locally.** It needs Docker. The SwiftLint custom
   rule covers the common case (an Apple-only import) but not a Foundation API that is missing
   off-Apple. The CI job covers it properly.

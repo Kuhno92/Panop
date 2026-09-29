@@ -119,8 +119,8 @@ The brief called performance a key concept. For IPTV this concentrates in one nu
 - [ ] **Image pipeline** *(surfaced)*. Thousands of channel logos need disk caching and
       downsampling, plus a memory purge on backgrounding to avoid jetsam.
 - [ ] **Empty, loading and error states** that explain what to do next.
-- [ ] **UI test target** *(surfaced)*. Needed to verify screens past the launch screen at all;
-      `simctl` has no tap command.
+- [ ] **UI test target** *(surfaced)*. The only reliable way to verify screens past launch on
+      iOS. tvOS can be driven by synthetic keystrokes; iOS cannot be tapped from the CLI.
 
 ---
 
