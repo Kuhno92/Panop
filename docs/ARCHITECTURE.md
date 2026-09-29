@@ -260,9 +260,9 @@ post-clone command.
 | Repo scaffolding, docs, vendored tooling | Done |
 | `PanopKit`: PanopCore, PanopPlaylist, PanopPlayback | Done |
 | `PanopXtream` (client, streaming list reader, `HTTPTransport`) | Done |
-| `PanopEPG` (XMLTV parser, gzip, rolling window) | Done, 126 tests passing across the package |
+| `PanopEPG` (XMLTV parser, gzip, rolling window) | Done |
+| `PanopCatalog` (importer, `CatalogStore` protocol, in-memory store) | Done, 175 tests passing across the package |
 | Xcode project and app target | Builds and launches on macOS, iOS and tvOS |
-| `PanopCatalog` | Planned |
 | Engines: AVPlayer, then VLCKit, then LumeEngine | Planned |
 | Playlist import wired to the catalog container | Planned |
 

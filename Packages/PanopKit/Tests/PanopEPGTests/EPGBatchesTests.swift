@@ -114,8 +114,9 @@ struct EPGBatchesTests {
                 nil
             }
         }
-        // Show n runs from minute n to n+1: those overlapping 00:30 through 01:00.
-        #expect(titles.first == "Show 29")
+        // Show n runs from minute n to n+1. Show 29 ends exactly at 00:30, so it
+        // is already over; Show 60 starts exactly at 01:00, so it is still in.
+        #expect(titles.first == "Show 30")
         #expect(titles.last == "Show 60")
     }
 

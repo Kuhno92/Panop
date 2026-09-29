@@ -171,7 +171,7 @@ public struct XMLTVParser {
             invalidProgrammes += 1
             return
         }
-        if let window, finished.stop < window.lowerBound || finished.start > window.upperBound {
+        if let window, finished.stop <= window.lowerBound || finished.start > window.upperBound {
             programmesOutsideWindow += 1
             return
         }

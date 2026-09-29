@@ -68,8 +68,28 @@ Getting a real provider's content into the app. Nothing else can be tested until
       decodes at ~165 MB/s. Profiling found two cheap wins (ASCII fast path for string
       conversion, no grapheme walk in the length cap), worth 1.7x. Not yet verified: the
       whole guide reader against a real provider, and the off-Apple branch (CI only).
-- [ ] **`PanopCatalog`** *(surfaced)*. Import and reconcile orchestration behind `CatalogStore`,
-      so Android can reuse it later.
+- [x] **`PanopCatalog`** *(surfaced)*. Import and reconcile orchestration behind `CatalogStore`,
+      so Android can reuse it later. M3U (remote or file), Xtream and XMLTV imports, with an
+      in-memory reference store that the tests run against.
+      **The rule:** a row is removed only after an import that ran to completion, and only if
+      the removal is believable. No stamping of rows with an import generation, because that
+      would rewrite every row on every unchanged refresh. Instead the importer keeps a set of
+      64-bit id hashes (a few MB for 100k rows) and sweeps stored ids not in it; a hash
+      collision keeps a stale row and can never delete a live one. A sweep that would remove
+      more than half a catalog (and more than 25 rows) is held back as a `DeferredRemoval`,
+      because an M3U file has no end marker and a cut-off download is indistinguishable from
+      a smaller playlist. Confirming is refused if a newer import has run since.
+      Xtream sections (live, movies, series) succeed or fail independently; a failed section
+      removes nothing. M3U identity is a hash of the stream URL, never the group, so
+      regrouping does not orphan favourites. Unchanged M3U files are skipped by digest.
+      Not yet verified: import speed against a real store (the in-memory one sorts on every
+      page and says nothing about throughput). That belongs with `SwiftDataCatalogStore`.
+- [ ] **Group M3U episodes into series.** In M3U, a `/series/` URL is an *episode*, so a large
+      playlist puts hundreds of thousands of episodes into the `.series` kind (Lume measured
+      86% of a real file). Needs episode-name parsing (`S01E05`) to build series shells, and a
+      decision on whether episodes are stored or fetched lazily as they are for Xtream.
+- [ ] **M3U channel order.** Playlist order is not stored. Assign a position on insert only, so
+      a provider that reorders does not rewrite every row.
 - [ ] **`SwiftDataCatalogStore`** in the app target, implementing that protocol.
 - [ ] **Playlist import flow**: add a playlist by URL, file, or Xtream credentials.
 - [ ] **Incremental re-import**. Skip unchanged playlists by digest rather than reparsing 80,000
