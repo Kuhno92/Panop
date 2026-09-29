@@ -16,9 +16,27 @@ command works because it is documented below.
 
 - [x] Repo skeleton, docs, lint tooling, ADRs
 - [x] `Packages/PanopKit`: PanopCore, PanopPlaylist, PanopPlayback (24 tests passing)
-- [ ] `Panop.xcodeproj` and the app target
+- [x] `Panop.xcodeproj` and the app target (**builds and launches on macOS only so far**)
 - [ ] PanopXtream, PanopEPG, PanopCatalog
 - [ ] Engines: AVPlayer, then VLCKit, then LumeEngine (KSPlayer stays unlinked)
+- [ ] Playlist import wired to the catalog container
+
+### iOS and tvOS cannot be built on this machine yet
+
+`xcodebuild -showdestinations` offers **macOS only**. The iOS 26.5 and tvOS 26.5 platform
+components are not installed, so any iOS or tvOS destination fails with "platform is not
+installed" before compiling anything. The iOS 26.2 simulator runtime being present is not
+enough; the platform itself is missing.
+
+Fix it once, then the destinations appear (each is a multi-GB download):
+
+```bash
+xcodebuild -downloadPlatform iOS
+xcodebuild -downloadPlatform tvOS
+```
+
+Until that is done, a macOS build is the only real verification available. Do not interpret an
+iOS destination error as a project problem.
 
 ---
 
@@ -185,6 +203,10 @@ transaction with autosave disabled.
   Branches mirror the type: `fix/epg-timezone-drift`.
 - **Tests:** swift-testing (`import Testing`) for new tests. XCTest only where a framework
   requires it, such as UI tests and `measure`.
+
+  Expect the pre-commit formatter to rewrite `@Test("some name") func someName()` into
+  ``@Test func `some name`()`` using Swift 6.2 raw identifiers. That is SwiftFormat doing its
+  job, not a mistake to revert. The displayed test name is unchanged.
 - **Fixtures are never committed.** Generate them; large playlists and media files stay out of
   git. Generated fixtures belong in gitignored `Generated/` directories.
 - **Comments explain why, not what.** If the reason is not surprising, omit the comment.
