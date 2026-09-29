@@ -15,7 +15,7 @@ The repo is being built up in stages. **Only check off what actually exists**; d
 command works because it is documented below.
 
 - [x] Repo skeleton, docs, lint tooling, ADRs
-- [ ] `Packages/PanopKit` (PanopCore, PanopPlaylist)
+- [x] `Packages/PanopKit`: PanopCore, PanopPlaylist, PanopPlayback (24 tests passing)
 - [ ] `Panop.xcodeproj` and the app target
 - [ ] PanopXtream, PanopEPG, PanopCatalog
 - [ ] Engines: AVPlayer, then VLCKit, then LumeEngine (KSPlayer stays unlinked)
@@ -47,13 +47,20 @@ swift test --package-path Packages/PanopKit
 # One target only
 swift test --package-path Packages/PanopKit --filter PanopPlaylistTests
 
-# Lint / format
-swift package plugin swiftlint lint
-swift package plugin --allow-writing-to-package-directory swiftformat
+# Lint / format (setup.sh symlinks these into .build/tools/bin)
+.build/tools/bin/swiftlint lint --strict --quiet
+.build/tools/bin/swiftformat .
+
+# Verify the core still builds off-Apple. Run before any PanopKit PR.
+Scripts/check-portability.sh
 
 # App build, all three platforms
 Scripts/build-all-platforms.sh
 ```
+
+No tvOS simulator runtime is installed on this machine, so the tvOS step in
+`build-all-platforms.sh` is a compile-only check against a generic destination.
+Install one with `xcodebuild -downloadPlatform tvOS` to launch on Apple TV.
 
 ### Always share the package clone directory
 

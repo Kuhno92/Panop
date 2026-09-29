@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  core:
+    name: PanopKit (macOS)
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache SwiftPM
+        uses: actions/cache@v4
+        with:
+          path: |
+            .build
+            Packages/PanopKit/.build
+          key: spm-${{ runner.os }}-${{ hashFiles('**/Package.resolved', '**/Package.swift') }}
+          restore-keys: spm-${{ runner.os }}-
+
+      - name: Test
+        run: swift test --package-path Packages/PanopKit
+
+      - name: Lint
+        run: |
+          swift package resolve
+          bin="$(find .build/artifacts -type f -name swiftlint -perm +111 | grep -v '/linux/' | head -1)"
+          "$bin" lint --strict --quiet
+
+  portability:
+    name: PanopKit (Linux)
+    runs-on: ubuntu-latest
+    container: swift:6.3
+    steps:
+      - uses: actions/checkout@v4
+
+      # This job is the enforcement mechanism for ADR 0007. PanopKit must keep
+      # compiling off-Apple so the same core can later drive Android, Windows
+      # and Linux UIs. Without a job that actually builds it there, an
+      # Apple-only import slips in and nobody notices until the port starts.
+      - name: Build and test on Linux
+        run: swift test --package-path Packages/PanopKit
