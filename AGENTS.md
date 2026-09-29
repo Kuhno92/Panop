@@ -113,6 +113,41 @@ a checkout race that breaks multi-platform archiving.
 
 ---
 
+## Performance is the product
+
+Panop has to feel instant. Every implementation decision is weighed against that first, ahead of
+convenience and ahead of elegance. The UI must stay snappy on the weakest supported device (an
+Apple TV HD), and nothing the user does should wait on something they cannot see.
+
+Treat these as defaults when writing or reviewing code:
+
+- **The main thread is for drawing.** No parsing, decoding, disk or network I/O, or catalog work
+  on it. Anything that can take more than a frame goes to a background task, and the UI shows
+  something immediately while it runs.
+- **Never make the user wait for a full result.** Stream and batch (see Large catalogs), show the
+  first rows as they arrive, and render from local data before touching the network.
+- **Bound every query.** A fetch has a limit, a predicate that narrows it in SQL, and an index
+  behind both. An unbounded fetch, or a sort that defeats the limit, is a bug even when the
+  screen looks right, because it only shows up at 80,000 rows.
+- **Channel zapping is the metric that matters.** Time from selecting a channel to the first
+  frame is what users judge an IPTV app on. Do not add work to that path; see `docs/ROADMAP.md`
+  M3 for the levers.
+- **Keep views cheap.** No sorting, filtering or formatting inside `body`. Lists are lazy, images
+  are downsampled and cached, and state that changes often is scoped so it does not re-render a
+  whole screen.
+- **Memory is a performance budget.** On tvOS an over-budget app is killed, with no swap and no
+  warning. Flat memory during import matters as much as speed.
+- **Measure, do not guess.** Before an optimisation and after it, and never in a Debug build,
+  where `-Onone` makes the numbers fiction. If a change touches a hot path (parsing, import,
+  browse queries, playback start), say what was measured in the PR.
+- **A regression is a bug.** If a change makes a screen, an import or a channel change slower,
+  fix it or justify it explicitly. "It still works" is not the bar.
+
+When speed and simplicity pull apart, choose speed, then leave a comment saying why, because the
+fast version is usually the surprising one.
+
+---
+
 ## Architecture
 
 ```

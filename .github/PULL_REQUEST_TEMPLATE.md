@@ -17,6 +17,21 @@ Platforms built (tick what you actually ran):
 - [ ] macOS
 - [ ] Not applicable, this change does not touch the app target
 
+## Performance
+
+Panop has to feel instant (see "Performance is the product" in AGENTS.md).
+
+- [ ] Nothing new runs on the main thread that could take longer than a frame
+- [ ] Queries are bounded: a limit, a narrowing predicate, and an index behind both
+- [ ] Hot paths (parsing, import, browse queries, playback start) were measured in a
+      non-Debug build. Paste the before and after numbers below
+- [ ] Not applicable, this change does not touch a hot path or the UI
+
+```
+before:
+after:
+```
+
 ## Invariants
 
 Confirm each, or say why it does not apply. Full reasoning is in AGENTS.md.
