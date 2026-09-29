@@ -157,7 +157,15 @@ Getting a real provider's content into the app. Nothing else can be tested until
 
 The first milestone where Panop is usable.
 
-- [ ] **Live TV list** with provider groups *(asked for)*
+- [ ] **Live TV list** with provider groups *(asked for)*. **Partly done:** Live TV shows the
+      channels of every source, or one chosen source (remembered, and offered only when there
+      are several), sorted by name, with search and a page that grows as you scroll up to a
+      5,000 row cap. Still to do: filtering by the provider's group. An earlier placeholder took
+      the first 200 rows it found, which showed only the first playlist's channels.
+      Names sort on a stored `nameKey` (case and accents folded at import) because SwiftData's
+      default string sort is localised and no index can serve it. Measured on 107k channels
+      across two sources: first page 0.01 s, grown to the cap 0.12 s, search 0.03 s. The two
+      browse indexes cost about 5 to 8% on import.
 - [ ] **Movies and Series** browsing, including episode lists *(asked for, VOD)*
 - [ ] **Search** across the catalog. Needs SQLite FTS or bounded predicates with a fetch limit;
       an unbounded sort defeats the limit entirely.

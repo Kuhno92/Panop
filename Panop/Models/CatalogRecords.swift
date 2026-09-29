@@ -27,14 +27,27 @@ final class CatalogEntryRecord {
     // per-kind counts the importer makes eight times per run, and the ordered
     // sweep. Dropping it made those counts scan the table (0.01 s became 0.15 s
     // each) and slowed every refresh by more than it saved on first import.
-    // Browse indexes arrive with the browse screens, so they are shaped by real
-    // queries rather than guessed.
-    #Index<CatalogEntryRecord>([\.playlist, \.id], [\.playlist, \.kindRaw, \.id])
+    //
+    // The two `nameKey` indexes serve browsing: a channel list sorted by name,
+    // for one source or for all of them. Sorting by `name` itself cannot use an
+    // index, because SwiftData's default `String` comparison is localised and
+    // SQLite has no index for that. `nameKey` is the name folded once at import
+    // (case and accents removed), so a plain binary sort on it *is* the order a
+    // person expects, and an index can serve it.
+    #Index<CatalogEntryRecord>(
+        [\.playlist, \.id],
+        [\.playlist, \.kindRaw, \.id],
+        [\.kindRaw, \.nameKey, \.id],
+        [\.playlist, \.kindRaw, \.nameKey, \.id]
+    )
 
     var playlist: String
     var id: String
     var kindRaw: String
     var name: String
+    /// `name` folded for sorting and searching. Defaulted so an existing store
+    /// migrates; rows keep the empty default until their next import refreshes them.
+    var nameKey: String = ""
     var groupID: String?
     var groupName: String?
     var iconURL: String?
@@ -54,6 +67,7 @@ final class CatalogEntryRecord {
         id = entry.id
         kindRaw = entry.kind.rawValue
         name = entry.name
+        nameKey = Self.nameKey(for: entry.name)
         groupID = entry.groupID
         groupName = entry.groupName
         iconURL = entry.iconURL
@@ -73,6 +87,12 @@ final class CatalogEntryRecord {
         MediaKind(rawValue: kindRaw) ?? .unknown
     }
 
+    /// The name with case and accents removed, so "Österreich 1" and "osterreich 1"
+    /// sort and search alike. Browsing sorts on this, in binary order.
+    nonisolated static func nameKey(for name: String) -> String {
+        name.folding(options: [.caseInsensitive, .diacriticInsensitive], locale: nil)
+    }
+
     /// Copies fields that differ. Returns false, having touched nothing, when
     /// the record already matches.
     func apply(_ entry: CatalogEntry) -> Bool {
@@ -85,6 +105,7 @@ final class CatalogEntryRecord {
         }
         assign(\.kindRaw, entry.kind.rawValue)
         assign(\.name, entry.name)
+        assign(\.nameKey, Self.nameKey(for: entry.name))
         assign(\.groupID, entry.groupID)
         assign(\.groupName, entry.groupName)
         assign(\.iconURL, entry.iconURL)

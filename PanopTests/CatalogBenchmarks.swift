@@ -4,6 +4,7 @@ import Foundation
 import PanopCatalog
 import PanopCore
 import PanopEPG
+import SwiftData
 import Testing
 
 /// Performance measurements for the catalog import path.
@@ -24,6 +25,7 @@ import Testing
     .enabled(if: ProcessInfo.processInfo.environment["PANOP_BENCHMARK"] == "1"),
     .serialized
 )
+@MainActor
 struct CatalogBenchmarks {
     private static let playlist = "bench"
 
@@ -112,6 +114,31 @@ struct CatalogBenchmarks {
         }
         _ = try await timed("count live entries") {
             try await store.entryCount(kind: .live, playlist: Self.playlist)
+        }
+
+        // Browsing, on the real catalog: 77k channels in one playlist and 30k in a second.
+        let other = try writeTemporaryFile(playlistText(live: 200_000 ..< 230_000).replacingOccurrences(
+            of: "Channel",
+            with: "Zed"
+        ))
+        _ = try await importer.importM3U(playlist: "second", source: .file(path: other))
+        let context = ModelContext(catalog.container)
+
+        _ = try await timed("Live TV first page (300), all sources") {
+            try context.fetch(LiveChannelQuery.descriptor(source: nil, search: "", limit: 300)).count
+        }
+        _ = try await timed("Live TV first page (300), one source") {
+            try context.fetch(LiveChannelQuery.descriptor(source: "second", search: "", limit: 300)).count
+        }
+        _ = try await timed("Live TV grown to the 5,000 cap, all sources") {
+            try context.fetch(LiveChannelQuery.descriptor(source: nil, search: "", limit: LiveChannelQuery.maxRows))
+                .count
+        }
+        _ = try await timed("Live TV search 'channel 7', all sources") {
+            try context.fetch(LiveChannelQuery.descriptor(source: nil, search: "channel 7", limit: 300)).count
+        }
+        _ = try await timed("Live TV search matching nothing, all sources") {
+            try context.fetch(LiveChannelQuery.descriptor(source: nil, search: "zzzzzz", limit: 300)).count
         }
     }
 
