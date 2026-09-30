@@ -68,10 +68,11 @@ private struct PlayerView: View {
 
     @ViewBuilder
     private var surface: some View {
-        // Each engine draws its own way. Only AVPlayer exists today; the other
-        // adapters add their own case here.
+        // Each engine draws its own way; a new adapter adds its own case here.
         if let engine = model.engine as? AVPlayerEngine {
             AVPlayerSurface(player: engine.player).ignoresSafeArea()
+        } else if let engine = model.engine as? VLCEngine {
+            VLCSurface(view: engine.surface).ignoresSafeArea()
         }
     }
 

@@ -18,6 +18,7 @@
 		AAAA000000000000000000F3 /* PanopXtream in Frameworks */ = {isa = PBXBuildFile; productRef = AAAA000000000000000000C5 /* PanopXtream */; };
 		AAAA000000000000000000F4 /* PanopEPG in Frameworks */ = {isa = PBXBuildFile; productRef = AAAA000000000000000000C6 /* PanopEPG */; };
 		AAAA000000000000000000F5 /* PanopCatalog in Frameworks */ = {isa = PBXBuildFile; productRef = AAAA000000000000000000C7 /* PanopCatalog */; };
+		AAAA000000000000000000F6 /* VLCKit in Frameworks */ = {isa = PBXBuildFile; productRef = AAAA000000000000000000C8 /* VLCKit */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -59,6 +60,7 @@
 				AAAA000000000000000000D5 /* PanopXtream in Frameworks */,
 				AAAA000000000000000000D6 /* PanopEPG in Frameworks */,
 				AAAA000000000000000000D7 /* PanopCatalog in Frameworks */,
+				AAAA000000000000000000F6 /* VLCKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -121,6 +123,7 @@
 				AAAA000000000000000000C5 /* PanopXtream */,
 				AAAA000000000000000000C6 /* PanopEPG */,
 				AAAA000000000000000000C7 /* PanopCatalog */,
+				AAAA000000000000000000C8 /* VLCKit */,
 			);
 			productName = Panop;
 			productReference = AAAA000000000000000000A5 /* Panop.app */;
@@ -183,6 +186,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				AAAA000000000000000000C1 /* XCLocalSwiftPackageReference "Packages/PanopKit" */,
+				AAAA000000000000000000C9 /* XCRemoteSwiftPackageReference "VLCKit" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = AAAA000000000000000000A3 /* Products */;
@@ -431,6 +435,17 @@
 		};
 /* End XCLocalSwiftPackageReference section */
 
+/* Begin XCRemoteSwiftPackageReference section */
+		AAAA000000000000000000C9 /* XCRemoteSwiftPackageReference "VLCKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://code.videolan.org/videolan/VLCKit.git";
+			requirement = {
+				kind = exactVersion;
+				version = "4.0.0-a24";
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
 /* Begin XCSwiftPackageProductDependency section */
 		AAAA000000000000000000C2 /* PanopCore */ = {
 			isa = XCSwiftPackageProductDependency;
@@ -455,6 +470,11 @@
 		AAAA000000000000000000C7 /* PanopCatalog */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = PanopCatalog;
+		};
+		AAAA000000000000000000C8 /* VLCKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AAAA000000000000000000C9 /* XCRemoteSwiftPackageReference "VLCKit" */;
+			productName = VLCKit;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

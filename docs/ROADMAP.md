@@ -196,7 +196,18 @@ The first milestone where Panop is usable.
       Floor for zapping, no network, warm: ~4 ms to first frame (cold ~80 ms). Not yet verified:
       any real provider stream. **Practical limit today:** AVPlayer cannot read raw MPEG-TS, so
       most M3U live streams fail until VLCKit or LumeEngine exists; Xtream live works (HLS).
-- [ ] **VLCKit adapter**. LGPL, must stay dynamically linked.
+- [x] **VLCKit adapter**. LGPL, must stay dynamically linked (verified: `@rpath/VLCKit.framework`,
+      no libvlc symbols in the app binary). Pinned to **4.0.0-a24**, an alpha and the only
+      SwiftPM line. Reports only, like the AVPlayer adapter. **Verified on real bytes:** a raw
+      MPEG-TS stream muxed by libVLC itself and served over HTTP the way a provider serves live
+      TV; AVPlayer refuses it and the coordinator moves to VLC, which plays it. Also verified:
+      play, pause, seek, resume, stop, garbage and missing files reported as failures, a healthy
+      stream settling at `playing` and not being reconnected, and real video surviving its
+      surface leaving the screen. Tests pass on macOS, iOS and tvOS simulators; the app links
+      for real iOS and tvOS devices (unsigned). **Not verified:** any real provider stream, and
+      the screens by eye. Crashes found and fixed on the way, all recorded in `docs/engines.md`:
+      rendering into a detached view, releasing a player on the main thread, a delegate class
+      inheriting main-actor isolation, and a 0 to 100 versus 0 to 1 buffering mix-up.
 - [ ] **LumeEngine adapter**, vendored as a pinned submodule, never a URL dependency.
 - [ ] **App-side facade over LumeEngine's `PlayerSession`** *(surfaced)*. Its `LumePlayer` facade
       exposes no event stream and keeps `session` private, so reconnect, PiP and Now Playing all

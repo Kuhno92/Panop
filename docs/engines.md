@@ -58,7 +58,28 @@ hidden symbol visibility. No `av*` symbols are exported and no C headers are ven
 It is effectively invisible to the other engines.
 
 **Integration:** SwiftPM URL dependency, exact version. Add the product to the Frameworks build
-phase only.
+phase only. Done, at **4.0.0-a24**: the only SwiftPM-distributed line is the VLCKit 4 alpha, since
+3.7.x has no `Package.swift`. Expect API churn when bumping it; the adapter is the only place that
+imports it. The package checkout is about 2.7 GB in the shared clone directory.
+
+**Things about libVLC that are not in its documentation** (each cost a crash or a bug to learn):
+
+- **Never let it render into a view that is not on screen.** Its OpenGL video output aborts the
+  whole process (an assertion in `vout_display_opengl_Prepare`, on its own render thread). The
+  engine therefore holds `play()` until its surface is in a window, and drops the drawable if the
+  surface leaves one mid-playback.
+- **Never release a `VLCMediaPlayer` on the main thread.** Its destructor joins a libVLC thread that
+  can be waiting on the main queue, and the app deadlocks. `VLCPlayerHolder` hands the last
+  reference to a background queue wherever the engine dies, and `stop()` runs off the main thread too.
+- **Delegate classes must be `nonisolated`.** libVLC calls them from its own threads, and under the
+  project's default main-actor isolation Swift asserts the main queue on entry and traps.
+- **Buffering progress is 0.0 to 1.0**, not a percentage. Read as 0 to 100 it left every stream stuck
+  in `.buffering`, which the coordinator answers by reconnecting.
+- **`:start-time` is ignored** by VLCKit 4 (every spelling measured as absent), so a resume position
+  is applied by seeking on the first frame. That is acceptable for video on demand, the only kind
+  the coordinator resumes.
+- **There is no "opened but not playing" state.** `load` only prepares the media; a failure to open
+  arrives as a `.failed` event after `play()`. It does report one for garbage and missing files.
 
 ### KSPlayer: the public one (only if you enable it)
 

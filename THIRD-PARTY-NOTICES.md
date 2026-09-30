@@ -18,6 +18,15 @@ LGPL requires that users be able to replace this component. VLCKit is consumed a
 xcframework and is **not** statically linked into Panop's binary. That must remain true.
 VLCKit bundles FFmpeg, statically linked inside `libvlccore` with hidden symbol visibility.
 
+- **Status:** integrated. Pinned to exactly **4.0.0-a24**, through SwiftPM
+  (`https://code.videolan.org/videolan/VLCKit.git`). This is a pre-release: VLCKit 4 is the only
+  line distributed as a Swift package, and the stable 3.7.x line is CocoaPods-only.
+- **Binary:** a prebuilt xcframework downloaded by SwiftPM from download.videolan.org (about
+  112 MB per macOS slice in the app, and several hundred MB in the package checkout).
+- **Linking, verified:** the app links `@rpath/VLCKit.framework` dynamically and embeds it as its
+  own framework. No libvlc symbols are in the app binary. This is what lets a user replace the
+  component, as the LGPL requires.
+
 ### KSPlayer
 - **License:** **GPL-3.0** by default. An LGPL license is available as a paid commercial option.
 - **Source:** https://github.com/kingslay/KSPlayer

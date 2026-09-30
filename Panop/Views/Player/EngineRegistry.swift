@@ -10,14 +10,15 @@ enum EngineRegistry {
     static func make(_ kind: PlaybackEngineKind) -> (any PlaybackEngine)? {
         switch kind {
         case .avPlayer: AVPlayerEngine()
-        case .vlcKit, .lumeEngine, .ksPlayer: nil
+        case .vlcKit: VLCEngine()
+        case .lumeEngine, .ksPlayer: nil
         }
     }
 
     nonisolated static func isImplemented(_ kind: PlaybackEngineKind) -> Bool {
         switch kind {
-        case .avPlayer: true
-        case .vlcKit, .lumeEngine, .ksPlayer: false
+        case .avPlayer, .vlcKit: true
+        case .lumeEngine, .ksPlayer: false
         }
     }
 

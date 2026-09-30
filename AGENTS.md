@@ -17,9 +17,10 @@ command works because it is documented below.
 - [x] Repo skeleton, docs, lint tooling, ADRs
 - [x] `Packages/PanopKit`: PanopCore, PanopPlaylist, PanopPlayback, PanopXtream, PanopEPG, PanopCatalog (211 tests passing)
 - [x] `Panop.xcodeproj` and the app target (builds and launches on **macOS and iOS**)
-- [x] `SwiftDataCatalogStore` and the `PanopTests` target (113 tests, passing on macOS, iOS and tvOS)
-- [x] Playback coordinator (portable, `PanopPlayback`) and the AVPlayer adapter. Channels play from the Live TV list. **Only AVPlayer exists**, and it cannot read raw MPEG-TS, so most M3U live streams fail until an FFmpeg-based engine lands. Xtream live streams work because the panel offers HLS
-- [ ] Engines: VLCKit, then LumeEngine (KSPlayer stays unlinked)
+- [x] `SwiftDataCatalogStore` and the `PanopTests` target (133 tests, passing on macOS, iOS and tvOS)
+- [x] Playback coordinator (portable, `PanopPlayback`) and the AVPlayer adapter. Channels play from the Live TV list. AVPlayer cannot read raw MPEG-TS, so those streams fall through to VLC; Xtream live streams play in AVPlayer directly because the panel offers HLS
+- [x] VLCKit adapter (4.0.0-a24, the only SwiftPM line; an alpha). Plays raw MPEG-TS over HTTP, so M3U live streams now work, verified on real transport-stream bytes through the coordinator
+- [ ] LumeEngine (KSPlayer stays unlinked)
 - [x] Playlist import wired to the catalog container: add by Xtream login, M3U link or M3U file, Keychain credentials, background sync. The screens launch and are covered by service-level tests, but have not been driven by hand or by UI tests yet
 
 `docs/ROADMAP.md` is the full feature list, ordered into milestones and traced back to the
@@ -249,6 +250,12 @@ own schedule.
 `SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor` is set project-wide. Value types and DTOs used from
 `nonisolated` contexts need an explicit `nonisolated` on **the type and every extension**.
 Missing one produces an error far from the cause.
+
+### VLCKit (libVLC)
+Three rules, each learned from a crash. Details in `docs/engines.md`.
+- **Never render video into a view that is not in a window.** libVLC aborts the whole process. `VLCEngine` holds `play()` until its surface is on screen; do not bypass that.
+- **Never release a `VLCMediaPlayer` on the main thread.** It deadlocks. Go through `VLCPlayerHolder`.
+- **libVLC delegate classes must be `nonisolated`**, or Swift traps on the main-queue assertion when libVLC calls from its own thread.
 
 ### Large catalogs
 Real IPTV playlists run to 80,000 entries and XMLTV guides exceed 100 MB. Parsers stream and
