@@ -4,11 +4,12 @@ import PanopXtream
 
 /// Turns each source's rows into ``CatalogEntry``.
 enum EntryMapping {
-    /// - Returns: nil for an entry with no URL, which cannot be played or
-    ///   given a stable identity.
-    static func entry(from playlistEntry: PlaylistEntry) -> CatalogEntry? {
-        let url = playlistEntry.url.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !url.isEmpty else { return nil }
+    /// - Parameter base: the playlist's own address, for resolving a relative one.
+    /// - Returns: nil for an entry with no playable address: empty, or relative with
+    ///   nothing to resolve it against. Such a row could never play, and giving it
+    ///   an identity would only hide the problem.
+    static func entry(from playlistEntry: PlaylistEntry, base: URL? = nil) -> CatalogEntry? {
+        guard let url = playableAddress(playlistEntry.url, base: base) else { return nil }
 
         let attributes = playlistEntry.attributes
         let group = attributes.groupTitle.flatMap { $0.isEmpty ? nil : $0 }
@@ -24,6 +25,32 @@ enum EntryMapping {
             hasArchive: attributes.catchup.map { !$0.isEmpty } ?? false,
             archiveDays: attributes.catchupDays.flatMap { Int($0) }
         )
+    }
+
+    /// The absolute address for an entry's URL, or nil if there is none.
+    ///
+    /// A URL with a scheme is kept exactly as written: providers put things in
+    /// URLs that `URL` would rewrite, and the catalog's identity hashes the text.
+    /// Only a scheme-less one is resolved, against the playlist's own address.
+    static func playableAddress(_ raw: String, base: URL?) -> String? {
+        let text = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !text.isEmpty else { return nil }
+        if hasScheme(text) {
+            return text
+        }
+        guard let base, let resolved = URL(string: text, relativeTo: base)?.absoluteURL,
+              resolved.scheme != nil, resolved.host?.isEmpty == false
+        else { return nil }
+        return resolved.absoluteString
+    }
+
+    /// `http://`, `rtmp://`, `file://` and so on. Looks for `scheme:` followed by `//`,
+    /// not just a colon, so a path such as `a:b/c` is not mistaken for one.
+    private static func hasScheme(_ text: String) -> Bool {
+        guard let range = text.range(of: "://") else { return false }
+        let scheme = text[..<range.lowerBound]
+        return !scheme.isEmpty && scheme
+            .allSatisfy { $0.isLetter || $0.isNumber || $0 == "+" || $0 == "-" || $0 == "." }
     }
 
     static func entry(from stream: XtreamLiveStream, groups: [String: String]) -> CatalogEntry {

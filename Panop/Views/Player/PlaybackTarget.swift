@@ -47,6 +47,14 @@ nonisolated enum PlaybackRequestBuilder {
         transport: any HTTPTransport
     ) throws -> PlaybackRequest {
         if let url = target.streamURL, !url.isEmpty {
+            // A path with no scheme and host reaches an engine as a failure that
+            // looks like a network problem. Say what is wrong instead.
+            guard let parsed = URL(string: url), parsed.scheme != nil,
+                  parsed.isFileURL || parsed.host?.isEmpty == false || url.contains("://@")
+            else {
+                throw PlaybackTargetError
+                    .notPlayable("This item's address is incomplete. Refresh the playlist and try again.")
+            }
             let item = PlaybackItem(url: url, title: target.name, mediaKind: target.kind)
             return PlaybackRequest(mediaKind: target.kind) { _ in item }
         }

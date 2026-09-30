@@ -80,6 +80,9 @@ public struct PlaybackError: Error, Sendable, Equatable, Hashable {
         /// The engine could not open the URL at all.
         case openFailed
         case network
+        /// The address is not a URL any engine could open, such as a path with no host.
+        /// No engine and no retry can fix it.
+        case invalidAddress
         /// The engine understood the container or codec and refused it. This is
         /// the signal to try the next engine rather than retry this one.
         case unsupportedFormat
@@ -103,7 +106,7 @@ public struct PlaybackError: Error, Sendable, Equatable, Hashable {
     public var isRetryable: Bool {
         switch code {
         case .network, .openFailed: true
-        case .unsupportedFormat, .decodeFailed, .cancelled, .internalError: false
+        case .invalidAddress, .unsupportedFormat, .decodeFailed, .cancelled, .internalError: false
         }
     }
 }

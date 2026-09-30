@@ -6,8 +6,13 @@ nonisolated enum PlaybackMessages {
         switch notice {
         case let .fellBack(from, to, _):
             "\(from.displayName) couldn't open this stream, so Panop is using \(to.displayName)."
-        case .reconnecting:
-            "The connection dropped. Reconnecting…"
+        case let .reconnecting(_, reason):
+            // An open that failed is not a dropped connection: saying so sent a
+            // bad address down the wrong diagnosis.
+            switch reason.code {
+            case .network: "The connection dropped. Reconnecting…"
+            default: "Couldn't open the stream. Trying again…"
+            }
         }
     }
 
@@ -20,6 +25,8 @@ nonisolated enum PlaybackMessages {
             "The available players can't open this stream's format."
         case .network:
             "Couldn't reach this stream. Check your connection, and that the provider is up."
+        case .invalidAddress:
+            "This stream's address isn't valid. Check the link, or refresh the playlist."
         case .openFailed:
             "This stream wouldn't open."
         case .cancelled, .internalError, nil:

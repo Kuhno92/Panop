@@ -10,11 +10,14 @@ public struct PlaylistDescriptor: Sendable, Equatable {
     /// A guide URL the user supplied. Used for M3U sources whose header does not
     /// advertise one. Xtream panels always use their own `xmltv.php`.
     public var guideURL: String?
+    /// What to call the channel if the source turns out to be a single stream.
+    public var name: String?
 
-    public init(id: String, source: PlaylistSource, guideURL: String? = nil) {
+    public init(id: String, source: PlaylistSource, guideURL: String? = nil, name: String? = nil) {
         self.id = id
         self.source = source
         self.guideURL = guideURL
+        self.name = name
     }
 }
 
@@ -108,14 +111,20 @@ extension CatalogImporter {
             let report = try await importM3U(
                 playlist: playlist.id,
                 source: .remote(url, redacting: secrets),
-                force: force
+                force: force,
+                streamName: playlist.name
             )
             let guideURL = Self.guideURL(advertised: report.epgURLs, configured: playlist.guideURL)
             secrets += guideURL.map(URLSecrets.values(in:)) ?? []
             return CatalogImportResult(report: report, guideURL: guideURL, secrets: secrets)
 
         case let .localM3U(path):
-            let report = try await importM3U(playlist: playlist.id, source: .file(path: path), force: force)
+            let report = try await importM3U(
+                playlist: playlist.id,
+                source: .file(path: path),
+                force: force,
+                streamName: playlist.name
+            )
             let guideURL = Self.guideURL(advertised: report.epgURLs, configured: playlist.guideURL)
             return CatalogImportResult(
                 report: report,

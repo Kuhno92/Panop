@@ -129,6 +129,11 @@ See `docs/adr/0003-two-model-containers.md`.
 
 - **Parsers stream.** The M3U parser reads in chunks and emits batches. An 80,000-entry
   playlist never exists as a single array.
+- **An HLS manifest is a stream, not a playlist.** Both start with `#EXTM3U`, so a stream
+  URL pasted as an "M3U link" used to import its variant lines as bogus channels. The
+  importer checks the first 64 KB for HLS-only tags and, if found, makes one channel that
+  plays the address itself. Relative entry addresses resolve against the playlist's URL;
+  ones that still have no host are skipped and counted in `ImportReport.skippedEntries`.
 - **Persistence batches.** Imports run on a background `ModelContext` with autosave disabled,
   saving once per batch.
 - **Queries are indexed.** Every predicate and sort column carries an index.

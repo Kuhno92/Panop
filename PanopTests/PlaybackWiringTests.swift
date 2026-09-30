@@ -294,4 +294,63 @@ struct PlayerModelTests {
         #expect(text.contains("AVPlayer"))
         await model.stop()
     }
+
+    /// The report that started this: a bad address showed "Connection dropped".
+    @Test
+    func `a failed open is not described as a dropped connection`() {
+        let text = PlaybackMessages.text(for: .reconnecting(
+            engine: .vlcKit,
+            reason: PlaybackError(code: .openFailed)
+        ))
+        #expect(!text.contains("connection"))
+        #expect(text.contains("open"))
+    }
+
+    @Test
+    func `a network drop is described as one`() {
+        let text = PlaybackMessages.text(for: .reconnecting(
+            engine: .vlcKit,
+            reason: PlaybackError(code: .network)
+        ))
+        #expect(text.contains("connection dropped"))
+    }
+
+    @Test
+    func `an invalid address is not retried and says so`() {
+        #expect(!PlaybackError(code: .invalidAddress).isRetryable)
+        let failure = PlaybackFailure(attempts: [PlaybackAttempt(
+            engine: .avPlayer,
+            error: PlaybackError(code: .invalidAddress)
+        )])
+        #expect(PlaybackMessages.text(for: failure).contains("address"))
+    }
+}
+
+struct PlaybackAddressValidationTests {
+    private func target(_ url: String) -> PlaybackTarget {
+        PlaybackTarget(playlist: "p", entryID: "e", kind: .live, name: "X", streamURL: url)
+    }
+
+    @Test(arguments: ["/hls/live/1/1.m3u8", "1.m3u8", "http:///nohost.ts", "not a url"])
+    func `an address with no scheme or host is refused with a clear message`(url: String) {
+        #expect(throws: PlaybackTargetError.self) {
+            try PlaybackRequestBuilder.request(
+                for: target(url),
+                source: nil,
+                transport: StubTransport { _ in (404, "") }
+            )
+        }
+    }
+
+    @Test(arguments: [
+        "http://host/a.ts", "https://host/a.m3u8", "udp://@239.1.1.1:1234",
+        "rtmp://host/app/stream", "file:///tmp/a.ts"
+    ])
+    func `complete addresses are accepted`(url: String) throws {
+        _ = try PlaybackRequestBuilder.request(
+            for: target(url),
+            source: nil,
+            transport: StubTransport { _ in (404, "") }
+        )
+    }
 }

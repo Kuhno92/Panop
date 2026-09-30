@@ -49,7 +49,7 @@ struct PlayerScreen: View {
     }
 }
 
-private struct PlayerView: View {
+struct PlayerView: View {
     let model: PlayerModel
 
     @Environment(\.dismiss) private var dismiss

@@ -109,7 +109,7 @@ final class VLCEngine: PlaybackEngine {
 
     func load(_ item: PlaybackItem) async throws {
         guard let url = URL(string: item.url), url.scheme != nil, let media = VLCMedia(url: url) else {
-            throw PlaybackError(code: .openFailed, message: "That is not a valid stream address.")
+            throw PlaybackError(code: .invalidAddress, message: "That is not a valid stream address.")
         }
 
         // Some providers reject requests without their expected User-Agent or Referer.

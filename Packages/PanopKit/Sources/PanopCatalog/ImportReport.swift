@@ -80,11 +80,16 @@ public struct ImportReport: Sendable, Equatable {
     /// Guide URLs the playlist advertises, for the caller to feed to
     /// ``CatalogImporter/importEPG(playlist:url:window:redacting:)``.
     public var epgURLs: [String]
+    /// Entries left out because they had no playable address. Not a failure, but
+    /// worth telling the user about: a playlist that is mostly this is probably not
+    /// the address they meant.
+    public var skippedEntries: Int
 
-    public init(outcome: Outcome, kinds: [KindReport] = [], epgURLs: [String] = []) {
+    public init(outcome: Outcome, kinds: [KindReport] = [], epgURLs: [String] = [], skippedEntries: Int = 0) {
         self.outcome = outcome
         self.kinds = kinds
         self.epgURLs = epgURLs
+        self.skippedEntries = skippedEntries
     }
 
     public var failures: [KindReport] {

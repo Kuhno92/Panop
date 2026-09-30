@@ -288,7 +288,7 @@ struct AVPlayerEngineTests {
     func `an address that is not a URL fails without touching the network`() async {
         let engine = AVPlayerEngine()
         let error = await capturedError { try await engine.load(PlaybackItem(url: "not a url")) }
-        #expect(error?.code == .openFailed)
+        #expect(error?.code == .invalidAddress)
         await engine.stop()
     }
 

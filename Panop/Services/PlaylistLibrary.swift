@@ -223,10 +223,14 @@ final class PlaylistLibrary {
         switch record.kind {
         case .remoteM3U:
             guard let url = secret?.url else { return nil }
-            return PlaylistDescriptor(id: id, source: .remoteM3U(url), guideURL: secret?.guideURL)
+            return PlaylistDescriptor(id: id, source: .remoteM3U(url), guideURL: secret?.guideURL, name: record.name)
         case .localM3U:
             guard let file = record.localFileName else { return nil }
-            return PlaylistDescriptor(id: id, source: .localM3U(path: directory.appendingPathComponent(file).path))
+            return PlaylistDescriptor(
+                id: id,
+                source: .localM3U(path: directory.appendingPathComponent(file).path),
+                name: record.name
+            )
         case .xtream:
             guard let secret, let url = secret.url, let user = secret.username,
                   let password = secret.password else { return nil }

@@ -8,6 +8,16 @@ public enum M3USource: Sendable, Equatable {
     /// to scrub from error messages, since these URLs commonly embed them.
     case remote(URL, redacting: [String] = [])
     case file(path: String)
+
+    /// What relative addresses inside the playlist are relative to. Only a
+    /// remote playlist has one: a relative path in a local file names nothing.
+    var baseURL: URL? {
+        if case let .remote(url, _) = self {
+            url
+        } else {
+            nil
+        }
+    }
 }
 
 /// Imports playlists and guides into a ``CatalogStore``.
@@ -64,8 +74,19 @@ public struct CatalogImporter: Sendable {
     /// M3U servers offer nothing to make a conditional request with, but
     /// parsing and writing 80,000 rows again is not.
     ///
-    /// - Parameter force: import even when the digest is unchanged.
-    public func importM3U(playlist: String, source: M3USource, force: Bool = false) async throws -> ImportReport {
+    /// A source that turns out to be a single HLS stream rather than a playlist of
+    /// channels (see ``HLSManifest``) becomes one channel whose address is the source
+    /// itself. That is what makes pasting a stream URL work.
+    ///
+    /// - Parameters:
+    ///   - force: import even when the digest is unchanged.
+    ///   - streamName: what to call the channel when the source is a single stream.
+    public func importM3U(
+        playlist: String,
+        source: M3USource,
+        force: Bool = false,
+        streamName: String? = nil
+    ) async throws -> ImportReport {
         let file = try await prepare(source)
         defer {
             if file.isTemporary {
@@ -87,7 +108,24 @@ public struct CatalogImporter: Sendable {
         for kind in MediaKind.allCases {
             trackers[kind] = try await KindTracker(kind: kind, before: store.entryCount(kind: kind, playlist: playlist))
         }
-        let header = try await parseM3U(path: file.path, playlist: playlist, trackers: &trackers)
+        var skipped = 0
+        let header: PlaylistHeader = if let kind = Self.hlsKind(atPath: file.path) {
+            try await acceptSingleStream(
+                kind: kind,
+                source: source,
+                name: streamName,
+                playlist: playlist,
+                trackers: &trackers
+            )
+        } else {
+            try await parseM3U(
+                path: file.path,
+                base: source.baseURL,
+                playlist: playlist,
+                trackers: &trackers,
+                skipped: &skipped
+            )
+        }
 
         // Reaching here means the whole file was read without error. It does
         // not mean the file was whole, which is what the sweep's gate is for.
@@ -111,22 +149,35 @@ public struct CatalogImporter: Sendable {
         state.digest = file.digest
         state.lastCompleted = now()
         try await store.saveSyncState(state, playlist: playlist)
-        return ImportReport(outcome: .imported, kinds: reports.filter(\.isWorthReporting), epgURLs: header.epgURLs)
+        return ImportReport(
+            outcome: .imported,
+            kinds: reports.filter(\.isWorthReporting),
+            epgURLs: header.epgURLs,
+            skippedEntries: skipped
+        )
     }
 
     private func parseM3U(
         path: String,
+        base: URL?,
         playlist: String,
-        trackers: inout [MediaKind: KindTracker]
+        trackers: inout [MediaKind: KindTracker],
+        skipped: inout Int
     ) async throws -> PlaylistHeader {
         guard let handle = FileHandle(forReadingAtPath: path) else { throw CatalogError.cannotReadFile }
         defer { try? handle.close() }
 
         var parser = M3UParser()
         while let chunk = try handle.read(upToCount: Self.readSize), !chunk.isEmpty {
-            try await accept(parser.consume(chunk), playlist: playlist, trackers: &trackers)
+            try await accept(
+                parser.consume(chunk),
+                base: base,
+                playlist: playlist,
+                trackers: &trackers,
+                skipped: &skipped
+            )
         }
-        try await accept(parser.finish(), playlist: playlist, trackers: &trackers)
+        try await accept(parser.finish(), base: base, playlist: playlist, trackers: &trackers, skipped: &skipped)
         for kind in MediaKind.allCases {
             try await flush(&trackers[kind, default: KindTracker(kind: kind, before: 0)], playlist: playlist)
         }
@@ -135,11 +186,17 @@ public struct CatalogImporter: Sendable {
 
     private func accept(
         _ parsed: [PlaylistEntry],
+        base: URL?,
         playlist: String,
-        trackers: inout [MediaKind: KindTracker]
+        trackers: inout [MediaKind: KindTracker],
+        skipped: inout Int
     ) async throws {
         for item in parsed {
-            guard let entry = EntryMapping.entry(from: item) else { continue }
+            // An entry with no playable address is not a channel. Counted, not hidden.
+            guard let entry = EntryMapping.entry(from: item, base: base) else {
+                skipped += 1
+                continue
+            }
             var tracker = trackers[entry.kind] ?? KindTracker(kind: entry.kind, before: 0)
             trackers[entry.kind] = nil
             tracker.add(entry)
@@ -148,6 +205,43 @@ public struct CatalogImporter: Sendable {
             }
             trackers[entry.kind] = tracker
         }
+    }
+
+    // MARK: - A single HLS stream
+
+    /// The HLS kind of the file at `path`, if it is a manifest and not a playlist.
+    static func hlsKind(atPath path: String) -> HLSManifest.Kind? {
+        guard let handle = FileHandle(forReadingAtPath: path) else { return nil }
+        defer { try? handle.close() }
+        let prefix = (try? handle.read(upToCount: 64 * 1024)) ?? Data()
+        return HLSManifest.kind(ofPrefix: prefix)
+    }
+
+    /// Records the source itself as the one channel.
+    private func acceptSingleStream(
+        kind: HLSManifest.Kind,
+        source: M3USource,
+        name: String?,
+        playlist: String,
+        trackers: inout [MediaKind: KindTracker]
+    ) async throws -> PlaylistHeader {
+        let address: String = switch source {
+        case let .remote(url, _): url.absoluteString
+        case let .file(path): URL(fileURLWithPath: path).absoluteString
+        }
+        let fallbackName = source.baseURL?.host ?? "Stream"
+        let mediaKind: MediaKind = kind == .live ? .live : .movie
+        let entry = CatalogEntry(
+            id: CatalogID.m3u(url: address),
+            kind: mediaKind,
+            name: name?.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty ?? fallbackName,
+            streamURL: address
+        )
+        var tracker = trackers[mediaKind] ?? KindTracker(kind: mediaKind, before: 0)
+        tracker.add(entry)
+        try await flush(&tracker, playlist: playlist)
+        trackers[mediaKind] = tracker
+        return PlaylistHeader()
     }
 
     // MARK: - Confirming a held-back removal
@@ -202,6 +296,12 @@ private extension KindReport {
     /// Kinds that saw no rows and lost none add only noise to a report.
     var isWorthReporting: Bool {
         imported > 0 || removed > 0 || deferredRemoval != nil || failure != nil
+    }
+}
+
+private extension String {
+    var nilIfEmpty: String? {
+        isEmpty ? nil : self
     }
 }
 
