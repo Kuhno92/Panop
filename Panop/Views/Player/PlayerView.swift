@@ -40,6 +40,7 @@ struct PlayerScreen: View {
                 title: target.name,
                 request: request,
                 preferred: PlaybackEngineKind(rawValue: engineRaw),
+                controlsTimeout: UITestMode.controlsTimeout ?? .seconds(4),
                 nowPlaying: SystemNowPlaying()
             )
         } catch let error as PlaybackTargetError {
@@ -59,6 +60,7 @@ struct PlayerView: View {
         ZStack {
             surface
             subtitles
+            tapSurface
             overlay
         }
         .task { model.start() }
@@ -123,7 +125,19 @@ struct PlayerView: View {
         }
         .animation(.default, value: model.notice)
         .animation(.easeOut(duration: 0.2), value: model.showsControls)
-        .contentShape(Rectangle())
+    }
+
+    /// The whole picture, as a touch target for showing and hiding the controls.
+    ///
+    /// A layer of its own, behind the controls. The gesture used to sit on the container that
+    /// holds them, and once they hid that container held nothing but spacers: a tap on the
+    /// picture then never arrived, so hidden controls could not be brought back (found by a UI
+    /// test, which tapped and watched nothing happen). Buttons are above this layer, so they
+    /// still get their own taps.
+    private var tapSurface: some View {
+        Color.clear
+            .contentShape(Rectangle())
+            .ignoresSafeArea()
         #if !os(tvOS)
             .onTapGesture { model.toggleControls() }
         #else

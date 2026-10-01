@@ -305,8 +305,10 @@ The brief called performance a key concept. For IPTV this concentrates in one nu
       the player controls now stay up while one has focus and count down once it lets go; and
       while they are hidden a focusable surface lets any direction press or Select bring them
       back (before, nothing on screen could take focus, so the remote could not wake them).
-      First launch on the Apple TV simulator looks right. **Not verified:** driving the remote
-      through the player and the lists, which needs the synthetic-keystroke route below.
+      **Now verified** by driving the real remote in the UI tests (`PanopUITests`): controls stay
+      up while focused, Menu closes the player, and the player is reachable from the list.
+      **Still open:** the controls coming back after they have hidden, by remote, since a held
+      bar does not hide while it has focus and so that state is hard to reach.
 - [ ] **macOS windowing**: a separate player window. New windows do not inherit the main
       scene's environment, so container and environment must be re-declared.
 - [x] **Image pipeline** *(surfaced)*, `Panop/Services/Images/`, shown as `ChannelLogo` in the
@@ -326,8 +328,17 @@ The brief called performance a key concept. For IPTV this concentrates in one nu
       a source that could not be updated and offers the retry. Search is offered only once a
       playlist exists. Decision logic tested separately (`LiveEmptyState`); looked at on macOS
       and tvOS. **Not done:** the same for movies and series, which have no screen yet.
-- [ ] **UI test target** *(surfaced)*. The only reliable way to verify screens past launch on
-      iOS. tvOS can be driven by synthetic keystrokes; iOS cannot be tapped from the CLI.
+- [x] **UI test target** *(surfaced)*: `PanopUITests`, run with `Scripts/test-ui.sh [ios|tvos]`.
+      iOS is driven by taps and tvOS by the real remote (`XCUIRemote`), against a deterministic
+      app (`-panop-uitest`, Debug only). 6 tests on iOS and 5 on tvOS cover: the seeded channels,
+      search, opening a channel, the controls and LIVE badge, pause and play, close, the controls
+      hiding and a tap bringing them back, and on tvOS the controls **staying up while the
+      remote has focus on them** and Menu closing the player. **Found three real bugs:** a row
+      that ignored a tap in its empty middle (the whole row is now the target, which Apple TV
+      focus also needs), hidden controls that a tap could not bring back (the gesture now has a
+      layer of its own), and a focused Pause button covering the LIVE badge on Apple TV. **Not
+      covered:** macOS (needs an accessibility grant), the Add Playlist flow, Settings, and
+      playback itself, since the test engine draws no picture.
 
 ---
 

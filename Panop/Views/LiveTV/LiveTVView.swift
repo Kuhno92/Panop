@@ -130,9 +130,14 @@ private struct LiveChannelList: View {
                 problemBanner
             }
             ForEach(channels) { channel in
-                Button { onPlay(channel) } label: { row(channel) }
-                    .buttonStyle(.plain)
-                    .onAppear { growIfNeeded(at: channel) }
+                Button { onPlay(channel) } label: {
+                    // A plain button answers only where something is drawn, so the empty
+                    // middle of a row would swallow a tap. The whole row is the target, which
+                    // is also what Apple TV focus needs.
+                    row(channel).contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .onAppear { growIfNeeded(at: channel) }
             }
             if channels.count >= LiveChannelQuery.maxRows {
                 Text("Showing the first \(LiveChannelQuery.maxRows.formatted()). Search to narrow it down.")
@@ -264,17 +269,25 @@ private struct PlayerPresentation: ViewModifier {
     }
 }
 
-/// Search, once there is something to search. Before the first playlist it would only put a
-/// keyboard, half the screen on Apple TV, above a message about adding one.
+/// Search. On Apple TV only once there is something to search: before the first playlist its
+/// keyboard, half the screen, would sit above a message about adding one.
+///
+/// Elsewhere it is always there. Switching it on and off changes the view's structure, which
+/// rebuilt the screen when the first playlist loaded, and a UI test sometimes found the search
+/// field missing afterwards.
 private struct ChannelSearch: ViewModifier {
     @Binding var text: String
     let isOffered: Bool
 
     func body(content: Content) -> some View {
-        if isOffered {
+        #if os(tvOS)
+            if isOffered {
+                content.searchable(text: $text, prompt: "Search channels")
+            } else {
+                content
+            }
+        #else
             content.searchable(text: $text, prompt: "Search channels")
-        } else {
-            content
-        }
+        #endif
     }
 }

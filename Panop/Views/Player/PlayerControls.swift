@@ -20,8 +20,18 @@ struct PlayerControls: View {
 
     private let skip = 10.0
 
+    /// A focused button on Apple TV grows, and at the usual spacing it covered its neighbour:
+    /// the LIVE badge sat half under the Pause button (seen in a UI test screenshot).
+    private static var spacing: CGFloat {
+        #if os(tvOS)
+            48
+        #else
+            20
+        #endif
+    }
+
     var body: some View {
-        HStack(spacing: 20) {
+        HStack(spacing: Self.spacing) {
             Button {
                 model.togglePause()
             } label: {

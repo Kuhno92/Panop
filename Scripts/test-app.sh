@@ -49,7 +49,9 @@ for runtime, entries in sorted(devices.items(), reverse=True):
 ' "$1"
 }
 
-flags=()
+# The scheme also holds the UI tests (Scripts/test-ui.sh). They are slow, need a simulator
+# and, on macOS, an accessibility grant, so they are never part of this fast run.
+flags=(-skip-testing:PanopUITests)
 if [[ $benchmark -eq 1 ]]; then
     # Debug is -Onone, which makes every number fiction. Testability is needed
     # for @testable import, and the hardened runtime refuses to load the

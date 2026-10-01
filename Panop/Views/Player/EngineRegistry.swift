@@ -8,7 +8,13 @@ import PanopPlayback
 /// nothing can be selected that cannot play.
 enum EngineRegistry {
     static func make(_ kind: PlaybackEngineKind) -> (any PlaybackEngine)? {
-        switch kind {
+        #if DEBUG
+            if UITestMode.isActive {
+                guard kind == .avPlayer else { return nil }
+                return UITestEngine()
+            }
+        #endif
+        return switch kind {
         case .avPlayer: AVPlayerEngine()
         case .vlcKit: VLCEngine()
         case .lumeEngine: LumePlaybackEngine()

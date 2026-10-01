@@ -95,6 +95,28 @@ Scripts/test-app.sh [macos|ios|tvos]
 # Catalog import benchmarks: Release build, macOS, prints a results table
 Scripts/test-app.sh --benchmark
 
+# UI tests (PanopUITests): drive the real screens, and the Apple TV remote, on a simulator.
+# Minutes, not seconds. Not on macOS, which needs an accessibility grant given by hand.
+Scripts/test-ui.sh [ios|tvos]
+```
+
+The UI tests launch the app with `-panop-uitest` (Debug builds only, `Panop/UITestSupport.swift`):
+in-memory storage, a seeded 30-channel playlist, and an engine that "plays" at once, so they need
+no network or stream. Three things learned the hard way:
+
+- **Run on the booted simulator, not a clone.** `xcodebuild` clones the device for parallel
+  testing, and a clone that fails to start leaves the run waiting forever ("Simulator device
+  failed to launch ...xctrunner"). `test-ui.sh` boots the device and passes
+  `-parallel-testing-enabled NO`. Do not run two at once.
+- **Tests find rows by label, and only the first rows exist.** The list is alphabetical and lazy,
+  so a row that is off screen is not in the accessibility tree.
+- **When a UI test fails, look at the screen.** `PanopUITestCase` puts the accessibility tree in
+  the failure message; screenshots can be exported from the result bundle with
+  `xcrun xcresulttool export attachments`. Three real bugs were found this way (a row that did not
+  respond to a tap in its empty middle, a tap that could not bring hidden controls back, and a
+  focused button covering its neighbour on Apple TV).
+
+```bash
 # Reclaim disk from build caches. Dry run by default; keeps the hook tooling
 Scripts/clean-caches.sh [--apply]
 ```

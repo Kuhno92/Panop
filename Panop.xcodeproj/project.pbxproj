@@ -32,6 +32,13 @@
 			remoteGlobalIDString = AAAA000000000000000000A4;
 			remoteInfo = Panop;
 		};
+		AAAA00000000000000000109 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AAAA000000000000000000A1 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = AAAA000000000000000000A4;
+			remoteInfo = Panop;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -51,6 +58,7 @@
 /* Begin PBXFileReference section */
 		AAAA000000000000000000A5 /* Panop.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Panop.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AAAA000000000000000000E1 /* PanopTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PanopTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		AAAA00000000000000000102 /* PanopUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PanopUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -62,6 +70,11 @@
 		AAAA000000000000000000E2 /* PanopTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = PanopTests;
+			sourceTree = "<group>";
+		};
+		AAAA00000000000000000103 /* PanopUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = PanopUITests;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -95,6 +108,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		AAAA00000000000000000105 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -103,6 +123,7 @@
 			children = (
 				AAAA000000000000000000A6 /* Panop */,
 				AAAA000000000000000000E2 /* PanopTests */,
+				AAAA00000000000000000103 /* PanopUITests */,
 				AAAA000000000000000000A3 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -112,6 +133,7 @@
 			children = (
 				AAAA000000000000000000A5 /* Panop.app */,
 				AAAA000000000000000000E1 /* PanopTests.xctest */,
+				AAAA00000000000000000102 /* PanopUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -178,6 +200,28 @@
 			productReference = AAAA000000000000000000E1 /* PanopTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		AAAA00000000000000000101 /* PanopUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AAAA00000000000000000106 /* Build configuration list for PBXNativeTarget "PanopUITests" */;
+			buildPhases = (
+				AAAA00000000000000000104 /* Sources */,
+				AAAA00000000000000000105 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				AAAA0000000000000000010A /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				AAAA00000000000000000103 /* PanopUITests */,
+			);
+			name = PanopUITests;
+			packageProductDependencies = (
+			);
+			productName = PanopUITests;
+			productReference = AAAA00000000000000000102 /* PanopUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -192,6 +236,10 @@
 						CreatedOnToolsVersion = 26.6;
 					};
 					AAAA000000000000000000E3 = {
+						CreatedOnToolsVersion = 26.6;
+						TestTargetID = AAAA000000000000000000A4;
+					};
+					AAAA00000000000000000101 = {
 						CreatedOnToolsVersion = 26.6;
 						TestTargetID = AAAA000000000000000000A4;
 					};
@@ -218,6 +266,7 @@
 			targets = (
 				AAAA000000000000000000A4 /* Panop */,
 				AAAA000000000000000000E3 /* PanopTests */,
+				AAAA00000000000000000101 /* PanopUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -247,6 +296,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		AAAA00000000000000000104 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -254,6 +310,11 @@
 			isa = PBXTargetDependency;
 			target = AAAA000000000000000000A4 /* Panop */;
 			targetProxy = AAAA000000000000000000E7 /* PBXContainerItemProxy */;
+		};
+		AAAA0000000000000000010A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = AAAA000000000000000000A4 /* Panop */;
+			targetProxy = AAAA00000000000000000109 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -419,6 +480,40 @@
 			};
 			name = Release;
 		};
+		AAAA00000000000000000107 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.panop.PanopUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "appletvos appletvsimulator iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
+				TARGETED_DEVICE_FAMILY = "1,2,3";
+				TEST_TARGET_NAME = Panop;
+			};
+			name = Debug;
+		};
+		AAAA00000000000000000108 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.panop.PanopUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "appletvos appletvsimulator iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
+				TARGETED_DEVICE_FAMILY = "1,2,3";
+				TEST_TARGET_NAME = Panop;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -445,6 +540,15 @@
 			buildConfigurations = (
 				AAAA000000000000000000EA /* Debug */,
 				AAAA000000000000000000EB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AAAA00000000000000000106 /* Build configuration list for PBXNativeTarget "PanopUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AAAA00000000000000000107 /* Debug */,
+				AAAA00000000000000000108 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

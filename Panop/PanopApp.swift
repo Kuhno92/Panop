@@ -12,6 +12,7 @@ struct PanopApp: App {
         // A hosted test run launches this app first. It must not open, or worse
         // migrate, the developer's real stores.
         let underTest = ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
+            || UITestMode.isActive
         do {
             let catalog = try PanopContainers.makeCatalog(inMemory: underTest)
             let cloud = try PanopContainers.makeCloud(inMemory: underTest)
@@ -23,6 +24,12 @@ struct PanopApp: App {
                 // Tests and previews must never write to the developer's real Keychain.
                 credentials: underTest ? InMemoryCredentialStore() : KeychainCredentialStore()
             )
+            #if DEBUG
+                if UITestMode.isActive {
+                    let seeded = services
+                    Task { await UITestMode.seed(seeded) }
+                }
+            #endif
         } catch {
             // A container that cannot open means the store is unusable. There
             // is no sensible degraded mode, and continuing would only fail
