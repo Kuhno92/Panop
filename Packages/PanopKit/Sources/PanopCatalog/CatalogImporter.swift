@@ -108,7 +108,7 @@ public struct CatalogImporter: Sendable {
         for kind in MediaKind.allCases {
             trackers[kind] = try await KindTracker(kind: kind, before: store.entryCount(kind: kind, playlist: playlist))
         }
-        var skipped = 0
+        var counts = ParseCounts()
         let header: PlaylistHeader = if let kind = Self.hlsKind(atPath: file.path) {
             try await acceptSingleStream(
                 kind: kind,
@@ -123,7 +123,7 @@ public struct CatalogImporter: Sendable {
                 base: source.baseURL,
                 playlist: playlist,
                 trackers: &trackers,
-                skipped: &skipped
+                counts: &counts
             )
         }
 
@@ -153,7 +153,7 @@ public struct CatalogImporter: Sendable {
             outcome: .imported,
             kinds: reports.filter(\.isWorthReporting),
             epgURLs: header.epgURLs,
-            skippedEntries: skipped
+            skippedEntries: counts.skipped
         )
     }
 
@@ -162,7 +162,7 @@ public struct CatalogImporter: Sendable {
         base: URL?,
         playlist: String,
         trackers: inout [MediaKind: KindTracker],
-        skipped: inout Int
+        counts: inout ParseCounts
     ) async throws -> PlaylistHeader {
         guard let handle = FileHandle(forReadingAtPath: path) else { throw CatalogError.cannotReadFile }
         defer { try? handle.close() }
@@ -174,10 +174,10 @@ public struct CatalogImporter: Sendable {
                 base: base,
                 playlist: playlist,
                 trackers: &trackers,
-                skipped: &skipped
+                counts: &counts
             )
         }
-        try await accept(parser.finish(), base: base, playlist: playlist, trackers: &trackers, skipped: &skipped)
+        try await accept(parser.finish(), base: base, playlist: playlist, trackers: &trackers, counts: &counts)
         for kind in MediaKind.allCases {
             try await flush(&trackers[kind, default: KindTracker(kind: kind, before: 0)], playlist: playlist)
         }
@@ -189,14 +189,18 @@ public struct CatalogImporter: Sendable {
         base: URL?,
         playlist: String,
         trackers: inout [MediaKind: KindTracker],
-        skipped: inout Int
+        counts: inout ParseCounts
     ) async throws {
         for item in parsed {
             // An entry with no playable address is not a channel. Counted, not hidden.
-            guard let entry = EntryMapping.entry(from: item, base: base) else {
-                skipped += 1
+            guard var entry = EntryMapping.entry(from: item, base: base) else {
+                counts.skipped += 1
                 continue
             }
+            // Where it stands in the file, which is the order the provider put its channels in.
+            // Rewritten only on a row whose position changed, like every other field.
+            counts.position += 1
+            entry.sortNumber = counts.position
             var tracker = trackers[entry.kind] ?? KindTracker(kind: entry.kind, before: 0)
             trackers[entry.kind] = nil
             tracker.add(entry)
@@ -309,4 +313,12 @@ extension Array {
     func chunked(into size: Int) -> [[Element]] {
         stride(from: 0, to: count, by: size).map { Array(self[$0 ..< Swift.min($0 + size, count)]) }
     }
+}
+
+/// What the parse of one playlist file counts as it goes.
+private struct ParseCounts {
+    /// Entries left out for having no playable address.
+    var skipped = 0
+    /// Entries accepted so far, which is the position of the latest in the file.
+    var position = 0
 }

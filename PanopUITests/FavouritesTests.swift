@@ -26,8 +26,14 @@ final class FavouritesTests: PanopUITestCase {
             XCUIRemote.shared.press(.select)
             XCTAssertTrue(app.descendants(matching: .any)["Favourite"].firstMatch.waitForExistence(timeout: 10))
 
-            // Back up to the filter row, over to Favourites.
+            // Back up past the Sort row to the filter row, over to Favourites.
             XCUIRemote.shared.press(.up)
+            XCUIRemote.shared.press(.up)
+            // Focus enters the row near where it came from, so go to the first segment first,
+            // then one over: that is Favourites, wherever it started.
+            for _ in 0 ..< 3 {
+                XCUIRemote.shared.press(.left)
+            }
             XCUIRemote.shared.press(.right)
             XCUIRemote.shared.press(.select)
 

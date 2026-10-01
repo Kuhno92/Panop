@@ -34,11 +34,15 @@ final class CatalogEntryRecord {
     // SQLite has no index for that. `nameKey` is the name folded once at import
     // (case and accents removed), so a plain binary sort on it *is* the order a
     // person expects, and an index can serve it.
+    // The two `sortNumber` indexes serve the same lists in the provider's own order, which is
+    // the position in an M3U file or the number an Xtream panel gives a channel.
     #Index<CatalogEntryRecord>(
         [\.playlist, \.id],
         [\.playlist, \.kindRaw, \.id],
         [\.kindRaw, \.nameKey, \.id],
-        [\.playlist, \.kindRaw, \.nameKey, \.id]
+        [\.playlist, \.kindRaw, \.nameKey, \.id],
+        [\.kindRaw, \.sortNumber, \.nameKey, \.id],
+        [\.playlist, \.kindRaw, \.sortNumber, \.nameKey, \.id]
     )
 
     var playlist: String

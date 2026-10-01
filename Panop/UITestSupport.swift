@@ -57,7 +57,7 @@ enum UITestMode {
         /// The simulator keeps UserDefaults between launches, and Live TV remembers its filters.
         /// A test that left it on Favourites must not decide what the next one sees.
         static func resetPreferences() {
-            for key in ["liveListMode", "liveSourceFilter", "playbackEngine"] {
+            for key in ["liveListMode", "liveSourceFilter", "liveSortOrder", "playbackEngine"] {
                 UserDefaults.standard.removeObject(forKey: key)
             }
         }

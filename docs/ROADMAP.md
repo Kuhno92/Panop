@@ -88,8 +88,21 @@ Getting a real provider's content into the app. Nothing else can be tested until
       playlist puts hundreds of thousands of episodes into the `.series` kind (Lume measured
       86% of a real file). Needs episode-name parsing (`S01E05`) to build series shells, and a
       decision on whether episodes are stored or fetched lazily as they are for Xtream.
-- [ ] **M3U channel order.** Playlist order is not stored. Assign a position on insert only, so
-      a provider that reorders does not rewrite every row.
+- [x] **M3U channel order.** Each M3U entry is stored with its position in the file as its sort
+      number (counting across kinds, not counting entries left out), and the channel list has a
+      Sort control: By name (the default) or the provider's order, which for Xtream is the number
+      the panel gives each channel. Served by two new indexes. **A decision the roadmap had the
+      other way round:** it said to assign a position on insert only, so that a provider who
+      reorders does not rewrite every row. That would leave a reordered list in its old order and
+      put new channels at the end, which is not what anyone sorting by the provider's order
+      wants. So the position follows the file, and, as for every field, only a row whose value
+      changed is written: a reorder costs a rewrite of the rows that moved (measured earlier at
+      about 8 s for a 2% change in 100,000), an unchanged file costs nothing (digest skip). Tested
+      in the package (order follows the file, across kinds, follows a reorder, no gap where an
+      unusable entry was) and against a real on-disk store, and by UI tests on iOS and tvOS.
+      **Not verified:** that an existing store gains the two indexes cleanly; they were checked on
+      new stores only (adding an index is a lightweight migration, but no old store was
+      opened).
 - [x] **`SwiftDataCatalogStore`** in the app target, implementing that protocol. A `ModelActor`
       with autosave off; unchanged rows are never dirtied, so an unchanged batch saves nothing.
       Tests run against real on-disk SQLite (an in-memory store hides collation and paging
@@ -119,7 +132,8 @@ Getting a real provider's content into the app. Nothing else can be tested until
       made every refresh slower than it made the first import faster, so it stays. A guide
       that paged every programme key with a compound cursor took 47 s (an invisible scan);
       the sweep now reads per channel. See the follow-ups below.
-- [ ] **Keep the guide window small.** Import time scales with rows kept, and most of a
+- [x] **Keep the guide window small.** *Already done, the entry was stale:* the sync keeps now-2h
+      to +48h (`GuideWindow.standard`, tested in `PlaylistSyncTests`). Import time scales with rows kept, and most of a
       provider's 7-14 day guide is never viewed. A window of roughly now-2h to +48h keeps a
       400-channel guide near 40k rows (~5 s cold) instead of 200k+. Choose it in the sync
       service, not the importer.

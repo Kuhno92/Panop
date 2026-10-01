@@ -25,16 +25,28 @@ enum LiveChannelQuery {
         kind: MediaKind = .live,
         source: String?,
         search: String,
-        limit: Int
+        limit: Int,
+        order: LiveOrder = .name
     ) -> FetchDescriptor<CatalogEntryRecord> {
         let live = kind.rawValue
         let term = CatalogEntryRecord.nameKey(for: search.trimmingCharacters(in: .whitespacesAndNewlines))
         // `.lexical` on a folded key is binary order, which an index can serve.
         // The id breaks ties so equal names keep a stable order between fetches.
-        let sort = [
-            SortDescriptor(\CatalogEntryRecord.nameKey, comparator: .lexical),
-            SortDescriptor(\CatalogEntryRecord.id, comparator: .lexical)
-        ]
+        let sort: [SortDescriptor<CatalogEntryRecord>] = switch order {
+        case .name:
+            [
+                SortDescriptor(\CatalogEntryRecord.nameKey, comparator: .lexical),
+                SortDescriptor(\CatalogEntryRecord.id, comparator: .lexical)
+            ]
+        case .provider:
+            // The provider's number first; entries with none sort together at the start of the
+            // number, then by name, so the order never depends on where the database left them.
+            [
+                SortDescriptor(\CatalogEntryRecord.sortNumber),
+                SortDescriptor(\CatalogEntryRecord.nameKey, comparator: .lexical),
+                SortDescriptor(\CatalogEntryRecord.id, comparator: .lexical)
+            ]
+        }
 
         var descriptor: FetchDescriptor<CatalogEntryRecord> = switch (source, term.isEmpty) {
         case let (source?, true):
@@ -95,6 +107,22 @@ enum LiveChannelQuery {
     /// of re-reads instead of seventeen.
     static func nextLimit(after limit: Int) -> Int {
         Swift.min(limit * 2, maxRows)
+    }
+}
+
+/// How the channel list is ordered.
+enum LiveOrder: String, CaseIterable, Identifiable {
+    case name, provider
+
+    var id: String {
+        rawValue
+    }
+
+    var title: String {
+        switch self {
+        case .name: "By name"
+        case .provider: "Provider's order"
+        }
     }
 }
 

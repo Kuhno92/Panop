@@ -12,6 +12,7 @@ struct LiveTVView: View {
     /// such as a playlist that was since deleted, reads as "all sources".
     @AppStorage("liveSourceFilter") private var storedSource = LiveSourceFilter.allID
     @AppStorage("liveListMode") private var storedMode = LiveListMode.all.rawValue
+    @AppStorage("liveSortOrder") private var storedOrder = LiveOrder.name.rawValue
     @State private var search = ""
     @State private var limit = LiveChannelQuery.pageSize
     @State private var showingAdd = false
@@ -31,6 +32,10 @@ struct LiveTVView: View {
         return playlists.map { LiveEmptyState.Source(id: $0.id, name: $0.name, status: status.status(for: $0.id)) }
     }
 
+    private var order: LiveOrder {
+        LiveOrder(rawValue: storedOrder) ?? .name
+    }
+
     private var mode: LiveListMode {
         LiveListMode(rawValue: storedMode) ?? .all
     }
@@ -41,7 +46,7 @@ struct LiveTVView: View {
     private var descriptor: FetchDescriptor<CatalogEntryRecord> {
         switch mode {
         case .all:
-            LiveChannelQuery.descriptor(source: selectedSource?.id, search: search, limit: limit)
+            LiveChannelQuery.descriptor(source: selectedSource?.id, search: search, limit: limit, order: order)
         case .favourites:
             LiveChannelQuery.descriptor(restrictedTo: entryIDs(of: Array(userState.favorites)))
         case .recents:
@@ -62,6 +67,7 @@ struct LiveTVView: View {
             descriptor: descriptor,
             mode: mode,
             modeRaw: $storedMode,
+            orderRaw: $storedOrder,
             sourceID: selectedSource?.id,
             search: search,
             sourceNames: Dictionary(uniqueKeysWithValues: library.playlists.map { ($0.id, $0.name) }),
@@ -92,6 +98,7 @@ struct LiveTVView: View {
         .toolbar {
             if !library.playlists.isEmpty {
                 ToolbarItem { modeMenu }
+                ToolbarItem { orderMenu }
             }
             if hasSeveralSources {
                 ToolbarItem { sourceMenu }
@@ -101,6 +108,7 @@ struct LiveTVView: View {
         // list had been scrolled and grown to.
         .onChange(of: storedSource) { limit = LiveChannelQuery.pageSize }
         .onChange(of: storedMode) { limit = LiveChannelQuery.pageSize }
+        .onChange(of: storedOrder) { limit = LiveChannelQuery.pageSize }
         .onChange(of: search) { limit = LiveChannelQuery.pageSize }
         .sheet(isPresented: $showingAdd) {
             NavigationStack { AddPlaylistView() }
@@ -119,6 +127,19 @@ struct LiveTVView: View {
             Label(mode.title, systemImage: mode.symbol)
         }
         .accessibilityLabel("Show")
+    }
+
+    private var orderMenu: some View {
+        Menu {
+            Picker("Sort", selection: $storedOrder) {
+                ForEach(LiveOrder.allCases) { order in
+                    Text(order.title).tag(order.rawValue)
+                }
+            }
+        } label: {
+            Label(order.title, systemImage: "arrow.up.arrow.down")
+        }
+        .accessibilityLabel("Sort")
     }
 
     private var sourceMenu: some View {
@@ -143,6 +164,7 @@ private struct LiveChannelList: View {
 
     let mode: LiveListMode
     @Binding var modeRaw: String
+    @Binding var orderRaw: String
     let sourceID: String?
     let search: String
     let sourceNames: [String: String]
@@ -158,6 +180,7 @@ private struct LiveChannelList: View {
         descriptor: FetchDescriptor<CatalogEntryRecord>,
         mode: LiveListMode,
         modeRaw: Binding<String>,
+        orderRaw: Binding<String>,
         sourceID: String?,
         search: String,
         sourceNames: [String: String],
@@ -172,6 +195,7 @@ private struct LiveChannelList: View {
         _channels = Query(descriptor)
         self.mode = mode
         _modeRaw = modeRaw
+        _orderRaw = orderRaw
         self.sourceID = sourceID
         self.search = search
         self.sourceNames = sourceNames
@@ -192,6 +216,12 @@ private struct LiveChannelList: View {
                     Picker("Show", selection: $modeRaw) {
                         ForEach(LiveListMode.allCases) { mode in
                             Text(mode.title).tag(mode.rawValue)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+                    Picker("Sort", selection: $orderRaw) {
+                        ForEach(LiveOrder.allCases) { order in
+                            Text(order.title).tag(order.rawValue)
                         }
                     }
                     .pickerStyle(.segmented)

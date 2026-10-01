@@ -254,3 +254,76 @@ struct LiveChannelQueryTests {
         #expect(!context.hasChanges, "the derived key made an unchanged row look changed")
     }
 }
+
+@Suite("Provider order", .serialized)
+@MainActor
+struct ProviderOrderTests {
+    private func numbered(_ id: String, _ name: String, _ number: Int?) -> CatalogEntry {
+        CatalogEntry(id: id, kind: .live, name: name, sortNumber: number)
+    }
+
+    private func names(_ catalog: OnDiskCatalog, source: String? = nil, search: String = "") throws -> [String] {
+        try ModelContext(catalog.container)
+            .fetch(LiveChannelQuery.descriptor(source: source, search: search, limit: 1000, order: .provider))
+            .map(\.name)
+    }
+
+    @Test
+    func `provider order follows the numbers, not the alphabet`() async throws {
+        let catalog = try OnDiskCatalog()
+        defer { catalog.cleanUp() }
+        _ = try await catalog.store.upsertEntries([
+            numbered("1", "Zebra", 1), numbered("2", "Alpha", 3), numbered("3", "Mango", 2)
+        ], playlist: "a")
+
+        #expect(try names(catalog) == ["Zebra", "Mango", "Alpha"])
+    }
+
+    @Test
+    func `by name is still the alphabet`() async throws {
+        let catalog = try OnDiskCatalog()
+        defer { catalog.cleanUp() }
+        _ = try await catalog.store.upsertEntries([
+            numbered("1", "Zebra", 1), numbered("2", "Alpha", 3), numbered("3", "Mango", 2)
+        ], playlist: "a")
+
+        let byName = try ModelContext(catalog.container)
+            .fetch(LiveChannelQuery.descriptor(source: nil, search: "", limit: 1000, order: .name)).map(\.name)
+
+        #expect(byName == ["Alpha", "Mango", "Zebra"])
+    }
+
+    @Test
+    func `equal or missing numbers fall back to the name, so the order never wobbles`() async throws {
+        let catalog = try OnDiskCatalog()
+        defer { catalog.cleanUp() }
+        _ = try await catalog.store.upsertEntries([
+            numbered("1", "Delta", 5), numbered("2", "Bravo", 5), numbered("3", "Charlie", nil), numbered(
+                "4",
+                "Alpha",
+                nil
+            )
+        ], playlist: "a")
+
+        let first = try names(catalog)
+        let second = try names(catalog)
+
+        #expect(first == second)
+        #expect(first.filter { ["Bravo", "Delta"].contains($0) } == ["Bravo", "Delta"], "ties by name")
+        #expect(first.filter { ["Alpha", "Charlie"].contains($0) } == ["Alpha", "Charlie"], "no number, by name")
+    }
+
+    @Test
+    func `provider order narrows by source and search like the other`() async throws {
+        let catalog = try OnDiskCatalog()
+        defer { catalog.cleanUp() }
+        _ = try await catalog.store.upsertEntries(
+            [numbered("1", "News Two", 2), numbered("2", "News One", 1)],
+            playlist: "a"
+        )
+        _ = try await catalog.store.upsertEntries([numbered("1", "News Three", 1)], playlist: "b")
+
+        #expect(try names(catalog, source: "a") == ["News One", "News Two"])
+        #expect(try names(catalog, search: "two") == ["News Two"])
+    }
+}

@@ -54,9 +54,9 @@ class PanopUITestCase: XCTestCase {
 
     #if os(tvOS)
         /// Focus starts on the tab bar. Down from there reaches the search keyboard, then the
-        /// Show filter, then the first channel.
+        /// Show filter, then the Sort row, then the first channel.
         func focusFirstChannel() {
-            for _ in 0 ..< 3 {
+            for _ in 0 ..< 4 {
                 XCUIRemote.shared.press(.down)
             }
         }
