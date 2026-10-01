@@ -80,6 +80,16 @@ imports it. The package checkout is about 2.7 GB in the shared clone directory.
   the coordinator resumes.
 - **There is no "opened but not playing" state.** `load` only prepares the media; a failure to open
   arrives as a `.failed` event after `play()`. It does report one for garbage and missing files.
+- **An unreachable stream is logged, not reported.** libVLC logged `TLS session handshake error` and
+  `HTTP connection failure` for an HTTPS stream, fired no error event, and stayed "opening" for good.
+  The coordinator then waited out its start timeout and called it a dropped connection.
+  `VLCConnectionWatch` listens to the library log for those two lines and fails the engine, so the
+  coordinator can retry and fall back. libVLC's logger is library-wide and is set in one assignment, so
+  anything else that wants the log (a test's file logger) goes through `install(alongside:)`.
+  The failure itself was **intermittent**: the same stream failed every run for an hour (`error while
+  writing: 4`, an interrupted system call, during the handshake) and then played in every run, with
+  the host and its certificate chain fine throughout. Cause not established; AVPlayer played the
+  stream throughout.
 
 ### KSPlayer: the public one (only if you enable it)
 

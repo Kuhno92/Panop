@@ -89,6 +89,7 @@ final class VLCEngine: PlaybackEngine {
         player.timeChangeUpdateInterval = 1
         bridge.owner = self
         player.delegate = bridge
+        VLCConnectionWatch.shared.install()
         surface.onWindowChange = { [weak self] attached in
             MainActor.assumeIsolated { self?.surfaceWindowChanged(attached: attached) }
         }
@@ -131,6 +132,7 @@ final class VLCEngine: PlaybackEngine {
         pendingStart = item.startPosition.flatMap { $0 > 0 ? $0 : nil }
 
         player.media = media
+        VLCConnectionWatch.shared.add(self)
         setState(.opening)
     }
 
@@ -202,6 +204,7 @@ final class VLCEngine: PlaybackEngine {
     func stop() async {
         isStopping = true
         wantsPlayback = false
+        VLCConnectionWatch.shared.remove(self)
         bridge.owner = nil
         player.delegate = nil
         let player = UncheckedBox(player)
@@ -256,6 +259,14 @@ final class VLCEngine: PlaybackEngine {
         @unknown default:
             break
         }
+    }
+
+    /// libVLC logged that it cannot reach the stream. Only news before the first
+    /// picture: later trouble is the stall and reconnect path's to handle.
+    func connectionFailed(_ reason: String) {
+        guard !isStopping, !hasPlayed, state == .opening else { return }
+        setState(.failed)
+        output.yield(.failed(PlaybackError(code: .network, message: "Could not connect to the stream (\(reason)).")))
     }
 
     /// `progress` is in [0.0, 1.0], and 1.0 means buffering is complete and playback

@@ -4,6 +4,7 @@ import PanopCore
 import PanopPlayback
 import SwiftUI
 import Testing
+import VLCKit
 
 /// Plays a real stream and logs everything the engine and the coordinator report, with
 /// timestamps, to `/tmp/panop-live-probe.txt`. Off unless `PANOP_LIVE_URL` is set, since
@@ -61,6 +62,14 @@ struct LiveStreamSmokeTests {
     }
 
     private func run(priority: [PlaybackEngineKind], start: ContinuousClock.Instant) async throws {
+        // libVLC's own log says why a stream stays "opening", which the engine cannot.
+        let logPath = "/tmp/panop-vlc-log.txt"
+        FileManager.default.createFile(atPath: logPath, contents: nil)
+        if let handle = FileHandle(forWritingAtPath: logPath) {
+            let logger = VLCFileLogger.create(with: handle)
+            logger.level = VLCLogLevel(rawValue: 3) ?? .info
+            VLCConnectionWatch.shared.install(alongside: [logger])
+        }
         let coordinator = PlaybackCoordinator(priority: priority, makeEngine: { EngineRegistry.make($0) })
         let attacher = SurfaceAttacher(coordinator)
         defer { attacher.stop() }

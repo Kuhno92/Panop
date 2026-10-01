@@ -4,6 +4,7 @@ import Foundation
 import PanopCore
 import PanopPlayback
 import Testing
+import VLCKit
 
 /// Collects an engine's events in the background.
 @MainActor
@@ -342,6 +343,58 @@ struct VLCEngineTests {
             }
         })
         await engine.stop()
+    }
+
+    /// libVLC logs why it cannot reach a stream and fires no error event, so without this
+    /// the engine sat "opening" until the coordinator's timeout (seen on an HTTPS stream
+    /// whose TLS handshake failed). The text is libVLC's own.
+    @Test
+    func `a connection failure logged while opening fails the engine`() async throws {
+        let engine = VLCEngine()
+        let recorder = Recorder(engine)
+        try await engine.load(PlaybackItem(url: "https://stream.invalid/live.m3u8"))
+
+        VLCConnectionWatch.shared.handleMessage("TLS session handshake error", logLevel: .error, context: nil)
+
+        #expect(await recorder.wait(seconds: 5) {
+            if case let .failed(error) = $0 {
+                error.code == .network
+            } else {
+                false
+            }
+        })
+        await engine.stop()
+    }
+
+    @Test
+    func `other libVLC log lines do not fail the engine`() async throws {
+        let engine = VLCEngine()
+        let recorder = Recorder(engine)
+        try await engine.load(PlaybackItem(url: "https://stream.invalid/live.m3u8"))
+
+        VLCConnectionWatch.shared.handleMessage("buffer deadlock prevented", logLevel: .error, context: nil)
+        VLCConnectionWatch.shared.handleMessage("lookup failed (-25300)", logLevel: .warning, context: nil)
+
+        let failed = await recorder.wait(seconds: 0.5) {
+            if case .failed = $0 {
+                true
+            } else {
+                false
+            }
+        }
+        #expect(!failed)
+        await engine.stop()
+    }
+
+    @Test
+    func `a stopped engine is not told about connection failures`() async throws {
+        let engine = VLCEngine()
+        try await engine.load(PlaybackItem(url: "https://stream.invalid/live.m3u8"))
+        await engine.stop()
+
+        VLCConnectionWatch.shared.handleMessage("HTTP connection failure", logLevel: .error, context: nil)
+
+        #expect(engine.state == .idle)
     }
 }
 
