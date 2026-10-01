@@ -116,6 +116,9 @@ public enum PlaybackCoordinatorEvent: Sendable, Equatable {
     /// judged on.
     case joined(engine: PlaybackEngineKind, seconds: Double)
     case position(seconds: Double)
+    /// The tracks the current engine offers. They arrive after the first frame and can
+    /// change, and a new engine after a fallback starts with its own.
+    case tracks(audio: [TrackDescriptor], subtitle: [TrackDescriptor])
 }
 
 public extension PlaybackEngineKind {

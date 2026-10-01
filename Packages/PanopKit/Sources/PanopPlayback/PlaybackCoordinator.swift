@@ -100,6 +100,16 @@ public final class PlaybackCoordinator {
         activeEngine?.seek(to: seconds)
     }
 
+    /// Switches audio track, by an id from a `.tracks` event.
+    public func selectAudioTrack(id: String?) {
+        activeEngine?.selectAudioTrack(id: id)
+    }
+
+    /// Switches subtitle track, or turns subtitles off with `nil`.
+    public func selectSubtitleTrack(id: String?) {
+        activeEngine?.selectSubtitleTrack(id: id)
+    }
+
     /// Stops playback and releases the engine.
     public func stop() async {
         let engine = activeEngine
@@ -242,7 +252,9 @@ public final class PlaybackCoordinator {
             } else {
                 setStatus(.ended)
             }
-        case .ready, .tracksChanged:
+        case let .tracksChanged(audio, subtitle):
+            emit(.tracks(audio: audio, subtitle: subtitle))
+        case .ready:
             break
         }
     }

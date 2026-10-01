@@ -218,7 +218,13 @@ The first milestone where Panop is usable.
       engines, and any real provider stream.
 - [ ] **Subtitle cues from LumeEngine**: `session.subtitles.activeCues(at:)` has the text, and
       `PlaybackEngine` has no channel for it yet.
-- [ ] **Player overlay** shared across engines: transport, track switching, engine indicator.
+- [x] **Player overlay** shared across engines, built on `PlayerModel` so no engine needs its
+      own: play and pause, a scrubber with ±10 s for video and a LIVE badge for channels, audio
+      and subtitle menus, the engine name, and controls that hide four seconds after the first
+      picture and stay up while paused or failed. The coordinator now forwards each engine's
+      tracks and passes a track choice on. Tested through the model with a scripted engine;
+      **not looked at by eye**, and tvOS shows a progress bar rather than a slider, since it
+      has none. Subtitle menus list tracks, but no engine draws the text yet.
 - [ ] **Resume playback** from a stored position. Pass it at load time; seeking an in-flight
       IPTV connection makes some providers drop the stream.
 

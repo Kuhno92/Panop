@@ -61,13 +61,12 @@ struct LumeEngineTests {
         #expect(engine.state == .idle)
     }
 
-    /// The commands go to the session one at a time, in order. (The finite test stream
-    /// is cut off by the server after a few seconds, which the session reports as a
-    /// network error, so this looks at the first moments only.)
+    /// The commands go to the session one at a time, in order. The server holds the
+    /// connection open: a finite stream that ends is reported as a network error.
     @Test
     func `play then pause is applied in that order`() async throws {
         let stream = try await TransportStreamFixture.shared()
-        let server = try LocalStreamServer(body: stream)
+        let server = try LocalStreamServer(body: stream, holdOpen: true)
         let url = try await server.start()
         defer { server.stop() }
         let engine = LumePlaybackEngine()

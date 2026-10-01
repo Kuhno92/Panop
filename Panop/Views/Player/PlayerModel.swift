@@ -18,18 +18,34 @@ final class PlayerModel {
     /// The engine to draw, or nil between engines.
     private(set) var engine: (any PlaybackEngine)?
 
+    private(set) var position: Double = 0
+    /// Nil for a live stream, and before the engine knows.
+    private(set) var duration: Double?
+    private(set) var audioTracks: [TrackDescriptor] = []
+    private(set) var subtitleTracks: [TrackDescriptor] = []
+    /// What the user picked. Engines do not report their own choice, and nil is the
+    /// stream's default for audio and "off" for subtitles.
+    private(set) var selectedAudioID: String?
+    private(set) var selectedSubtitleID: String?
+    private(set) var controlsVisible = true
+
     private let coordinator: PlaybackCoordinator
     private let request: PlaybackRequest
     private var listener: Task<Void, Never>?
+    private var hideTask: Task<Void, Never>?
+    /// How long the controls stay up once playing with nothing touched.
+    private let controlsTimeout: Duration
 
     init(
         title: String,
         request: PlaybackRequest,
         preferred: PlaybackEngineKind?,
+        controlsTimeout: Duration = .seconds(4),
         makeEngine: @escaping PlaybackCoordinator.EngineFactory = { EngineRegistry.make($0) }
     ) {
         self.title = title
         self.request = request
+        self.controlsTimeout = controlsTimeout
         coordinator = PlaybackCoordinator(
             priority: PlaybackEngineKind.order(preferred: preferred),
             makeEngine: makeEngine
@@ -54,6 +70,16 @@ final class PlayerModel {
         case .connecting, .buffering, .reconnecting: true
         default: false
         }
+    }
+
+    /// Whether the stream can be scrubbed: video on demand, not a live channel.
+    var canSeek: Bool {
+        duration != nil
+    }
+
+    /// Controls stay up while paused or failed: there is nothing to see behind them.
+    var showsControls: Bool {
+        controlsVisible || isPaused || failureText != nil
     }
 
     var failureText: String? {
@@ -81,11 +107,64 @@ final class PlayerModel {
         } else {
             coordinator.pause()
         }
+        showControls()
+    }
+
+    func seek(to seconds: Double) {
+        let target = clamp(seconds)
+        coordinator.seek(to: target)
+        position = target
+        showControls()
+    }
+
+    func skip(by seconds: Double) {
+        seek(to: position + seconds)
+    }
+
+    /// Passing nil returns to the stream's default track.
+    func selectAudio(id: String?) {
+        selectedAudioID = id
+        coordinator.selectAudioTrack(id: id)
+        showControls()
+    }
+
+    /// Passing nil turns subtitles off.
+    func selectSubtitle(id: String?) {
+        selectedSubtitleID = id
+        coordinator.selectSubtitleTrack(id: id)
+        showControls()
+    }
+
+    func toggleControls() {
+        if controlsVisible {
+            hideTask?.cancel()
+            controlsVisible = false
+        } else {
+            showControls()
+        }
+    }
+
+    /// Brings the controls up and starts the countdown to hide them again.
+    func showControls() {
+        controlsVisible = true
+        hideTask?.cancel()
+        hideTask = Task { [weak self, controlsTimeout] in
+            try? await Task.sleep(for: controlsTimeout)
+            guard !Task.isCancelled else { return }
+            self?.controlsVisible = false
+        }
+    }
+
+    private func clamp(_ seconds: Double) -> Double {
+        let lower = max(0, seconds)
+        return duration.map { min(lower, $0) } ?? lower
     }
 
     func stop() async {
         listener?.cancel()
         listener = nil
+        hideTask?.cancel()
+        hideTask = nil
         await coordinator.stop()
         engine = nil
         status = .idle
@@ -96,16 +175,33 @@ final class PlayerModel {
         case let .status(new):
             status = new
             engine = coordinator.activeEngine
+            duration = engine?.duration
+            if case .connecting = new {
+                // A new engine starts with its own tracks and none of the old choices.
+                audioTracks = []
+                subtitleTracks = []
+                selectedAudioID = nil
+                selectedSubtitleID = nil
+            }
             // A notice is about the last change of engine; it goes once playing starts.
             if case .playing = new {
                 scheduleNoticeClear()
+                // Start the countdown once, at the first picture. Not on every rebuffer,
+                // which would bring the controls back up each time.
+                if hideTask == nil {
+                    showControls()
+                }
             }
         case let .notice(notice):
             self.notice = PlaybackMessages.text(for: notice)
         case let .joined(_, seconds):
             joinTime = seconds
-        case .position:
-            break
+        case let .position(seconds):
+            position = seconds
+            duration = coordinator.activeEngine?.duration
+        case let .tracks(audio, subtitle):
+            audioTracks = audio
+            subtitleTracks = subtitle
         }
     }
 

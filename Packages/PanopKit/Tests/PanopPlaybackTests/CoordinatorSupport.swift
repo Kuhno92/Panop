@@ -85,8 +85,16 @@ final class FakeEngine: PlaybackEngine {
         seeks.append(seconds)
     }
 
-    func selectAudioTrack(id: String?) {}
-    func selectSubtitleTrack(id: String?) {}
+    private(set) var audioSelections: [String?] = []
+    private(set) var subtitleSelections: [String?] = []
+
+    func selectAudioTrack(id: String?) {
+        audioSelections.append(id)
+    }
+
+    func selectSubtitleTrack(id: String?) {
+        subtitleSelections.append(id)
+    }
 
     func stop() async {
         stopCalls += 1

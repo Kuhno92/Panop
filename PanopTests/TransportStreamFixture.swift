@@ -81,19 +81,28 @@ final class LocalStreamServer: @unchecked Sendable {
     private let listener: NWListener
     private let body: Data
     private let contentType: String
+    private let holdOpen: Bool
     private let queue = DispatchQueue(label: "panop.test.stream-server")
+    private let lock = NSLock()
+    private var connections: [NWConnection] = []
 
-    init(body: Data, contentType: String = "video/mp2t") throws {
+    /// - Parameter holdOpen: keep each connection open after the body, as a live feed
+    ///   that has simply gone quiet does. Otherwise the server closes after a moment,
+    ///   which a player reports as the stream ending or failing.
+    init(body: Data, contentType: String = "video/mp2t", holdOpen: Bool = false) throws {
         listener = try NWListener(using: .tcp, on: .any)
         self.body = body
         self.contentType = contentType
+        self.holdOpen = holdOpen
     }
 
     /// Starts listening and returns the address to fetch from.
     func start() async throws -> URL {
         let contentType = contentType
         let body = body
-        listener.newConnectionHandler = { connection in
+        let holdOpen = holdOpen
+        listener.newConnectionHandler = { [weak self] connection in
+            self?.lock.withLock { self?.connections.append(connection) }
             connection.start(queue: DispatchQueue.global())
             // Read the request line and headers, whatever they are, then answer.
             connection.receive(minimumIncompleteLength: 1, maximumLength: 8192) { _, _, _, _ in
@@ -101,8 +110,9 @@ final class LocalStreamServer: @unchecked Sendable {
                 connection.send(
                     content: Data(head.utf8) + body,
                     contentContext: .finalMessage,
-                    isComplete: true,
+                    isComplete: !holdOpen,
                     completion: .contentProcessed { _ in
+                        guard !holdOpen else { return }
                         // Closing at once can reset the connection while the client is
                         // still reading, which FFmpeg reports as an I/O error rather
                         // than the end of the stream. Give it time to take the bytes.
@@ -137,6 +147,7 @@ final class LocalStreamServer: @unchecked Sendable {
 
     func stop() {
         listener.cancel()
+        lock.withLock { connections.forEach { $0.cancel() } }
     }
 }
 

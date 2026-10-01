@@ -487,4 +487,24 @@ struct PlaybackCoordinatorTests {
     private func waitForEngines(_ factory: EngineFactory, _ kind: PlaybackEngineKind, count: Int) async throws {
         try await waitFor { factory.engines(kind).count >= count }
     }
+
+    @Test
+    func `tracks the engine reports are passed on, and a choice reaches the engine`() async throws {
+        let factory = EngineFactory([:])
+        let coordinator = makeCoordinator(factory)
+        let log = EventLog(coordinator)
+        coordinator.play(stream)
+        #expect(await log.waitForStatus(.playing(.avPlayer)))
+        let german = TrackDescriptor(id: "1", label: "Deutsch", languageCode: "de")
+        let english = TrackDescriptor(id: "2", label: "English", languageCode: "en")
+        let forced = TrackDescriptor(id: "3", label: "Forced", languageCode: "de", isForced: true)
+
+        factory.lastEngine?.report(.tracksChanged(audio: [german, english], subtitle: [forced]))
+        try await waitFor { log.events.contains(.tracks(audio: [german, english], subtitle: [forced])) }
+
+        coordinator.selectAudioTrack(id: "2")
+        coordinator.selectSubtitleTrack(id: nil)
+        #expect(factory.lastEngine?.audioSelections == ["2"])
+        #expect(factory.lastEngine?.subtitleSelections == [nil])
+    }
 }

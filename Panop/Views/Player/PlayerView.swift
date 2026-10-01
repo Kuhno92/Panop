@@ -81,27 +81,10 @@ struct PlayerView: View {
 
     private var overlay: some View {
         VStack {
-            HStack(alignment: .top) {
-                #if !os(tvOS)
-                    Button {
-                        dismiss()
-                    } label: {
-                        Image(systemName: "xmark.circle.fill").font(.title)
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel("Close")
-                #endif
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(model.title).font(.headline)
-                    if let engineName = model.engineName {
-                        Text(engineName).font(.caption).foregroundStyle(.secondary)
-                    }
-                }
-                Spacer()
+            if model.showsControls {
+                header
+                    .transition(.opacity)
             }
-            .padding()
-            .foregroundStyle(.white)
-            .shadow(radius: 4)
 
             Spacer()
 
@@ -121,12 +104,46 @@ struct PlayerView: View {
                     .padding()
                     .transition(.opacity)
             }
+
+            if model.showsControls, model.failureText == nil {
+                PlayerControls(model: model)
+                    .transition(.opacity)
+            }
         }
         .animation(.default, value: model.notice)
+        .animation(.easeOut(duration: 0.2), value: model.showsControls)
         .contentShape(Rectangle())
         #if !os(tvOS)
-            .onTapGesture { model.togglePause() }
+            .onTapGesture { model.toggleControls() }
+        #else
+            // The remote only moves focus, so any movement brings the controls up. Deferred
+            // out of the focus engine's animation context.
+            .onMoveCommand { _ in Task { model.showControls() } }
         #endif
+    }
+
+    private var header: some View {
+        HStack(alignment: .top) {
+            #if !os(tvOS)
+                Button {
+                    dismiss()
+                } label: {
+                    Image(systemName: "xmark.circle.fill").font(.title)
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Close")
+            #endif
+            VStack(alignment: .leading, spacing: 2) {
+                Text(model.title).font(.headline)
+                if let engineName = model.engineName {
+                    Text(engineName).font(.caption).foregroundStyle(.secondary)
+                }
+            }
+            Spacer()
+        }
+        .padding()
+        .foregroundStyle(.white)
+        .shadow(radius: 4)
     }
 }
 
