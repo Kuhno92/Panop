@@ -46,7 +46,9 @@ struct PlayerScreen: View {
                 startPosition: target.resumeAt ?? 0,
                 onProgress: target.kind == .live ? nil : { [userState, key = target.id] position, duration in
                     userState.saveProgress(key, position: position, duration: duration)
-                }
+                },
+                memory: userState,
+                memoryKey: target.id
             )
         } catch let error as PlaybackTargetError {
             problem = error.message

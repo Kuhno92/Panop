@@ -24,6 +24,9 @@ final class UserContentState {
     /// When it was last opened, or `distantPast` if never. Defaulted, so a store made before
     /// this existed still opens.
     var lastPlayedAt: Date = Date.distantPast
+    /// The engine that played this when the person's own choice could not, as its raw value, or
+    /// empty. Defaulted, so a store made before this existed still opens.
+    var rememberedEngine: String = ""
 
     init(
         streamID: String = "",

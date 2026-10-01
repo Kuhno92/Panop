@@ -281,9 +281,19 @@ The brief called performance a key concept. For IPTV this concentrates in one nu
       (5) Join times are not strictly comparable: libVLC reports `playing` when decoding
       starts, AVPlayer when its clock runs. **Not measured:** a raw MPEG-TS channel from a real
       provider, which is the case VLC and Lume exist for, and an Apple TV HD.
-      Levers still open: a pre-created engine for the next zap (VLC's 50 to 70 ms creation is the
-      only engine cost large enough to matter), and remembering which engine worked for a
-      channel so a known raw-TS channel skips the AVPlayer attempt.
+      **Levers, now closed.** *Remembering which engine worked for a channel* is built: when an
+      engine other than the person's own choice ends up playing a channel, it is remembered
+      (in the cloud container, with the favourites) and tried first next time, so a raw-TS
+      channel AVPlayer cannot read stops failing there before it plays; the person's own choice
+      playing it again clears the memory. Tested through the player model with a scripted
+      factory (it is not even asked for the failing engine the second time). *A launch warm-up
+      of libVLC and AVFoundation* was built and measured, and **rejected**: it saved about
+      10 to 20 ms of VLC's 130 ms first zap (the rest happens when the engine first plays) and
+      about 7 ms for Lume, while loading libVLC's plug-ins into memory for people who never use
+      it, and memory is a budget on Apple TV. *A pre-created engine for the next zap* was not
+      built: with the memory above, the only engine cost that mattered (VLC's creation) is paid
+      only on a channel that needs VLC, and 50 ms there is not worth holding an engine and a
+      surface in memory.
 - [x] **Reconnect and backoff policy** on stall or IO error, distinguishing retryable failures
       from format rejections. In `PlaybackCoordinator` (see the M2 entry), driven by
       `PlaybackError.isRetryable`.

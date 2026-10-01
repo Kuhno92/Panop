@@ -254,3 +254,42 @@ struct ResumePointTests {
         #expect(store.progress.keys.sorted() == [UserStateStore.key(playlist: "kept", entry: "a")])
     }
 }
+
+@Suite("Engine memory store")
+@MainActor
+struct EngineMemoryStoreTests {
+    @Test
+    func `a remembered engine survives a new launch`() throws {
+        let container = try PanopContainers.makeCloud(inMemory: true)
+        UserStateStore(context: ModelContext(container)).remember(.vlcKit, for: "p|c")
+
+        let later = UserStateStore(context: ModelContext(container))
+
+        #expect(later.remembered(for: "p|c") == .vlcKit)
+        #expect(later.remembered(for: "p|other") == nil)
+    }
+
+    @Test
+    func `forgetting leaves no row behind`() throws {
+        let container = try PanopContainers.makeCloud(inMemory: true)
+        let store = UserStateStore(context: ModelContext(container))
+        store.remember(.lumeEngine, for: "p|c")
+        #expect(try ModelContext(container).fetchCount(FetchDescriptor<UserContentState>()) == 1)
+
+        store.forget(for: "p|c")
+
+        #expect(store.remembered(for: "p|c") == nil)
+        #expect(try ModelContext(container).fetchCount(FetchDescriptor<UserContentState>()) == 0)
+    }
+
+    @Test
+    func `a remembered engine keeps its row alive and does not disturb the favourite`() throws {
+        let store = try UserStateStore(context: ModelContext(PanopContainers.makeCloud(inMemory: true)))
+        store.toggleFavorite("p|c")
+
+        store.remember(.vlcKit, for: "p|c")
+        store.forget(for: "p|c")
+
+        #expect(store.isFavorite("p|c"))
+    }
+}

@@ -33,7 +33,14 @@ final class ScriptedEngine: PlaybackEngine {
         output.yield(event)
     }
 
-    func load(_ item: PlaybackItem) async throws {}
+    /// When set, `load` fails with it, as an engine that cannot open the stream does.
+    var loadError: PlaybackError?
+
+    func load(_ item: PlaybackItem) async throws {
+        if let loadError {
+            throw loadError
+        }
+    }
 
     func play() {
         state = .playing

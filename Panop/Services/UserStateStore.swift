@@ -1,5 +1,6 @@
 import Foundation
 import Observation
+import PanopPlayback
 import SwiftData
 
 /// Favourites and recently played, for the screens to read.
@@ -31,6 +32,7 @@ final class UserStateStore {
     }
 
     private(set) var progress: [String: Progress] = [:]
+    private var engines: [String: PlaybackEngineKind] = [:]
 
     static let recentLimit = 50
     /// Played-but-not-favourite rows kept on disk, so recents can reach back past what shows.
@@ -124,6 +126,10 @@ final class UserStateStore {
             },
             uniquingKeysWith: { first, _ in first }
         )
+        engines = Dictionary(
+            rows.compactMap { row in PlaybackEngineKind(rawValue: row.rememberedEngine).map { (row.streamID, $0) } },
+            uniquingKeysWith: { first, _ in first }
+        )
         recents = rows
             .filter { $0.lastPlayedAt > .distantPast }
             .sorted { $0.lastPlayedAt > $1.lastPlayedAt }
@@ -146,7 +152,7 @@ final class UserStateStore {
     }
 
     private func removeIfEmpty(_ row: UserContentState) {
-        if !row.isFavorite, row.lastPlayedAt == .distantPast, row.positionSeconds == 0 {
+        if !row.isFavorite, row.lastPlayedAt == .distantPast, row.positionSeconds == 0, row.rememberedEngine.isEmpty {
             context.delete(row)
         }
     }
@@ -171,5 +177,33 @@ final class UserStateStore {
             context.rollback()
         }
         reload()
+    }
+}
+
+/// What the player consults to try, first, the engine that worked last time.
+@MainActor
+protocol EngineMemory: AnyObject {
+    func remembered(for key: String) -> PlaybackEngineKind?
+    func remember(_ engine: PlaybackEngineKind, for key: String)
+    func forget(for key: String)
+}
+
+extension UserStateStore: EngineMemory {
+    func remembered(for key: String) -> PlaybackEngineKind? {
+        engines[key]
+    }
+
+    func remember(_ engine: PlaybackEngineKind, for key: String) {
+        guard engines[key] != engine else { return }
+        let row = state(for: key) ?? insert(key)
+        row.rememberedEngine = engine.rawValue
+        commit()
+    }
+
+    func forget(for key: String) {
+        guard engines[key] != nil, let row = state(for: key) else { return }
+        row.rememberedEngine = ""
+        removeIfEmpty(row)
+        commit()
     }
 }

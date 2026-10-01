@@ -42,6 +42,11 @@ final class PlayerModel {
     /// a live channel, which has nowhere to resume.
     private let onProgress: ((_ position: Double, _ duration: Double?) -> Void)?
     private var lastReportedProgress: Double
+    private let memory: (any EngineMemory)?
+    private let memoryKey: String?
+    /// The engine the person's own setting would try first, to tell a fallback from their pick.
+    private let settingsFirst: PlaybackEngineKind?
+    private var lastRecordedEngine: PlaybackEngineKind?
 
     init(
         title: String,
@@ -51,6 +56,8 @@ final class PlayerModel {
         nowPlaying: (any NowPlayingPublishing)? = nil,
         startPosition: Double = 0,
         onProgress: ((_ position: Double, _ duration: Double?) -> Void)? = nil,
+        memory: (any EngineMemory)? = nil,
+        memoryKey: String? = nil,
         makeEngine: @escaping PlaybackCoordinator.EngineFactory = { EngineRegistry.make($0) }
     ) {
         self.title = title
@@ -60,8 +67,15 @@ final class PlayerModel {
         self.onProgress = onProgress
         lastReportedProgress = startPosition
         position = startPosition
+        self.memory = memory
+        self.memoryKey = memoryKey
+        let settingOrder = PlaybackEngineKind.order(preferred: preferred)
+        settingsFirst = settingOrder.first
+        // The engine that played this last time, when it was not the person's own pick, goes
+        // first: a channel one engine cannot read should not fail there again every time.
+        let learned = memoryKey.flatMap { memory?.remembered(for: $0) }
         coordinator = PlaybackCoordinator(
-            priority: PlaybackEngineKind.order(preferred: preferred),
+            priority: learned.map { PlaybackEngineKind.order(preferred: $0) } ?? settingOrder,
             makeEngine: makeEngine
         )
     }
@@ -272,7 +286,8 @@ final class PlayerModel {
             }
             publishNowPlaying()
             // A notice is about the last change of engine; it goes once playing starts.
-            if case .playing = new {
+            if case let .playing(kind) = new {
+                recordEngine(kind)
                 scheduleNoticeClear()
                 // Start the countdown once, at the first picture. Not on every rebuffer,
                 // which would bring the controls back up each time.
@@ -295,6 +310,18 @@ final class PlayerModel {
         case let .tracks(audio, subtitle):
             audioTracks = audio
             subtitleTracks = subtitle
+        }
+    }
+
+    /// Learns which engine plays this: one other than the person's choice is remembered, and
+    /// their own choice playing it again means there is nothing to remember.
+    private func recordEngine(_ kind: PlaybackEngineKind) {
+        guard let memory, let memoryKey, kind != lastRecordedEngine else { return }
+        lastRecordedEngine = kind
+        if kind == settingsFirst {
+            memory.forget(for: memoryKey)
+        } else {
+            memory.remember(kind, for: memoryKey)
         }
     }
 
