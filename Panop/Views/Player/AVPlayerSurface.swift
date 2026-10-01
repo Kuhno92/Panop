@@ -5,6 +5,8 @@ import SwiftUI
 /// Panop draws its own overlay so it looks the same whichever engine is playing.
 struct AVPlayerSurface {
     let player: AVPlayer
+    /// Told about the layer once it exists, for Picture in Picture.
+    var onLayer: ((AVPlayerLayer) -> Void)?
 }
 
 #if os(macOS)
@@ -14,6 +16,7 @@ struct AVPlayerSurface {
         func makeNSView(context: Context) -> PlayerLayerView {
             let view = PlayerLayerView()
             view.playerLayer.player = player
+            onLayer?(view.playerLayer)
             return view
         }
 
@@ -46,6 +49,7 @@ struct AVPlayerSurface {
         func makeUIView(context: Context) -> PlayerLayerView {
             let view = PlayerLayerView()
             view.playerLayer.player = player
+            onLayer?(view.playerLayer)
             return view
         }
 

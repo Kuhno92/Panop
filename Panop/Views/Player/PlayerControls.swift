@@ -46,6 +46,15 @@ struct PlayerControls: View {
             }
 
             tracks
+
+            if model.supportsPictureInPicture {
+                Button {
+                    model.togglePictureInPicture()
+                } label: {
+                    Image(systemName: "pip.enter").font(.title3)
+                }
+                .accessibilityLabel("Picture in Picture")
+            }
         }
         .buttonStyle(.plain)
         .foregroundStyle(.white)

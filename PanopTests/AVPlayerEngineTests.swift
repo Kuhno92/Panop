@@ -1,4 +1,7 @@
 import AVFoundation
+#if !os(tvOS)
+    import AVKit
+#endif
 import Foundation
 @testable import Panop
 import PanopCore
@@ -481,5 +484,36 @@ private final class StatusWatcher {
             try? await Task.sleep(for: .milliseconds(10))
         }
         return false
+    }
+}
+
+@Suite("AVPlayer Picture in Picture")
+@MainActor
+struct AVPlayerPictureInPictureTests {
+    @Test
+    func `an engine offers it once it has a layer, where the system supports it`() {
+        let engine = AVPlayerEngine()
+        #expect(!engine.supportsPictureInPicture, "there is nothing to float before a layer exists")
+
+        engine.attach(layer: AVPlayerLayer(player: engine.player))
+
+        #if os(tvOS)
+            #expect(!engine.supportsPictureInPicture, "tvOS has no Picture in Picture")
+        #else
+            #expect(engine.supportsPictureInPicture == AVPictureInPictureController.isPictureInPictureSupported())
+        #endif
+    }
+
+    @Test
+    func `asking again does not make a second controller`() {
+        let engine = AVPlayerEngine()
+        let layer = AVPlayerLayer(player: engine.player)
+
+        engine.attach(layer: layer)
+        let first = engine.supportsPictureInPicture
+        engine.attach(layer: AVPlayerLayer(player: engine.player))
+
+        #expect(engine.supportsPictureInPicture == first)
+        engine.togglePictureInPicture()
     }
 }

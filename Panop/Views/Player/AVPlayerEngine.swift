@@ -1,6 +1,10 @@
 import AVFoundation
 import Foundation
 import PanopCore
+
+#if !os(tvOS)
+    import AVKit
+#endif
 import PanopPlayback
 
 /// The AVPlayer engine adapter.
@@ -34,9 +38,44 @@ final class AVPlayerEngine: PlaybackEngine {
     private var kvoTokens: [NSKeyValueObservation] = []
     private var timeObserver: Any?
     private var wantsPlayback = false
+    #if !os(tvOS)
+        private var pictureInPicture: AVPictureInPictureController?
+    #endif
 
     init() {
         (events, output) = AsyncStream.makeStream()
+    }
+
+    // MARK: - Picture in Picture
+
+    /// Whether this engine can float its video in a small window. Only AVPlayer can:
+    /// the system's PiP needs an `AVPlayerLayer`, which the other engines do not draw
+    /// into. Not on tvOS, which has no such window.
+    var supportsPictureInPicture: Bool {
+        #if os(tvOS)
+            false
+        #else
+            pictureInPicture != nil
+        #endif
+    }
+
+    /// Called once the view that draws the video exists, because PiP is made from its layer.
+    func attach(layer: AVPlayerLayer) {
+        #if !os(tvOS)
+            guard pictureInPicture == nil, AVPictureInPictureController.isPictureInPictureSupported() else { return }
+            pictureInPicture = AVPictureInPictureController(playerLayer: layer)
+        #endif
+    }
+
+    func togglePictureInPicture() {
+        #if !os(tvOS)
+            guard let pictureInPicture else { return }
+            if pictureInPicture.isPictureInPictureActive {
+                pictureInPicture.stopPictureInPicture()
+            } else {
+                pictureInPicture.startPictureInPicture()
+            }
+        #endif
     }
 
     var position: Double? {

@@ -35,17 +35,20 @@ final class PlayerModel {
     private var hideTask: Task<Void, Never>?
     /// How long the controls stay up once playing with nothing touched.
     private let controlsTimeout: Duration
+    private let nowPlaying: (any NowPlayingPublishing)?
 
     init(
         title: String,
         request: PlaybackRequest,
         preferred: PlaybackEngineKind?,
         controlsTimeout: Duration = .seconds(4),
+        nowPlaying: (any NowPlayingPublishing)? = nil,
         makeEngine: @escaping PlaybackCoordinator.EngineFactory = { EngineRegistry.make($0) }
     ) {
         self.title = title
         self.request = request
         self.controlsTimeout = controlsTimeout
+        self.nowPlaying = nowPlaying
         coordinator = PlaybackCoordinator(
             priority: PlaybackEngineKind.order(preferred: preferred),
             makeEngine: makeEngine
@@ -77,6 +80,14 @@ final class PlayerModel {
         duration != nil
     }
 
+    var supportsPictureInPicture: Bool {
+        (engine as? AVPlayerEngine)?.supportsPictureInPicture ?? false
+    }
+
+    func togglePictureInPicture() {
+        (engine as? AVPlayerEngine)?.togglePictureInPicture()
+    }
+
     /// Controls stay up while paused or failed: there is nothing to see behind them.
     var showsControls: Bool {
         controlsVisible || isPaused || failureText != nil
@@ -93,12 +104,36 @@ final class PlayerModel {
     func start() {
         guard listener == nil else { return }
         let events = coordinator.events
+        nowPlaying?.begin { [weak self] command in self?.handle(command) }
         listener = Task { [weak self] in
             for await event in events {
                 self?.apply(event)
             }
         }
         coordinator.play(request)
+    }
+
+    func play() {
+        if isPaused {
+            togglePause()
+        }
+    }
+
+    func pause() {
+        if !isPaused {
+            togglePause()
+        }
+    }
+
+    /// A command from the system's media controls.
+    func handle(_ command: RemoteCommand) {
+        switch command {
+        case .play: play()
+        case .pause: pause()
+        case .toggle: togglePause()
+        case let .skip(seconds): skip(by: seconds)
+        case let .seek(seconds): seek(to: seconds)
+        }
     }
 
     func togglePause() {
@@ -115,6 +150,7 @@ final class PlayerModel {
         coordinator.seek(to: target)
         position = target
         showControls()
+        publishNowPlaying()
     }
 
     func skip(by seconds: Double) {
@@ -166,6 +202,7 @@ final class PlayerModel {
         hideTask?.cancel()
         hideTask = nil
         await coordinator.stop()
+        nowPlaying?.end()
         engine = nil
         status = .idle
     }
@@ -183,6 +220,7 @@ final class PlayerModel {
                 selectedAudioID = nil
                 selectedSubtitleID = nil
             }
+            publishNowPlaying()
             // A notice is about the last change of engine; it goes once playing starts.
             if case .playing = new {
                 scheduleNoticeClear()
@@ -198,11 +236,30 @@ final class PlayerModel {
             joinTime = seconds
         case let .position(seconds):
             position = seconds
+            let known = duration
             duration = coordinator.activeEngine?.duration
+            if duration != known {
+                publishNowPlaying()
+            }
         case let .tracks(audio, subtitle):
             audioTracks = audio
             subtitleTracks = subtitle
         }
+    }
+
+    private func publishNowPlaying() {
+        guard let nowPlaying else { return }
+        switch status {
+        case .idle, .failed, .ended:
+            return
+        default:
+            break
+        }
+        let playing = switch status {
+        case .playing, .buffering: true
+        default: false
+        }
+        nowPlaying.update(NowPlayingInfo(title: title, position: position, duration: duration, isPlaying: playing))
     }
 
     private func scheduleNoticeClear() {

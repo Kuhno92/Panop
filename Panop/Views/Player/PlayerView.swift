@@ -39,7 +39,8 @@ struct PlayerScreen: View {
             model = PlayerModel(
                 title: target.name,
                 request: request,
-                preferred: PlaybackEngineKind(rawValue: engineRaw)
+                preferred: PlaybackEngineKind(rawValue: engineRaw),
+                nowPlaying: SystemNowPlaying()
             )
         } catch let error as PlaybackTargetError {
             problem = error.message
@@ -71,7 +72,7 @@ struct PlayerView: View {
     private var surface: some View {
         // Each engine draws its own way; a new adapter adds its own case here.
         if let engine = model.engine as? AVPlayerEngine {
-            AVPlayerSurface(player: engine.player).ignoresSafeArea()
+            AVPlayerSurface(player: engine.player, onLayer: { engine.attach(layer: $0) }).ignoresSafeArea()
         } else if let engine = model.engine as? VLCEngine {
             VLCSurface(view: engine.surface).ignoresSafeArea()
         } else if let engine = model.engine as? LumePlaybackEngine {
