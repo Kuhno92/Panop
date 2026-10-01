@@ -27,16 +27,30 @@ nonisolated enum LiveEmptyState: Equatable {
     case failed([Problem])
     /// The source loaded and holds no live channels, for instance a movies-only account.
     case noLiveChannels
+    case noFavourites
+    case noRecents
 
     /// - Parameters:
     ///   - sources: the sources the screen is showing: the chosen one, or all.
     ///   - hasPlaylists: whether any playlist exists at all, chosen or not.
-    static func resolve(isSearching: Bool, sources: [Source], hasPlaylists: Bool) -> LiveEmptyState {
+    static func resolve(
+        isSearching: Bool,
+        sources: [Source],
+        hasPlaylists: Bool,
+        mode: LiveListMode = .all
+    ) -> LiveEmptyState {
         if isSearching {
             return .searchFoundNothing
         }
         guard hasPlaylists, !sources.isEmpty else {
             return .noPlaylists
+        }
+        // An empty favourites or history is not a problem with a source, whatever state the
+        // sources are in.
+        switch mode {
+        case .favourites: return .noFavourites
+        case .recents: return .noRecents
+        case .all: break
         }
         if sources.contains(where: \.status.isSyncing) {
             return .syncing

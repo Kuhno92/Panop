@@ -26,6 +26,7 @@ struct PanopApp: App {
             )
             #if DEBUG
                 if UITestMode.isActive {
+                    UITestMode.resetPreferences()
                     let seeded = services
                     Task { await UITestMode.seed(seeded) }
                 }
@@ -43,6 +44,7 @@ struct PanopApp: App {
             RootView()
                 .environment(\.cloudModelContext, ModelContext(cloudContainer))
                 .environment(services.library)
+                .environment(services.userState)
                 .environment(services.syncStatus)
         }
         .modelContainer(catalogContainer)

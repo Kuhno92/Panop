@@ -9,6 +9,7 @@ import SwiftData
 @MainActor
 final class AppServices {
     let library: PlaylistLibrary
+    let userState: UserStateStore
     let syncStatus: SyncStatusCenter
     let sync: SyncService
     let catalogStore: SwiftDataCatalogStore
@@ -29,6 +30,8 @@ final class AppServices {
         catalogContainer = catalog
         syncStatus = status
         self.sync = sync
+        let userState = UserStateStore(context: ModelContext(cloud))
+        self.userState = userState
         library = PlaylistLibrary(
             context: ModelContext(cloud),
             credentials: credentials,
@@ -36,6 +39,8 @@ final class AppServices {
             transport: transport,
             directory: playlistsDirectory
         )
+        // A deleted playlist's favourites and history go with it.
+        library.onRemoved = { id in userState.forget(playlist: id) }
     }
 
     /// In-memory containers and Keychain, for previews and tests.

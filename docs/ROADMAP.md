@@ -321,6 +321,16 @@ The brief called performance a key concept. For IPTV this concentrates in one nu
       and anything over 4 MB are refused and never cached. 17 tests with a scripted network.
       **Not measured:** scroll performance on a long list with real logos, and an Apple TV HD.
       **Not done:** logos for movies and series, and programme artwork.
+- [x] **Favourites and recently watched** *(surfaced)*, on this device. Star a channel by
+      touch and hold (or the remote's long press) or, off tvOS, a swipe; a star shows on the row;
+      the list filters to All, Favourites or Recently watched (a toolbar menu, and a row at the top
+      of the list on Apple TV, which shows no toolbar). Opening a channel records it. Held in
+      the cloud container (`UserStateStore`, explicit fetches, never `@Query`), keyed by playlist
+      *and* entry because Xtream stream ids repeat across providers. An unstarred channel with no
+      history leaves no row; played-only rows are capped at 200; deleting a playlist deletes
+      its favourites and history. 15 store tests, and UI tests on iOS and tvOS. **Not done:**
+      the same for movies and series (no screens yet), resume positions (the field exists, nothing
+      writes it), and a home screen that shows these as rails.
 - [x] **Empty, loading and error states** that explain what to do next, for Live TV. The screen
       now tells apart: no playlist yet, a search with no match, still loading, **a source that
       failed (with the reason and a Try again button)**, and a source that loaded with no live
@@ -347,7 +357,9 @@ The brief called performance a key concept. For IPTV this concentrates in one nu
 - [ ] **Enable CloudKit mirroring** *(asked for, as "iCloud sync")*. Needs a Developer Program
       team and a real container identifier first; without them the app fails to launch rather
       than degrading.
-- [ ] **Favourites** across devices
+- [ ] **Favourites** across devices. They exist on one device now (see M4, *Favourites and
+      recently watched*) and live in the cloud container, so turning CloudKit on is what carries
+      them across: no change to the model should be needed beyond the entitlement.
 - [ ] **Watch progress and resume points** across devices
 - [ ] **App settings**, including the selected playback engine
 - [ ] **Encrypted provider credentials** via `@Attribute(.allowsCloudEncryption)`

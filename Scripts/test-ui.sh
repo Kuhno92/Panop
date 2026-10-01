@@ -45,12 +45,6 @@ if [[ -z "$id" ]]; then
     exit 1
 fi
 
-# xcodebuild clones the device for parallel testing, and a clone that fails to start leaves the
-# run waiting forever ("Simulator device failed to launch ...xctrunner"). So: no clones, run on
-# the device itself, and have it booted first.
-xcrun simctl boot "$id" 2>/dev/null || true
-xcrun simctl bootstatus "$id" -b >/dev/null
-
 flags=()
 if [[ -n "${PANOP_ONLY:-}" ]]; then
     IFS=',' read -r -a only <<<"$PANOP_ONLY"
@@ -61,17 +55,49 @@ fi
 
 log="$(mktemp -t panop-ui-test)"
 echo "==> UI tests on $wanted (log: $log)"
-set +e
-xcodebuild test \
-    -project Panop.xcodeproj \
-    -scheme PanopUITests \
-    -destination "platform=$runtime Simulator,id=$id" \
-    -parallel-testing-enabled NO \
-    -derivedDataPath "${DD_BASE}-ui-${platform}" \
-    -clonedSourcePackagesDirPath "$SHARED_SPM" \
-    ${flags[@]+"${flags[@]}"} >"$log" 2>&1
-status=$?
-set -e
+
+# xcodebuild clones the device for parallel testing, and a clone that fails to start leaves the
+# run waiting forever ("Simulator device failed to launch ...xctrunner"). So: no clones, run on
+# the device itself, and have it booted first.
+#
+# Even so the runner sometimes never launches and nothing ever times out. A run that has not
+# started a single test after seven minutes (a cold build takes three) is stuck: kill it, bring
+# the simulator down and up again, and try once more. Three tries, then give up.
+status=1
+for attempt in 1 2 3; do
+    xcrun simctl shutdown "$id" 2>/dev/null || true
+    xcrun simctl boot "$id" 2>/dev/null || true
+    xcrun simctl bootstatus "$id" -b >/dev/null
+
+    xcodebuild test \
+        -project Panop.xcodeproj \
+        -scheme PanopUITests \
+        -destination "platform=$runtime Simulator,id=$id" \
+        -parallel-testing-enabled NO \
+        -derivedDataPath "${DD_BASE}-ui-${platform}" \
+        -clonedSourcePackagesDirPath "$SHARED_SPM" \
+        ${flags[@]+"${flags[@]}"} >"$log" 2>&1 &
+    pid=$!
+    began=$SECONDS
+    stuck=0
+    while kill -0 "$pid" 2>/dev/null; do
+        sleep 10
+        if ! grep -qE "^Test (Suite|case)" "$log" && (( SECONDS - began > 420 )); then
+            stuck=1
+            pkill -P "$pid" 2>/dev/null || true
+            kill "$pid" 2>/dev/null || true
+            break
+        fi
+    done
+    set +e
+    wait "$pid" 2>/dev/null
+    status=$?
+    set -e
+    if (( stuck == 0 )); then
+        break
+    fi
+    echo "==> attempt $attempt never started a test; restarting the simulator" >&2
+done
 
 grep -E "^Test case .* (passed|failed)" "$log" | sed -E "s/ on '.*'//" || true
 grep -E "error:|Failing tests:|^\s+[A-Za-z]+Tests\." "$log" | head -20 || true

@@ -52,10 +52,55 @@ enum LiveChannelQuery {
         return descriptor
     }
 
+    /// The channels with these entry ids, for the favourites and recents views.
+    ///
+    /// Those sets live in the cloud container and cannot be joined to the catalog, so the ids
+    /// go into the catalog query. They are few (a person's favourites, at most fifty recents),
+    /// which is why this is fine where it would not be for the whole catalog. An id can repeat
+    /// across playlists, so the caller still checks the playlist.
+    static func descriptor(restrictedTo entryIDs: [String]) -> FetchDescriptor<CatalogEntryRecord> {
+        let live = MediaKind.live.rawValue
+        let wanted = entryIDs
+        var descriptor = FetchDescriptor<CatalogEntryRecord>(
+            predicate: #Predicate { wanted.contains($0.id) && $0.kindRaw == live },
+            sortBy: [
+                SortDescriptor(\CatalogEntryRecord.nameKey, comparator: .lexical),
+                SortDescriptor(\CatalogEntryRecord.id, comparator: .lexical)
+            ]
+        )
+        descriptor.fetchLimit = maxRows
+        return descriptor
+    }
+
     /// Doubles rather than adding a page, so reaching row 5,000 costs a handful
     /// of re-reads instead of seventeen.
     static func nextLimit(after limit: Int) -> Int {
         Swift.min(limit * 2, maxRows)
+    }
+}
+
+/// Which channels to list.
+enum LiveListMode: String, CaseIterable, Identifiable {
+    case all, favourites, recents
+
+    var id: String {
+        rawValue
+    }
+
+    var title: String {
+        switch self {
+        case .all: "All channels"
+        case .favourites: "Favourites"
+        case .recents: "Recently watched"
+        }
+    }
+
+    var symbol: String {
+        switch self {
+        case .all: "tv"
+        case .favourites: "star"
+        case .recents: "clock"
+        }
     }
 }
 

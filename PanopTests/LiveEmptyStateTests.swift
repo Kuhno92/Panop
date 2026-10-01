@@ -72,4 +72,31 @@ struct LiveEmptyStateTests {
         // The screen passes only the sources on show: choosing a healthy one hides the other's.
         #expect(LiveEmptyState.problems(in: [source("Healthy", .idle)]).isEmpty)
     }
+
+    @Test
+    func `an empty favourites list says so, whatever state the sources are in`() {
+        let sources = [source("Home", .failed("down"))]
+        #expect(LiveEmptyState
+            .resolve(isSearching: false, sources: sources, hasPlaylists: true, mode: .favourites) == .noFavourites)
+    }
+
+    @Test
+    func `an empty history says nothing has been watched`() {
+        let sources = [source("Home", .idle)]
+        #expect(LiveEmptyState
+            .resolve(isSearching: false, sources: sources, hasPlaylists: true, mode: .recents) == .noRecents)
+    }
+
+    @Test
+    func `a search that finds nothing is still a search, in any mode`() {
+        let sources = [source("Home", .idle)]
+        #expect(LiveEmptyState
+            .resolve(isSearching: true, sources: sources, hasPlaylists: true, mode: .favourites) == .searchFoundNothing)
+    }
+
+    @Test
+    func `with no playlist there is nothing to favourite either`() {
+        #expect(LiveEmptyState
+            .resolve(isSearching: false, sources: [], hasPlaylists: false, mode: .favourites) == .noPlaylists)
+    }
 }

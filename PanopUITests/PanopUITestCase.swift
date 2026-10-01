@@ -20,6 +20,8 @@ class PanopUITestCase: XCTestCase {
             throw XCTSkip("UI tests run on the iOS and tvOS simulators.")
         #endif
         app = XCUIApplication()
+        // The app clears its remembered filters when it starts in this mode. They are not set
+        // here as launch arguments: those pin a value, and the app could then never change it.
         app.launchArguments = ["-panop-uitest"]
         app.launchEnvironment["PANOP_CONTROLS_TIMEOUT"] = String(controlsTimeout)
         app.launch()
@@ -43,4 +45,14 @@ class PanopUITestCase: XCTestCase {
             line: line
         )
     }
+
+    #if os(tvOS)
+        /// Focus starts on the tab bar. Down from there reaches the search keyboard, then the
+        /// Show filter, then the first channel.
+        func focusFirstChannel() {
+            for _ in 0 ..< 3 {
+                XCUIRemote.shared.press(.down)
+            }
+        }
+    #endif
 }

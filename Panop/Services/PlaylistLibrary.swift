@@ -34,6 +34,8 @@ final class PlaylistLibrary {
     private(set) var playlists: [PlaylistSummary] = []
     /// Playlists being deleted right now, so the screen can show it and refuse a second tap.
     private(set) var removing: Set<String> = []
+    /// Called with a playlist's id once it has been deleted, so what hangs off it can go too.
+    var onRemoved: ((String) -> Void)?
 
     private let context: ModelContext
     private let credentials: any CredentialStore
@@ -273,6 +275,7 @@ final class PlaylistLibrary {
             try? context.save()
         }
         reload()
+        onRemoved?(id)
         return nil
     }
 

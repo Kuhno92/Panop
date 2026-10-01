@@ -30,6 +30,14 @@ enum UITestMode {
 
 #if DEBUG
     extension UITestMode {
+        /// The simulator keeps UserDefaults between launches, and Live TV remembers its filters.
+        /// A test that left it on Favourites must not decide what the next one sees.
+        static func resetPreferences() {
+            for key in ["liveListMode", "liveSourceFilter", "playbackEngine"] {
+                UserDefaults.standard.removeObject(forKey: key)
+            }
+        }
+
         /// Channel names the tests look for. The first three are real-looking on purpose, so a
         /// search has something distinct to match.
         static let channelNames = ["Das Erste", "ZDF", "3sat", "Arte", "Phoenix", "Tagesschau 24"]

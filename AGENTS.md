@@ -17,7 +17,7 @@ command works because it is documented below.
 - [x] Repo skeleton, docs, lint tooling, ADRs
 - [x] `Packages/PanopKit`: PanopCore, PanopPlaylist, PanopPlayback, PanopXtream, PanopEPG, PanopCatalog (231 tests passing)
 - [x] `Panop.xcodeproj` and the app target (builds and launches on **macOS and iOS**)
-- [x] `SwiftDataCatalogStore` and the `PanopTests` target (217 tests, passing on macOS, iOS and tvOS)
+- [x] `SwiftDataCatalogStore` and the `PanopTests` target (232 tests, passing on macOS, iOS and tvOS)
 - [x] Playback coordinator (portable, `PanopPlayback`) and the AVPlayer adapter. Channels play from the Live TV list. AVPlayer cannot read raw MPEG-TS, so those streams fall through to VLC; Xtream live streams play in AVPlayer directly because the panel offers HLS
 - [x] VLCKit adapter (4.0.0-a24, the only SwiftPM line; an alpha). Plays raw MPEG-TS over HTTP, so M3U live streams now work, verified on real transport-stream bytes through the coordinator
 - [x] LumeEngine adapter (submodule `vendor/LumeEngine`, pinned to v0.2.2, dynamic and embedded). Plays raw MPEG-TS and HLS; verified on macOS, iOS and tvOS. PiP and the AirPlay picker are wired for AVPlayer (iOS, macOS) but neither is seen working on a device (KSPlayer stays unlinked)
@@ -95,7 +95,7 @@ Scripts/test-app.sh [macos|ios|tvos]
 # Catalog import benchmarks: Release build, macOS, prints a results table
 Scripts/test-app.sh --benchmark
 
-# UI tests (PanopUITests): drive the real screens, and the Apple TV remote, on a simulator.
+# UI tests (PanopUITests: 12 on iOS, 11 on tvOS): drive the real screens, and the Apple TV remote, on a simulator.
 # Minutes, not seconds. Not on macOS, which needs an accessibility grant given by hand.
 Scripts/test-ui.sh [ios|tvos]
 ```

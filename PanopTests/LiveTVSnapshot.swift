@@ -14,6 +14,7 @@
             let view = NavigationStack { LiveTVView() }
                 .modelContainer(app.services.catalogContainer)
                 .environment(app.services.library)
+                .environment(app.services.userState)
                 .environment(app.services.syncStatus)
                 .frame(width: 560, height: 420)
             let hosting = NSHostingView(rootView: view)

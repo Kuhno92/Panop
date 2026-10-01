@@ -27,5 +27,6 @@ struct RootView: View {
     RootView()
         .modelContainer(services.catalogContainer)
         .environment(services.library)
+        .environment(services.userState)
         .environment(services.syncStatus)
 }

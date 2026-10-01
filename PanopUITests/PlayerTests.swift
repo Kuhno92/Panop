@@ -4,10 +4,7 @@ final class PlayerTests: PanopUITestCase {
     private func openFirstChannel() {
         waitForChannels()
         #if os(tvOS)
-            // Focus starts on the tab bar. The first press down lands on the search keyboard
-            // above the list; the second reaches the first channel.
-            XCUIRemote.shared.press(.down)
-            XCUIRemote.shared.press(.down)
+            focusFirstChannel()
             XCUIRemote.shared.press(.select)
         #else
             channel("3sat").tap()
