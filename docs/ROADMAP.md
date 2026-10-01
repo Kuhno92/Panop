@@ -241,11 +241,36 @@ The first milestone where Panop is usable.
 The brief called performance a key concept. For IPTV this concentrates in one number.
 
 - [ ] **Fast channel zapping** *(asked for, as "streaming performance")*. Time from channel
-      select to first frame is the metric users judge an IPTV app on. Levers: a pre-warmed
-      second player instance, HTTP keep-alive to the provider, and caching resolved stream URLs.
-- [ ] **Reconnect and backoff policy** on stall or IO error, distinguishing retryable failures
-      from format rejections. `PlaybackError.isRetryable` already encodes the distinction.
-- [ ] **Engine fallback on failure**, with the reason surfaced rather than a silent switch.
+      select to first frame is the metric users judge an IPTV app on. **Measured, not yet
+      improved.** Release build, this Mac, a fresh engine per zap, median of 8 over the real
+      network (`TEST_RUNNER_PANOP_LIVE_URL=... Scripts/test-app.sh --benchmark playback`):
+
+      | Stream | AVPlayer | VLC | LumeEngine |
+      |---|---|---|---|
+      | 3sat, single-variant HLS | 276 ms | 132 ms | 715 ms |
+      | ZDF, multivariant HLS | 148 ms | 81 ms | 2924 ms |
+      | Local mp4 | 11 ms | 67 ms | 6 ms |
+      | MPEG-TS over local HTTP | cannot read | 51 ms | 188 ms |
+
+      What this says. (1) The default path is already quick: AVPlayer plays HLS in 150 to
+      300 ms warm. (2) **LumeEngine is slow on multivariant HLS**, 2.9 s on ZDF, and tightening
+      `probeSize` and `maxAnalyzeDuration` did not move it, so the cost is FFmpeg's HLS demuxer
+      opening every variant, not probing. It only matters if Lume is the chosen engine, since
+      AVPlayer takes HLS first by default. Choosing one variant is not simple: ZDF carries its
+      audio in a separate group. (3) **Prefetching the playlist before the first zap** saved
+      about 50 ms, inside the run-to-run noise, so it is not worth building. (4) The cold first
+      zap is the larger gap (300 to 1000 ms against 150 ms), mostly DNS, TLS and a cold CDN.
+      (5) Join times are not strictly comparable: libVLC reports `playing` when decoding
+      starts, AVPlayer when its clock runs. **Not measured:** a raw MPEG-TS channel from a real
+      provider, which is the case VLC and Lume exist for, and an Apple TV HD.
+      Levers still open: a pre-created engine for the next zap (VLC's 50 to 70 ms creation is the
+      only engine cost large enough to matter), and remembering which engine worked for a
+      channel so a known raw-TS channel skips the AVPlayer attempt.
+- [x] **Reconnect and backoff policy** on stall or IO error, distinguishing retryable failures
+      from format rejections. In `PlaybackCoordinator` (see the M2 entry), driven by
+      `PlaybackError.isRetryable`.
+- [x] **Engine fallback on failure**, with the reason surfaced rather than a silent switch.
+      Every fallback and reconnect carries a notice with its reason; the player shows it.
 - [ ] **Playback QoE metrics** *(surfaced)*: join time, rebuffer ratio, exits before first
       frame, engine fallbacks. Flush at session boundaries only; periodic writes during playback
       cause hitching.

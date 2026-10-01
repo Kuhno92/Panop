@@ -245,6 +245,10 @@ job, which matches where that policy lives for the other three engines anyway.
   as `av_read_frame: Input/output error`, mapped to `.network`, so the coordinator reconnects.
 - **Garbage bytes** open as `avformat_open_input: Input/output error`, which maps to the retryable
   `.openFailed`, not `.unsupportedFormat`. The coordinator retries before moving on.
+- **Multivariant HLS is slow to open.** Measured 2.9 s on ZDF against 0.15 s for AVPlayer and
+  0.08 s for libVLC (docs/ROADMAP.md, M3). Probe limits do not help: FFmpeg's HLS demuxer opens
+  every variant. AVPlayer takes HLS first in the default order, so this only shows when Lume is
+  the engine the user chose.
 - **A quiet connection is not a live one, for tests.** A test server that sends a short stream
   and then holds the connection open makes the player probe until its 15 second read timeout.
   `LocalStreamServer(holdOpen: true)` loops the body instead, as a live channel keeps coming.
