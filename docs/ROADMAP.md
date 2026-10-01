@@ -223,8 +223,10 @@ The first milestone where Panop is usable.
       and subtitle menus, the engine name, and controls that hide four seconds after the first
       picture and stay up while paused or failed. The coordinator now forwards each engine's
       tracks and passes a track choice on. Tested through the model with a scripted engine;
-      **not looked at by eye**, and tvOS shows a progress bar rather than a slider, since it
-      has none. Subtitle menus list tracks, but no engine draws the text yet.
+      looked at on macOS through
+      `PlayerSnapshot` (`TEST_RUNNER_PANOP_SNAPSHOT=1`, writes `/tmp/panop-player-*.png`) but
+      **not on iOS or tvOS**, where tvOS shows a progress bar rather than a slider, since it has
+      none. Subtitle menus list tracks, but no engine draws the text yet.
 - [ ] **Resume playback** from a stored position. Pass it at load time; seeking an in-flight
       IPTV connection makes some providers drop the stream.
 
