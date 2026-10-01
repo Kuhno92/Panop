@@ -7,6 +7,25 @@ import PanopEPG
 import SwiftData
 import Testing
 
+/// What a list does when the store changes under it: fetch its page and read what it draws.
+/// Used from the main queue only; `@unchecked Sendable` so a notification handler can hold it.
+private final class ListRefresher: @unchecked Sendable {
+    let context: ModelContext
+    let descriptor: FetchDescriptor<CatalogEntryRecord>
+    private(set) var refreshes = 0
+
+    init(context: ModelContext, descriptor: FetchDescriptor<CatalogEntryRecord>) {
+        self.context = context
+        self.descriptor = descriptor
+    }
+
+    func refresh() {
+        let rows = (try? context.fetch(descriptor)) ?? []
+        refreshes += 1
+        _ = rows.reduce(0) { $0 + $1.name.count }
+    }
+}
+
 /// Performance measurements for the catalog import path.
 ///
 /// Off unless `PANOP_BENCHMARK=1`, and only meaningful in an optimized build:
@@ -150,6 +169,68 @@ struct CatalogBenchmarks {
             try await store.removePlaylist(Self.playlist)
         }
         #expect(try await store.entryCount(kind: .live, playlist: Self.playlist) == 0)
+    }
+
+    /// The first import of a big playlist on a screen that is already showing the list.
+    ///
+    /// Each background save makes the Live TV list refetch its first page. This measures what
+    /// that does to the main thread: a ticker that asks to run every 10 ms records how late it
+    /// actually runs. A gap over 50 ms is three dropped frames.
+    @Test
+    func `the main thread while a first import runs under a list that refreshes on every save`() async throws {
+        let text = playlistText(live: 0 ..< 80000)
+        let file = try writeTemporaryFile(text)
+
+        func run(watching: Bool) async throws {
+            let catalog = try OnDiskCatalog()
+            defer { catalog.cleanUp() }
+            let importer = CatalogImporter(store: catalog.store, transport: StubTransport { _ in (404, "") })
+            let refresher = ListRefresher(
+                context: ModelContext(catalog.container),
+                descriptor: LiveChannelQuery.descriptor(source: nil, search: "", limit: 300)
+            )
+            var observer: NSObjectProtocol?
+            if watching {
+                observer = NotificationCenter.default.addObserver(
+                    forName: ModelContext.didSave, object: nil, queue: .main
+                ) { _ in
+                    MainActor.assumeIsolated { refresher.refresh() }
+                }
+            }
+
+            var gaps: [Double] = []
+            let ticker = Task { @MainActor in
+                var last = ContinuousClock.now
+                while !Task.isCancelled {
+                    try? await Task.sleep(for: .milliseconds(10))
+                    let now = ContinuousClock.now
+                    let gap = now - last
+                    gaps.append(Double(gap.components.seconds) * 1000 + Double(gap.components.attoseconds) / 1e15)
+                    last = now
+                }
+            }
+
+            let began = ContinuousClock.now
+            _ = try await importer.importM3U(playlist: Self.playlist, source: .file(path: file))
+            let took = ContinuousClock.now - began
+            ticker.cancel()
+            if let observer {
+                NotificationCenter.default.removeObserver(observer)
+            }
+
+            let sorted = gaps.sorted()
+            let seconds = Double(took.components.seconds) + Double(took.components.attoseconds) / 1e18
+            let label = watching ? "list refreshing on every save" : "nothing watching"
+            record("first import of 80k channels, \(label): \(String(format: "%.1f", seconds)) s")
+            record(
+                "  main-thread ticks: \(gaps.count), median gap \(String(format: "%.0f", sorted[sorted.count / 2])) ms, " +
+                    "worst \(String(format: "%.0f", sorted.last ?? 0)) ms, over 50 ms: \(gaps.filter { $0 > 50 }.count)" +
+                    (watching ? ", list refreshes: \(refresher.refreshes)" : "")
+            )
+        }
+
+        try await run(watching: false)
+        try await run(watching: true)
     }
 
     @Test

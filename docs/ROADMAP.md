@@ -152,14 +152,27 @@ Getting a real provider's content into the app. Nothing else can be tested until
       provider's 7-14 day guide is never viewed. A window of roughly now-2h to +48h keeps a
       400-channel guide near 40k rows (~5 s cold) instead of 200k+. Choose it in the sync
       service, not the importer.
-- [ ] **Show channels while the first import runs.** A cold import is minutes on an Apple TV.
-      Import live first and let the list fill in, but note every background save re-runs the
-      main context's `@Query`s, so batch the UI refresh instead of updating per save.
-- [ ] **M3U identity when stream URLs carry rotating tokens.** Identity is a hash of the whole
-      URL. A provider that adds a per-request token to each URL makes every row look new and
-      every old row look stale, which the removal gate then (correctly) holds back, but
-      favourites would still be orphaned. Needs a decision on which query parameters to strip
-      before hashing. Check real playlists before choosing.
+- [x] **Show channels while the first import runs.** *Mostly already true, and measured.* Rows
+      appear as soon as they are saved, because the list's query sees each background save, so
+      the list fills in as the import goes; the screen says "Getting your channels…" only until
+      the first rows land. The roadmap's worry was that every save re-runs the list's query on the
+      main thread. Measured (Release, this Mac, `Scripts/test-app.sh --benchmark catalog`): an
+      80,000-channel first import with a list refetching its first page after **every one of the
+      403 saves** left the main thread's worst delay at **20 ms against 12 ms with nothing
+      watching, with no gap over 50 ms** (a gap of three frames); the import itself took 21.2 s
+      against 17.8 s, 19% longer from the contention. So no batching of the refresh was built.
+      **Not measured:** an Apple TV HD, where that 20 ms could be several times larger; if a
+      stall shows there, the fix is to coalesce the refresh while a sync runs. M3U is read in
+      file order, so the first channels in the file appear first.
+- [x] **M3U identity when stream URLs carry rotating tokens.** *Decided: the whole address stays
+      the identity, query string included.* The roadmap asked to check real playlists before
+      choosing, so one was checked (the iptv-org German list): 11 of about 245 addresses have a
+      query, every parameter in them identifies the channel (`network_id`, `ref`, `profile`,
+      `account`, `file`), and two entries differ only in `?network_id=16660` against `?network_id=535`.
+      Stripping the query would have merged different channels. No rotating token appears in it.
+      A test (`M3UIdentityTests`) keeps it that way. **If a real provider turns out to rotate
+      a token**, the fix is to strip *named* parameters (`token`, `expires`, `sig` and the like),
+      not the query as a whole, and it needs a sample of that provider's addresses first.
 - [x] **Playlist import flow**: add a playlist by URL, file, or Xtream credentials. Xtream logins
       are checked against the panel before anything is stored, so a typo fails at the form. The
       playlist record (cloud container) holds only a display host; the whole source URL counts as a
