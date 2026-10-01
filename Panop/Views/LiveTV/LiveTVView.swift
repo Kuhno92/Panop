@@ -130,7 +130,10 @@ private struct LiveChannelList: View {
             }
             .foregroundStyle(.secondary)
         } label: {
-            Text(channel.name)
+            HStack(spacing: 12) {
+                ChannelLogo(address: channel.iconURL)
+                Text(channel.name)
+            }
         }
     }
 

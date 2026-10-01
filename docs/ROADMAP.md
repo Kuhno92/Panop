@@ -303,8 +303,16 @@ The brief called performance a key concept. For IPTV this concentrates in one nu
       for fills, layout mutations deferred out of the focus animation context.
 - [ ] **macOS windowing**: a separate player window. New windows do not inherit the main
       scene's environment, so container and environment must be re-declared.
-- [ ] **Image pipeline** *(surfaced)*. Thousands of channel logos need disk caching and
-      downsampling, plus a memory purge on backgrounding to avoid jetsam.
+- [x] **Image pipeline** *(surfaced)*, `Panop/Services/Images/`, shown as `ChannelLogo` in the
+      Live TV rows. Decodes with ImageIO at the displayed size (never the downloaded size); a
+      memory cache with a byte budget (16 MB tvOS, 24 MB iOS, 64 MB Mac) emptied on a memory
+      warning and on backgrounding; a disk cache in Caches capped at 120 MB, least recently
+      used out first; one download per image however many rows ask; at most four in flight,
+      newest first, so a fast scroll fetches what is on screen now; a download nobody waits for
+      any more is cancelled; a failed logo is not asked for again for ten minutes; non-images
+      and anything over 4 MB are refused and never cached. 17 tests with a scripted network.
+      **Not measured:** scroll performance on a long list with real logos, and an Apple TV HD.
+      **Not done:** logos for movies and series, and programme artwork.
 - [ ] **Empty, loading and error states** that explain what to do next.
 - [ ] **UI test target** *(surfaced)*. The only reliable way to verify screens past launch on
       iOS. tvOS can be driven by synthetic keystrokes; iOS cannot be tapped from the CLI.
