@@ -33,6 +33,11 @@ public struct CatalogEntry: Sendable, Equatable, Hashable {
     public var addedAt: Date?
     public var rating: Double?
     public var plot: String?
+    /// For an episode grouped under a series built from an M3U file, that series' id. Nil for
+    /// everything else, including the series themselves.
+    public var seriesID: String?
+    public var seasonNumber: Int?
+    public var episodeNumber: Int?
 
     public init(
         id: String,
@@ -50,7 +55,10 @@ public struct CatalogEntry: Sendable, Equatable, Hashable {
         archiveDays: Int? = nil,
         addedAt: Date? = nil,
         rating: Double? = nil,
-        plot: String? = nil
+        plot: String? = nil,
+        seriesID: String? = nil,
+        seasonNumber: Int? = nil,
+        episodeNumber: Int? = nil
     ) {
         self.id = id
         self.kind = kind
@@ -68,6 +76,9 @@ public struct CatalogEntry: Sendable, Equatable, Hashable {
         self.addedAt = addedAt
         self.rating = rating
         self.plot = plot
+        self.seriesID = seriesID
+        self.seasonNumber = seasonNumber
+        self.episodeNumber = episodeNumber
     }
 }
 

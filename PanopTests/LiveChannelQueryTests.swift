@@ -327,3 +327,98 @@ struct ProviderOrderTests {
         #expect(try names(catalog, search: "two") == ["News Two"])
     }
 }
+
+@Suite("Series browse query", .serialized)
+@MainActor
+struct SeriesQueryTests {
+    private func shell(_ id: String, _ name: String) -> CatalogEntry {
+        CatalogEntry(id: id, kind: .series, name: name)
+    }
+
+    private func episode(_ id: String, _ name: String, of series: String, season: Int, number: Int) -> CatalogEntry {
+        CatalogEntry(
+            id: id, kind: .series, name: name, streamURL: "http://h/\(id).mkv",
+            seriesID: series, seasonNumber: season, episodeNumber: number
+        )
+    }
+
+    private func populate(_ catalog: OnDiskCatalog) async throws {
+        _ = try await catalog.store.upsertEntries([
+            shell("s:dark", "Dark"),
+            shell("s:lost", "Lost"),
+            episode("e1", "Dark S02E01", of: "s:dark", season: 2, number: 1),
+            episode("e2", "Dark S01E02", of: "s:dark", season: 1, number: 2),
+            episode("e3", "Dark S01E01", of: "s:dark", season: 1, number: 1),
+            episode("e4", "Lost S01E01", of: "s:lost", season: 1, number: 1),
+            // A series entry that could not be grouped stands on its own.
+            CatalogEntry(id: "x1", kind: .series, name: "A Documentary", streamURL: "http://h/x1.mkv")
+        ], playlist: "p")
+    }
+
+    private func names(_ catalog: OnDiskCatalog, search: String = "") throws -> [String] {
+        try ModelContext(catalog.container)
+            .fetch(LiveChannelQuery.descriptor(kind: .series, source: nil, search: search, limit: 1000))
+            .map(\.name)
+    }
+
+    @Test
+    func `the list shows the series, not their episodes`() async throws {
+        let catalog = try OnDiskCatalog()
+        defer { catalog.cleanUp() }
+        try await populate(catalog)
+
+        #expect(try names(catalog) == ["A Documentary", "Dark", "Lost"])
+    }
+
+    @Test
+    func `searching finds a series by name and never an episode of it`() async throws {
+        let catalog = try OnDiskCatalog()
+        defer { catalog.cleanUp() }
+        try await populate(catalog)
+
+        #expect(try names(catalog, search: "dark") == ["Dark"])
+    }
+
+    @Test
+    func `a series' episodes come back season by season, in order`() async throws {
+        let catalog = try OnDiskCatalog()
+        defer { catalog.cleanUp() }
+        try await populate(catalog)
+
+        let rows = try ModelContext(catalog.container).fetch(LiveChannelQuery.episodes(of: "s:dark", in: "p"))
+
+        #expect(rows.map(\.name) == ["Dark S01E01", "Dark S01E02", "Dark S02E01"])
+    }
+
+    @Test
+    func `another show's episodes, and another playlist's, are not mixed in`() async throws {
+        let catalog = try OnDiskCatalog()
+        defer { catalog.cleanUp() }
+        try await populate(catalog)
+        _ = try await catalog.store.upsertEntries(
+            [episode("e1", "Dark S01E01", of: "s:dark", season: 1, number: 1)],
+            playlist: "other"
+        )
+
+        let lost = try ModelContext(catalog.container).fetch(LiveChannelQuery.episodes(of: "s:lost", in: "p"))
+        let other = try ModelContext(catalog.container).fetch(LiveChannelQuery.episodes(of: "s:dark", in: "other"))
+
+        #expect(lost.map(\.name) == ["Lost S01E01"])
+        #expect(other.count == 1)
+    }
+
+    @Test
+    func `the series fields survive being saved and read back`() async throws {
+        let catalog = try OnDiskCatalog()
+        defer { catalog.cleanUp() }
+        try await populate(catalog)
+
+        let row = try #require(
+            try ModelContext(catalog.container).fetch(LiveChannelQuery.episodes(of: "s:dark", in: "p")).last
+        )
+
+        #expect(row.seriesID == "s:dark")
+        #expect(row.seasonNumber == 2)
+        #expect(row.episodeNumber == 1)
+    }
+}

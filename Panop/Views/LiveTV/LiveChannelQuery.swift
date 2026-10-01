@@ -28,25 +28,15 @@ enum LiveChannelQuery {
         limit: Int,
         order: LiveOrder = .name
     ) -> FetchDescriptor<CatalogEntryRecord> {
+        // Series are listed as shows: an episode grouped under its show is reached through the show.
+        if kind == .series {
+            return seriesDescriptor(source: source, search: search, limit: limit, order: order)
+        }
         let live = kind.rawValue
         let term = CatalogEntryRecord.nameKey(for: search.trimmingCharacters(in: .whitespacesAndNewlines))
         // `.lexical` on a folded key is binary order, which an index can serve.
         // The id breaks ties so equal names keep a stable order between fetches.
-        let sort: [SortDescriptor<CatalogEntryRecord>] = switch order {
-        case .name:
-            [
-                SortDescriptor(\CatalogEntryRecord.nameKey, comparator: .lexical),
-                SortDescriptor(\CatalogEntryRecord.id, comparator: .lexical)
-            ]
-        case .provider:
-            // The provider's number first; entries with none sort together at the start of the
-            // number, then by name, so the order never depends on where the database left them.
-            [
-                SortDescriptor(\CatalogEntryRecord.sortNumber),
-                SortDescriptor(\CatalogEntryRecord.nameKey, comparator: .lexical),
-                SortDescriptor(\CatalogEntryRecord.id, comparator: .lexical)
-            ]
-        }
+        let sort = Self.sort(for: order)
 
         var descriptor: FetchDescriptor<CatalogEntryRecord> = switch (source, term.isEmpty) {
         case let (source?, true):
@@ -99,6 +89,75 @@ enum LiveChannelQuery {
         } else {
             descriptor = FetchDescriptor(predicate: #Predicate { wanted.contains($0.id) }, sortBy: sort)
         }
+        descriptor.fetchLimit = maxRows
+        return descriptor
+    }
+
+    private static func sort(for order: LiveOrder) -> [SortDescriptor<CatalogEntryRecord>] {
+        switch order {
+        case .name:
+            [
+                SortDescriptor(\CatalogEntryRecord.nameKey, comparator: .lexical),
+                SortDescriptor(\CatalogEntryRecord.id, comparator: .lexical)
+            ]
+        case .provider:
+            // The provider's number first; entries with none sort together, then by name, so the
+            // order never depends on where the database left them.
+            [
+                SortDescriptor(\CatalogEntryRecord.sortNumber),
+                SortDescriptor(\CatalogEntryRecord.nameKey, comparator: .lexical),
+                SortDescriptor(\CatalogEntryRecord.id, comparator: .lexical)
+            ]
+        }
+    }
+
+    /// The Series screen: shows, and any series entry that is not an episode of one. An episode
+    /// grouped under its show is left out, which is the point: a real playlist has hundreds of
+    /// thousands of episodes and a few thousand shows.
+    private static func seriesDescriptor(
+        source: String?,
+        search: String,
+        limit: Int,
+        order: LiveOrder
+    ) -> FetchDescriptor<CatalogEntryRecord> {
+        let series = MediaKind.series.rawValue
+        let term = CatalogEntryRecord.nameKey(for: search.trimmingCharacters(in: .whitespacesAndNewlines))
+        let sort = Self.sort(for: order)
+        var descriptor: FetchDescriptor<CatalogEntryRecord> = switch (source, term.isEmpty) {
+        case let (source?, true):
+            FetchDescriptor(
+                predicate: #Predicate { $0.playlist == source && $0.kindRaw == series && $0.seriesID == nil },
+                sortBy: sort
+            )
+        case let (source?, false):
+            FetchDescriptor(
+                predicate: #Predicate {
+                    $0.playlist == source && $0.kindRaw == series && $0.seriesID == nil && $0.nameKey.contains(term)
+                },
+                sortBy: sort
+            )
+        case (nil, true):
+            FetchDescriptor(predicate: #Predicate { $0.kindRaw == series && $0.seriesID == nil }, sortBy: sort)
+        case (nil, false):
+            FetchDescriptor(
+                predicate: #Predicate { $0.kindRaw == series && $0.seriesID == nil && $0.nameKey.contains(term) },
+                sortBy: sort
+            )
+        }
+        descriptor.fetchLimit = Swift.min(Swift.max(limit, 1), maxRows)
+        return descriptor
+    }
+
+    /// One series' episodes, season by season and in order.
+    static func episodes(of seriesID: String, in playlist: String) -> FetchDescriptor<CatalogEntryRecord> {
+        var descriptor = FetchDescriptor<CatalogEntryRecord>(
+            predicate: #Predicate { $0.playlist == playlist && $0.seriesID == seriesID },
+            sortBy: [
+                SortDescriptor(\CatalogEntryRecord.seasonNumber),
+                SortDescriptor(\CatalogEntryRecord.episodeNumber),
+                SortDescriptor(\CatalogEntryRecord.id, comparator: .lexical)
+            ]
+        )
         descriptor.fetchLimit = maxRows
         return descriptor
     }

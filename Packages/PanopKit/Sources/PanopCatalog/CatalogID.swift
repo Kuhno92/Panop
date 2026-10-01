@@ -25,6 +25,12 @@ public enum CatalogID {
         "m3u:" + hex(hash64(url))
     }
 
+    /// A series built from M3U episodes has no provider id either, so its identity is its name,
+    /// folded. Every episode that names the same show lands on the same series.
+    public static func m3uSeries(key: String) -> String {
+        "series:" + hex(hash64(key))
+    }
+
     public static func xtream(_ kind: String, _ remoteID: Int) -> String {
         "\(kind):\(remoteID)"
     }

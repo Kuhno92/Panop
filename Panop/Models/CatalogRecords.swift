@@ -42,7 +42,11 @@ final class CatalogEntryRecord {
         [\.kindRaw, \.nameKey, \.id],
         [\.playlist, \.kindRaw, \.nameKey, \.id],
         [\.kindRaw, \.sortNumber, \.nameKey, \.id],
-        [\.playlist, \.kindRaw, \.sortNumber, \.nameKey, \.id]
+        [\.playlist, \.kindRaw, \.sortNumber, \.nameKey, \.id],
+        // The Series screen lists the entries that are not episodes of another entry, by name.
+        [\.kindRaw, \.seriesID, \.nameKey, \.id],
+        // And a series' episodes, in order.
+        [\.playlist, \.seriesID, \.seasonNumber, \.episodeNumber]
     )
 
     var playlist: String
@@ -65,6 +69,10 @@ final class CatalogEntryRecord {
     var addedAt: Date?
     var rating: Double?
     var plot: String?
+    /// The series this is an episode of, for one built from an M3U file. Nil otherwise.
+    var seriesID: String?
+    var seasonNumber: Int?
+    var episodeNumber: Int?
 
     init(playlist: String, entry: CatalogEntry) {
         self.playlist = playlist
@@ -85,6 +93,9 @@ final class CatalogEntryRecord {
         addedAt = entry.addedAt
         rating = entry.rating
         plot = entry.plot
+        seriesID = entry.seriesID
+        seasonNumber = entry.seasonNumber
+        episodeNumber = entry.episodeNumber
     }
 
     var kind: MediaKind {
@@ -123,6 +134,9 @@ final class CatalogEntryRecord {
         assign(\.addedAt, entry.addedAt)
         assign(\.rating, entry.rating)
         assign(\.plot, entry.plot)
+        assign(\.seriesID, entry.seriesID)
+        assign(\.seasonNumber, entry.seasonNumber)
+        assign(\.episodeNumber, entry.episodeNumber)
         return changed
     }
 }

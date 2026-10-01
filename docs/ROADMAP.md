@@ -84,10 +84,25 @@ Getting a real provider's content into the app. Nothing else can be tested until
       regrouping does not orphan favourites. Unchanged M3U files are skipped by digest.
       Not yet verified: import speed against a real store (the in-memory one sorts on every
       page and says nothing about throughput). That belongs with `SwiftDataCatalogStore`.
-- [ ] **Group M3U episodes into series.** In M3U, a `/series/` URL is an *episode*, so a large
-      playlist puts hundreds of thousands of episodes into the `.series` kind (Lume measured
-      86% of a real file). Needs episode-name parsing (`S01E05`) to build series shells, and a
-      decision on whether episodes are stored or fetched lazily as they are for Xtream.
+- [x] **Group M3U episodes into series.** In M3U a `/series/` address is one *episode*, and a
+      real playlist puts hundreds of thousands of them in the `.series` kind (86% of a real file
+      by one measure), so the Series screen would have been a wall of episodes. At import, a name
+      such as `Dark S01E05`, `Dark - s1e5 - Title`, `Dark.S01.E05`, `Dark 1x05` or `Dark Season 1
+      Episode 5` is read by `EpisodeTitle` (one pass over the characters, no regular expression,
+      since it runs on every series entry; names it cannot read, such as `Dune Part 2`, are left
+      alone). The first episode of each show makes a **series entry** (named from the title,
+      with the first episode's logo and position), and each episode is stored with its series,
+      season and episode numbers. **Decision the roadmap left open: stored, not fetched lazily**,
+      because an M3U has no per-series endpoint to fetch from; the cost is that an episode row
+      is kept, but the Series screen asks only for shows (an index serves it) and a show's
+      episodes are read when it is opened (a second index). A show whose episodes all leave the
+      list goes with them, and re-importing is idempotent. A series entry that could not be
+      grouped still plays by itself. 8 importer tests, 6 parser tests (a table of 15 spellings, 12
+      names that must not match, and a speed check), 5 query tests on a real store, and UI tests
+      on iOS and tvOS. **Not verified:** against a real playlist's naming (the parser is built
+      from the common conventions; a provider with its own would need another form), and
+      existing stores gain the new fields and indexes by lightweight migration, which was
+      checked on new stores only.
 - [x] **M3U channel order.** Each M3U entry is stored with its position in the file as its sort
       number (counting across kinds, not counting entries left out), and the channel list has a
       Sort control: By name (the default) or the provider's order, which for Xtream is the number
@@ -414,7 +429,7 @@ The brief called performance a key concept. For IPTV this concentrates in one nu
       and tvOS. **Not done:** the same for movies and series, which have no screen yet.
 - [x] **UI test target** *(surfaced)*: `PanopUITests`, run with `Scripts/test-ui.sh [ios|tvos]`.
       iOS is driven by taps and tvOS by the real remote (`XCUIRemote`), against a deterministic
-      app (`-panop-uitest`, Debug only). The suite (16 tests on iOS, 10 on tvOS) covers: the seeded channels,
+      app (`-panop-uitest`, Debug only). The suite (19 tests on iOS, 10 on tvOS) covers: the seeded channels,
       search, opening a channel, the controls and LIVE badge, pause and play, close, the controls
       hiding and a tap bringing them back, and on tvOS the controls **staying up while the
       remote has focus on them** and Menu closing the player. **Found three real bugs:** a row

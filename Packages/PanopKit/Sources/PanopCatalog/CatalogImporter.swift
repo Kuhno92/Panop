@@ -201,6 +201,33 @@ public struct CatalogImporter: Sendable {
             // Rewritten only on a row whose position changed, like every other field.
             counts.position += 1
             entry.sortNumber = counts.position
+            // An M3U "series" entry is one episode. Group it under its show, making the show
+            // the first time it is met, so the Series screen lists shows and not every episode.
+            if entry.kind == .series, let episode = EpisodeTitle.parse(entry.name) {
+                let seriesID = CatalogID.m3uSeries(key: episode.seriesKey)
+                entry.seriesID = seriesID
+                entry.seasonNumber = episode.season
+                entry.episodeNumber = episode.episode
+                if counts.seriesSeen.insert(seriesID).inserted {
+                    let shell = CatalogEntry(
+                        id: seriesID,
+                        kind: .series,
+                        name: episode.series,
+                        groupID: entry.groupID,
+                        groupName: entry.groupName,
+                        iconURL: entry.iconURL,
+                        // Where its first episode stands, so the provider's order places the show.
+                        sortNumber: entry.sortNumber
+                    )
+                    var shellTracker = trackers[.series] ?? KindTracker(kind: .series, before: 0)
+                    trackers[.series] = nil
+                    shellTracker.add(shell)
+                    if shellTracker.pending.count >= batchSize {
+                        try await flush(&shellTracker, playlist: playlist)
+                    }
+                    trackers[.series] = shellTracker
+                }
+            }
             var tracker = trackers[entry.kind] ?? KindTracker(kind: entry.kind, before: 0)
             trackers[entry.kind] = nil
             tracker.add(entry)
@@ -321,4 +348,6 @@ private struct ParseCounts {
     var skipped = 0
     /// Entries accepted so far, which is the position of the latest in the file.
     var position = 0
+    /// The series already made from episodes met so far, so each is made once.
+    var seriesSeen: Set<String> = []
 }

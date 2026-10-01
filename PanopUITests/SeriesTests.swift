@@ -5,9 +5,11 @@ final class SeriesTests: PanopUITestCase {
         "series"
     }
 
-    func testSeriesAppearAsPosters() {
-        XCTAssertTrue(app.buttons["Dark S01E01"].waitForExistence(timeout: 30), "the seeded series never appeared")
-        XCTAssertTrue(app.buttons["Severance S01E01"].exists)
+    /// The seeded playlist has three episodes of two shows. The screen lists the shows.
+    func testSeriesAppearAsShowsNotEpisodes() {
+        XCTAssertTrue(app.buttons["Dark"].waitForExistence(timeout: 30), "the seeded series never appeared")
+        XCTAssertTrue(app.buttons["Severance"].exists)
+        XCTAssertFalse(app.buttons["Dark S01E01"].exists, "an episode is listed as if it were a show")
         let shot = XCTAttachment(screenshot: app.screenshot())
         shot.name = "series-grid"
         shot.lifetime = .keepAlways
@@ -15,11 +17,20 @@ final class SeriesTests: PanopUITestCase {
     }
 
     #if !os(tvOS)
-        /// An M3U "series" entry is one episode with its own address, so it plays at once.
-        func testAnM3UEpisodePlaysDirectly() {
-            XCTAssertTrue(app.buttons["Dark S01E01"].waitForExistence(timeout: 30))
+        func testOpeningAShowListsItsEpisodesAndOnePlays() {
+            XCTAssertTrue(app.buttons["Dark"].waitForExistence(timeout: 30))
 
-            app.buttons["Dark S01E01"].tap()
+            app.buttons["Dark"].tap()
+
+            XCTAssertTrue(app.staticTexts["Season 1"].waitForExistence(timeout: 10), "no season in the detail")
+            let second = app.buttons.matching(NSPredicate(format: "label CONTAINS 'Episode 2'")).firstMatch
+            XCTAssertTrue(second.exists, "the show's second episode is missing")
+            let shot = XCTAttachment(screenshot: app.screenshot())
+            shot.name = "series-detail"
+            shot.lifetime = .keepAlways
+            add(shot)
+
+            second.tap()
 
             XCTAssertTrue(app.buttons["Close"].waitForExistence(timeout: 15), "the episode did not open")
         }
