@@ -57,6 +57,7 @@ struct PlayerView: View {
     var body: some View {
         ZStack {
             surface
+            subtitles
             overlay
         }
         .task { model.start() }
@@ -76,6 +77,15 @@ struct PlayerView: View {
         } else if let engine = model.engine as? LumePlaybackEngine {
             // The wrapper only hands an engine-owned view to SwiftUI, whichever engine.
             VLCSurface(view: engine.surface).ignoresSafeArea()
+        }
+    }
+
+    /// Subtitle text for the engine that leaves drawing to us. Sits above the controls
+    /// while they are up, so neither covers the other.
+    @ViewBuilder
+    private var subtitles: some View {
+        if let engine = model.engine as? LumePlaybackEngine {
+            SubtitleOverlay(display: engine.subtitles, controlsUp: model.showsControls)
         }
     }
 
@@ -160,5 +170,29 @@ private struct PlayerProblem: View {
         .foregroundStyle(.white)
         .padding(32)
         .frame(maxWidth: 520)
+    }
+}
+
+private struct SubtitleOverlay: View {
+    let display: SubtitleDisplay
+    let controlsUp: Bool
+
+    var body: some View {
+        VStack {
+            Spacer()
+            if let text = display.text {
+                Text(text)
+                    .font(.title3.weight(.semibold))
+                    .multilineTextAlignment(.center)
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(.black.opacity(0.6), in: RoundedRectangle(cornerRadius: 6))
+                    .padding(.horizontal, 40)
+            }
+        }
+        .padding(.bottom, controlsUp ? 110 : 36)
+        .allowsHitTesting(false)
+        .animation(.easeOut(duration: 0.2), value: controlsUp)
     }
 }

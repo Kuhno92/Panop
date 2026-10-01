@@ -213,11 +213,15 @@ The first milestone where Panop is usable.
       stream and a start position set at open time. Plays raw MPEG-TS over HTTP and, checked by
       hand, the 3sat and ZDF HLS streams (3sat joins in 0.75 s, ZDF in 3.2 s). Its own HTTP
       reconnect is switched off: that policy is the coordinator's. Tests on macOS, iOS and tvOS.
-      **Not done:** subtitle text drawing (the engine returns cues,
-      nothing shows them yet), PiP and Now Playing, channel-switch latency against the other
+      **Not done:** PiP and Now Playing, channel-switch latency against the other
       engines, and any real provider stream.
-- [ ] **Subtitle cues from LumeEngine**: `session.subtitles.activeCues(at:)` has the text, and
-      `PlaybackEngine` has no channel for it yet.
+- [x] **Subtitle text from LumeEngine**. The engine hands back text and draws nothing, so
+      `LumePlaybackEngine` looks the cue up against the playback clock ten times a second, only
+      while subtitles are on, and `SubtitleOverlay` draws it above the controls. AVPlayer and
+      libVLC draw their own, so `PlaybackEngine` is unchanged. Tested with a sidecar SRT on a
+      playing stream (`loadExternalSubtitles`, which is also the hook for downloaded
+      subtitles). **Not verified:** an embedded subtitle track in a real stream, and how it
+      looks over real video. Plain text only, with no positioning or styling.
 - [x] **Player overlay** shared across engines, built on `PlayerModel` so no engine needs its
       own: play and pause, a scrubber with ±10 s for video and a LIVE badge for channels, audio
       and subtitle menus, the engine name, and controls that hide four seconds after the first

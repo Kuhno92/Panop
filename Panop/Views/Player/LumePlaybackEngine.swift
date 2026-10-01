@@ -1,7 +1,17 @@
 import Foundation
 import LumeEngine
+import Observation
 import PanopCore
 import PanopPlayback
+
+/// The subtitle line to draw, for the one engine that does not draw its own. AVPlayer and
+/// libVLC put subtitles in the picture; LumeEngine hands back the text and leaves the
+/// drawing to the app.
+@MainActor
+@Observable
+final class SubtitleDisplay {
+    fileprivate(set) var text: String?
+}
 
 /// The LumeEngine adapter, built on its `PlayerSession` rather than the `LumePlayer`
 /// facade: the session has the typed event stream and takes a start position at
@@ -20,6 +30,7 @@ final class LumePlaybackEngine: PlaybackEngine {
     }
 
     let surface = LumeSurfaceView()
+    let subtitles = SubtitleDisplay()
 
     let events: AsyncStream<PlaybackEvent>
     private let output: AsyncStream<PlaybackEvent>.Continuation
@@ -48,6 +59,7 @@ final class LumePlaybackEngine: PlaybackEngine {
     private var failurePending = false
     private var stallThreshold = PlayerConfiguration().stallThreshold
     private var lastPositionReport = -1.0
+    private var subtitlePoll: Task<Void, Never>?
 
     init() {
         (events, output) = AsyncStream.makeStream()
@@ -145,11 +157,60 @@ final class LumePlaybackEngine: PlaybackEngine {
 
     func selectSubtitleTrack(id: String?) {
         commandSink.yield(.subtitle(id.flatMap { Int32($0) }))
+        if id == nil {
+            stopSubtitlePoll()
+        } else {
+            startSubtitlePoll()
+        }
+    }
+
+    /// Loads a sidecar file (SRT, VTT, ASS) and shows it. Replaces any embedded selection.
+    func loadExternalSubtitles(url: String) async throws {
+        guard let session else {
+            throw PlaybackError(code: .internalError, message: "Nothing is loaded to add subtitles to.")
+        }
+        do {
+            try await session.loadExternalSubtitles(url: url)
+        } catch {
+            throw Self.map(error)
+        }
+        startSubtitlePoll()
+    }
+
+    /// Cues are looked up against the playback clock about ten times a second, and only
+    /// while subtitles are on, so a stream without them pays nothing for this.
+    private func startSubtitlePoll() {
+        guard subtitlePoll == nil, let session else { return }
+        subtitlePoll = Task { [weak self] in
+            while !Task.isCancelled {
+                self?.updateSubtitle(session)
+                try? await Task.sleep(for: .milliseconds(100))
+            }
+        }
+    }
+
+    private func stopSubtitlePoll() {
+        subtitlePoll?.cancel()
+        subtitlePoll = nil
+        subtitles.text = nil
+    }
+
+    private func updateSubtitle(_ session: PlayerSession) {
+        let now = session.renderer.currentTime
+        let text: String? = if MediaTime.isValid(now) {
+            session.subtitles.activeCues(at: now).map(\.text).joined(separator: "\n").nilIfEmpty
+        } else {
+            nil
+        }
+        if text != subtitles.text {
+            subtitles.text = text
+        }
     }
 
     func stop() async {
         isStopping = true
         commandSink.finish()
+        stopSubtitlePoll()
         tasks.forEach { $0.cancel() }
         tasks = []
         surface.removeLayer()
@@ -273,5 +334,11 @@ final class LumePlaybackEngine: PlaybackEngine {
         @unknown default: .internalError
         }
         return PlaybackError(code: code, message: error.message)
+    }
+}
+
+private extension String {
+    var nilIfEmpty: String? {
+        isEmpty ? nil : self
     }
 }

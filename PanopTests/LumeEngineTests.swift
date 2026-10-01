@@ -83,6 +83,37 @@ struct LumeEngineTests {
         await engine.stop()
     }
 
+    /// LumeEngine returns subtitle text and draws nothing, so the adapter has to look the
+    /// cue up against the playback clock. A sidecar file is the one way to test it without
+    /// building a stream with a subtitle track in it.
+    @Test
+    func `a subtitle file's text shows while it plays and goes when subtitles are switched off`() async throws {
+        let stream = try await TransportStreamFixture.shared()
+        let server = try LocalStreamServer(body: stream, holdOpen: true)
+        let url = try await server.start()
+        defer { server.stop() }
+        let srt = FileManager.default.temporaryDirectory.appendingPathComponent("\(UUID().uuidString).srt")
+        try "1\n00:00:00,000 --> 00:10:00,000\nHello subtitles\n".write(to: srt, atomically: true, encoding: .utf8)
+        defer { try? FileManager.default.removeItem(at: srt) }
+        let engine = LumePlaybackEngine()
+        let recorder = Recorder(engine)
+        try await engine.load(PlaybackItem(url: url.absoluteString, mediaKind: .live))
+        engine.play()
+        #expect(await recorder.wait { $0 == .stateChanged(.playing) })
+        #expect(engine.subtitles.text == nil, "nothing shows before subtitles are on")
+
+        try await engine.loadExternalSubtitles(url: srt.absoluteString)
+
+        #expect(
+            await waitFor { engine.subtitles.text == "Hello subtitles" },
+            "text: \(String(describing: engine.subtitles.text))"
+        )
+
+        engine.selectSubtitleTrack(id: nil)
+        #expect(engine.subtitles.text == nil)
+        await engine.stop()
+    }
+
     @Test
     func `an address with no scheme is refused without touching the network`() async {
         let engine = LumePlaybackEngine()

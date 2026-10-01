@@ -86,14 +86,30 @@ final class LocalStreamServer: @unchecked Sendable {
     private let lock = NSLock()
     private var connections: [NWConnection] = []
 
-    /// - Parameter holdOpen: keep each connection open after the body, as a live feed
-    ///   that has simply gone quiet does. Otherwise the server closes after a moment,
-    ///   which a player reports as the stream ending or failing.
+    /// - Parameter holdOpen: keep sending the body in a loop, like a live channel.
+    ///   Otherwise the server sends it once and closes after a moment, which a player
+    ///   reports as the stream ending.
     init(body: Data, contentType: String = "video/mp2t", holdOpen: Bool = false) throws {
         listener = try NWListener(using: .tcp, on: .any)
         self.body = body
         self.contentType = contentType
         self.holdOpen = holdOpen
+    }
+
+    /// Sends the body over and over until the connection goes, as a live channel keeps
+    /// coming. A player probing a stream that has simply stopped waits out its read
+    /// timeout before it gives up on finding more, so a quiet connection is not a live one.
+    private static func stream(_ body: Data, after head: Data?, to connection: NWConnection) {
+        connection.send(
+            content: (head ?? Data()) + body,
+            contentContext: .defaultMessage,
+            isComplete: false,
+            completion: .contentProcessed { error in
+                if error == nil {
+                    stream(body, after: nil, to: connection)
+                }
+            }
+        )
     }
 
     /// Starts listening and returns the address to fetch from.
@@ -107,12 +123,15 @@ final class LocalStreamServer: @unchecked Sendable {
             // Read the request line and headers, whatever they are, then answer.
             connection.receive(minimumIncompleteLength: 1, maximumLength: 8192) { _, _, _, _ in
                 let head = "HTTP/1.1 200 OK\r\nContent-Type: \(contentType)\r\nConnection: close\r\n\r\n"
+                if holdOpen {
+                    Self.stream(body, after: Data(head.utf8), to: connection)
+                    return
+                }
                 connection.send(
                     content: Data(head.utf8) + body,
                     contentContext: .finalMessage,
-                    isComplete: !holdOpen,
+                    isComplete: true,
                     completion: .contentProcessed { _ in
-                        guard !holdOpen else { return }
                         // Closing at once can reset the connection while the client is
                         // still reading, which FFmpeg reports as an I/O error rather
                         // than the end of the stream. Give it time to take the bytes.

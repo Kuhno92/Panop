@@ -245,6 +245,10 @@ job, which matches where that policy lives for the other three engines anyway.
   as `av_read_frame: Input/output error`, mapped to `.network`, so the coordinator reconnects.
 - **Garbage bytes** open as `avformat_open_input: Input/output error`, which maps to the retryable
   `.openFailed`, not `.unsupportedFormat`. The coordinator retries before moving on.
+- **A quiet connection is not a live one, for tests.** A test server that sends a short stream
+  and then holds the connection open makes the player probe until its 15 second read timeout.
+  `LocalStreamServer(holdOpen: true)` loops the body instead, as a live channel keeps coming.
+  Closing instead is read as the stream failing, so a finite stream cannot stand in for a live one.
 - **Tests sharing a process interfere.** With the engine suites running in parallel, a LumeEngine
   open failed with an I/O error one millisecond after opening whenever the VLC and AVPlayer suites
   ran at the same time. The mechanism is not established; libVLC tearing players down in the
