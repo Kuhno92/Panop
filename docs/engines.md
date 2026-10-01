@@ -250,10 +250,17 @@ job, which matches where that policy lives for the other three engines anyway.
   network stack, so asking it again gets the same answer, and the coordinator moves to the next
   engine (which, with a different stack, may succeed) without the retries and their delay. A plain
   `HTTP connection failure` stays a retryable `.network`.
-- **Multivariant HLS is slow to open.** Measured 2.9 s on ZDF against 0.15 s for AVPlayer and
-  0.08 s for libVLC (docs/ROADMAP.md, M3). Probe limits do not help: FFmpeg's HLS demuxer opens
-  every variant. AVPlayer takes HLS first in the default order, so this only shows when Lume is
-  the engine the user chose.
+- **Multivariant HLS is slow to open, so Lume is handed one variant.** FFmpeg's HLS demuxer opens
+  every variant and audio group before it starts: 2.9 to 3.3 s on ZDF (six video variants, eight
+  audio and subtitle entries), against 0.15 s for AVPlayer and 0.08 s for libVLC. Probe limits do
+  not help. FFmpeg never switches variants as the network changes, so naming one loses no adaptive
+  behaviour. `HLSVariantPicker` fetches the playlist (4 s limit, 512 KB limit, the item's headers),
+  `HLSMultivariant.simplified` keeps the best variant under 6 Mbps with its own audio group and
+  absolute addresses, and Lume opens that as a local file with `protocol_whitelist` and
+  `allowed_extensions` set. Measured on ZDF: 970, 943, 958, 930, 841 ms against 3323, 3197, 3278,
+  3069, 3106 ms for the whole playlist. Any failure falls back to the original address, and the
+  temporary file is deleted in `stop()`. AVPlayer takes HLS first in the default order, so this
+  only shows when Lume is the chosen engine.
 - **A quiet connection is not a live one, for tests.** A test server that sends a short stream
   and then holds the connection open makes the player probe until its 15 second read timeout.
   `LocalStreamServer(holdOpen: true)` loops the body instead, as a live channel keeps coming.

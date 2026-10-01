@@ -61,6 +61,58 @@ struct LumeEngineTests {
         #expect(engine.state == .idle)
     }
 
+    /// The path the one-variant playlist takes: the picker fetches the multivariant playlist,
+    /// writes a local file, and the engine reads that file while its entries are on the network.
+    /// Three servers stand in for the broadcaster: the multivariant playlist, the variant's
+    /// playlist, and its one segment.
+    @Test
+    func `plays a stream from a multivariant playlist by way of the local one-variant file`() async throws {
+        let segments = try await LocalStreamServer(body: TransportStreamFixture.shared())
+        let segmentURL = try await segments.start()
+        let variant = try LocalStreamServer(
+            body: Data("""
+            #EXTM3U
+            #EXT-X-VERSION:3
+            #EXT-X-TARGETDURATION:10
+            #EXT-X-MEDIA-SEQUENCE:0
+            #EXTINF:5.0,
+            \(segmentURL.absoluteString)
+            #EXT-X-ENDLIST
+
+            """.utf8),
+            contentType: "application/vnd.apple.mpegurl"
+        )
+        let variantURL = try await variant.start()
+        let overview = try LocalStreamServer(
+            body: Data("""
+            #EXTM3U
+            #EXT-X-STREAM-INF:BANDWIDTH=1000000
+            \(variantURL.absoluteString)
+            #EXT-X-STREAM-INF:BANDWIDTH=2000000
+            \(variantURL.absoluteString)
+
+            """.utf8),
+            contentType: "application/vnd.apple.mpegurl"
+        )
+        let overviewURL = try await overview.start().appendingPathComponent("index.m3u8")
+        defer {
+            segments.stop()
+            variant.stop()
+            overview.stop()
+        }
+        let engine = LumePlaybackEngine()
+        let recorder = Recorder(engine)
+
+        try await engine.load(PlaybackItem(url: overviewURL.absoluteString, mediaKind: .live))
+        engine.play()
+
+        #expect(await recorder.wait(for: isReady), "events: \(recorder.events)")
+        let file = try #require(engine.playlistFile, "the engine was given the one-variant file, not the original")
+        #expect(FileManager.default.fileExists(atPath: file.path))
+        await engine.stop()
+        #expect(!FileManager.default.fileExists(atPath: file.path), "the file goes when playback does")
+    }
+
     /// The commands go to the session one at a time, in order. The server holds the
     /// connection open: a finite stream that ends is reported as a network error.
     @Test

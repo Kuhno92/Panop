@@ -316,8 +316,9 @@ The brief called performance a key concept. For IPTV this concentrates in one nu
       300 ms warm. (2) **LumeEngine is slow on multivariant HLS**, 2.9 s on ZDF, and tightening
       `probeSize` and `maxAnalyzeDuration` did not move it, so the cost is FFmpeg's HLS demuxer
       opening every variant, not probing. It only matters if Lume is the chosen engine, since
-      AVPlayer takes HLS first by default. Choosing one variant is not simple: ZDF carries its
-      audio in a separate group. (3) **Prefetching the playlist before the first zap** saved
+      AVPlayer takes HLS first by default. **Fixed**: Lume is now handed a playlist naming one
+      variant plus its audio group (`HLSMultivariant`, `HLSVariantPicker`), 0.9 s against 3.2 s
+      on ZDF (see docs/engines.md). (3) **Prefetching the playlist before the first zap** saved
       about 50 ms, inside the run-to-run noise, so it is not worth building. (4) The cold first
       zap is the larger gap (300 to 1000 ms against 150 ms), mostly DNS, TLS and a cold CDN.
       (5) Join times are not strictly comparable: libVLC reports `playing` when decoding

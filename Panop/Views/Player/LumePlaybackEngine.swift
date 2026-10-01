@@ -52,6 +52,8 @@ final class LumePlaybackEngine: PlaybackEngine {
     private let commandSink: AsyncStream<Command>.Continuation
 
     private var session: PlayerSession?
+    /// The one-variant playlist made for this stream, deleted when playback ends.
+    private(set) var playlistFile: URL?
     private var tasks: [Task<Void, Never>] = []
     private var hasPlayed = false
     private var isStopping = false
@@ -90,6 +92,13 @@ final class LumePlaybackEngine: PlaybackEngine {
         }
         stallThreshold = configuration.stallThreshold
 
+        // A multivariant HLS playlist makes the engine open every variant before it starts.
+        let choice = await HLSVariantPicker.choose(for: item)
+        playlistFile = choice.file
+        if choice.file != nil {
+            configuration.demuxer.formatOptions.merge(HLSVariantPicker.formatOptions) { _, new in new }
+        }
+
         let session = PlayerSession(configuration: configuration)
         self.session = session
         surface.install(layer: session.renderer.displayLayer)
@@ -97,7 +106,7 @@ final class LumePlaybackEngine: PlaybackEngine {
         setState(.opening)
 
         do {
-            let info = try await session.open(url: item.url)
+            let info = try await session.open(url: choice.address)
             duration = info.duration.map(MediaTime.seconds)
             audioTracks = info.audioTracks.map(Self.descriptor)
             subtitleTracks = info.subtitleTracks.map(Self.descriptor)
@@ -218,6 +227,10 @@ final class LumePlaybackEngine: PlaybackEngine {
             await session.shutdown()
         }
         session = nil
+        if let playlistFile {
+            try? FileManager.default.removeItem(at: playlistFile)
+            self.playlistFile = nil
+        }
         state = .idle
         output.finish()
     }
