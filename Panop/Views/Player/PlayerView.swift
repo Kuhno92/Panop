@@ -73,6 +73,9 @@ struct PlayerView: View {
             AVPlayerSurface(player: engine.player).ignoresSafeArea()
         } else if let engine = model.engine as? VLCEngine {
             VLCSurface(view: engine.surface).ignoresSafeArea()
+        } else if let engine = model.engine as? LumePlaybackEngine {
+            // The wrapper only hands an engine-owned view to SwiftUI, whichever engine.
+            VLCSurface(view: engine.surface).ignoresSafeArea()
         }
     }
 

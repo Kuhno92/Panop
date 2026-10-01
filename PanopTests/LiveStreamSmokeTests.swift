@@ -18,7 +18,8 @@ import VLCKit
 @Suite(
     "Live stream smoke test",
     .enabled(if: ProcessInfo.processInfo.environment["PANOP_LIVE_URL"] != nil),
-    .serialized
+    .serialized,
+    .engineGate
 )
 @MainActor
 struct LiveStreamSmokeTests {
@@ -51,6 +52,14 @@ struct LiveStreamSmokeTests {
         let start = ContinuousClock.now
         line("coordinator, VLC only: \(url)", since: start)
         try await run(priority: [.vlcKit], start: start)
+    }
+
+    @Test
+    func `through the coordinator with only LumeEngine`() async throws {
+        let start = ContinuousClock.now
+        line("", since: start)
+        line("coordinator, LumeEngine only: \(url)", since: start)
+        try await run(priority: [.lumeEngine], start: start)
     }
 
     @Test

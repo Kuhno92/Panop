@@ -1,0 +1,3 @@
+[submodule "vendor/LumeEngine"]
+	path = vendor/LumeEngine
+	url = https://github.com/bilipp/LumeEngine.git

@@ -7,7 +7,7 @@ import Testing
 
 /// The reason a second engine exists, proven on real bytes: a raw MPEG-TS stream over
 /// HTTP, served the way an IPTV provider serves a live channel.
-@Suite("Raw transport stream over HTTP", .serialized)
+@Suite("Raw transport stream over HTTP", .serialized, .engineGate)
 @MainActor
 struct RawTransportStreamTests {
     @Test

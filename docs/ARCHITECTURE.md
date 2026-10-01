@@ -243,7 +243,7 @@ Panop.xcodeproj/       Hand-authored, ~330 lines.
 Scripts/               setup.sh, build-all-platforms.sh, check-portability.sh, test-app.sh, ...
 docs/adr/              Decision records.
 reference/             Gitignored third-party clones, design reference only.
-vendor/LumeEngine/     Planned: git submodule, path dependency.
+vendor/LumeEngine/     Git submodule (v0.2.2), local path dependency, embedded dynamically.
 ```
 
 The Xcode project uses file-system-synchronized groups, so adding a source file means writing
@@ -270,7 +270,7 @@ post-clone command.
 | Xcode project and app target | Builds and launches on macOS, iOS and tvOS |
 | Playback coordinator and the AVPlayer adapter | Done: 23 coordinator tests in 0.2 s, and the adapter tested against real AVFoundation on macOS, iOS and tvOS |
 | VLCKit adapter (4.0.0-a24) | Done: plays raw MPEG-TS over HTTP; coordinator fallback from AVPlayer verified on real transport-stream bytes on macOS |
-| LumeEngine | Planned |
+| LumeEngine adapter (v0.2.2) | Done: plays raw MPEG-TS and HLS; coordinator fallback from AVPlayer verified; macOS and iOS |
 | `SwiftDataCatalogStore`, `PanopTests` target | Done, 22 tests passing on macOS, iOS and tvOS |
 | Playlist import flow: add, Keychain credentials, background sync, playlists screen | Done at the service level (43 app tests); screens launch but are not yet driven by UI tests |
 

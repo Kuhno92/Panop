@@ -20,7 +20,7 @@ command works because it is documented below.
 - [x] `SwiftDataCatalogStore` and the `PanopTests` target (133 tests, passing on macOS, iOS and tvOS)
 - [x] Playback coordinator (portable, `PanopPlayback`) and the AVPlayer adapter. Channels play from the Live TV list. AVPlayer cannot read raw MPEG-TS, so those streams fall through to VLC; Xtream live streams play in AVPlayer directly because the panel offers HLS
 - [x] VLCKit adapter (4.0.0-a24, the only SwiftPM line; an alpha). Plays raw MPEG-TS over HTTP, so M3U live streams now work, verified on real transport-stream bytes through the coordinator
-- [ ] LumeEngine (KSPlayer stays unlinked)
+- [x] LumeEngine adapter (submodule `vendor/LumeEngine`, pinned to v0.2.2, dynamic and embedded). Plays raw MPEG-TS and HLS; verified on macOS and iOS, **not tvOS**. Subtitles, PiP and Now Playing are not done (KSPlayer stays unlinked)
 - [x] Playlist import wired to the catalog container: add by Xtream login, M3U link or M3U file, Keychain credentials, background sync. The screens launch and are covered by service-level tests, but have not been driven by hand or by UI tests yet
 
 `docs/ROADMAP.md` is the full feature list, ordered into milestones and traced back to the

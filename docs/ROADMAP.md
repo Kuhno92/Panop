@@ -208,10 +208,16 @@ The first milestone where Panop is usable.
       the screens by eye. Crashes found and fixed on the way, all recorded in `docs/engines.md`:
       rendering into a detached view, releasing a player on the main thread, a delegate class
       inheriting main-actor isolation, and a 0 to 100 versus 0 to 1 buffering mix-up.
-- [ ] **LumeEngine adapter**, vendored as a pinned submodule, never a URL dependency.
-- [ ] **App-side facade over LumeEngine's `PlayerSession`** *(surfaced)*. Its `LumePlayer` facade
-      exposes no event stream and keeps `session` private, so reconnect, PiP and Now Playing all
-      need building on the lower-level type.
+- [x] **LumeEngine adapter**, vendored as a pinned submodule (`v0.2.2`), never a URL dependency.
+      Built on `PlayerSession`, which is public after all, so the adapter has the typed event
+      stream and a start position set at open time. Plays raw MPEG-TS over HTTP and, checked by
+      hand, the 3sat and ZDF HLS streams (3sat joins in 0.75 s, ZDF in 3.2 s). Its own HTTP
+      reconnect is switched off: that policy is the coordinator's. Tests on macOS and iOS.
+      **Not done:** tvOS (no platform installed), subtitle text drawing (the engine returns cues,
+      nothing shows them yet), PiP and Now Playing, channel-switch latency against the other
+      engines, and any real provider stream.
+- [ ] **Subtitle cues from LumeEngine**: `session.subtitles.activeCues(at:)` has the text, and
+      `PlaybackEngine` has no channel for it yet.
 - [ ] **Player overlay** shared across engines: transport, track switching, engine indicator.
 - [ ] **Resume playback** from a stored position. Pass it at load time; seeking an in-flight
       IPTV connection makes some providers drop the stream.

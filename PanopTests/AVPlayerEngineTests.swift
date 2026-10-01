@@ -115,7 +115,7 @@ private final class Recorder {
     }
 }
 
-@Suite("AVPlayer engine", .serialized)
+@Suite("AVPlayer engine", .serialized, .engineGate)
 @MainActor
 struct AVPlayerEngineTests {
     // MARK: - Playing real media

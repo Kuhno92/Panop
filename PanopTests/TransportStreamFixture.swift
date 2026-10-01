@@ -103,7 +103,12 @@ final class LocalStreamServer: @unchecked Sendable {
                     contentContext: .finalMessage,
                     isComplete: true,
                     completion: .contentProcessed { _ in
-                        connection.cancel()
+                        // Closing at once can reset the connection while the client is
+                        // still reading, which FFmpeg reports as an I/O error rather
+                        // than the end of the stream. Give it time to take the bytes.
+                        DispatchQueue.global().asyncAfter(deadline: .now() + 3) {
+                            connection.cancel()
+                        }
                     }
                 )
             }

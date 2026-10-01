@@ -11,7 +11,7 @@
 # package. The logic tests are much faster: swift test --package-path Packages/PanopKit
 #
 # Pairs -derivedDataPath with the shared package clone, as AGENTS.md requires.
-# Override the locations with PANOP_DD and PANOP_SPM, and run a single suite with PANOP_ONLY.
+# Override the locations with PANOP_DD and PANOP_SPM, and run chosen suites with PANOP_ONLY.
 
 set -euo pipefail
 
@@ -77,9 +77,13 @@ case "$platform" in
         ;;
 esac
 
-# PANOP_ONLY=LiveStreamSmokeTests runs one suite (or Suite/test) instead of everything.
+# PANOP_ONLY=LiveStreamSmokeTests runs one suite (or Suite/test) instead of everything;
+# a comma-separated list runs several.
 if [[ -n "${PANOP_ONLY:-}" ]]; then
-    flags+=("-only-testing:PanopTests/$PANOP_ONLY")
+    IFS=',' read -r -a only <<<"$PANOP_ONLY"
+    for name in "${only[@]}"; do
+        flags+=("-only-testing:PanopTests/$name")
+    done
 fi
 
 log="$(mktemp -t panop-test)"

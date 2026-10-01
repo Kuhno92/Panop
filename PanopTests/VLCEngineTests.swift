@@ -64,7 +64,7 @@ private func writeWAV(seconds: Double) throws -> URL {
     return url
 }
 
-@Suite("VLC engine", .serialized)
+@Suite("VLC engine", .serialized, .engineGate)
 @MainActor
 struct VLCEngineTests {
     @Test

@@ -147,7 +147,7 @@ struct PlaybackMessagesTests {
 struct EngineRegistryTests {
     @Test
     func `only engines with an adapter are offered`() {
-        #expect(EngineRegistry.selectable == [.avPlayer, .vlcKit])
+        #expect(EngineRegistry.selectable == [.avPlayer, .vlcKit, .lumeEngine])
         #expect(!EngineRegistry.selectable.contains(.ksPlayer), "KSPlayer is GPL-3.0 and must never be offered")
     }
 
@@ -156,8 +156,8 @@ struct EngineRegistryTests {
     func `an engine without an adapter builds nothing`() {
         #expect(EngineRegistry.make(.avPlayer) != nil)
         #expect(EngineRegistry.make(.vlcKit) != nil)
-        #expect(EngineRegistry.make(.lumeEngine) == nil, "LumeEngine is not built yet")
-        #expect(EngineRegistry.make(.ksPlayer) == nil)
+        #expect(EngineRegistry.make(.lumeEngine) != nil)
+        #expect(EngineRegistry.make(.ksPlayer) == nil, "KSPlayer is not linked, so it has no adapter")
     }
 }
 

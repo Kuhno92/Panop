@@ -69,6 +69,13 @@ This is required for correctness, not preference; see [docs/engines.md](docs/eng
 LumeEngine bundles **FFmpeg 9.0.x under LGPL**. Its product is dynamically linked to preserve
 relinkability, and that must remain true.
 
+- **Pinned:** tag `v0.2.2`, commit `069a818`. Its FFmpeg comes from a checksum-pinned xcframework
+  the package downloads from its own GitHub release. Its own notices and the LGPL text are in
+  `vendor/LumeEngine/THIRD-PARTY-NOTICES.md` and `vendor/LumeEngine/LICENSES/`.
+- **Linking, verified:** the app links `@rpath/LumeEngine.framework` dynamically and embeds it in
+  `Contents/Frameworks` through an explicit Embed Frameworks phase, code-signed on copy. Without
+  that phase the build succeeds and the app cannot launch anywhere but the machine that built it.
+
 ---
 
 ## Developer tooling

@@ -218,11 +218,35 @@ specific commit rather than tracking a version range.
 
 Two integration gaps to plan around:
 
-- Its `LumePlayer` facade exposes no event stream, and its underlying `PlayerSession` is
-  private to it. Reconnect handling, Picture in Picture, and Now Playing therefore need an
-  app-side facade built directly on `PlayerSession`.
+- Its `LumePlayer` facade exposes no event stream, but `PlayerSession` is public in `LumeEngineCore`
+  and `import LumeEngine` re-exports it. The adapter (`LumePlaybackEngine`) is built on the session,
+  which has the typed events, `stalled`, and a start position applied before the demuxer streams.
+  Picture in Picture and Now Playing still need building on top of it.
 - One session plays one URL. Changing channel means a full teardown and a new session, so
   channel-switch latency needs measuring against the other engines.
 
 The engine deliberately never retries on its own schedule. Reconnect and backoff are Panop's
 job, which matches where that policy lives for the other three engines anyway.
+
+### What integrating it showed
+
+- **Embed it explicitly.** A source-built `.dynamic` package product is linked as
+  `@rpath/LumeEngine.framework`, but Xcode does not copy it into the app: only binary xcframeworks
+  such as VLCKit are embedded for you. The build succeeds, the tests pass, and the app then cannot
+  launch on any machine but the one that built it. The app target has an Embed Frameworks phase
+  (sign on copy) for it. Check `Contents/Frameworks` in a Release build after touching the project.
+- **Its enums are not frozen** (library evolution), so every `switch` over `PlayerEvent`,
+  `PlayerSession.State` or `EngineError.Code` needs `@unknown default`.
+- **Failure arrives before its reason.** The session sets `.failed` and only then emits the `.error`
+  event that explains it, so the adapter waits briefly for the error before reporting the failure.
+- **Turn off its HTTP auto-reconnect** (`enableReconnect`, on by default). Reconnect policy is the
+  coordinator's, and a quiet reconnect hides the failure from it.
+- **A connection that ends is an error, as it should be.** A server closing a finite stream shows up
+  as `av_read_frame: Input/output error`, mapped to `.network`, so the coordinator reconnects.
+- **Garbage bytes** open as `avformat_open_input: Input/output error`, which maps to the retryable
+  `.openFailed`, not `.unsupportedFormat`. The coordinator retries before moving on.
+- **Tests sharing a process interfere.** With the engine suites running in parallel, a LumeEngine
+  open failed with an I/O error one millisecond after opening whenever the VLC and AVPlayer suites
+  ran at the same time. The mechanism is not established; libVLC tearing players down in the
+  background is the suspect. `.engineGate` (`PanopTests/EngineGate.swift`) lets one real-engine test
+  run at a time, across suites, and the failure stopped. Put new engine suites under it.
