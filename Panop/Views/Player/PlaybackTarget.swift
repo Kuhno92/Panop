@@ -115,7 +115,11 @@ nonisolated enum PlaybackRequestBuilder {
         }
         // An episode is not a catalog row: its address is built from the playlist's login and the
         // episode's own id, which is a string on some panels and so is not parsed as a number.
-        if target.kind == .series, let episodeID = target.remoteID, !episodeID.isEmpty {
+        // Told apart by its id, not by having a provider id: a series *shell* in the catalog has
+        // one too, and is not playable (below).
+        if target.kind == .series, target.entryID.hasPrefix("episode:"), let episodeID = target.remoteID,
+           !episodeID.isEmpty
+        {
             let client: XtreamClient
             do {
                 client = try XtreamClient(credentials: credentials, transport: transport)

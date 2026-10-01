@@ -90,16 +90,50 @@ fi
 
 log="$(mktemp -t panop-test)"
 echo "==> Testing on $platform (log: $log)"
-set +e
-xcodebuild test \
-    -project Panop.xcodeproj \
-    -scheme PanopTests \
-    -destination "$destination" \
-    -derivedDataPath "${DD_BASE}-test-${platform}$([[ $benchmark -eq 1 ]] && echo -bench)" \
-    -clonedSourcePackagesDirPath "$SHARED_SPM" \
-    ${flags[@]+"${flags[@]}"} >"$log" 2>&1
-status=$?
-set -e
+
+# The test host sometimes never starts its tests and xcodebuild then waits for it forever: the
+# system's test manager (macOS) or the simulator is wedged. A run that has not started one test
+# five minutes after it began (a cold build takes up to three) is stuck, so it is killed, the
+# thing that wedged is restarted, and the run tried again, up to three times. The numbers below
+# are in seconds. Benchmarks are left alone: they print nothing while they measure.
+stall_after=420
+status=1
+for attempt in 1 2 3; do
+    xcodebuild test \
+        -project Panop.xcodeproj \
+        -scheme PanopTests \
+        -destination "$destination" \
+        -derivedDataPath "${DD_BASE}-test-${platform}$([[ $benchmark -eq 1 ]] && echo -bench)" \
+        -clonedSourcePackagesDirPath "$SHARED_SPM" \
+        ${flags[@]+"${flags[@]}"} >"$log" 2>&1 &
+    pid=$!
+    began=$SECONDS
+    stuck=0
+    while kill -0 "$pid" 2>/dev/null; do
+        sleep 10
+        if [[ $benchmark -eq 0 ]] && ! grep -qE "^Test (Suite|case)" "$log" && (( SECONDS - began > stall_after )); then
+            stuck=1
+            pkill -P "$pid" 2>/dev/null || true
+            kill "$pid" 2>/dev/null || true
+            break
+        fi
+    done
+    set +e
+    wait "$pid" 2>/dev/null
+    status=$?
+    set -e
+    if (( stuck == 0 )); then
+        break
+    fi
+    echo "==> attempt $attempt never started a test; restarting what wedged" >&2
+    if [[ "$platform" == macos ]]; then
+        pkill -f "Panop.app/Contents/MacOS/Panop" 2>/dev/null || true
+        killall -9 testmanagerd 2>/dev/null || true
+    else
+        xcrun simctl shutdown "$id" 2>/dev/null || true
+    fi
+    sleep 3
+done
 
 grep -E "^Test case .* (passed|failed)" "$log" | sed -E "s/ on '.*'//" || true
 grep -E "error:|Failing tests:|^\s+[A-Za-z]+Tests\." "$log" | head -20 || true

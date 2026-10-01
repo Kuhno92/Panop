@@ -3,7 +3,7 @@ import Foundation
 import PanopPlayback
 import Testing
 
-@Suite("Progress reporting")
+@Suite("Progress reporting", .engineGate)
 @MainActor
 struct ProgressReportingTests {
     /// What the player told whoever keeps resume points.
@@ -120,7 +120,7 @@ private final class FakeMemory: EngineMemory {
     }
 }
 
-@Suite("Engine memory")
+@Suite("Engine memory", .engineGate)
 @MainActor
 struct EngineMemoryTests {
     /// Engines by kind, recording which were asked for, in order.
@@ -217,7 +217,7 @@ struct EngineMemoryTests {
     }
 }
 
-@Suite("Session recording")
+@Suite("Session recording", .engineGate)
 @MainActor
 struct SessionRecordingTests {
     private func store() -> PlaybackMetricsStore {
