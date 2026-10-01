@@ -44,6 +44,11 @@ final class AVPlayerEngine: PlaybackEngine {
 
     init() {
         (events, output) = AsyncStream.makeStream()
+        #if !os(tvOS)
+            // The default on iOS, and stated here because the AirPlay button in the
+            // controls is pointless without it. The route is chosen by the user, never by us.
+            player.allowsExternalPlayback = true
+        #endif
     }
 
     // MARK: - Picture in Picture

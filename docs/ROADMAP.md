@@ -249,12 +249,15 @@ The brief called performance a key concept. For IPTV this concentrates in one nu
 - [ ] **Playback QoE metrics** *(surfaced)*: join time, rebuffer ratio, exits before first
       frame, engine fallbacks. Flush at session boundaries only; periodic writes during playback
       cause hitching.
-- [ ] **Picture in Picture and AirPlay** via AVPlayer; note the other engines cannot match this. *Partly done.*
+- [ ] **Picture in Picture and AirPlay** via AVPlayer; note the other engines cannot match this. *Both wired, neither seen working.*
       PiP is wired for AVPlayer on iOS and macOS (a button in the controls, made from the video
       layer; tvOS has no PiP). Tested that it is offered once a layer exists and where the system
       supports it. **Not verified:** that the window actually floats and comes back, which needs
-      a device. **Not done:** AirPlay's route picker (AVPlayer does external playback by
-      default, but there is no button to choose a destination).
+      a device. AirPlay is the system's route picker
+      (`AVRoutePickerView`) in the controls on iOS and macOS, shown only while AVPlayer is the
+      engine, since libVLC and LumeEngine cannot send video there; tvOS has no AirPlay out. Tested
+      that it is offered for AVPlayer and not for the others. **Not verified:** a real AirPlay
+      destination.
 - [x] **Now Playing and remote commands**, needed for the Apple TV Siri remote. Title, position,
       length (or live) and play state go to the system's controls; play, pause, toggle, ±10 s
       and scrubbing come back from them, with scrubbing off for a live channel. Works for every

@@ -47,6 +47,14 @@ struct PlayerControls: View {
 
             tracks
 
+            #if !os(tvOS)
+                if model.supportsAirPlay {
+                    AirPlayButton()
+                        .frame(width: 28, height: 28)
+                        .accessibilityLabel("AirPlay")
+                }
+            #endif
+
             if model.supportsPictureInPicture {
                 Button {
                     model.togglePictureInPicture()

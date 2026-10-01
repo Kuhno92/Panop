@@ -218,6 +218,11 @@ struct PlayerModelTests {
         #expect(await waitFor { model.status == .playing(.avPlayer) })
         #expect(await waitFor { model.joinTime != nil })
         #expect(model.engine is AVPlayerEngine)
+        #if os(tvOS)
+            #expect(!model.supportsAirPlay)
+        #else
+            #expect(model.supportsAirPlay, "AVPlayer is the engine that can AirPlay")
+        #endif
         #expect(model.engineName == "AVPlayer")
         #expect(!model.isWorking)
         #expect(model.failureText == nil)

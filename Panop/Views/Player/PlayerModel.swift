@@ -80,6 +80,16 @@ final class PlayerModel {
         duration != nil
     }
 
+    /// AirPlay is the system's, so only the engine that plays through AVFoundation can
+    /// send its video there. Not offered on tvOS.
+    var supportsAirPlay: Bool {
+        #if os(tvOS)
+            false
+        #else
+            engine is AVPlayerEngine
+        #endif
+    }
+
     var supportsPictureInPicture: Bool {
         (engine as? AVPlayerEngine)?.supportsPictureInPicture ?? false
     }

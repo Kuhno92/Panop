@@ -358,3 +358,39 @@ struct SystemNowPlayingTests {
         #expect(MPNowPlayingInfoCenter.default().nowPlayingInfo == nil)
     }
 }
+
+@Suite("AirPlay")
+@MainActor
+struct AirPlayTests {
+    private func model(_ makeEngine: @escaping PlaybackCoordinator.EngineFactory) -> PlayerModel {
+        PlayerModel(
+            title: "X",
+            request: PlaybackRequest(PlaybackItem(url: "http://h/x", mediaKind: .live)),
+            preferred: .avPlayer,
+            makeEngine: makeEngine
+        )
+    }
+
+    @Test
+    func `only the AVPlayer engine offers it`() async {
+        // No engine yet: nothing to send anywhere.
+        #expect(!model { _ in nil }.supportsAirPlay)
+
+        let scripted = ScriptedEngine()
+        let other = model { $0 == .avPlayer ? scripted : nil }
+        other.start()
+        try? await Task.sleep(for: .milliseconds(200))
+        #expect(!other.supportsAirPlay, "an engine that is not AVPlayer cannot AirPlay its video")
+        await other.stop()
+    }
+
+    @Test
+    func `AVPlayer allows external playback on the platforms that have it`() {
+        let engine = AVPlayerEngine()
+        #if os(tvOS)
+            _ = engine
+        #else
+            #expect(engine.player.allowsExternalPlayback)
+        #endif
+    }
+}
