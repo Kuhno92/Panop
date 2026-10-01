@@ -355,8 +355,22 @@ The brief called performance a key concept. For IPTV this concentrates in one nu
       up while focused, Menu closes the player, and the player is reachable from the list.
       **Still open:** the controls coming back after they have hidden, by remote, since a held
       bar does not hide while it has focus and so that state is hard to reach.
-- [ ] **macOS windowing**: a separate player window. New windows do not inherit the main
-      scene's environment, so container and environment must be re-declared.
+- [x] **macOS windowing**: the player is a window of its own (`WindowGroup` with a value), not a
+      sheet over the list. It can be moved, resized, put on another display and taken full
+      screen, and opening the same item again brings its window forward. A new window does not
+      inherit the main scene's environment, so the container and the services are declared
+      again on it. **The window's value holds no stream address**: macOS saves a window's value
+      to restore it, and an address can carry the account's login, so the value is only which
+      item it is, and the window finds the address again, in the catalog for a channel or film
+      and from the playlist's own login for an episode. Restoration is switched off, since a
+      restored window would start a stream the moment the app opened. Closing the window stops
+      playback and ends the session. **Verified on a real Mac**, by launching the app with a
+      Debug flag that opens the window, clicking in it, and closing it: the window appeared
+      with its controls, a click showed and hid them, and closing it left one window and one
+      recorded session. 8 unit tests cover the request (no address, survives a save, the same
+      item is the same window), the catalog lookup across playlists, and episode addresses.
+      **Not covered by an automated UI test**: macOS UI tests need an accessibility grant given
+      by hand; the check above is a manual one.
 - [x] **Image pipeline** *(surfaced)*, `Panop/Services/Images/`, shown as `ChannelLogo` in the
       Live TV rows. Decodes with ImageIO at the displayed size (never the downloaded size); a
       memory cache with a byte budget (16 MB tvOS, 24 MB iOS, 64 MB Mac) emptied on a memory

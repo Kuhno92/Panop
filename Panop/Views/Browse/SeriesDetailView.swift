@@ -112,6 +112,9 @@ struct SeriesDetailView: View {
             name: name,
             streamURL: client.episodeURL(episodeID: episode.id, containerExtension: episode.containerExtension)?
                 .absoluteString,
+            // The id and extension too, so a player window can rebuild the address itself.
+            remoteID: episode.id,
+            containerExtension: episode.containerExtension,
             resumeAt: position
         )
     }

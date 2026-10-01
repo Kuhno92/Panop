@@ -60,6 +60,26 @@ struct PanopApp: App {
                 .environment(\.playbackMetrics, metricsStore)
         }
         .modelContainer(catalogContainer)
+
+        #if os(macOS)
+            // The player, in a window of its own. A new window does not inherit the main
+            // scene's container or environment, so both are declared again here.
+            WindowGroup("Player", id: PlayerWindow.id, for: PlayerWindowRequest.self) { $request in
+                if let request {
+                    PlayerWindowContent(request: request)
+                        .environment(\.cloudModelContext, ModelContext(cloudContainer))
+                        .environment(services.library)
+                        .environment(services.userState)
+                        .environment(services.syncStatus)
+                        .environment(\.playbackMetrics, metricsStore)
+                }
+            }
+            .modelContainer(catalogContainer)
+            .defaultSize(width: 1100, height: 680)
+            // A restored window would start playing a stream the moment the app opened.
+            .restorationBehavior(.disabled)
+            .commandsRemoved()
+        #endif
     }
 }
 

@@ -74,8 +74,13 @@ struct PlayerView: View {
         }
         .task { model.start() }
         .onDisappear { Task { await model.stop() } }
+        #if os(macOS)
+            .onReceive(NotificationCenter.default.publisher(for: .playerWindowWillClose)) { _ in
+                Task { await model.stop() }
+            }
+        #endif
         #if os(tvOS)
-            .onPlayPauseCommand { model.togglePause() }
+        .onPlayPauseCommand { model.togglePause() }
         #endif
     }
 

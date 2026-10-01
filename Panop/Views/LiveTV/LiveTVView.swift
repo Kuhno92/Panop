@@ -389,14 +389,24 @@ extension PlaybackTarget {
     }
 }
 
-/// Full screen where the platform has it; a sheet on the Mac.
+/// Full screen where the platform has it; a window of its own on the Mac.
 struct PlayerPresentation: ViewModifier {
     @Binding var target: PlaybackTarget?
 
+    #if os(macOS)
+        @Environment(\.openWindow) private var openWindow
+    #endif
+
     func body(content: Content) -> some View {
         #if os(macOS)
-            content.sheet(item: $target) { target in
-                PlayerScreen(target: target).frame(minWidth: 880, minHeight: 520)
+            // A film belongs in a window that can be moved, resized, put on another display and
+            // taken full screen, not a sheet that sits on the list. Opening the same item again
+            // brings its window forward instead of making a second one.
+            content.onChange(of: target) {
+                if let target {
+                    openWindow(id: PlayerWindow.id, value: PlayerWindowRequest(target))
+                    self.target = nil
+                }
             }
         #else
             content.fullScreenCover(item: $target) { target in

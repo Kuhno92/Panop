@@ -21,6 +21,11 @@ enum UITestMode {
             return .seconds(seconds)
         }
 
+        /// Open a player window for the first seeded channel at launch (macOS), so the window can be
+        /// seen working without a way to click. `-panop-open-player-window`.
+        static let opensPlayerWindow = isActive && ProcessInfo.processInfo.arguments
+            .contains("-panop-open-player-window")
+
         /// The tab to open on, from the environment `PANOP_START_TAB` (`home`, `live`). Most UI
         /// tests are about Live TV and ask for it; the home screen tests ask for `home`.
         static var startTab: AppTab? {
@@ -36,6 +41,7 @@ enum UITestMode {
         }
     #else
         static let isActive = false
+        static let opensPlayerWindow = false
         static var controlsTimeout: Duration? {
             nil
         }

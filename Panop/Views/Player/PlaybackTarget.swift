@@ -7,7 +7,7 @@ import PanopXtream
 ///
 /// A snapshot rather than the model object, so the player does not hold a live
 /// SwiftData record while it runs, and so a request can be built off the main actor.
-nonisolated struct PlaybackTarget: Identifiable, Equatable, Sendable {
+nonisolated struct PlaybackTarget: Identifiable, Equatable, Hashable, Sendable {
     var playlist: String
     var entryID: String
     var kind: MediaKind
@@ -24,6 +24,47 @@ nonisolated struct PlaybackTarget: Identifiable, Equatable, Sendable {
 
     var id: String {
         "\(playlist)|\(entryID)"
+    }
+}
+
+/// What a macOS player window is opened with.
+///
+/// **No stream address.** A window's value is saved by the system to restore it later, and an
+/// address can carry the account's login. So this holds only which item it is, and the window
+/// looks the address up again: from the catalog for a channel or film, or from the playlist's
+/// own login for an episode.
+nonisolated struct PlayerWindowRequest: Codable, Hashable {
+    var playlist: String
+    var entryID: String
+    var kind: MediaKind
+    var name: String
+    /// For an episode, its id, from which its address is rebuilt.
+    var remoteID: String?
+    var containerExtension: String?
+    var resumeAt: Double?
+
+    init(_ target: PlaybackTarget) {
+        playlist = target.playlist
+        entryID = target.entryID
+        kind = target.kind
+        name = target.name
+        remoteID = target.remoteID
+        containerExtension = target.containerExtension
+        resumeAt = target.resumeAt
+    }
+
+    /// The target to play, given the address if the catalog has one for this item.
+    func target(streamURL: String?) -> PlaybackTarget {
+        PlaybackTarget(
+            playlist: playlist,
+            entryID: entryID,
+            kind: kind,
+            name: name,
+            streamURL: streamURL,
+            remoteID: remoteID,
+            containerExtension: containerExtension,
+            resumeAt: resumeAt
+        )
     }
 }
 
@@ -71,6 +112,26 @@ nonisolated enum PlaybackRequestBuilder {
         guard case let .xtream(credentials)? = source else {
             throw PlaybackTargetError
                 .notPlayable("This item has no stream address. Refresh the playlist and try again.")
+        }
+        // An episode is not a catalog row: its address is built from the playlist's login and the
+        // episode's own id, which is a string on some panels and so is not parsed as a number.
+        if target.kind == .series, let episodeID = target.remoteID, !episodeID.isEmpty {
+            let client: XtreamClient
+            do {
+                client = try XtreamClient(credentials: credentials, transport: transport)
+            } catch {
+                throw PlaybackTargetError.notPlayable("The provider's server address is not valid.")
+            }
+            let ext = target.containerExtension
+            let resume = target.resumeAt
+            return PlaybackRequest(mediaKind: .series) { _ in
+                PlaybackItem(
+                    url: client.episodeURL(episodeID: episodeID, containerExtension: ext)?.absoluteString ?? "",
+                    title: target.name,
+                    startPosition: resume,
+                    mediaKind: .series
+                )
+            }
         }
         guard let remote = target.remoteID.flatMap(Int.init) else {
             throw PlaybackTargetError
