@@ -212,8 +212,8 @@ The first milestone where Panop is usable.
       Built on `PlayerSession`, which is public after all, so the adapter has the typed event
       stream and a start position set at open time. Plays raw MPEG-TS over HTTP and, checked by
       hand, the 3sat and ZDF HLS streams (3sat joins in 0.75 s, ZDF in 3.2 s). Its own HTTP
-      reconnect is switched off: that policy is the coordinator's. Tests on macOS and iOS.
-      **Not done:** tvOS (no platform installed), subtitle text drawing (the engine returns cues,
+      reconnect is switched off: that policy is the coordinator's. Tests on macOS, iOS and tvOS.
+      **Not done:** subtitle text drawing (the engine returns cues,
       nothing shows them yet), PiP and Now Playing, channel-switch latency against the other
       engines, and any real provider stream.
 - [ ] **Subtitle cues from LumeEngine**: `session.subtitles.activeCues(at:)` has the text, and

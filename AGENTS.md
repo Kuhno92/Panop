@@ -17,10 +17,10 @@ command works because it is documented below.
 - [x] Repo skeleton, docs, lint tooling, ADRs
 - [x] `Packages/PanopKit`: PanopCore, PanopPlaylist, PanopPlayback, PanopXtream, PanopEPG, PanopCatalog (230 tests passing)
 - [x] `Panop.xcodeproj` and the app target (builds and launches on **macOS and iOS**)
-- [x] `SwiftDataCatalogStore` and the `PanopTests` target (133 tests, passing on macOS, iOS and tvOS)
+- [x] `SwiftDataCatalogStore` and the `PanopTests` target (154 tests, passing on macOS, iOS and tvOS)
 - [x] Playback coordinator (portable, `PanopPlayback`) and the AVPlayer adapter. Channels play from the Live TV list. AVPlayer cannot read raw MPEG-TS, so those streams fall through to VLC; Xtream live streams play in AVPlayer directly because the panel offers HLS
 - [x] VLCKit adapter (4.0.0-a24, the only SwiftPM line; an alpha). Plays raw MPEG-TS over HTTP, so M3U live streams now work, verified on real transport-stream bytes through the coordinator
-- [x] LumeEngine adapter (submodule `vendor/LumeEngine`, pinned to v0.2.2, dynamic and embedded). Plays raw MPEG-TS and HLS; verified on macOS and iOS, **not tvOS**. Subtitles, PiP and Now Playing are not done (KSPlayer stays unlinked)
+- [x] LumeEngine adapter (submodule `vendor/LumeEngine`, pinned to v0.2.2, dynamic and embedded). Plays raw MPEG-TS and HLS; verified on macOS, iOS and tvOS. Subtitles, PiP and Now Playing are not done (KSPlayer stays unlinked)
 - [x] Playlist import wired to the catalog container: add by Xtream login, M3U link or M3U file, Keychain credentials, background sync. The screens launch and are covered by service-level tests, but have not been driven by hand or by UI tests yet
 
 `docs/ROADMAP.md` is the full feature list, ordered into milestones and traced back to the
@@ -29,9 +29,9 @@ It exists so that features raised once in conversation are not lost between sess
 
 ### Platform components and disk
 
-iOS 26.5 is installed and verified. **tvOS is not yet**, so a tvOS destination still fails with
-"platform is not installed" before compiling anything. That is an environment gap, never a
-project fault. Install it once:
+iOS 26.5 and tvOS 26.5 are installed and verified: `Scripts/test-app.sh macos|ios|tvos` all run.
+If a destination ever fails with "platform is not installed", that is an environment gap, never a
+project fault. Check `xcodebuild -showdestinations`, then install it once:
 
 ```bash
 xcodebuild -downloadPlatform tvOS     # ~8 GB, and it needs room to expand
@@ -99,9 +99,8 @@ Scripts/test-app.sh --benchmark
 Scripts/clean-caches.sh [--apply]
 ```
 
-No tvOS simulator runtime is installed on this machine, so the tvOS step in
-`build-all-platforms.sh` is a compile-only check against a generic destination.
-Install one with `xcodebuild -downloadPlatform tvOS` to launch on Apple TV.
+`build-all-platforms.sh` builds for a tvOS simulator when a runtime is present, and falls back
+to a compile-only check against a generic destination when none is.
 
 ### Always share the package clone directory
 
