@@ -263,10 +263,10 @@ final class VLCEngine: PlaybackEngine {
 
     /// libVLC logged that it cannot reach the stream. Only news before the first
     /// picture: later trouble is the stall and reconnect path's to handle.
-    func connectionFailed(_ reason: String) {
+    func connectionFailed(_ reason: String, code: PlaybackError.Code = .network) {
         guard !isStopping, !hasPlayed, state == .opening else { return }
         setState(.failed)
-        output.yield(.failed(PlaybackError(code: .network, message: "Could not connect to the stream (\(reason)).")))
+        output.yield(.failed(PlaybackError(code: code, message: "Could not connect to the stream (\(reason)).")))
     }
 
     /// `progress` is in [0.0, 1.0], and 1.0 means buffering is complete and playback

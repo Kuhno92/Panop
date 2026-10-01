@@ -349,7 +349,7 @@ struct VLCEngineTests {
     /// the engine sat "opening" until the coordinator's timeout (seen on an HTTPS stream
     /// whose TLS handshake failed). The text is libVLC's own.
     @Test
-    func `a connection failure logged while opening fails the engine`() async throws {
+    func `a TLS failure logged while opening fails the engine as one another engine may not share`() async throws {
         let engine = VLCEngine()
         let recorder = Recorder(engine)
         try await engine.load(PlaybackItem(url: "https://stream.invalid/live.m3u8"))
@@ -358,12 +358,38 @@ struct VLCEngineTests {
 
         #expect(await recorder.wait(seconds: 5) {
             if case let .failed(error) = $0 {
-                error.code == .network
+                error.code == .secureConnectionFailed
             } else {
                 false
             }
         })
         await engine.stop()
+    }
+
+    @Test
+    func `a plain connection failure is still a retryable network error`() async throws {
+        let engine = VLCEngine()
+        let recorder = Recorder(engine)
+        try await engine.load(PlaybackItem(url: "https://stream.invalid/live.m3u8"))
+
+        VLCConnectionWatch.shared.handleMessage("HTTP connection failure", logLevel: .error, context: nil)
+
+        #expect(await recorder.wait(seconds: 5) {
+            if case let .failed(error) = $0 {
+                error.code == .network && error.isRetryable
+            } else {
+                false
+            }
+        })
+        await engine.stop()
+    }
+
+    @Test
+    func `libVLC's lines are told apart`() {
+        #expect(VLCConnectionWatch.failure(in: "TLS session handshake error") == .secureConnectionFailed)
+        #expect(VLCConnectionWatch.failure(in: "HTTP connection failure") == .network)
+        #expect(VLCConnectionWatch.failure(in: "buffer deadlock prevented") == nil)
+        #expect(VLCConnectionWatch.failure(in: "handshake returned error -36") == nil)
     }
 
     @Test

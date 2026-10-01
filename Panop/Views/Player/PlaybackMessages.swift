@@ -25,6 +25,8 @@ nonisolated enum PlaybackMessages {
             "The available players can't open this stream's format."
         case .network:
             "Couldn't reach this stream. Check your connection, and that the provider is up."
+        case .secureConnectionFailed:
+            "A secure connection to this stream could not be made."
         case .invalidAddress:
             "This stream's address isn't valid. Check the link, or refresh the playlist."
         case .openFailed:

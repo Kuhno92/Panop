@@ -1,4 +1,5 @@
 import Foundation
+import PanopPlayback
 import VLCKit
 
 /// Turns libVLC's connection failures into something an engine can act on.
@@ -18,8 +19,18 @@ nonisolated class VLCConnectionWatch: NSObject, VLCLogging, @unchecked Sendable 
 
     nonisolated(unsafe) var level: VLCLogLevel = .error
 
-    /// Messages that mean the stream cannot be reached at all.
-    private static let fatal = ["HTTP connection failure", "TLS session handshake error"]
+    /// What a libVLC log line says about reaching the stream, or nil if it says nothing of the
+    /// kind. A TLS failure is told apart from the rest: it comes from libVLC's own TLS and a
+    /// retry on it fails the same way, where another engine may not.
+    nonisolated static func failure(in message: String) -> PlaybackError.Code? {
+        if message.contains("TLS session handshake error") {
+            .secureConnectionFailed
+        } else if message.contains("HTTP connection failure") {
+            .network
+        } else {
+            nil
+        }
+    }
 
     private struct Entry {
         weak var engine: VLCEngine?
@@ -51,13 +62,13 @@ nonisolated class VLCConnectionWatch: NSObject, VLCLogging, @unchecked Sendable 
     }
 
     func handleMessage(_ message: String, logLevel: VLCLogLevel, context: VLCLogContext?) {
-        guard Self.fatal.contains(where: message.contains) else { return }
+        guard let code = Self.failure(in: message) else { return }
         let watching = lock.withLock { engines.compactMap(\.engine) }
         guard !watching.isEmpty else { return }
         let box = UncheckedBox(watching)
         DispatchQueue.main.async {
             MainActor.assumeIsolated {
-                box.value.forEach { $0.connectionFailed(message) }
+                box.value.forEach { $0.connectionFailed(message, code: code) }
             }
         }
     }

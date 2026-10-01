@@ -245,6 +245,11 @@ job, which matches where that policy lives for the other three engines anyway.
   as `av_read_frame: Input/output error`, mapped to `.network`, so the coordinator reconnects.
 - **Garbage bytes** open as `avformat_open_input: Input/output error`, which maps to the retryable
   `.openFailed`, not `.unsupportedFormat`. The coordinator retries before moving on.
+- **A TLS failure is its own error.** `PlaybackError.Code.secureConnectionFailed`, from libVLC's
+  `TLS session handshake error` line, is not retryable: the handshake is done by the engine's own
+  network stack, so asking it again gets the same answer, and the coordinator moves to the next
+  engine (which, with a different stack, may succeed) without the retries and their delay. A plain
+  `HTTP connection failure` stays a retryable `.network`.
 - **Multivariant HLS is slow to open.** Measured 2.9 s on ZDF against 0.15 s for AVPlayer and
   0.08 s for libVLC (docs/ROADMAP.md, M3). Probe limits do not help: FFmpeg's HLS demuxer opens
   every variant. AVPlayer takes HLS first in the default order, so this only shows when Lume is

@@ -507,4 +507,20 @@ struct PlaybackCoordinatorTests {
         #expect(factory.lastEngine?.audioSelections == ["2"])
         #expect(factory.lastEngine?.subtitleSelections == [nil])
     }
+
+    @Test
+    func `a secure connection failure is not retried, the next engine is tried at once`() async {
+        let factory = EngineFactory([:])
+        let coordinator = makeCoordinator(factory)
+        let log = EventLog(coordinator)
+        #expect(!PlaybackError(code: .secureConnectionFailed).isRetryable)
+
+        coordinator.play(stream)
+        #expect(await log.waitForStatus(.playing(.avPlayer)))
+        factory.lastEngine?.report(.failed(PlaybackError(code: .secureConnectionFailed)))
+
+        // Reconnecting the same engine would fail the same way; the coordinator moves on.
+        #expect(await log.waitForStatus(.playing(.vlcKit)), "it never reached the next engine")
+        #expect(factory.engines(.avPlayer).count == 1, "the failed engine was tried again")
+    }
 }

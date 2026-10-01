@@ -407,6 +407,43 @@ struct PlaylistLibraryTests {
         #expect(app.services.library.playlists.isEmpty)
     }
 
+    // MARK: - Skipped entries
+
+    @Test
+    func `entries with no playable address are counted on the summary, not silently dropped`() async throws {
+        let app = try TestApp(transport: StubTransport { _ in (404, "") })
+        defer { app.cleanUp() }
+        // A file has no address to resolve a relative path against, so these two are unusable.
+        let text = "#EXTM3U\n#EXTINF:-1,Relative\n/live/1.ts\n#EXTINF:-1,Also relative\nlive/2.ts\n#EXTINF:-1,Good\nhttp://h/3.ts\n"
+        let file = try writeTemporaryFile(text)
+
+        let playlist = try await app.services.library.add(.m3uFile(name: "Mixed", fileURL: URL(fileURLWithPath: file)))
+        await app.services.sync.waitForCompletion(playlist.id)
+
+        guard case let .finished(summary) = app.services.syncStatus.status(for: playlist.id) else {
+            Issue.record("the import did not finish")
+            return
+        }
+        #expect(summary.entries == 1)
+        #expect(summary.skipped == 2)
+    }
+
+    @Test
+    func `a clean playlist skips nothing`() async throws {
+        let app = try TestApp(transport: StubTransport { _ in (404, "") })
+        defer { app.cleanUp() }
+        let file = try writeTemporaryFile(playlistText(live: 0 ..< 4))
+
+        let playlist = try await app.services.library.add(.m3uFile(name: "Clean", fileURL: URL(fileURLWithPath: file)))
+        await app.services.sync.waitForCompletion(playlist.id)
+
+        guard case let .finished(summary) = app.services.syncStatus.status(for: playlist.id) else {
+            Issue.record("the import did not finish")
+            return
+        }
+        #expect(summary.skipped == 0)
+    }
+
     // MARK: - Helpers
 
     private func waitFor(_ condition: () -> Bool, seconds: Double = 5) async -> Bool {

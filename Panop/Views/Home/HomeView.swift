@@ -28,9 +28,13 @@ struct HomeView: View {
                 } else if userState.recents.isEmpty, userState.favorites.isEmpty {
                     nothingYet
                 } else {
+                    if let last = userState.recents.first {
+                        ContinueBanner(key: last, onPlay: play)
+                    }
                     ChannelRail(
                         title: "Recently watched",
-                        keys: Array(userState.recents.prefix(railLimit)),
+                        // The most recent channel is the banner above, so it is not shown twice.
+                        keys: Array(userState.recents.dropFirst().prefix(railLimit)),
                         keepsOrder: true,
                         onPlay: play
                     )
@@ -220,6 +224,64 @@ struct ChannelCard: View {
             120
         #else
             64
+        #endif
+    }
+}
+
+/// The channel watched last, as a large way back into it.
+struct ContinueBanner: View {
+    @Query private var channels: [CatalogEntryRecord]
+
+    let key: String
+    let onPlay: (CatalogEntryRecord) -> Void
+
+    init(key: String, onPlay: @escaping (CatalogEntryRecord) -> Void) {
+        self.key = key
+        self.onPlay = onPlay
+        _channels = Query(LiveChannelQuery.descriptor(restrictedTo: [UserStateStore.entryID(in: key)]))
+    }
+
+    /// The query matched on entry id alone, so the playlist is checked here.
+    private var channel: CatalogEntryRecord? {
+        channels.first { UserStateStore.key(playlist: $0.playlist, entry: $0.id) == key }
+    }
+
+    var body: some View {
+        if let channel {
+            Button { onPlay(channel) } label: {
+                HStack(spacing: 16) {
+                    ChannelLogo(address: channel.iconURL, size: Self.logoSize)
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Continue watching")
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(.secondary)
+                        Text(channel.name)
+                            .font(.title2.bold())
+                            .lineLimit(2)
+                    }
+                    Spacer(minLength: 8)
+                    Image(systemName: "play.fill")
+                        .font(.title2)
+                }
+                .padding(16)
+                .contentShape(Rectangle())
+            }
+            #if os(tvOS)
+            .buttonStyle(.card)
+            #else
+            .buttonStyle(.plain)
+            .background(.quaternary.opacity(0.5), in: RoundedRectangle(cornerRadius: 18))
+            #endif
+            .padding(.horizontal)
+            .accessibilityLabel("Continue watching \(channel.name)")
+        }
+    }
+
+    private static var logoSize: CGFloat {
+        #if os(tvOS)
+            110
+        #else
+            72
         #endif
     }
 }

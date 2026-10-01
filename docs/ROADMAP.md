@@ -381,13 +381,13 @@ Features real users expect that the brief did not name. All *(surfaced)*.
 
 - [ ] **EPG / TV guide UI**. A player without a guide is half an app.
 - [ ] **Catch-up and timeshift**. Xtream supports it; the M3U attributes are already parsed.
-- [ ] **Multiple playlists** and switching between them.
+- [x] **Multiple playlists** and switching between them. Several sources can be added, and Live TV shows all of them or one chosen source (M2); each can be refreshed or deleted from Playlists.
 - [ ] **Profiles**. Shared family devices, especially Apple TV.
 - [ ] **Parental controls**. A PIN cannot ride iCloud Keychain to tvOS, so it goes through the
       CloudKit container.
-- [ ] **Subtitles**. LumeEngine returns plain text only, with no positioning or styling and no
+- [ ] **Subtitles**. Plain text from LumeEngine is drawn now (M2); what is left is styling, positioning and bitmap subtitles. LumeEngine returns plain text only, with no positioning or styling and no
       bitmap subtitle support, so rendering is Panop's job.
-- [ ] **Audio and subtitle track selection** per engine.
+- [x] **Audio and subtitle track selection** per engine. The player's controls list the tracks any engine reports and pass a choice to it (M2, *Player overlay*). Not yet checked against a real stream with several tracks.
 - [ ] **Large-catalog hardening**. Indexes on every predicate and sort column, batched writes
       with autosave off, and background indexing that yields while the user browses.
 - [ ] **Performance benchmarks** in a separate target and configuration. Never benchmark in

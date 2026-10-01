@@ -29,6 +29,9 @@ nonisolated struct SyncSummary: Equatable, Sendable {
     var removed: Int
     /// Sections that failed while others succeeded, with a readable reason.
     var failedSections: [String]
+    /// Entries in the playlist left out because they had no address that could be played, for
+    /// instance a relative path in a file with nothing to resolve it against.
+    var skipped: Int
     /// Removals the safety check held back, waiting for the user to confirm.
     var heldBack: [DeferredRemoval]
     var guide: Guide
@@ -41,6 +44,7 @@ nonisolated struct SyncSummary: Equatable, Sendable {
         added = report.kinds.reduce(0) { $0 + $1.summary.inserted }
         removed = report.kinds.reduce(0) { $0 + $1.removed }
         failedSections = report.failures.map { "\(Self.name(of: $0.kind)): \($0.failure ?? "")" }
+        skipped = report.skippedEntries
         heldBack = report.deferredRemovals
         switch outcome.guide {
         case .noGuideAvailable: guide = .notAvailable

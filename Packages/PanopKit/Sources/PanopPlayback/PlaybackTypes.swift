@@ -80,6 +80,10 @@ public struct PlaybackError: Error, Sendable, Equatable, Hashable {
         /// The engine could not open the URL at all.
         case openFailed
         case network
+        /// The secure connection could not be set up, for instance a TLS handshake that failed.
+        /// That is decided by the engine's own network stack, so asking it again gets the same
+        /// answer: the next engine, with a different stack, may well succeed.
+        case secureConnectionFailed
         /// The address is not a URL any engine could open, such as a path with no host.
         /// No engine and no retry can fix it.
         case invalidAddress
@@ -106,7 +110,8 @@ public struct PlaybackError: Error, Sendable, Equatable, Hashable {
     public var isRetryable: Bool {
         switch code {
         case .network, .openFailed: true
-        case .invalidAddress, .unsupportedFormat, .decodeFailed, .cancelled, .internalError: false
+        case .secureConnectionFailed, .invalidAddress, .unsupportedFormat, .decodeFailed, .cancelled,
+             .internalError: false
         }
     }
 }

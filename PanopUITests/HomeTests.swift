@@ -44,12 +44,12 @@ final class HomeTests: PanopUITestCase {
             app.tabBars.buttons["Home"].tap()
 
             XCTAssertTrue(app.staticTexts["Favourites"].waitForExistence(timeout: 10), "no Favourites rail")
-            XCTAssertTrue(app.staticTexts["Recently watched"].exists, "no Recently watched rail")
-            XCTAssertTrue(app.buttons.matching(NSPredicate(format: "label CONTAINS 'Arte'")).firstMatch.exists)
+            // The channel watched last is the banner, not a card in the rail.
+            XCTAssertTrue(app.buttons["Continue watching Arte"].exists, "no Continue watching banner")
             attach("home-rails")
         }
 
-        func testTappingACardPlaysTheChannel() {
+        func testTappingTheContinueBannerPlaysTheChannel() {
             XCTAssertTrue(app.staticTexts["Nothing here yet"].waitForExistence(timeout: 30))
             app.buttons["Browse Live TV"].tap()
             XCTAssertTrue(channel("3sat").waitForExistence(timeout: 20))
@@ -57,10 +57,10 @@ final class HomeTests: PanopUITestCase {
             XCTAssertTrue(app.buttons["Close"].waitForExistence(timeout: 15))
             app.buttons["Close"].tap()
             app.tabBars.buttons["Home"].tap()
-            let card = app.buttons.matching(NSPredicate(format: "label CONTAINS '3sat'")).firstMatch
-            XCTAssertTrue(card.waitForExistence(timeout: 10), "the channel just watched is not on Home")
+            let banner = app.buttons["Continue watching 3sat"]
+            XCTAssertTrue(banner.waitForExistence(timeout: 10), "the channel just watched is not on Home")
 
-            card.tap()
+            banner.tap()
 
             XCTAssertTrue(app.buttons["Pause"].waitForExistence(timeout: 15), "the card did not open the player")
         }

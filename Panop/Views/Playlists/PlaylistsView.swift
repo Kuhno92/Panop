@@ -222,6 +222,15 @@ struct PlaylistRow: View {
         ForEach(summary.failedSections, id: \.self) { failure in
             Label(failure, systemImage: "exclamationmark.triangle.fill").font(.caption).foregroundStyle(.orange)
         }
+        if summary.skipped > 0 {
+            // Not an error: the rest imported. But a person whose channel count is lower than
+            // the file's should be told why.
+            Label(
+                "\(summary.skipped.formatted()) \(summary.skipped == 1 ? "entry was" : "entries were") left out: no address to play.",
+                systemImage: "info.circle"
+            )
+            .font(.caption).foregroundStyle(.secondary)
+        }
         if summary.guide == .failed {
             Label("The TV guide could not be loaded.", systemImage: "exclamationmark.circle")
                 .font(.caption).foregroundStyle(.orange)
