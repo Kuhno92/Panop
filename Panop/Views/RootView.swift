@@ -1,16 +1,26 @@
 import SwiftUI
 
+enum AppTab: Hashable {
+    case home, live, settings
+}
+
 struct RootView: View {
     @Environment(PlaylistLibrary.self) private var library
+    @State private var selection: AppTab = UITestMode.startTab ?? .home
 
     var body: some View {
-        TabView {
-            Tab("Live TV", systemImage: "tv") {
+        TabView(selection: $selection) {
+            Tab("Home", systemImage: "house", value: AppTab.home) {
+                NavigationStack {
+                    HomeView(onBrowse: { selection = .live })
+                }
+            }
+            Tab("Live TV", systemImage: "tv", value: AppTab.live) {
                 NavigationStack {
                     LiveTVView()
                 }
             }
-            Tab("Settings", systemImage: "gearshape") {
+            Tab("Settings", systemImage: "gearshape", value: AppTab.settings) {
                 NavigationStack {
                     SettingsView()
                 }

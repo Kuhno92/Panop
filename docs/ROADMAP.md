@@ -298,7 +298,15 @@ The brief called performance a key concept. For IPTV this concentrates in one nu
 
 ## M4 — Interface
 
-- [ ] **Modern UI pass** *(asked for)*. Home with rails, hero, artwork.
+- [ ] **Modern UI pass** *(asked for)*. Home with rails, hero, artwork. **Home with rails is
+      done**: a first tab with a Recently watched rail and a Favourites rail of channel cards
+      (logo, name, a star when starred, the same star menu), a link to the full list, and empty
+      states for no playlist and for nothing watched or starred yet. Each rail is a bounded
+      fetch by entry id; an empty rail is not drawn. Looked at on iOS and Apple TV (a card style
+      on tvOS, so a focused card lifts). UI tests cover the empty state and its Browse button on
+      both, and, on iOS, starring, playing and finding both on Home. **Not done:** a hero for
+      the channel last watched, artwork beyond logos, a rail per group or per source, and
+      movie and series rails, which wait for those screens.
 - [ ] **tvOS focus engine work** *(surfaced)*. Full-width focus targets, no `Color.accentColor`
       for fills, layout mutations deferred out of the focus animation context. **Audited and
       partly fixed:** no accent-colour fills anywhere; the remote-driven callbacks are deferred;
@@ -340,7 +348,7 @@ The brief called performance a key concept. For IPTV this concentrates in one nu
       and tvOS. **Not done:** the same for movies and series, which have no screen yet.
 - [x] **UI test target** *(surfaced)*: `PanopUITests`, run with `Scripts/test-ui.sh [ios|tvos]`.
       iOS is driven by taps and tvOS by the real remote (`XCUIRemote`), against a deterministic
-      app (`-panop-uitest`, Debug only). 6 tests on iOS and 5 on tvOS cover: the seeded channels,
+      app (`-panop-uitest`, Debug only). The suite (11 tests on iOS, 8 on tvOS) covers: the seeded channels,
       search, opening a channel, the controls and LIVE badge, pause and play, close, the controls
       hiding and a tap bringing them back, and on tvOS the controls **staying up while the
       remote has focus on them** and Menu closing the player. **Found three real bugs:** a row

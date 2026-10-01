@@ -13,6 +13,11 @@ class PanopUITestCase: XCTestCase {
         60
     }
 
+    /// The tab the app opens on: Live TV, since most tests are about it.
+    var startTab: String {
+        "live"
+    }
+
     override func setUpWithError() throws {
         continueAfterFailure = false
         // Driving a Mac app needs an accessibility grant that is only given interactively.
@@ -24,6 +29,7 @@ class PanopUITestCase: XCTestCase {
         // here as launch arguments: those pin a value, and the app could then never change it.
         app.launchArguments = ["-panop-uitest"]
         app.launchEnvironment["PANOP_CONTROLS_TIMEOUT"] = String(controlsTimeout)
+        app.launchEnvironment["PANOP_START_TAB"] = startTab
         app.launch()
     }
 

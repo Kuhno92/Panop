@@ -20,9 +20,25 @@ enum UITestMode {
                   let seconds = Double(text) else { return nil }
             return .seconds(seconds)
         }
+
+        /// The tab to open on, from the environment `PANOP_START_TAB` (`home`, `live`). Most UI
+        /// tests are about Live TV and ask for it; the home screen tests ask for `home`.
+        static var startTab: AppTab? {
+            guard isActive else { return nil }
+            switch ProcessInfo.processInfo.environment["PANOP_START_TAB"] {
+            case "home": return .home
+            case "live": return .live
+            case "settings": return .settings
+            default: return nil
+            }
+        }
     #else
         static let isActive = false
         static var controlsTimeout: Duration? {
+            nil
+        }
+
+        static var startTab: AppTab? {
             nil
         }
     #endif

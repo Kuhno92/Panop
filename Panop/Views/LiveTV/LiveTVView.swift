@@ -390,7 +390,7 @@ extension PlaybackTarget {
 }
 
 /// Full screen where the platform has it; a sheet on the Mac.
-private struct PlayerPresentation: ViewModifier {
+struct PlayerPresentation: ViewModifier {
     @Binding var target: PlaybackTarget?
 
     func body(content: Content) -> some View {

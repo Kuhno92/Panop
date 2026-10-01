@@ -95,7 +95,7 @@ Scripts/test-app.sh [macos|ios|tvos]
 # Catalog import benchmarks: Release build, macOS, prints a results table
 Scripts/test-app.sh --benchmark
 
-# UI tests (PanopUITests: 12 on iOS, 11 on tvOS): drive the real screens, and the Apple TV remote, on a simulator.
+# UI tests (PanopUITests: 11 on iOS, 8 on tvOS): drive the real screens, and the Apple TV remote, on a simulator.
 # Minutes, not seconds. Not on macOS, which needs an accessibility grant given by hand.
 Scripts/test-ui.sh [ios|tvos]
 ```
