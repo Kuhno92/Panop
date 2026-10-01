@@ -7,6 +7,7 @@ struct PanopApp: App {
     private let catalogContainer: ModelContainer
     private let cloudContainer: ModelContainer
     private let services: AppServices
+    private let metricsStore: PlaybackMetricsStore?
 
     init() {
         // A hosted test run launches this app first. It must not open, or worse
@@ -18,6 +19,16 @@ struct PanopApp: App {
             let cloud = try PanopContainers.makeCloud(inMemory: underTest)
             catalogContainer = catalog
             cloudContainer = cloud
+            // The real file only for the real app: a test run must not write to it.
+            metricsStore = if UITestMode.isActive {
+                // A file of its own, so a UI test can see a session it just played.
+                PlaybackMetricsStore(
+                    file: FileManager.default.temporaryDirectory
+                        .appendingPathComponent("uitest-\(UUID().uuidString).json")
+                )
+            } else {
+                underTest ? nil : PlaybackMetricsStore()
+            }
             services = AppServices(
                 catalog: catalog,
                 cloud: cloud,
@@ -46,11 +57,15 @@ struct PanopApp: App {
                 .environment(services.library)
                 .environment(services.userState)
                 .environment(services.syncStatus)
+                .environment(\.playbackMetrics, metricsStore)
         }
         .modelContainer(catalogContainer)
     }
 }
 
 extension EnvironmentValues {
+    /// Where finished viewing sessions are recorded. Nil in tests and previews, which must not
+    /// write to the real file.
+    @Entry var playbackMetrics: PlaybackMetricsStore?
     @Entry var cloudModelContext: ModelContext?
 }

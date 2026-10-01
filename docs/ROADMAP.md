@@ -299,9 +299,19 @@ The brief called performance a key concept. For IPTV this concentrates in one nu
       `PlaybackError.isRetryable`.
 - [x] **Engine fallback on failure**, with the reason surfaced rather than a silent switch.
       Every fallback and reconnect carries a notice with its reason; the player shows it.
-- [ ] **Playback QoE metrics** *(surfaced)*: join time, rebuffer ratio, exits before first
-      frame, engine fallbacks. Flush at session boundaries only; periodic writes during playback
-      cause hitching.
+- [x] **Playback QoE metrics** *(surfaced)*: join time, rebuffer ratio, exits before first
+      frame, engine fallbacks, reconnects and failures. A recorder in the portable core
+      (`PlaybackSessionRecorder`) turns the coordinator's events into one record per viewing
+      session, with the clock passed in so the arithmetic is tested exactly (14 tests: rebuffer
+      time, paused time not counted, leaving before a picture, the first join time kept). The
+      record is kept only when the session ends, never while it plays, by an actor that writes a
+      JSON file in Application Support (last 300 sessions, a damaged file starts empty).
+      **Nothing identifying is stored**: no address, channel name or account, which a test
+      checks on the encoded record. Settings, Playback Statistics shows the typical and the
+      slowest-tenth join time, the share of time spent waiting, sessions left before a picture,
+      sessions that needed another player, sessions that failed, and the join time by engine.
+      On this device only. **Not done:** sending any of it anywhere (nothing is, by design),
+      and a per-channel view, which would need to store channel names.
 - [ ] **Picture in Picture and AirPlay** via AVPlayer; note the other engines cannot match this. *Both wired, neither seen working.*
       PiP is wired for AVPlayer on iOS and macOS (a button in the controls, made from the video
       layer; tvOS has no PiP). Tested that it is offered once a layer exists and where the system

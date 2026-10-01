@@ -40,6 +40,16 @@ struct SettingsView: View {
                     "Panop tries your choice first, and falls back through the other players when a stream will not start."
                 )
             }
+
+            Section {
+                NavigationLink {
+                    PlaybackStatisticsView()
+                } label: {
+                    Label("Playback Statistics", systemImage: "chart.bar")
+                }
+            } footer: {
+                Text("How fast channels start and how often they stall. Kept on this device only.")
+            }
         }
         .navigationTitle("Settings")
     }

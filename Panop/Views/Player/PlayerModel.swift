@@ -43,6 +43,10 @@ final class PlayerModel {
     private let onProgress: ((_ position: Double, _ duration: Double?) -> Void)?
     private var lastReportedProgress: Double
     private let memory: (any EngineMemory)?
+    /// Where the finished session's numbers go, or nil to record none.
+    private let metrics: PlaybackMetricsStore?
+    private var session: PlaybackSessionRecorder
+    private var sessionRecorded = false
     private let memoryKey: String?
     /// The engine the person's own setting would try first, to tell a fallback from their pick.
     private let settingsFirst: PlaybackEngineKind?
@@ -58,6 +62,7 @@ final class PlayerModel {
         onProgress: ((_ position: Double, _ duration: Double?) -> Void)? = nil,
         memory: (any EngineMemory)? = nil,
         memoryKey: String? = nil,
+        metrics: PlaybackMetricsStore? = nil,
         makeEngine: @escaping PlaybackCoordinator.EngineFactory = { EngineRegistry.make($0) }
     ) {
         self.title = title
@@ -69,6 +74,8 @@ final class PlayerModel {
         position = startPosition
         self.memory = memory
         self.memoryKey = memoryKey
+        self.metrics = metrics
+        session = PlaybackSessionRecorder(startedAt: .now, mediaKind: request.mediaKind)
         let settingOrder = PlaybackEngineKind.order(preferred: preferred)
         settingsFirst = settingOrder.first
         // The engine that played this last time, when it was not the person's own pick, goes
@@ -257,6 +264,12 @@ final class PlayerModel {
     }
 
     func stop() async {
+        // The session's numbers, kept now that it is over and never while it ran.
+        if let metrics, !sessionRecorded {
+            sessionRecorded = true
+            let record = session.finish(at: .now)
+            Task { await metrics.append(record) }
+        }
         // Where it was left, so the next play can pick up there. Only once something has played.
         if duration != nil, position > 0 {
             onProgress?(position, duration)
@@ -272,6 +285,7 @@ final class PlayerModel {
     }
 
     private func apply(_ event: PlaybackCoordinatorEvent) {
+        session.apply(event, at: .now)
         switch event {
         case let .status(new):
             status = new

@@ -9,6 +9,7 @@ struct PlayerScreen: View {
 
     @Environment(PlaylistLibrary.self) private var library
     @Environment(UserStateStore.self) private var userState
+    @Environment(\.playbackMetrics) private var metricsStore
     @AppStorage("playbackEngine") private var engineRaw = PlaybackEngineKind.avPlayer.rawValue
 
     @State private var model: PlayerModel?
@@ -48,7 +49,8 @@ struct PlayerScreen: View {
                     userState.saveProgress(key, position: position, duration: duration)
                 },
                 memory: userState,
-                memoryKey: target.id
+                memoryKey: target.id,
+                metrics: metricsStore
             )
         } catch let error as PlaybackTargetError {
             problem = error.message

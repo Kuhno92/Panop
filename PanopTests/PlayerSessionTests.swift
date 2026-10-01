@@ -216,3 +216,93 @@ struct EngineMemoryTests {
         await model.stop()
     }
 }
+
+@Suite("Session recording")
+@MainActor
+struct SessionRecordingTests {
+    private func store() -> PlaybackMetricsStore {
+        PlaybackMetricsStore(file: FileManager.default.temporaryDirectory
+            .appendingPathComponent("m-\(UUID().uuidString).json"))
+    }
+
+    private func model(_ engine: ScriptedEngine, metrics: PlaybackMetricsStore?) -> PlayerModel {
+        PlayerModel(
+            title: "X",
+            request: PlaybackRequest(PlaybackItem(url: "http://h/x", mediaKind: .live)),
+            preferred: .avPlayer,
+            metrics: metrics,
+            makeEngine: { $0 == .avPlayer ? engine : nil }
+        )
+    }
+
+    private func played(_ model: PlayerModel) async {
+        model.start()
+        let deadline = ContinuousClock.now + .seconds(5)
+        while model.joinTime == nil, ContinuousClock.now < deadline {
+            try? await Task.sleep(for: .milliseconds(5))
+        }
+    }
+
+    private func waitForRecords(_ store: PlaybackMetricsStore, _ count: Int) async -> [PlaybackSessionRecord] {
+        let deadline = ContinuousClock.now + .seconds(3)
+        while await store.all().count < count, ContinuousClock.now < deadline {
+            try? await Task.sleep(for: .milliseconds(10))
+        }
+        return await store.all()
+    }
+
+    @Test
+    func `a session is recorded when it ends, with its join time and engine`() async {
+        let metrics = store()
+        let model = model(ScriptedEngine(), metrics: metrics)
+        await played(model)
+
+        await model.stop()
+
+        let records = await waitForRecords(metrics, 1)
+        #expect(records.count == 1)
+        #expect(records.first?.outcome == .watched)
+        #expect(records.first?.engine == .avPlayer)
+        #expect(records.first?.joinSeconds != nil)
+    }
+
+    @Test
+    func `stopping twice records it once`() async {
+        let metrics = store()
+        let model = model(ScriptedEngine(), metrics: metrics)
+        await played(model)
+
+        await model.stop()
+        await model.stop()
+
+        _ = await waitForRecords(metrics, 1)
+        try? await Task.sleep(for: .milliseconds(150))
+        #expect(await metrics.all().count == 1)
+    }
+
+    @Test
+    func `leaving before the first picture is recorded as that`() async {
+        let metrics = store()
+        let engine = ScriptedEngine()
+        engine.loadError = PlaybackError(code: .network)
+        let model = model(engine, metrics: metrics)
+        model.start()
+        try? await Task.sleep(for: .milliseconds(100))
+
+        await model.stop()
+
+        let records = await waitForRecords(metrics, 1)
+        #expect(records.first?.joinSeconds == nil)
+        #expect(records.first?.outcome != .watched)
+    }
+
+    @Test
+    func `with no store nothing is written`() async {
+        let model = model(ScriptedEngine(), metrics: nil)
+        await played(model)
+
+        await model.stop()
+        // Nothing to check but that it did not crash: there is nowhere for a record to go.
+        #expect(model.status == .idle)
+    }
+}
