@@ -57,8 +57,14 @@ struct HomeView: View {
     }
 
     private func play(_ channel: CatalogEntryRecord) {
-        userState.markPlayed(UserStateStore.key(playlist: channel.playlist, entry: channel.id))
-        playing = PlaybackTarget(entry: channel)
+        let key = UserStateStore.key(playlist: channel.playlist, entry: channel.id)
+        userState.markPlayed(key)
+        var target = PlaybackTarget(entry: channel)
+        // A film left part-way picks up there: Home is the quick way back in, so it does not ask.
+        if channel.kind != .live {
+            target.resumeAt = userState.resumePosition(for: key)
+        }
+        playing = target
     }
 
     private var noPlaylist: some View {
@@ -105,7 +111,10 @@ struct ChannelRail: View {
         self.keys = keys
         self.keepsOrder = keepsOrder
         self.onPlay = onPlay
-        _channels = Query(LiveChannelQuery.descriptor(restrictedTo: Array(Set(keys.map(UserStateStore.entryID(in:))))))
+        _channels = Query(LiveChannelQuery.descriptor(
+            restrictedTo: Array(Set(keys.map(UserStateStore.entryID(in:)))),
+            kind: nil
+        ))
     }
 
     /// The query matched on entry id alone, and an id can repeat across playlists, so the
@@ -238,7 +247,7 @@ struct ContinueBanner: View {
     init(key: String, onPlay: @escaping (CatalogEntryRecord) -> Void) {
         self.key = key
         self.onPlay = onPlay
-        _channels = Query(LiveChannelQuery.descriptor(restrictedTo: [UserStateStore.entryID(in: key)]))
+        _channels = Query(LiveChannelQuery.descriptor(restrictedTo: [UserStateStore.entryID(in: key)], kind: nil))
     }
 
     /// The query matched on entry id alone, so the playlist is checked here.

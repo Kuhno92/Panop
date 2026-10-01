@@ -19,6 +19,19 @@ final class UserStateStore {
     /// Keys of the channels played most recently, newest first, at most `recentLimit`.
     private(set) var recents: [String] = []
 
+    /// How far into a film or episode someone got, for the ones left unfinished.
+    struct Progress: Equatable {
+        var position: Double
+        var duration: Double
+
+        /// 0 to 1, or nil when the length is not known.
+        var fraction: Double? {
+            duration > 0 ? min(position / duration, 1) : nil
+        }
+    }
+
+    private(set) var progress: [String: Progress] = [:]
+
     static let recentLimit = 50
     /// Played-but-not-favourite rows kept on disk, so recents can reach back past what shows.
     /// Beyond it the oldest go.
@@ -62,6 +75,36 @@ final class UserStateStore {
         commit()
     }
 
+    /// Where to resume `key`, or nil to start from the beginning.
+    func resumePosition(for key: String) -> Double? {
+        progress[key]?.position
+    }
+
+    /// Records how far someone has watched. Called now and then during playback and once more
+    /// when it stops.
+    ///
+    /// Not worth keeping: the first moments (nobody resumes ten seconds in), and the last of
+    /// the film (the credits). Reaching them clears the point, so the next play starts over.
+    func saveProgress(_ key: String, position: Double, duration: Double?, at date: Date = .now) {
+        let length = duration ?? 0
+        let finished = length > 0 &&
+            (position >= length * Self.finishedFraction || length - position < Self.finishedTail)
+        let worthKeeping = position >= Self.minimumToKeep && !finished
+        guard let row = state(for: key) ?? (worthKeeping ? insert(key) : nil) else { return }
+        row.positionSeconds = worthKeeping ? position : 0
+        row.durationSeconds = worthKeeping ? length : 0
+        row.updatedAt = date
+        removeIfEmpty(row)
+        commit()
+    }
+
+    /// Past this share of the way through, it counts as watched.
+    static let finishedFraction = 0.95
+    /// Or with less than this many seconds left.
+    static let finishedTail = 30.0
+    /// Before this many seconds in there is nothing to come back to.
+    static let minimumToKeep = 10.0
+
     /// Drops everything about a playlist that has been deleted.
     func forget(playlist: String) {
         let prefix = Self.key(playlist: playlist, entry: "")
@@ -75,6 +118,12 @@ final class UserStateStore {
     func reload() {
         let rows = (try? context.fetch(FetchDescriptor<UserContentState>())) ?? []
         favorites = Set(rows.filter(\.isFavorite).map(\.streamID))
+        progress = Dictionary(
+            rows.filter { $0.positionSeconds > 0 }.map {
+                ($0.streamID, Progress(position: $0.positionSeconds, duration: $0.durationSeconds))
+            },
+            uniquingKeysWith: { first, _ in first }
+        )
         recents = rows
             .filter { $0.lastPlayedAt > .distantPast }
             .sorted { $0.lastPlayedAt > $1.lastPlayedAt }

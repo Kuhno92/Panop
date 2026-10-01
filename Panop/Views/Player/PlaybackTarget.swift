@@ -17,6 +17,10 @@ nonisolated struct PlaybackTarget: Identifiable, Equatable, Sendable {
     /// The provider's own id, for building an Xtream URL.
     var remoteID: String?
     var containerExtension: String?
+    /// Where to start, in seconds, for a film or episode someone left part-way. Passed at load
+    /// time, not applied by seeking afterwards: seeking a running connection makes some
+    /// providers drop it.
+    var resumeAt: Double?
 
     var id: String {
         "\(playlist)|\(entryID)"
@@ -55,7 +59,12 @@ nonisolated enum PlaybackRequestBuilder {
                 throw PlaybackTargetError
                     .notPlayable("This item's address is incomplete. Refresh the playlist and try again.")
             }
-            let item = PlaybackItem(url: url, title: target.name, mediaKind: target.kind)
+            let item = PlaybackItem(
+                url: url,
+                title: target.name,
+                startPosition: target.kind == .live ? nil : target.resumeAt,
+                mediaKind: target.kind
+            )
             return PlaybackRequest(mediaKind: target.kind) { _ in item }
         }
 
@@ -86,10 +95,12 @@ nonisolated enum PlaybackRequestBuilder {
             }
         case .movie:
             let ext = target.containerExtension
+            let resume = target.resumeAt
             return PlaybackRequest(mediaKind: .movie) { _ in
                 PlaybackItem(
                     url: client.movieURL(streamID: remote, containerExtension: ext)?.absoluteString ?? "",
                     title: target.name,
+                    startPosition: resume,
                     mediaKind: .movie
                 )
             }

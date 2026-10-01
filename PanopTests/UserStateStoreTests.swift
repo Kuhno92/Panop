@@ -158,3 +158,99 @@ struct UserStateStoreTests {
         #expect(UserStateStore.entryID(in: "bare") == "bare")
     }
 }
+
+@Suite("Resume points")
+@MainActor
+struct ResumePointTests {
+    private func makeStore() throws -> UserStateStore {
+        try UserStateStore(context: ModelContext(PanopContainers.makeCloud(inMemory: true)))
+    }
+
+    private let film = UserStateStore.key(playlist: "p", entry: "film")
+
+    @Test
+    func `how far someone got is remembered`() throws {
+        let store = try makeStore()
+
+        store.saveProgress(film, position: 1834, duration: 7200)
+
+        #expect(store.resumePosition(for: film) == 1834)
+        #expect(store.progress[film]?.fraction.map { abs($0 - 0.2547) < 0.001 } == true)
+    }
+
+    @Test
+    func `it survives a new launch`() throws {
+        let container = try PanopContainers.makeCloud(inMemory: true)
+        UserStateStore(context: ModelContext(container)).saveProgress(film, position: 600, duration: 3600)
+
+        let later = UserStateStore(context: ModelContext(container))
+
+        #expect(later.resumePosition(for: film) == 600)
+    }
+
+    @Test
+    func `the first moments are not worth coming back to`() throws {
+        let store = try makeStore()
+
+        store.saveProgress(film, position: 6, duration: 7200)
+
+        #expect(store.resumePosition(for: film) == nil)
+        #expect(store.progress.isEmpty)
+    }
+
+    @Test(arguments: [(6900.0, 7200.0), (7190.0, 7200.0), (7200.0, 7200.0)])
+    func `reaching the end clears the point, so the next play starts over`(position: Double, duration: Double) throws {
+        let store = try makeStore()
+        store.saveProgress(film, position: 1000, duration: duration)
+        #expect(store.resumePosition(for: film) == 1000)
+
+        store.saveProgress(film, position: position, duration: duration)
+
+        #expect(store.resumePosition(for: film) == nil)
+    }
+
+    @Test
+    func `a later save replaces an earlier one`() throws {
+        let store = try makeStore()
+        store.saveProgress(film, position: 100, duration: 7200)
+
+        store.saveProgress(film, position: 2500, duration: 7200)
+
+        #expect(store.resumePosition(for: film) == 2500)
+    }
+
+    @Test
+    func `with no known length it keeps the position and never calls it finished`() throws {
+        let store = try makeStore()
+
+        store.saveProgress(film, position: 5000, duration: nil)
+
+        #expect(store.resumePosition(for: film) == 5000)
+        #expect(store.progress[film]?.fraction == nil)
+    }
+
+    @Test
+    func `a point that is cleared leaves no row behind, unless it was starred or watched`() throws {
+        let container = try PanopContainers.makeCloud(inMemory: true)
+        let store = UserStateStore(context: ModelContext(container))
+        store.saveProgress(film, position: 1000, duration: 7200)
+        store.saveProgress(film, position: 7199, duration: 7200)
+        #expect(try ModelContext(container).fetchCount(FetchDescriptor<UserContentState>()) == 0)
+
+        store.markPlayed(film)
+        store.saveProgress(film, position: 1000, duration: 7200)
+        store.saveProgress(film, position: 7199, duration: 7200)
+        #expect(store.recents == [film], "history stays when the point goes")
+    }
+
+    @Test
+    func `a deleted playlist takes its resume points with it`() throws {
+        let store = try makeStore()
+        store.saveProgress(UserStateStore.key(playlist: "gone", entry: "a"), position: 500, duration: 7200)
+        store.saveProgress(UserStateStore.key(playlist: "kept", entry: "a"), position: 500, duration: 7200)
+
+        store.forget(playlist: "gone")
+
+        #expect(store.progress.keys.sorted() == [UserStateStore.key(playlist: "kept", entry: "a")])
+    }
+}

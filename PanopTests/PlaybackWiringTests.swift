@@ -358,4 +358,30 @@ struct PlaybackAddressValidationTests {
             transport: StubTransport { _ in (404, "") }
         )
     }
+
+    @Test
+    func `a film resumes where it was left, and a channel never does`() throws {
+        let movie = PlaybackTarget(
+            playlist: "p", entryID: "m", kind: .movie, name: "Film",
+            streamURL: "http://host/movie/1.mp4", resumeAt: 1234
+        )
+        let channel = PlaybackTarget(
+            playlist: "p", entryID: "c", kind: .live, name: "Chan",
+            streamURL: "http://host/live/1.ts", resumeAt: 99
+        )
+
+        let film = try PlaybackRequestBuilder.request(
+            for: movie,
+            source: nil,
+            transport: StubTransport { _ in (404, "") }
+        )
+        let live = try PlaybackRequestBuilder.request(
+            for: channel,
+            source: nil,
+            transport: StubTransport { _ in (404, "") }
+        )
+
+        #expect(film.item(.avPlayer).startPosition == 1234)
+        #expect(live.item(.avPlayer).startPosition == nil, "a live channel has nothing to resume")
+    }
 }

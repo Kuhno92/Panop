@@ -17,6 +17,9 @@ final class UserContentState {
     var isFavorite: Bool = false
     /// Resume position in seconds.
     var positionSeconds: Double = 0
+    /// How long the stream is, as last seen, so progress can be shown and "finished" decided.
+    /// Zero when unknown.
+    var durationSeconds: Double = 0
     var updatedAt: Date = Date.distantPast
     /// When it was last opened, or `distantPast` if never. Defaulted, so a store made before
     /// this existed still opens.
@@ -26,12 +29,14 @@ final class UserContentState {
         streamID: String = "",
         isFavorite: Bool = false,
         positionSeconds: Double = 0,
+        durationSeconds: Double = 0,
         updatedAt: Date = .now,
         lastPlayedAt: Date = .distantPast
     ) {
         self.streamID = streamID
         self.isFavorite = isFavorite
         self.positionSeconds = positionSeconds
+        self.durationSeconds = durationSeconds
         self.updatedAt = updatedAt
         self.lastPlayedAt = lastPlayedAt
     }

@@ -174,7 +174,18 @@ The first milestone where Panop is usable.
       default string sort is localised and no index can serve it. Measured on 107k channels
       across two sources: first page 0.01 s, grown to the cap 0.12 s, search 0.03 s. The two
       browse indexes cost about 5 to 8% on import.
-- [ ] **Movies and Series** browsing, including episode lists *(asked for, VOD)*
+- [x] **Movies and Series** browsing, including episode lists *(asked for, VOD)*. Two tabs share
+      one poster grid (`VODBrowseView`): searchable, paged like the channel list through the same
+      bounded indexed fetch, posters through the image pipeline, a star and a progress bar on a
+      card, the same long-press menu to star. A film plays on tap. A **provider series** is a
+      shell, so opening it fetches its episodes then (`SeriesDetailView`: seasons in order with
+      specials last, each episode with its length and how far through you are). An **M3U
+      "series" entry** is already one episode with its own address, so it plays at once.
+      Season grouping is in the portable package, tested on a real panel-shaped response. Looked
+      at on iOS and Apple TV; UI tests cover the grid, resume and series on iOS, and the grids on
+      tvOS. **Not verified:** the episode list against a real provider panel (no panel to
+      test with), and M3U episodes are not grouped into series yet (the open item in M1).
+      **Not done:** a detail page for a film (plot, cast, rating), and groups or categories.
 - [ ] **Search** across the catalog. Needs SQLite FTS or bounded predicates with a fetch limit;
       an unbounded sort defeats the limit entirely.
 - [x] **Engine coordinator** *(surfaced)*: owns the ordered fallback list, reconnect and
@@ -231,8 +242,15 @@ The first milestone where Panop is usable.
       `PlayerSnapshot` (`TEST_RUNNER_PANOP_SNAPSHOT=1`, writes `/tmp/panop-player-*.png`) but
       **not on iOS or tvOS**, where tvOS shows a progress bar rather than a slider, since it has
       none. Subtitle menus list tracks, but no engine draws the text yet.
-- [ ] **Resume playback** from a stored position. Pass it at load time; seeking an in-flight
-      IPTV connection makes some providers drop the stream.
+- [x] **Resume playback** from a stored position. Passed at load time (`PlaybackItem.startPosition`),
+      never by seeking a running connection, which some providers cannot survive. The player
+      reports progress every fifteen seconds and once more when it stops; nothing under ten
+      seconds in is kept, and reaching the last 5% or last 30 seconds clears the point so the next
+      play starts over. A film left part-way asks "Resume from 32:10" or "Start over" in the
+      grids; Home's banner and cards resume without asking. Live channels never resume. Held
+      in the cloud container with the favourites. 8 store tests, 4 for the throttling, and UI
+      tests for resume and start over. **Not done:** a "Continue watching" rail ordered by
+      progress, and a mark for watched films.
 
 ---
 
@@ -348,7 +366,7 @@ The brief called performance a key concept. For IPTV this concentrates in one nu
       and tvOS. **Not done:** the same for movies and series, which have no screen yet.
 - [x] **UI test target** *(surfaced)*: `PanopUITests`, run with `Scripts/test-ui.sh [ios|tvos]`.
       iOS is driven by taps and tvOS by the real remote (`XCUIRemote`), against a deterministic
-      app (`-panop-uitest`, Debug only). The suite (11 tests on iOS, 8 on tvOS) covers: the seeded channels,
+      app (`-panop-uitest`, Debug only). The suite (16 tests on iOS, 10 on tvOS) covers: the seeded channels,
       search, opening a channel, the controls and LIVE badge, pause and play, close, the controls
       hiding and a tap bringing them back, and on tvOS the controls **staying up while the
       remote has focus on them** and Menu closing the player. **Found three real bugs:** a row
@@ -368,7 +386,7 @@ The brief called performance a key concept. For IPTV this concentrates in one nu
 - [ ] **Favourites** across devices. They exist on one device now (see M4, *Favourites and
       recently watched*) and live in the cloud container, so turning CloudKit on is what carries
       them across: no change to the model should be needed beyond the entitlement.
-- [ ] **Watch progress and resume points** across devices
+- [ ] **Watch progress and resume points** across devices. They exist on one device now (see M2, *Resume playback*), in the cloud container, so CloudKit carries them once it is on.
 - [ ] **App settings**, including the selected playback engine
 - [ ] **Encrypted provider credentials** via `@Attribute(.allowsCloudEncryption)`
 - [ ] **Reconcile guard**: never let an empty local catalog push mass deletions to CloudKit.

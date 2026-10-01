@@ -28,6 +28,8 @@ enum UITestMode {
             switch ProcessInfo.processInfo.environment["PANOP_START_TAB"] {
             case "home": return .home
             case "live": return .live
+            case "movies": return .movies
+            case "series": return .series
             case "settings": return .settings
             default: return nil
             }
@@ -59,10 +61,20 @@ enum UITestMode {
         static let channelNames = ["Das Erste", "ZDF", "3sat", "Arte", "Phoenix", "Tagesschau 24"]
             + (7 ... 30).map { "Channel \($0)" }
 
+        /// Films and series for the Movies and Series screens. The address path is what marks them.
+        static let movieNames = ["Alien", "Blade Runner", "Casablanca", "Dune", "Eraser", "Fargo"]
+        static let seriesNames = ["Dark S01E01", "Dark S01E02", "Severance S01E01"]
+
         static func seed(_ services: AppServices) async {
-            let lines = channelNames.enumerated().map { index, name in
+            var lines = channelNames.enumerated().map { index, name in
                 "#EXTINF:-1 tvg-id=\"c\(index)\" group-title=\"\(index < 6 ? "Germany" : "Other")\",\(name)\n" +
                     "http://127.0.0.1:9/live/\(index).ts"
+            }
+            lines += movieNames.enumerated().map { index, name in
+                "#EXTINF:5400 tvg-id=\"m\(index)\" group-title=\"Films\",\(name)\nhttp://127.0.0.1:9/movie/u/p/\(index).mp4"
+            }
+            lines += seriesNames.enumerated().map { index, name in
+                "#EXTINF:2700 tvg-id=\"s\(index)\" group-title=\"Shows\",\(name)\nhttp://127.0.0.1:9/series/u/p/\(index).mkv"
             }
             let text = "#EXTM3U\n" + lines.joined(separator: "\n") + "\n"
             let file = FileManager.default.temporaryDirectory.appendingPathComponent("uitest-\(UUID().uuidString).m3u")
@@ -101,6 +113,8 @@ enum UITestMode {
 
         func load(_ item: PlaybackItem) async throws {
             duration = item.mediaKind == .live ? nil : 5400
+            // Where it was asked to start, so a resume can be seen to have worked.
+            position = item.startPosition ?? 0
             state = .opening
         }
 

@@ -38,6 +38,10 @@ final class PlayerModel {
     /// How long the controls stay up once playing with nothing touched.
     private let controlsTimeout: Duration
     private let nowPlaying: (any NowPlayingPublishing)?
+    /// Told how far a film or episode has got, now and then and when it stops. Not called for
+    /// a live channel, which has nowhere to resume.
+    private let onProgress: ((_ position: Double, _ duration: Double?) -> Void)?
+    private var lastReportedProgress: Double
 
     init(
         title: String,
@@ -45,12 +49,17 @@ final class PlayerModel {
         preferred: PlaybackEngineKind?,
         controlsTimeout: Duration = .seconds(4),
         nowPlaying: (any NowPlayingPublishing)? = nil,
+        startPosition: Double = 0,
+        onProgress: ((_ position: Double, _ duration: Double?) -> Void)? = nil,
         makeEngine: @escaping PlaybackCoordinator.EngineFactory = { EngineRegistry.make($0) }
     ) {
         self.title = title
         self.request = request
         self.controlsTimeout = controlsTimeout
         self.nowPlaying = nowPlaying
+        self.onProgress = onProgress
+        lastReportedProgress = startPosition
+        position = startPosition
         coordinator = PlaybackCoordinator(
             priority: PlaybackEngineKind.order(preferred: preferred),
             makeEngine: makeEngine
@@ -223,7 +232,21 @@ final class PlayerModel {
         return duration.map { min(lower, $0) } ?? lower
     }
 
+    /// How often progress is handed on while playing. A write per position tick would be a write
+    /// a second for the length of a film.
+    static let progressInterval = 15.0
+
+    private func reportProgressIfDue(at seconds: Double) {
+        guard duration != nil, abs(seconds - lastReportedProgress) >= Self.progressInterval else { return }
+        lastReportedProgress = seconds
+        onProgress?(seconds, duration)
+    }
+
     func stop() async {
+        // Where it was left, so the next play can pick up there. Only once something has played.
+        if duration != nil, position > 0 {
+            onProgress?(position, duration)
+        }
         listener?.cancel()
         listener = nil
         hideTask?.cancel()
@@ -265,6 +288,7 @@ final class PlayerModel {
             position = seconds
             let known = duration
             duration = coordinator.activeEngine?.duration
+            reportProgressIfDue(at: seconds)
             if duration != known {
                 publishNowPlaying()
             }

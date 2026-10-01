@@ -1,7 +1,7 @@
 import SwiftUI
 
 enum AppTab: Hashable {
-    case home, live, settings
+    case home, live, movies, series, settings
 }
 
 struct RootView: View {
@@ -18,6 +18,16 @@ struct RootView: View {
             Tab("Live TV", systemImage: "tv", value: AppTab.live) {
                 NavigationStack {
                     LiveTVView()
+                }
+            }
+            Tab("Movies", systemImage: "film", value: AppTab.movies) {
+                NavigationStack {
+                    VODBrowseView(kind: .movie)
+                }
+            }
+            Tab("Series", systemImage: "rectangle.stack", value: AppTab.series) {
+                NavigationStack {
+                    VODBrowseView(kind: .series)
                 }
             }
             Tab("Settings", systemImage: "gearshape", value: AppTab.settings) {

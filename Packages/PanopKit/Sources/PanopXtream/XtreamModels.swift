@@ -412,3 +412,39 @@ public struct XtreamAccount: Sendable, Equatable {
         self.allowedFormats = allowedFormats
     }
 }
+
+/// One season's episodes, in order.
+public struct XtreamSeason: Sendable, Equatable, Identifiable {
+    public var number: Int
+    public var episodes: [XtreamEpisode]
+
+    public var id: Int {
+        number
+    }
+
+    /// Season 0 is how providers file specials and extras.
+    public var title: String {
+        number == 0 ? "Specials" : "Season \(number)"
+    }
+
+    public init(number: Int, episodes: [XtreamEpisode]) {
+        self.number = number
+        self.episodes = episodes
+    }
+}
+
+public extension XtreamSeriesInfo {
+    /// The episodes grouped by season, in season order with specials last: someone choosing a
+    /// season is looking for season one, not for the extras.
+    var seasons: [XtreamSeason] {
+        let grouped = Dictionary(grouping: episodes, by: \.seasonNumber)
+        return grouped
+            .map { XtreamSeason(number: $0.key, episodes: $0.value.sorted { $0.episodeNumber < $1.episodeNumber }) }
+            .sorted { lhs, rhs in
+                if (lhs.number == 0) != (rhs.number == 0) {
+                    return rhs.number == 0
+                }
+                return lhs.number < rhs.number
+            }
+    }
+}

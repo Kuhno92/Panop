@@ -19,8 +19,15 @@ enum LiveChannelQuery {
     /// - Parameters:
     ///   - source: one playlist's id, or nil for every playlist.
     ///   - search: matched against the folded name, so case and accents are ignored.
-    static func descriptor(source: String?, search: String, limit: Int) -> FetchDescriptor<CatalogEntryRecord> {
-        let live = MediaKind.live.rawValue
+    ///   - kind: live channels by default; the Movies and Series screens ask for theirs, through
+    ///     the same bounded, indexed fetch.
+    static func descriptor(
+        kind: MediaKind = .live,
+        source: String?,
+        search: String,
+        limit: Int
+    ) -> FetchDescriptor<CatalogEntryRecord> {
+        let live = kind.rawValue
         let term = CatalogEntryRecord.nameKey(for: search.trimmingCharacters(in: .whitespacesAndNewlines))
         // `.lexical` on a folded key is binary order, which an index can serve.
         // The id breaks ties so equal names keep a stable order between fetches.
@@ -58,16 +65,28 @@ enum LiveChannelQuery {
     /// go into the catalog query. They are few (a person's favourites, at most fifty recents),
     /// which is why this is fine where it would not be for the whole catalog. An id can repeat
     /// across playlists, so the caller still checks the playlist.
-    static func descriptor(restrictedTo entryIDs: [String]) -> FetchDescriptor<CatalogEntryRecord> {
-        let live = MediaKind.live.rawValue
+    ///
+    /// - Parameter kind: live channels by default, since that is what the channel list wants;
+    ///   nil for any kind, which is what Home wants, where a film can sit beside a channel.
+    static func descriptor(
+        restrictedTo entryIDs: [String],
+        kind: MediaKind? = .live
+    ) -> FetchDescriptor<CatalogEntryRecord> {
         let wanted = entryIDs
-        var descriptor = FetchDescriptor<CatalogEntryRecord>(
-            predicate: #Predicate { wanted.contains($0.id) && $0.kindRaw == live },
-            sortBy: [
-                SortDescriptor(\CatalogEntryRecord.nameKey, comparator: .lexical),
-                SortDescriptor(\CatalogEntryRecord.id, comparator: .lexical)
-            ]
-        )
+        let sort = [
+            SortDescriptor(\CatalogEntryRecord.nameKey, comparator: .lexical),
+            SortDescriptor(\CatalogEntryRecord.id, comparator: .lexical)
+        ]
+        var descriptor: FetchDescriptor<CatalogEntryRecord>
+        if let kind {
+            let raw = kind.rawValue
+            descriptor = FetchDescriptor(
+                predicate: #Predicate { wanted.contains($0.id) && $0.kindRaw == raw },
+                sortBy: sort
+            )
+        } else {
+            descriptor = FetchDescriptor(predicate: #Predicate { wanted.contains($0.id) }, sortBy: sort)
+        }
         descriptor.fetchLimit = maxRows
         return descriptor
     }

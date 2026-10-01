@@ -8,6 +8,7 @@ struct PlayerScreen: View {
     let target: PlaybackTarget
 
     @Environment(PlaylistLibrary.self) private var library
+    @Environment(UserStateStore.self) private var userState
     @AppStorage("playbackEngine") private var engineRaw = PlaybackEngineKind.avPlayer.rawValue
 
     @State private var model: PlayerModel?
@@ -41,7 +42,11 @@ struct PlayerScreen: View {
                 request: request,
                 preferred: PlaybackEngineKind(rawValue: engineRaw),
                 controlsTimeout: UITestMode.controlsTimeout ?? .seconds(4),
-                nowPlaying: SystemNowPlaying()
+                nowPlaying: SystemNowPlaying(),
+                startPosition: target.resumeAt ?? 0,
+                onProgress: target.kind == .live ? nil : { [userState, key = target.id] position, duration in
+                    userState.saveProgress(key, position: position, duration: duration)
+                }
             )
         } catch let error as PlaybackTargetError {
             problem = error.message
