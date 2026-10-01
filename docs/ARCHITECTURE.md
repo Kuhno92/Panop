@@ -232,6 +232,20 @@ The practical rule: check a dependency's license before adding it, and record it
 
 ---
 
+### App configuration that is easy to lose
+
+Two settings live in `Config/Panop-Info.plist`, merged into the generated Info.plist, and
+`AppConfigurationTests` checks both in the built app:
+
+- **App Transport Security is relaxed** (`NSAllowsArbitraryLoads`). IPTV providers overwhelmingly
+  serve playlists, Xtream APIs and streams over plain `http` on hostnames the user types in, and
+  ATS refuses all of it by default (error -1022, on iOS, tvOS and macOS alike). This is a
+  deliberate exception the App Store review will ask to have justified; "media from
+  user-supplied IPTV providers" is the justification. Do not narrow it to media only: the
+  playlist and Xtream requests are not media loads.
+- **Background audio** (`UIBackgroundModes` = `audio`). The build setting
+  `INFOPLIST_KEY_UIBackgroundModes` produced nothing in the built app, so it had to move here.
+
 ## 9. Repository layout
 
 ```

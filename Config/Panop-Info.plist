@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- IPTV providers overwhelmingly serve playlists, Xtream APIs and streams over plain
+	     http, on hostnames the user types in and the app cannot know in advance. ATS blocks
+	     all of that by default (error -1022), so the app cannot work without this. It is a
+	     deliberate exception, to be justified in App Store review; see docs/ARCHITECTURE.md. -->
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+	</dict>
+	<!-- Lets playback continue when the app is not in front, and lets the system's media
+	     controls and Picture in Picture work. The build setting INFOPLIST_KEY_UIBackgroundModes
+	     does not produce this: it was set to "audio" for a long time and the built app had no
+	     such key. It has to be an array, so it lives here. -->
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>audio</string>
+	</array>
+</dict>
+</plist>

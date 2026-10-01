@@ -289,7 +289,10 @@ The brief called performance a key concept. For IPTV this concentrates in one nu
       engine because it hangs off `PlayerModel`. Tested through a recording stand-in and against
       the real `MPNowPlayingInfoCenter` on macOS, iOS and tvOS. **Not verified:** a real remote,
       the lock screen, or AirPods taps, which need a device.
-- [ ] **Background audio**. `UIBackgroundModes` is already set.
+- [ ] **Background audio**. `UIBackgroundModes` was *not* in fact set: the build setting for it
+      produced nothing. It is now declared in `Config/Panop-Info.plist` and checked by a test, and
+      the audio session is set to playback when a player starts. **Not verified:** that audio
+      really continues with the app in the background, which needs a device.
 
 ---
 
