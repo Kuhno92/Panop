@@ -28,6 +28,8 @@ final class PlayerModel {
     private(set) var selectedAudioID: String?
     private(set) var selectedSubtitleID: String?
     private(set) var controlsVisible = true
+    /// Set while something in the controls has focus. The controls do not hide under it.
+    private(set) var controlsHeld = false
 
     private let coordinator: PlaybackCoordinator
     private let request: PlaybackRequest
@@ -194,10 +196,25 @@ final class PlayerModel {
     func showControls() {
         controlsVisible = true
         hideTask?.cancel()
+        guard !controlsHeld else { return }
         hideTask = Task { [weak self, controlsTimeout] in
             try? await Task.sleep(for: controlsTimeout)
             guard !Task.isCancelled else { return }
             self?.controlsVisible = false
+        }
+    }
+
+    /// Keeps the controls up while a person is working them, then starts the countdown
+    /// from the moment they let go. On Apple TV the remote moves focus between controls,
+    /// and a bar that vanished under it would take the focus with it.
+    func holdControls(_ held: Bool) {
+        guard held != controlsHeld else { return }
+        controlsHeld = held
+        if held {
+            hideTask?.cancel()
+            controlsVisible = true
+        } else {
+            showControls()
         }
     }
 

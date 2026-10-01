@@ -23,20 +23,40 @@ struct LiveTVView: View {
         library.playlists.count > 1
     }
 
+    /// The sources on screen: the chosen one, or all of them.
+    private var shownSources: [LiveEmptyState.Source] {
+        let playlists = selectedSource.map { [$0] } ?? library.playlists
+        return playlists.map { LiveEmptyState.Source(id: $0.id, name: $0.name, status: status.status(for: $0.id)) }
+    }
+
+    private var isSearching: Bool {
+        !search.trimmingCharacters(in: .whitespaces).isEmpty
+    }
+
     var body: some View {
         LiveChannelList(
             descriptor: LiveChannelQuery.descriptor(source: selectedSource?.id, search: search, limit: limit),
             sourceNames: Dictionary(uniqueKeysWithValues: library.playlists.map { ($0.id, $0.name) }),
             showsSource: hasSeveralSources && selectedSource == nil,
-            isSearching: !search.trimmingCharacters(in: .whitespaces).isEmpty,
-            hasPlaylists: !library.playlists.isEmpty,
-            isSyncing: status.isAnySyncing,
+            emptyState: LiveEmptyState.resolve(
+                isSearching: isSearching,
+                sources: shownSources,
+                hasPlaylists: !library.playlists.isEmpty
+            ),
+            problems: LiveEmptyState.problems(in: shownSources),
             limit: $limit,
             onPlay: { playing = PlaybackTarget(entry: $0) },
-            onAdd: { showingAdd = true }
+            onAdd: { showingAdd = true },
+            onRetry: { ids in
+                Task {
+                    for id in ids {
+                        await library.refresh(id)
+                    }
+                }
+            }
         )
         .navigationTitle(selectedSource?.name ?? "Live TV")
-        .searchable(text: $search, prompt: "Search channels")
+        .modifier(ChannelSearch(text: $search, isOffered: !library.playlists.isEmpty))
         .toolbar {
             if hasSeveralSources {
                 ToolbarItem { sourceMenu }
@@ -73,37 +93,42 @@ private struct LiveChannelList: View {
 
     let sourceNames: [String: String]
     let showsSource: Bool
-    let isSearching: Bool
-    let hasPlaylists: Bool
-    let isSyncing: Bool
+    let emptyState: LiveEmptyState
+    let problems: [LiveEmptyState.Problem]
     @Binding var limit: Int
     let onPlay: (CatalogEntryRecord) -> Void
     let onAdd: () -> Void
+    let onRetry: ([String]) -> Void
 
     init(
         descriptor: FetchDescriptor<CatalogEntryRecord>,
         sourceNames: [String: String],
         showsSource: Bool,
-        isSearching: Bool,
-        hasPlaylists: Bool,
-        isSyncing: Bool,
+        emptyState: LiveEmptyState,
+        problems: [LiveEmptyState.Problem],
         limit: Binding<Int>,
         onPlay: @escaping (CatalogEntryRecord) -> Void,
-        onAdd: @escaping () -> Void
+        onAdd: @escaping () -> Void,
+        onRetry: @escaping ([String]) -> Void
     ) {
         _channels = Query(descriptor)
         self.sourceNames = sourceNames
         self.showsSource = showsSource
-        self.isSearching = isSearching
-        self.hasPlaylists = hasPlaylists
-        self.isSyncing = isSyncing
+        self.emptyState = emptyState
+        self.problems = problems
         _limit = limit
         self.onPlay = onPlay
         self.onAdd = onAdd
+        self.onRetry = onRetry
     }
 
     var body: some View {
         List {
+            // Channels are showing, but a source behind them could not be updated: say so,
+            // and offer the retry, rather than let the list look current.
+            if !channels.isEmpty, !problems.isEmpty {
+                problemBanner
+            }
             ForEach(channels) { channel in
                 Button { onPlay(channel) } label: { row(channel) }
                     .buttonStyle(.plain)
@@ -115,7 +140,11 @@ private struct LiveChannelList: View {
                     .foregroundStyle(.secondary)
             }
         }
-        .overlay { emptyState }
+        .overlay {
+            if channels.isEmpty {
+                emptyContent
+            }
+        }
     }
 
     private func row(_ channel: CatalogEntryRecord) -> some View {
@@ -146,31 +175,58 @@ private struct LiveChannelList: View {
         }
     }
 
+    private var problemBanner: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Label(
+                problems.count == 1
+                    ? "\(problems[0].name) couldn't be updated"
+                    : "\(problems.count) sources couldn't be updated",
+                systemImage: "exclamationmark.triangle.fill"
+            )
+            .font(.subheadline.weight(.semibold))
+            .foregroundStyle(.orange)
+            if problems.count == 1 {
+                Text(problems[0].message).font(.footnote).foregroundStyle(.secondary)
+            }
+            Button("Try again") { onRetry(problems.map(\.id)) }
+        }
+        .padding(.vertical, 4)
+    }
+
     @ViewBuilder
-    private var emptyState: some View {
-        if channels.isEmpty {
-            if isSearching {
-                ContentUnavailableView.search
-            } else if isSyncing {
-                ContentUnavailableView {
-                    ProgressView()
-                } description: {
-                    Text("Getting your channels…")
-                }
-            } else if hasPlaylists {
-                ContentUnavailableView(
-                    "No channels",
-                    systemImage: "tv",
-                    description: Text("This source has no live channels yet.")
-                )
-            } else {
-                ContentUnavailableView {
-                    Label("No playlist yet", systemImage: "antenna.radiowaves.left.and.right")
-                } description: {
-                    Text("Add an M3U playlist or Xtream provider to get started.")
-                } actions: {
-                    Button("Add playlist", action: onAdd)
-                }
+    private var emptyContent: some View {
+        switch emptyState {
+        case .searchFoundNothing:
+            ContentUnavailableView.search
+        case .syncing:
+            ContentUnavailableView {
+                ProgressView()
+            } description: {
+                Text("Getting your channels…")
+            }
+        case let .failed(problems):
+            ContentUnavailableView {
+                Label("Couldn't load channels", systemImage: "exclamationmark.triangle")
+            } description: {
+                Text(problems.count == 1
+                    ? "\(problems[0].message)"
+                    : problems.map { "\($0.name): \($0.message)" }.joined(separator: "\n"))
+            } actions: {
+                Button("Try again") { onRetry(problems.map(\.id)) }
+            }
+        case .noLiveChannels:
+            ContentUnavailableView(
+                "No live channels",
+                systemImage: "tv",
+                description: Text("This source loaded, but has no live channels. It may only hold movies or series.")
+            )
+        case .noPlaylists:
+            ContentUnavailableView {
+                Label("No playlist yet", systemImage: "antenna.radiowaves.left.and.right")
+            } description: {
+                Text("Add an M3U playlist or Xtream provider to get started.")
+            } actions: {
+                Button("Add playlist", action: onAdd)
             }
         }
     }
@@ -205,5 +261,20 @@ private struct PlayerPresentation: ViewModifier {
                 PlayerScreen(target: target)
             }
         #endif
+    }
+}
+
+/// Search, once there is something to search. Before the first playlist it would only put a
+/// keyboard, half the screen on Apple TV, above a message about adding one.
+private struct ChannelSearch: ViewModifier {
+    @Binding var text: String
+    let isOffered: Bool
+
+    func body(content: Content) -> some View {
+        if isOffered {
+            content.searchable(text: $text, prompt: "Search channels")
+        } else {
+            content
+        }
     }
 }

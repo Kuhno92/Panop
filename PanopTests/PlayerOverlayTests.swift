@@ -153,6 +153,31 @@ struct PlayerOverlayTests {
         await model.stop()
     }
 
+    @Test
+    func `the controls do not hide while one has focus, and count down once it lets go`() async {
+        let engine = ScriptedEngine()
+        let model = await playing(engine, timeout: .milliseconds(60))
+        model.holdControls(true)
+
+        try? await Task.sleep(for: .milliseconds(250))
+        #expect(model.controlsVisible, "a held bar stays up well past the timeout")
+
+        model.holdControls(false)
+        #expect(await waitFor { !model.controlsVisible })
+        await model.stop()
+    }
+
+    @Test
+    func `holding the controls brings them back if they had gone`() async {
+        let model = await playing(ScriptedEngine(), timeout: .milliseconds(40))
+        #expect(await waitFor { !model.controlsVisible })
+
+        model.holdControls(true)
+
+        #expect(model.controlsVisible)
+        await model.stop()
+    }
+
     // MARK: - Clock text
 
     @Test(arguments: [

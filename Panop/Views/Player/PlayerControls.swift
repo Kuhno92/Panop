@@ -11,6 +11,13 @@ struct PlayerControls: View {
     /// seek once, on release, and not on every movement.
     @State private var scrubbing: Double?
 
+    /// Which control has focus, on Apple TV, so the bar can stay up while it is being used.
+    private enum Control: Hashable {
+        case play, back, forward, audio, subtitles
+    }
+
+    @FocusState private var focused: Control?
+
     private let skip = 10.0
 
     var body: some View {
@@ -22,6 +29,7 @@ struct PlayerControls: View {
                     .font(.title2)
                     .frame(width: 36)
             }
+            .trackFocus($focused, .play)
             .accessibilityLabel(model.isPaused ? "Play" : "Pause")
 
             if model.canSeek {
@@ -30,6 +38,7 @@ struct PlayerControls: View {
                 } label: {
                     Image(systemName: "gobackward.10").font(.title3)
                 }
+                .trackFocus($focused, .back)
                 .accessibilityLabel("Back 10 seconds")
 
                 timeline
@@ -39,6 +48,7 @@ struct PlayerControls: View {
                 } label: {
                     Image(systemName: "goforward.10").font(.title3)
                 }
+                .trackFocus($focused, .forward)
                 .accessibilityLabel("Forward 10 seconds")
             } else {
                 liveBadge
@@ -70,6 +80,8 @@ struct PlayerControls: View {
         .padding(.vertical, 14)
         .background(.black.opacity(0.55), in: RoundedRectangle(cornerRadius: 16))
         .padding()
+        // Focus anywhere in the bar holds it up; letting go starts the countdown again.
+        .onChange(of: focused) { model.holdControls(focused != nil) }
     }
 
     private var liveBadge: some View {
@@ -124,6 +136,7 @@ struct PlayerControls: View {
             } label: {
                 Image(systemName: "speaker.wave.2").font(.title3)
             }
+            .trackFocus($focused, .audio)
             .accessibilityLabel("Audio")
         }
         if !model.subtitleTracks.isEmpty {
@@ -143,6 +156,7 @@ struct PlayerControls: View {
             } label: {
                 Image(systemName: "captions.bubble").font(.title3)
             }
+            .trackFocus($focused, .subtitles)
             .accessibilityLabel("Subtitles")
         }
     }
@@ -154,5 +168,18 @@ struct PlayerControls: View {
         } else {
             Text(text)
         }
+    }
+}
+
+private extension View {
+    /// Reports focus to the controls on tvOS, where the remote drives it. Elsewhere a
+    /// pointer or touch does the work and there is nothing to track.
+    @ViewBuilder
+    func trackFocus<Value: Hashable>(_ focus: FocusState<Value?>.Binding, _ value: Value) -> some View {
+        #if os(tvOS)
+            focused(focus, equals: value)
+        #else
+            self
+        #endif
     }
 }

@@ -127,9 +127,13 @@ struct PlayerView: View {
         #if !os(tvOS)
             .onTapGesture { model.toggleControls() }
         #else
-            // The remote only moves focus, so any movement brings the controls up. Deferred
-            // out of the focus engine's animation context.
+            // The remote only moves focus, and a view that cannot take focus never hears it.
+            // So while the controls are hidden this surface can: any movement or a press of
+            // Select brings them up. While they are showing it must not, or it would take
+            // the focus from them. Deferred out of the focus engine's animation context.
+            .focusable(!model.showsControls)
             .onMoveCommand { _ in Task { model.showControls() } }
+            .onTapGesture { Task { model.toggleControls() } }
         #endif
     }
 

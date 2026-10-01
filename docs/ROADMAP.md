@@ -300,7 +300,13 @@ The brief called performance a key concept. For IPTV this concentrates in one nu
 
 - [ ] **Modern UI pass** *(asked for)*. Home with rails, hero, artwork.
 - [ ] **tvOS focus engine work** *(surfaced)*. Full-width focus targets, no `Color.accentColor`
-      for fills, layout mutations deferred out of the focus animation context.
+      for fills, layout mutations deferred out of the focus animation context. **Audited and
+      partly fixed:** no accent-colour fills anywhere; the remote-driven callbacks are deferred;
+      the player controls now stay up while one has focus and count down once it lets go; and
+      while they are hidden a focusable surface lets any direction press or Select bring them
+      back (before, nothing on screen could take focus, so the remote could not wake them).
+      First launch on the Apple TV simulator looks right. **Not verified:** driving the remote
+      through the player and the lists, which needs the synthetic-keystroke route below.
 - [ ] **macOS windowing**: a separate player window. New windows do not inherit the main
       scene's environment, so container and environment must be re-declared.
 - [x] **Image pipeline** *(surfaced)*, `Panop/Services/Images/`, shown as `ChannelLogo` in the
@@ -313,7 +319,13 @@ The brief called performance a key concept. For IPTV this concentrates in one nu
       and anything over 4 MB are refused and never cached. 17 tests with a scripted network.
       **Not measured:** scroll performance on a long list with real logos, and an Apple TV HD.
       **Not done:** logos for movies and series, and programme artwork.
-- [ ] **Empty, loading and error states** that explain what to do next.
+- [x] **Empty, loading and error states** that explain what to do next, for Live TV. The screen
+      now tells apart: no playlist yet, a search with no match, still loading, **a source that
+      failed (with the reason and a Try again button)**, and a source that loaded with no live
+      channels. A failed source used to read "no channels". With channels showing, a banner names
+      a source that could not be updated and offers the retry. Search is offered only once a
+      playlist exists. Decision logic tested separately (`LiveEmptyState`); looked at on macOS
+      and tvOS. **Not done:** the same for movies and series, which have no screen yet.
 - [ ] **UI test target** *(surfaced)*. The only reliable way to verify screens past launch on
       iOS. tvOS can be driven by synthetic keystrokes; iOS cannot be tapped from the CLI.
 
