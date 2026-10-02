@@ -86,7 +86,31 @@ enum UITestMode {
         static let movieNames = ["Alien", "Blade Runner", "Casablanca", "Dune", "Eraser", "Fargo"]
         static let seriesNames = ["Dark S01E01", "Dark S01E02", "Severance S01E01"]
 
+        /// A real provider to try the app against, from the environment `PANOP_DEV_XTREAM` as
+        /// `url|username|password`. Debug builds only, held in memory only, and never written to a
+        /// file: the login is the developer's own and stays out of the repository.
+        static func seedDevProvider(_ services: AppServices) async -> Bool {
+            let parts = (ProcessInfo.processInfo.environment["PANOP_DEV_XTREAM"] ?? "").split(separator: "|")
+                .map(String.init)
+            guard parts.count == 3 else { return false }
+            do {
+                _ = try await services.library.add(.xtream(
+                    name: "Dev",
+                    baseURL: parts[0],
+                    username: parts[1],
+                    password: parts[2]
+                ))
+                return true
+            } catch {
+                assertionFailure("dev provider seed failed: \(error)")
+                return false
+            }
+        }
+
         static func seed(_ services: AppServices) async {
+            if await seedDevProvider(services) {
+                return
+            }
             var lines = channelNames.enumerated().map { index, name in
                 "#EXTINF:-1 tvg-id=\"c\(index)\" group-title=\"\(index < 6 ? "Germany" : "Other")\",\(name)\n" +
                     "http://127.0.0.1:9/live/\(index).ts"

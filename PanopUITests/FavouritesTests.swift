@@ -37,8 +37,9 @@ final class FavouritesTests: PanopUITestCase {
             XCUIRemote.shared.press(.right)
             XCUIRemote.shared.press(.select)
 
-            XCTAssertTrue(channel("Arte").waitForNonExistence(timeout: 10), "an unstarred channel is in Favourites")
-            XCTAssertTrue(channel("3sat").exists)
+            // The first channel in the provider's order is the one that was starred.
+            XCTAssertTrue(channel("ZDF").waitForNonExistence(timeout: 10), "an unstarred channel is in Favourites")
+            XCTAssertTrue(channel("Das Erste").exists)
         }
     #else
         func testStarringAChannelShowsItInFavourites() {

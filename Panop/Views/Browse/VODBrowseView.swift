@@ -16,7 +16,6 @@ struct VODBrowseView: View {
 
     @State private var search = ""
     @State private var group: String?
-    @State private var limit = LiveChannelQuery.pageSize
     @State private var playing: PlaybackTarget?
     @State private var resume: ResumeChoice?
     @State private var openSeries: SeriesReference?
@@ -33,25 +32,16 @@ struct VODBrowseView: View {
 
     var body: some View {
         VODGrid(
-            descriptor: LiveChannelQuery.descriptor(
-                kind: kind,
-                source: nil,
-                search: search,
-                limit: limit,
-                group: group
-            ),
+            spec: ListSpec(kind: kind, search: search, group: group),
             kind: kind,
             isSearching: isSearching,
             hasPlaylists: !library.playlists.isEmpty,
             isSyncing: status.isAnySyncing,
-            limit: $limit,
             onSelect: select,
             onAdd: { showingAdd = true }
         )
         .navigationTitle(title)
         .modifier(VODSearch(text: $search, isOffered: !library.playlists.isEmpty))
-        .onChange(of: search) { limit = LiveChannelQuery.pageSize }
-        .onChange(of: group) { limit = LiveChannelQuery.pageSize }
         .toolbar {
             if !library.playlists.isEmpty {
                 ToolbarItem { CategoryButton(kind: kind, source: nil, group: $group) }
@@ -66,13 +56,13 @@ struct VODBrowseView: View {
         .modifier(PlayerPresentation(target: $playing))
     }
 
-    private func select(_ item: CatalogEntryRecord) {
+    private func select(_ item: CatalogRow) {
         // A series from a provider panel is a shell: its episodes are fetched when it is opened.
         // An M3U "series" entry is already one episode, with its own address, so it plays.
         if kind == .series, (item.streamURL ?? "").isEmpty {
             openSeries = SeriesReference(
                 playlist: item.playlist,
-                entryID: item.id,
+                entryID: item.entryID,
                 remoteID: item.remoteID,
                 name: item.name,
                 posterURL: item.iconURL,
@@ -85,8 +75,7 @@ struct VODBrowseView: View {
             openMovie = MovieReference(item)
             return
         }
-        let key = UserStateStore.key(playlist: item.playlist, entry: item.id)
-        if let position = userState.resumePosition(for: key) {
+        if let position = userState.resumePosition(for: item.id) {
             resume = ResumeChoice(title: item.name, position: position) { start in
                 play(item, at: start)
             }
@@ -95,9 +84,9 @@ struct VODBrowseView: View {
         }
     }
 
-    private func play(_ item: CatalogEntryRecord, at position: Double?) {
-        userState.markPlayed(UserStateStore.key(playlist: item.playlist, entry: item.id))
-        var target = PlaybackTarget(entry: item)
+    private func play(_ item: CatalogRow, at position: Double?) {
+        userState.markPlayed(item.id)
+        var target = PlaybackTarget(row: item)
         target.resumeAt = position
         playing = target
     }
@@ -118,35 +107,33 @@ struct SeriesReference: Hashable, Identifiable {
     }
 }
 
-/// The grid itself. Its `@Query` is rebuilt whenever the descriptor changes.
+/// The grid itself, fed in pages by a background read (see `CatalogListModel`).
 private struct VODGrid: View {
-    @Query private var items: [CatalogEntryRecord]
-    @Environment(UserStateStore.self) private var userState
+    @Environment(\.modelContext) private var catalog
+    @State private var model = CatalogListModel()
+    let spec: ListSpec
 
     let kind: MediaKind
     let isSearching: Bool
     let hasPlaylists: Bool
     let isSyncing: Bool
-    @Binding var limit: Int
-    let onSelect: (CatalogEntryRecord) -> Void
+    let onSelect: (CatalogRow) -> Void
     let onAdd: () -> Void
 
     init(
-        descriptor: FetchDescriptor<CatalogEntryRecord>,
+        spec: ListSpec,
         kind: MediaKind,
         isSearching: Bool,
         hasPlaylists: Bool,
         isSyncing: Bool,
-        limit: Binding<Int>,
-        onSelect: @escaping (CatalogEntryRecord) -> Void,
+        onSelect: @escaping (CatalogRow) -> Void,
         onAdd: @escaping () -> Void
     ) {
-        _items = Query(descriptor)
+        self.spec = spec
         self.kind = kind
         self.isSearching = isSearching
         self.hasPlaylists = hasPlaylists
         self.isSyncing = isSyncing
-        _limit = limit
         self.onSelect = onSelect
         self.onAdd = onAdd
     }
@@ -157,27 +144,19 @@ private struct VODGrid: View {
                 columns: [GridItem(.adaptive(minimum: Self.cardWidth), spacing: Self.spacing)],
                 spacing: Self.spacing
             ) {
-                ForEach(items) { item in
+                ForEach(model.rows) { item in
                     VODCard(item: item, kind: kind) { onSelect(item) }
-                        .onAppear { growIfNeeded(at: item) }
+                        .onAppear { model.rowAppeared(item) }
                 }
             }
             .padding()
         }
         .overlay {
-            if items.isEmpty {
+            if model.rows.isEmpty, model.phase == .loaded {
                 emptyContent
             }
         }
-    }
-
-    /// Reaching the last loaded card loads more, until the cap.
-    private func growIfNeeded(at item: CatalogEntryRecord) {
-        guard item.id == items.last?.id, items.count >= limit else { return }
-        let next = LiveChannelQuery.nextLimit(after: limit)
-        if next != limit {
-            limit = next
-        }
+        .task(id: spec) { model.show(spec, in: catalog.container) }
     }
 
     @ViewBuilder
@@ -226,14 +205,14 @@ private struct VODGrid: View {
 
 /// One poster, its title, and how far through it someone got.
 private struct VODCard: View {
-    let item: CatalogEntryRecord
+    let item: CatalogRow
     let kind: MediaKind
     let action: () -> Void
 
     @Environment(UserStateStore.self) private var userState
 
     private var key: String {
-        UserStateStore.key(playlist: item.playlist, entry: item.id)
+        item.id
     }
 
     var body: some View {

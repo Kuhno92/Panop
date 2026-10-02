@@ -168,6 +168,8 @@ public struct XtreamSeries: Sendable, Equatable, Hashable, Decodable {
     public var categoryID: String?
     public var lastModified: Date?
     public var backdropURLs: [String]
+    /// Where the panel lists it, which is the order its own apps show.
+    public var number: Int?
 
     public init(
         seriesID: Int,
@@ -181,7 +183,8 @@ public struct XtreamSeries: Sendable, Equatable, Hashable, Decodable {
         rating: Double? = nil,
         categoryID: String? = nil,
         lastModified: Date? = nil,
-        backdropURLs: [String] = []
+        backdropURLs: [String] = [],
+        number: Int? = nil
     ) {
         self.seriesID = seriesID
         self.name = name
@@ -195,12 +198,14 @@ public struct XtreamSeries: Sendable, Equatable, Hashable, Decodable {
         self.categoryID = categoryID
         self.lastModified = lastModified
         self.backdropURLs = backdropURLs
+        self.number = number
     }
 
     private enum CodingKeys: String, CodingKey {
         case seriesID = "series_id", name, coverURL = "cover", plot, cast, director, genre
         case releaseDate, releaseDateSnake = "release_date", rating
         case categoryID = "category_id", lastModified = "last_modified", backdropURLs = "backdrop_path"
+        case number = "num"
     }
 
     public init(from decoder: any Decoder) throws {
@@ -221,6 +226,7 @@ public struct XtreamSeries: Sendable, Equatable, Hashable, Decodable {
         categoryID = container.lenientString(.categoryID)
         lastModified = container.lenientDate(.lastModified)
         backdropURLs = container.lenientStrings(.backdropURLs)
+        number = container.lenientInt(.number)
     }
 }
 

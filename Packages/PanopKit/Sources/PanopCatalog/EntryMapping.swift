@@ -97,6 +97,7 @@ enum EntryMapping {
             groupName: series.categoryID.flatMap { groups[$0] },
             iconURL: series.coverURL,
             remoteID: String(series.seriesID),
+            sortNumber: series.number,
             addedAt: series.lastModified,
             rating: series.rating,
             plot: series.plot

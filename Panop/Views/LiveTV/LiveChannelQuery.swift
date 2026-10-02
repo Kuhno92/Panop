@@ -9,7 +9,7 @@ import SwiftData
 /// channel catalog is only snappy if the database does the narrowing, and a fetch
 /// that sorts or filters on an unindexed column reads the whole table however
 /// small the limit looks.
-enum LiveChannelQuery {
+nonisolated enum LiveChannelQuery {
     /// Rows to load first, and the step the list grows by as you scroll.
     static let pageSize = 300
     /// The most rows the list will ever hold. Each is a live model object, so
@@ -26,7 +26,7 @@ enum LiveChannelQuery {
         source: String?,
         search: String,
         limit: Int,
-        order: LiveOrder = .name,
+        order: LiveOrder = .provider,
         group: String? = nil
     ) -> FetchDescriptor<CatalogEntryRecord> {
         if let group {
@@ -239,8 +239,8 @@ enum LiveChannelQuery {
 }
 
 /// How the channel list is ordered.
-enum LiveOrder: String, CaseIterable, Identifiable {
-    case name, provider
+nonisolated enum LiveOrder: String, CaseIterable, Identifiable {
+    case provider, name
 
     var id: String {
         rawValue

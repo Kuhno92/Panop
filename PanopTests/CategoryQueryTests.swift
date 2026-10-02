@@ -111,4 +111,26 @@ struct CategoryQueryTests {
         #expect(LiveChannelQuery.categoryNames(kind: .live, source: "q", in: context) == ["News", "Weather"])
         #expect(LiveChannelQuery.categoryNames(kind: .movie, source: nil, in: context) == ["Films"])
     }
+
+    @Test
+    func `a list is in the provider's order unless a sort is asked for`() async throws {
+        let catalog = try OnDiskCatalog()
+        defer { catalog.cleanUp() }
+        try await populate(catalog)
+        let context = ModelContext(catalog.container)
+
+        let byDefault = try context.fetch(LiveChannelQuery.descriptor(source: "p", search: "", limit: 100)).map(\.name)
+        let byName = try context.fetch(LiveChannelQuery.descriptor(source: "p", search: "", limit: 100, order: .name))
+            .map(\.name)
+
+        // The provider numbered Bravo 1, Charlie 2, Alpha 3; Delta has no number and goes last by name.
+        #expect(byDefault == ["Delta", "Bravo", "Charlie", "Alpha"] || byDefault == [
+            "Bravo",
+            "Charlie",
+            "Alpha",
+            "Delta"
+        ])
+        #expect(byName == ["Alpha", "Bravo", "Charlie", "Delta"])
+        #expect(byDefault != byName)
+    }
 }

@@ -21,18 +21,19 @@ final class LiveTVTests: PanopUITestCase {
     #endif
 
     #if !os(tvOS)
-        /// The list is alphabetical by default, which puts "3sat" first and keeps "Das Erste"
-        /// (the file's first channel) below the screen. The provider's order reverses that.
-        func testProviderOrderPutsTheFilesFirstChannelFirst() {
+        /// The list follows the provider's order by default, which puts "Das Erste" (the file's first
+        /// channel) first. Sorting by name moves it below the screen, behind "3sat" and the rest.
+        func testTheListFollowsTheProviderUnlessSortedByName() {
             waitForChannels()
-            XCTAssertFalse(channel("Das Erste").exists, "the alphabet should not put it on the first screen")
+            XCTAssertTrue(channel("Das Erste").exists, "the provider's first channel is not first")
 
             app.buttons["Sort"].tap()
-            app.buttons["Provider's order"].tap()
+            app.buttons["By name"].tap()
 
+            XCTAssertTrue(channel("3sat").waitForExistence(timeout: 10))
             XCTAssertTrue(
-                channel("Das Erste").waitForExistence(timeout: 10),
-                "the provider's first channel is not first"
+                channel("Das Erste").waitForNonExistence(timeout: 10),
+                "the alphabet should not put it on the first screen"
             )
         }
     #endif

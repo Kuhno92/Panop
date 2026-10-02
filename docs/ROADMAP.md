@@ -320,6 +320,19 @@ The first milestone where Panop is usable.
 
 The brief called performance a key concept. For IPTV this concentrates in one number.
 
+- [x] **Lists stay smooth against a real provider** *(asked for)*. Measured on a real panel (1,026
+      channels, 10,425 movies, 1,394 series, a 38 MB guide, 56,000 programmes), in an optimised
+      build, which found two main-thread costs: the "Now:" line on each channel row read the
+      guide with a query that could not use the index, **25 ms a row**, now two index reads at
+      **0.2 to 0.5 ms**; and the lists re-read their whole result each time they grew
+      (**18 ms** from 300 rows to 600, **31 ms** from 600 to 1,200, mid-scroll). Lists are now fed
+      by `CatalogListModel`: pages of 60 then 120 rows read on a background context
+      (`CatalogReader`), handed over as plain `CatalogRow` values and appended; the catalog's
+      changes are followed with a debounced background re-read. The longest main-thread wait
+      while paging through all 1,026 channels is **3.3 ms**. The default order is now the
+      **provider's own** on Live TV, Movies and Series (the panel's `num`, now read for series
+      too); "By name" is one choice in Sort. `RealProviderBenchmarks` repeats the measurements
+      against any provider (login from the environment only, never stored).
 - [ ] **Fast channel zapping** *(asked for, as "streaming performance")*. Time from channel
       select to first frame is the metric users judge an IPTV app on. **Measured, not yet
       improved.** Release build, this Mac, a fresh engine per zap, median of 8 over the real

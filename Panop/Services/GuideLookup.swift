@@ -45,12 +45,30 @@ enum GuideLookup {
         in context: ModelContext
     ) -> [ProgrammeSnapshot] {
         guard let key = epgKey, !key.isEmpty, limit > 0 else { return [] }
-        var descriptor = FetchDescriptor<EPGProgrammeRecord>(
-            predicate: #Predicate { $0.playlist == playlist && $0.channelKey == key && $0.stop > now },
+
+        // Two reads that each walk the (playlist, channel, start) index from a point, rather than
+        // one filtered on the end time: that filter cannot use the index, so SQLite read every
+        // programme of the source instead. Measured against a real provider (27,000 programmes)
+        // the single filtered read took 25 ms, a whole frame and more, on the main thread for
+        // every row that scrolled into view.
+        //
+        // What is on now began at or before now. The few latest starters are read, and those still
+        // running kept, so a long programme overlapped by a short one is not missed.
+        var earlier = FetchDescriptor<EPGProgrammeRecord>(
+            predicate: #Predicate { $0.playlist == playlist && $0.channelKey == key && $0.start <= now },
+            sortBy: [SortDescriptor(\.start, order: .reverse)]
+        )
+        earlier.fetchLimit = 3
+        let onNow = ((try? context.fetch(earlier)) ?? []).filter { $0.stop > now }.sorted { $0.start < $1.start }
+
+        var later = FetchDescriptor<EPGProgrammeRecord>(
+            predicate: #Predicate { $0.playlist == playlist && $0.channelKey == key && $0.start > now },
             sortBy: [SortDescriptor(\.start)]
         )
-        descriptor.fetchLimit = limit
-        return ((try? context.fetch(descriptor)) ?? []).map {
+        later.fetchLimit = Swift.max(limit - onNow.count, 0)
+        let following = later.fetchLimit == 0 ? [] : ((try? context.fetch(later)) ?? [])
+
+        return (onNow + following).prefix(limit).map {
             ProgrammeSnapshot(
                 start: $0.start,
                 stop: $0.stop,

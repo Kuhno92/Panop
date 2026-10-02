@@ -21,6 +21,19 @@ struct MovieReference: Hashable, Identifiable {
         "\(playlist)|\(entryID)"
     }
 
+    init(_ row: CatalogRow) {
+        playlist = row.playlist
+        entryID = row.entryID
+        remoteID = row.remoteID
+        name = row.name
+        posterURL = row.iconURL
+        groupName = row.groupName
+        plot = row.plot
+        rating = row.rating
+        streamURL = row.streamURL
+        containerExtension = row.containerExtension
+    }
+
     init(_ item: CatalogEntryRecord) {
         playlist = item.playlist
         entryID = item.id

@@ -12,10 +12,9 @@ struct LiveTVView: View {
     /// such as a playlist that was since deleted, reads as "all sources".
     @AppStorage("liveSourceFilter") private var storedSource = LiveSourceFilter.allID
     @AppStorage("liveListMode") private var storedMode = LiveListMode.all.rawValue
-    @AppStorage("liveSortOrder") private var storedOrder = LiveOrder.name.rawValue
+    @AppStorage("liveSortOrder") private var storedOrder = LiveOrder.provider.rawValue
     @State private var search = ""
     @State private var group: String?
-    @State private var limit = LiveChannelQuery.pageSize
     @State private var showingAdd = false
     @State private var playing: PlaybackTarget?
 
@@ -34,7 +33,7 @@ struct LiveTVView: View {
     }
 
     private var order: LiveOrder {
-        LiveOrder(rawValue: storedOrder) ?? .name
+        LiveOrder(rawValue: storedOrder) ?? .provider
     }
 
     private var mode: LiveListMode {
@@ -44,20 +43,14 @@ struct LiveTVView: View {
     /// What to ask the catalog for. Favourites and recents are not in the catalog, so those
     /// ask for their entry ids; the list then narrows by source and search in memory, which is
     /// cheap for a set that small.
-    private var descriptor: FetchDescriptor<CatalogEntryRecord> {
+    private var spec: ListSpec {
         switch mode {
         case .all:
-            LiveChannelQuery.descriptor(
-                source: selectedSource?.id,
-                search: search,
-                limit: limit,
-                order: order,
-                group: group
-            )
+            ListSpec(kind: .live, source: selectedSource?.id, search: search, order: order, group: group)
         case .favourites:
-            LiveChannelQuery.descriptor(restrictedTo: entryIDs(of: Array(userState.favorites)))
+            ListSpec(kind: .live, restrictedTo: entryIDs(of: Array(userState.favorites)))
         case .recents:
-            LiveChannelQuery.descriptor(restrictedTo: entryIDs(of: userState.recents))
+            ListSpec(kind: .live, restrictedTo: entryIDs(of: userState.recents))
         }
     }
 
@@ -71,7 +64,7 @@ struct LiveTVView: View {
 
     var body: some View {
         LiveChannelList(
-            descriptor: descriptor,
+            spec: spec,
             mode: mode,
             modeRaw: $storedMode,
             orderRaw: $storedOrder,
@@ -86,10 +79,9 @@ struct LiveTVView: View {
                 mode: mode
             ),
             problems: LiveEmptyState.problems(in: shownSources),
-            limit: $limit,
             onPlay: {
-                userState.markPlayed(UserStateStore.key(playlist: $0.playlist, entry: $0.id))
-                playing = PlaybackTarget(entry: $0)
+                userState.markPlayed($0.id)
+                playing = PlaybackTarget(row: $0)
             },
             onPlayTarget: { playing = $0 },
             onAdd: { showingAdd = true },
@@ -115,17 +107,8 @@ struct LiveTVView: View {
                 ToolbarItem { sourceMenu }
             }
         }
-        // A new filter or search starts from the top, not from wherever the last
-        // list had been scrolled and grown to.
-        .onChange(of: storedSource) {
-            limit = LiveChannelQuery.pageSize
-            // The category may not exist in the other source.
-            group = nil
-        }
-        .onChange(of: group) { limit = LiveChannelQuery.pageSize }
-        .onChange(of: storedMode) { limit = LiveChannelQuery.pageSize }
-        .onChange(of: storedOrder) { limit = LiveChannelQuery.pageSize }
-        .onChange(of: search) { limit = LiveChannelQuery.pageSize }
+        // The category may not exist in the other source.
+        .onChange(of: storedSource) { group = nil }
         .sheet(isPresented: $showingAdd) {
             NavigationStack { AddPlaylistView() }
         }
@@ -175,9 +158,10 @@ struct LiveTVView: View {
 /// The list itself. Its `@Query` is rebuilt whenever the descriptor changes, which
 /// is how the source, the search and the growing page reach the database.
 private struct LiveChannelList: View {
-    @Query private var channels: [CatalogEntryRecord]
     @Environment(UserStateStore.self) private var userState
-    @State private var guideFor: CatalogEntryRecord?
+    @Environment(\.modelContext) private var catalog
+    @State private var model = CatalogListModel()
+    @State private var guideFor: CatalogRow?
 
     let mode: LiveListMode
     @Binding var modeRaw: String
@@ -188,14 +172,14 @@ private struct LiveChannelList: View {
     let showsSource: Bool
     let emptyState: LiveEmptyState
     let problems: [LiveEmptyState.Problem]
-    @Binding var limit: Int
-    let onPlay: (CatalogEntryRecord) -> Void
+    let spec: ListSpec
+    let onPlay: (CatalogRow) -> Void
     let onPlayTarget: (PlaybackTarget) -> Void
     let onAdd: () -> Void
     let onRetry: ([String]) -> Void
 
     init(
-        descriptor: FetchDescriptor<CatalogEntryRecord>,
+        spec: ListSpec,
         mode: LiveListMode,
         modeRaw: Binding<String>,
         orderRaw: Binding<String>,
@@ -205,13 +189,12 @@ private struct LiveChannelList: View {
         showsSource: Bool,
         emptyState: LiveEmptyState,
         problems: [LiveEmptyState.Problem],
-        limit: Binding<Int>,
-        onPlay: @escaping (CatalogEntryRecord) -> Void,
+        onPlay: @escaping (CatalogRow) -> Void,
         onPlayTarget: @escaping (PlaybackTarget) -> Void,
         onAdd: @escaping () -> Void,
         onRetry: @escaping ([String]) -> Void
     ) {
-        _channels = Query(descriptor)
+        self.spec = spec
         self.mode = mode
         _modeRaw = modeRaw
         _orderRaw = orderRaw
@@ -221,7 +204,6 @@ private struct LiveChannelList: View {
         self.showsSource = showsSource
         self.emptyState = emptyState
         self.problems = problems
-        _limit = limit
         self.onPlay = onPlay
         self.onPlayTarget = onPlayTarget
         self.onAdd = onAdd
@@ -253,7 +235,7 @@ private struct LiveChannelList: View {
                 problemBanner
             }
             ForEach(shown) { channel in
-                let key = UserStateStore.key(playlist: channel.playlist, entry: channel.id)
+                let key = channel.id
                 Button { onPlay(channel) } label: {
                     // A plain button answers only where something is drawn, so the empty
                     // middle of a row would swallow a tap. The whole row is the target, which
@@ -261,7 +243,7 @@ private struct LiveChannelList: View {
                     row(channel, isFavorite: userState.isFavorite(key)).contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
-                .onAppear { growIfNeeded(at: channel) }
+                .onAppear { model.rowAppeared(channel) }
                 // Touch and hold (or the remote's long press) on every platform; a swipe too
                 // where there is one.
                 .contextMenu {
@@ -272,17 +254,20 @@ private struct LiveChannelList: View {
                 .swipeActions(edge: .leading) { favoriteButton(key).tint(.yellow) }
                 #endif
             }
-            if channels.count >= LiveChannelQuery.maxRows {
+            if model.rows.count >= LiveChannelQuery.maxRows {
                 Text("Showing the first \(LiveChannelQuery.maxRows.formatted()). Search to narrow it down.")
                     .font(.footnote)
                     .foregroundStyle(.secondary)
             }
         }
         .overlay {
-            if shown.isEmpty {
+            // Not while the first page is still being read: an empty list is not a list with
+            // nothing in it until the catalog has answered.
+            if shown.isEmpty, model.phase == .loaded {
                 emptyContent
             }
         }
+        .task(id: spec) { model.show(spec, in: catalog.container) }
         .sheet(item: $guideFor) { channel in
             NavigationStack {
                 ChannelGuideView(channel: channel, onPlay: onPlay, onPlayTarget: onPlayTarget)
@@ -295,26 +280,22 @@ private struct LiveChannelList: View {
         }
     }
 
-    /// What the list shows. All channels is the query as it stands. Favourites and recents
-    /// were fetched by entry id alone, so they are narrowed here by playlist, the chosen
-    /// source and the search, and recents are put in the order they were watched.
-    private var shown: [CatalogEntryRecord] {
+    /// What the list shows. All channels is the list as read. Favourites and recents were read by
+    /// entry id alone, so they are narrowed here by playlist, the chosen source and the search,
+    /// and recents are put in the order they were watched.
+    private var shown: [CatalogRow] {
         switch mode {
         case .all:
-            return channels
+            return model.rows
         case .favourites:
-            return channels.filter { matches($0) && userState.isFavorite(key(of: $0)) }
+            return model.rows.filter { matches($0) && userState.isFavorite($0.id) }
         case .recents:
-            let byKey = Dictionary(channels.map { (key(of: $0), $0) }, uniquingKeysWith: { first, _ in first })
+            let byKey = Dictionary(model.rows.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
             return userState.recents.compactMap { byKey[$0] }.filter { matches($0) }
         }
     }
 
-    private func key(of channel: CatalogEntryRecord) -> String {
-        UserStateStore.key(playlist: channel.playlist, entry: channel.id)
-    }
-
-    private func matches(_ channel: CatalogEntryRecord) -> Bool {
+    private func matches(_ channel: CatalogRow) -> Bool {
         if let sourceID, channel.playlist != sourceID {
             return false
         }
@@ -334,7 +315,7 @@ private struct LiveChannelList: View {
         }
     }
 
-    private func row(_ channel: CatalogEntryRecord, isFavorite: Bool) -> some View {
+    private func row(_ channel: CatalogRow, isFavorite: Bool) -> some View {
         LabeledContent {
             VStack(alignment: .trailing, spacing: 2) {
                 if let group = channel.groupName {
@@ -358,16 +339,6 @@ private struct LiveChannelList: View {
                         .accessibilityLabel("Favourite")
                 }
             }
-        }
-    }
-
-    /// Reaching the last loaded row loads more, until the cap.
-    private func growIfNeeded(at channel: CatalogEntryRecord) {
-        // Paging belongs to the full list; favourites and recents arrive whole.
-        guard mode == .all, channel.id == channels.last?.id, channels.count >= limit else { return }
-        let next = LiveChannelQuery.nextLimit(after: limit)
-        if next != limit {
-            limit = next
         }
     }
 
@@ -441,6 +412,19 @@ private struct LiveChannelList: View {
 }
 
 extension PlaybackTarget {
+    /// A snapshot of a list row.
+    init(row: CatalogRow) {
+        self.init(
+            playlist: row.playlist,
+            entryID: row.entryID,
+            kind: row.kind,
+            name: row.name,
+            streamURL: row.streamURL,
+            remoteID: row.remoteID,
+            containerExtension: row.containerExtension
+        )
+    }
+
     /// A snapshot of a catalog row, so the player never holds the live record.
     init(entry: CatalogEntryRecord) {
         self.init(

@@ -6,7 +6,7 @@ import SwiftUI
 /// The line under a channel's name saying what is on now. Nothing at all for a channel the
 /// guide does not cover, so the row stays as it was.
 struct NowOnAirLine: View {
-    let channel: CatalogEntryRecord
+    let channel: CatalogRow
 
     @Environment(\.modelContext) private var catalog
     @State private var current: ProgrammeSnapshot?
@@ -32,8 +32,8 @@ struct NowOnAirLine: View {
 
 /// One channel's schedule: what is on and what follows, with a way to start watching.
 struct ChannelGuideView: View {
-    let channel: CatalogEntryRecord
-    let onPlay: (CatalogEntryRecord) -> Void
+    let channel: CatalogRow
+    let onPlay: (CatalogRow) -> Void
     let onPlayTarget: (PlaybackTarget) -> Void
 
     @Environment(PlaylistLibrary.self) private var library
@@ -132,7 +132,7 @@ struct ChannelGuideView: View {
     }
 
     private func watch(_ programme: ProgrammeSnapshot) {
-        var target = PlaybackTarget(entry: channel)
+        var target = PlaybackTarget(row: channel)
         target.name = "\(channel.name) · \(programme.title)"
         target.catchup = CatchupWindow(
             start: programme.start,
