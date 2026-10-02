@@ -89,6 +89,16 @@ public struct XtreamClient: Sendable {
         }
     }
 
+    /// What the panel knows about one film.
+    public func movieInfo(streamID: Int) async throws -> XtreamMovieInfo {
+        let data = try await fetch(action: "get_vod_info", extra: [("vod_id", String(streamID))])
+        do {
+            return try JSONDecoder().decode(XtreamMovieInfo.self, from: data)
+        } catch {
+            throw XtreamError.unexpectedResponse
+        }
+    }
+
     /// The next few programmes on one channel. Cheap enough to call per channel
     /// while browsing; for a full guide use XMLTV instead.
     public func shortEPG(streamID: Int, limit: Int = 4) async throws -> [XtreamEPGListing] {

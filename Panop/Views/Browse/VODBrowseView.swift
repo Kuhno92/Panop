@@ -19,6 +19,7 @@ struct VODBrowseView: View {
     @State private var playing: PlaybackTarget?
     @State private var resume: ResumeChoice?
     @State private var openSeries: SeriesReference?
+    @State private var openMovie: MovieReference?
     @State private var showingAdd = false
 
     private var title: String {
@@ -44,6 +45,7 @@ struct VODBrowseView: View {
         .modifier(VODSearch(text: $search, isOffered: !library.playlists.isEmpty))
         .onChange(of: search) { limit = LiveChannelQuery.pageSize }
         .navigationDestination(item: $openSeries) { SeriesDetailView(series: $0) }
+        .navigationDestination(item: $openMovie) { MovieDetailView(movie: $0) }
         .sheet(isPresented: $showingAdd) {
             NavigationStack { AddPlaylistView() }
         }
@@ -63,6 +65,11 @@ struct VODBrowseView: View {
                 posterURL: item.iconURL,
                 plot: item.plot
             )
+            return
+        }
+        // A film opens its page, which has the resume choice and the details.
+        if kind == .movie {
+            openMovie = MovieReference(item)
             return
         }
         let key = UserStateStore.key(playlist: item.playlist, entry: item.id)

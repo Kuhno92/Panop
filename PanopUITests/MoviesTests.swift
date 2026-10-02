@@ -23,18 +23,30 @@ final class MoviesTests: PanopUITestCase {
     }
 
     #if !os(tvOS)
+        func testOpeningAFilmShowsItsPage() {
+            XCTAssertTrue(poster("Dune").waitForExistence(timeout: 30))
+            poster("Dune").tap()
+
+            XCTAssertTrue(app.buttons["Play"].waitForExistence(timeout: 10), "no Play button on the film's page")
+            XCTAssertTrue(app.staticTexts["Dune"].exists, "the title is not on the page")
+            XCTAssertTrue(app.buttons["Add to Favourites"].exists)
+            XCTAssertTrue(app.buttons["Mark as Watched"].exists)
+            attach("movie-page")
+        }
+
         func testAFilmLeftPartWayOffersToResume() {
             XCTAssertTrue(poster("Alien").waitForExistence(timeout: 30))
             poster("Alien").tap()
+            XCTAssertTrue(app.buttons["Play"].waitForExistence(timeout: 10), "the film's page did not open")
+            app.buttons["Play"].tap()
             XCTAssertTrue(app.buttons["Close"].waitForExistence(timeout: 15), "the film did not open")
             XCTAssertTrue(app.buttons["Back 10 seconds"].exists, "a film has a scrubber, not a LIVE badge")
 
             // Long enough that there is somewhere to resume from (nothing under ten seconds is kept).
             Thread.sleep(forTimeInterval: 13)
             app.buttons["Close"].tap()
-            XCTAssertTrue(poster("Alien").waitForExistence(timeout: 10))
 
-            poster("Alien").tap()
+            // Closing the player returns to the film's page, which now offers where it was left.
             let resume = app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Resume from'")).firstMatch
             XCTAssertTrue(resume.waitForExistence(timeout: 10), "no offer to resume")
             attach("movies-resume-dialog")
@@ -49,10 +61,11 @@ final class MoviesTests: PanopUITestCase {
         func testStartingOverIgnoresTheSavedPoint() {
             XCTAssertTrue(poster("Blade Runner").waitForExistence(timeout: 30))
             poster("Blade Runner").tap()
+            XCTAssertTrue(app.buttons["Play"].waitForExistence(timeout: 10), "the film's page did not open")
+            app.buttons["Play"].tap()
             XCTAssertTrue(app.buttons["Close"].waitForExistence(timeout: 15))
             Thread.sleep(forTimeInterval: 13)
             app.buttons["Close"].tap()
-            poster("Blade Runner").tap()
             XCTAssertTrue(app.buttons["Start over"].waitForExistence(timeout: 10))
 
             app.buttons["Start over"].tap()

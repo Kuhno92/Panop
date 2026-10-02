@@ -227,7 +227,12 @@ The first milestone where Panop is usable.
       at on iOS and Apple TV; UI tests cover the grid, resume and series on iOS, and the grids on
       tvOS. **Not verified:** the episode list against a real provider panel (no panel to
       test with). M3U episodes are grouped into series (see M1).
-      **Not done:** a detail page for a film (plot, cast, rating), and groups or categories.
+      A film has a **detail page**: poster, title, a line of year,
+      genre, length and rating, the plot, director, cast and country, and Play, Resume from,
+      Start over, favourite and watched. What the catalog holds shows at once; a provider
+      panel's extra details (`get_vod_info`, lenient decoding, 6 tests) are fetched when the
+      page opens. An M3U source has nothing more to fetch. UI tests on iOS (page, resume and
+      start over through it). **Not done:** groups or categories, a backdrop image, a trailer.
 - [ ] **Search** across the catalog. Needs SQLite FTS or bounded predicates with a fetch limit;
       an unbounded sort defeats the limit entirely.
 - [x] **Engine coordinator** *(surfaced)*: owns the ordered fallback list, reconnect and
