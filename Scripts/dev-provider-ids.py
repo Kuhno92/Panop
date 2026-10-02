@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 """Which ids does an Xtream provider carry, and do they match Simkl's?
 
 Development aid, read-only. The login comes from the environment and is never written anywhere:
