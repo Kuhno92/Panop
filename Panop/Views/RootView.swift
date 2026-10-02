@@ -1,3 +1,5 @@
+import PanopCore
+import PanopSimkl
 import SwiftData
 import SwiftUI
 
@@ -13,6 +15,10 @@ struct RootView: View {
     @State private var autoplay: PlaybackTarget?
     /// One set of rails for Home, Movies and Series, built off the main thread (see `DiscoveryModel`).
     @State private var discovery = DiscoveryModel()
+    @State private var simkl = SimklAccount(
+        auth: SimklAuth(transport: URLSessionTransport(), app: SimklConfig.app),
+        store: KeychainSimklTokenStore()
+    )
     @AppStorage(DiscoveryModel.enabledKey) private var showsSuggestions = true
     @AppStorage(DiscoveryModel.trendingKey) private var showsTrending = true
 
@@ -66,6 +72,7 @@ struct RootView: View {
         // The work runs on the sync service's actor, not here.
         .task { await library.refreshStale(maxAge: 12 * 3600) }
         .environment(discovery)
+        .environment(simkl)
         .task(id: showsTrending && showsSuggestions) {
             await discovery.loadTrending(enabled: showsTrending && showsSuggestions, source: .panop)
         }

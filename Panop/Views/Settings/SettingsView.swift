@@ -80,6 +80,10 @@ struct SettingsView: View {
                 )
             }
 
+            if SimklConfig.isConfigured {
+                SimklSettingsSection()
+            }
+
             Section {
                 NavigationLink {
                     PlaybackStatisticsView()
