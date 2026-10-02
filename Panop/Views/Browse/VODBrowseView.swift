@@ -182,7 +182,8 @@ struct VODBrowseView: View {
                 remoteID: item.remoteID,
                 name: item.name,
                 posterURL: item.iconURL,
-                plot: item.plot
+                plot: item.plot,
+                tmdbID: item.tmdbID
             )
             return
         }
@@ -217,6 +218,7 @@ struct SeriesReference: Hashable, Identifiable {
     var name: String
     var posterURL: String?
     var plot: String?
+    var tmdbID: Int?
 
     var id: String {
         "\(playlist)|\(entryID)"

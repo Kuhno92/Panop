@@ -108,7 +108,8 @@ struct HomeView: View {
                 remoteID: row.remoteID,
                 name: row.name,
                 posterURL: row.iconURL,
-                plot: row.plot
+                plot: row.plot,
+                tmdbID: row.tmdbID
             )
         default:
             userState.markPlayed(row.id)

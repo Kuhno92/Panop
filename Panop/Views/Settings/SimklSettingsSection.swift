@@ -6,6 +6,7 @@ import SwiftUI
 /// television needs no typing.
 struct SimklSettingsSection: View {
     @Environment(SimklAccount.self) private var account
+    @AppStorage(SimklSync.enabledKey) private var sendsWatched = true
 
     var body: some View {
         Section {
@@ -16,6 +17,7 @@ struct SimklSettingsSection: View {
                 waiting(code)
             case .connected:
                 LabeledContent("Simkl", value: "Connected")
+                Toggle("Send what I finish watching", isOn: $sendsWatched)
                 Button("Disconnect", role: .destructive) { Task { await account.signOut() } }
             case let .failed(failure):
                 Text(failure == .codeExpired ? "The code ran out before it was approved." :
@@ -26,7 +28,10 @@ struct SimklSettingsSection: View {
         } header: {
             Text("Simkl")
         } footer: {
-            Text("Connecting lets Panop keep your watched titles and lists in step with your Simkl account.")
+            Text(
+                "Once connected, films and episodes you finish are recorded on your Simkl account. "
+                    + "Nothing is sent while you are disconnected, and live TV is never sent."
+            )
         }
     }
 

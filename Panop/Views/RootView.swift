@@ -15,10 +15,9 @@ struct RootView: View {
     @State private var autoplay: PlaybackTarget?
     /// One set of rails for Home, Movies and Series, built off the main thread (see `DiscoveryModel`).
     @State private var discovery = DiscoveryModel()
-    @State private var simkl = SimklAccount(
-        auth: SimklAuth(transport: URLSessionTransport(), app: SimklConfig.app),
-        store: KeychainSimklTokenStore()
-    )
+    @State private var simkl: SimklAccount
+    @State private var simklSync: SimklSync
+    @AppStorage(SimklSync.enabledKey) private var sendsWatched = true
     @AppStorage(DiscoveryModel.enabledKey) private var showsSuggestions = true
     @AppStorage(DiscoveryModel.trendingKey) private var showsTrending = true
 
@@ -26,6 +25,14 @@ struct RootView: View {
         // The screen it opens on is known from the settings alone, so the first frame is the
         // right one. `applyStartupPlan` corrects it if that screen turns out not to be offered.
         _selection = State(initialValue: UITestMode.startTab ?? StartupPreference.current(offersVOD: true).tab)
+        let transport = URLSessionTransport()
+        let account = SimklAccount(
+            auth: SimklAuth(transport: transport, app: SimklConfig.app),
+            store: KeychainSimklTokenStore()
+        )
+        let client = SimklClient(transport: transport, app: SimklConfig.app) { await account.accessToken() }
+        _simkl = State(initialValue: account)
+        _simklSync = State(initialValue: SimklSync(send: { try await client.addHistory($0) }))
     }
 
     var body: some View {
@@ -73,6 +80,18 @@ struct RootView: View {
         .task { await library.refreshStale(maxAge: 12 * 3600) }
         .environment(discovery)
         .environment(simkl)
+        .environment(simklSync)
+        // What is finished goes to Simkl only while connected and switched on; the queue belongs to the
+        // account it was made for, so signing out drops it.
+        .task(id: [sendsWatched, simkl.isConnected]) {
+            userState.onFinished = { [simklSync] key, date in simklSync.finished(key, at: date) }
+            simklSync.isEnabled = sendsWatched && simkl.isConnected
+            if simkl.isConnected {
+                simklSync.flushIfNeeded()
+            } else {
+                simklSync.discardQueue()
+            }
+        }
         .task(id: showsTrending && showsSuggestions) {
             await discovery.loadTrending(enabled: showsTrending && showsSuggestions, source: .panop)
         }

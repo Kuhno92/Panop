@@ -15,6 +15,7 @@ struct SeriesDetailView: View {
 
     @Environment(PlaylistLibrary.self) private var library
     @Environment(UserStateStore.self) private var userState
+    @Environment(SimklSync.self) private var simkl
     @Environment(\.modelContext) private var catalog
 
     /// An episode as the screen needs it, whichever playlist it came from.
@@ -131,6 +132,7 @@ struct SeriesDetailView: View {
         .contextMenu {
             let seen = userState.isWatched(key)
             Button {
+                registerForSimkl(episode, season: season, key: key)
                 userState.setWatched(!seen, for: key)
             } label: {
                 Label(seen ? "Mark as Not Watched" : "Mark as Watched", systemImage: seen ? "eye.slash" : "eye")
@@ -142,14 +144,22 @@ struct SeriesDetailView: View {
         let name = "\(series.name) · S\(season.number)E\(episode.number)"
         if let position = userState.resumePosition(for: key) {
             resume = ResumeChoice(title: name, position: position) { start in
-                play(episode, name: name, key: key, at: start)
+                play(episode, season: season, name: name, key: key, at: start)
             }
         } else {
-            play(episode, name: name, key: key, at: nil)
+            play(episode, season: season, name: name, key: key, at: nil)
         }
     }
 
-    private func play(_ episode: Episode, name: String, key: String, at position: Double?) {
+    /// Tells the Simkl sync what this episode is, for when it is finished or marked.
+    private func registerForSimkl(_ episode: Episode, season: Season, key: String) {
+        simkl.register(key, as: series.tmdbID.map {
+            .episode(showTMDB: $0, season: season.number, number: episode.number)
+        })
+    }
+
+    private func play(_ episode: Episode, season: Season, name: String, key: String, at position: Double?) {
+        registerForSimkl(episode, season: season, key: key)
         userState.markPlayed(key, parent: UserStateStore.key(playlist: series.playlist, entry: series.entryID))
         playing = PlaybackTarget(
             playlist: series.playlist,

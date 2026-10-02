@@ -16,6 +16,7 @@ struct MovieReference: Hashable, Identifiable {
     var rating: Double?
     var streamURL: String?
     var containerExtension: String?
+    var tmdbID: Int?
 
     var id: String {
         "\(playlist)|\(entryID)"
@@ -32,6 +33,7 @@ struct MovieReference: Hashable, Identifiable {
         rating = row.rating
         streamURL = row.streamURL
         containerExtension = row.containerExtension
+        tmdbID = row.tmdbID
     }
 
     init(_ item: CatalogEntryRecord) {
@@ -45,6 +47,7 @@ struct MovieReference: Hashable, Identifiable {
         rating = item.rating
         streamURL = item.streamURL
         containerExtension = item.containerExtension
+        tmdbID = item.tmdbID == 0 ? nil : item.tmdbID
     }
 
     var target: PlaybackTarget {
@@ -100,6 +103,7 @@ struct MovieDetailView: View {
 
     @Environment(PlaylistLibrary.self) private var library
     @Environment(UserStateStore.self) private var userState
+    @Environment(SimklSync.self) private var simkl
 
     @State private var info: XtreamMovieInfo?
     @State private var playing: PlaybackTarget?
@@ -131,6 +135,7 @@ struct MovieDetailView: View {
             .navigationBarTitleDisplayMode(.inline)
         #endif
             .task { await loadInfo() }
+            .onAppear { simkl.register(movie.id, as: movie.tmdbID.map { .movie(tmdb: $0) }) }
             .modifier(PlayerPresentation(target: $playing))
     }
 

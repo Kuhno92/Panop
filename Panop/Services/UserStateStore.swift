@@ -46,6 +46,9 @@ final class UserStateStore {
     var hiddenCategoryNames: [String: Set<String>] = [:]
     var categoryPositions: [String: [String: Int]] = [:]
     private var engines: [String: PlaybackEngineKind] = [:]
+    /// Told when a film or episode becomes watched, by reaching its end or by being marked. For what
+    /// keeps another place (a Simkl account) in step.
+    @ObservationIgnored var onFinished: ((_ key: String, _ date: Date) -> Void)?
 
     static let recentLimit = 50
     /// Played-but-not-favourite rows kept on disk, so recents can reach back past what shows.
@@ -123,8 +126,14 @@ final class UserStateStore {
             (position >= length * Self.finishedFraction || length - position < Self.finishedTail)
         let worthKeeping = position >= Self.minimumToKeep && !finished
         guard let row = state(for: key) ?? (worthKeeping || finished ? insert(key) : nil) else { return }
+        let wasWatched = row.isWatched
         if finished {
             row.isWatched = true
+        }
+        defer {
+            if finished, !wasWatched {
+                onFinished?(key, date)
+            }
         }
         row.positionSeconds = worthKeeping ? position : 0
         row.durationSeconds = worthKeeping ? length : 0
@@ -155,6 +164,12 @@ final class UserStateStore {
     /// there is nothing left to resume.
     func setWatched(_ isWatched: Bool, for key: String, at date: Date = .now) {
         guard let row = state(for: key) ?? (isWatched ? insert(key) : nil) else { return }
+        let wasWatched = row.isWatched
+        defer {
+            if isWatched, !wasWatched {
+                onFinished?(key, date)
+            }
+        }
         row.isWatched = isWatched
         if isWatched {
             row.positionSeconds = 0
