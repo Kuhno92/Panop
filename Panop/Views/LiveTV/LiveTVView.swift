@@ -176,6 +176,7 @@ struct LiveTVView: View {
 private struct LiveChannelList: View {
     @Query private var channels: [CatalogEntryRecord]
     @Environment(UserStateStore.self) private var userState
+    @State private var guideFor: CatalogEntryRecord?
 
     let mode: LiveListMode
     @Binding var modeRaw: String
@@ -259,9 +260,12 @@ private struct LiveChannelList: View {
                 .onAppear { growIfNeeded(at: channel) }
                 // Touch and hold (or the remote's long press) on every platform; a swipe too
                 // where there is one.
-                .contextMenu { favoriteButton(key) }
+                .contextMenu {
+                    favoriteButton(key)
+                    Button("Programme Guide", systemImage: "calendar") { guideFor = channel }
+                }
                 #if !os(tvOS)
-                    .swipeActions(edge: .leading) { favoriteButton(key).tint(.yellow) }
+                .swipeActions(edge: .leading) { favoriteButton(key).tint(.yellow) }
                 #endif
             }
             if channels.count >= LiveChannelQuery.maxRows {
@@ -273,6 +277,16 @@ private struct LiveChannelList: View {
         .overlay {
             if shown.isEmpty {
                 emptyContent
+            }
+        }
+        .sheet(item: $guideFor) { channel in
+            NavigationStack {
+                ChannelGuideView(channel: channel, onPlay: onPlay)
+                    .toolbar {
+                        ToolbarItem(placement: .cancellationAction) {
+                            Button("Done") { guideFor = nil }
+                        }
+                    }
             }
         }
     }
@@ -330,7 +344,10 @@ private struct LiveChannelList: View {
         } label: {
             HStack(spacing: 12) {
                 ChannelLogo(address: channel.iconURL)
-                Text(channel.name)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(channel.name)
+                    NowOnAirLine(channel: channel)
+                }
                 if isFavorite {
                     Image(systemName: "star.fill")
                         .foregroundStyle(.yellow)

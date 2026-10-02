@@ -1,5 +1,6 @@
 import Foundation
 import PanopCore
+import PanopEPG
 import PanopPlayback
 #if canImport(UIKit)
     import UIKit
@@ -101,7 +102,26 @@ enum UITestMode {
             do {
                 try text.write(to: file, atomically: true, encoding: .utf8)
                 let liveOnly = ProcessInfo.processInfo.environment["PANOP_LIVE_ONLY"] == "1"
-                _ = try await services.library.add(.m3uFile(name: "Test Source", fileURL: file), includeVOD: !liveOnly)
+                let playlist = try await services.library.add(
+                    .m3uFile(name: "Test Source", fileURL: file),
+                    includeVOD: !liveOnly
+                )
+                // A guide for 3sat (the third channel, `c2`), so its row can say what is on.
+                let now = Date.now
+                _ = try await services.catalogStore.upsertProgrammes([
+                    EPGProgramme(
+                        channelID: "c2",
+                        start: now.addingTimeInterval(-1800),
+                        stop: now.addingTimeInterval(1800),
+                        title: "Seeded News"
+                    ),
+                    EPGProgramme(
+                        channelID: "c2",
+                        start: now.addingTimeInterval(1800),
+                        stop: now.addingTimeInterval(7200),
+                        title: "Seeded Film"
+                    )
+                ], playlist: playlist.id)
             } catch {
                 assertionFailure("UI test seed failed: \(error)")
             }

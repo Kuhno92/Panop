@@ -48,4 +48,24 @@ final class LiveTVTests: PanopUITestCase {
             XCTAssertFalse(channel("3sat").exists, "a channel from another category is still listed")
         }
     #endif
+
+    #if !os(tvOS)
+        func testARowSaysWhatIsOnNowAndItsGuideListsWhatFollows() {
+            waitForChannels()
+            XCTAssertTrue(
+                app.staticTexts["Now: Seeded News"].waitForExistence(timeout: 15),
+                "the row for a channel with a guide does not say what is on"
+            )
+
+            channel("3sat").press(forDuration: 1.2)
+            XCTAssertTrue(app.buttons["Programme Guide"].waitForExistence(timeout: 10), "no guide in the row's menu")
+            app.buttons["Programme Guide"].tap()
+
+            XCTAssertTrue(
+                app.staticTexts["Seeded Film"].waitForExistence(timeout: 10),
+                "the next programme is not listed"
+            )
+            XCTAssertTrue(app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Watch'")).firstMatch.exists)
+        }
+    #endif
 }

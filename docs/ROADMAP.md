@@ -512,7 +512,14 @@ The brief called performance a key concept. For IPTV this concentrates in one nu
 
 Features real users expect that the brief did not name. All *(surfaced)*.
 
-- [ ] **EPG / TV guide UI**. A player without a guide is half an app.
+- [ ] **EPG / TV guide UI**. A player without a guide is half an app. **First part done**: a Live
+      TV row says "Now: <programme>" for a channel the guide covers, and its menu has
+      "Programme Guide", a schedule of what is on and what follows (up to 60 programmes, the one
+      on air marked and with its progress), with a Watch button. Each is one bounded read on the
+      (source, channel, start) index (4 lookup tests; UI test on iOS; tvOS runs unchanged).
+      **Not done:** a time grid across channels, a "next" line on the row, the line refreshing
+      as the hour turns (it is read when the row appears), the schedule on tvOS (the menu is
+      there, but no UI test drives it), and a reminder or record action.
 - [ ] **Catch-up and timeshift**. Xtream supports it; the M3U attributes are already parsed.
 - [x] **Multiple playlists** and switching between them. Several sources can be added, and Live TV shows all of them or one chosen source (M2); each can be refreshed or deleted from Playlists.
 - [ ] **Profiles**. Shared family devices, especially Apple TV.
