@@ -392,6 +392,19 @@ The brief called performance a key concept. For IPTV this concentrates in one nu
       both, and, on iOS, starring, playing and finding both on Home. **Not done:** a hero for
       the channel last watched, artwork beyond logos, a rail per group or per source, and
       movie and series rails, which wait for those screens.
+- [ ] **Live-only sources: make VOD optional** *(asked for)*. When adding a source, an option to
+      load live TV only. A live-only source skips the movie and series part of the import (less
+      to download, parse and store). If no source with VOD is present, the Movies and Series
+      tabs are not shown at all, on every platform, and come back when a source with VOD is
+      added. Open questions: where the choice lives (per source, changeable later, with the VOD
+      rows dropped when it is turned off), and what Xtream does (skip the VOD and series
+      calls) against M3U (skip entries that are not live, which still means reading the file).
+- [ ] **Startup behaviour** *(asked for)*. Settings options for what the app does on launch: open
+      a chosen screen (Home, Live TV, Movies or Series) or start playing a chosen channel in
+      Live TV. Open questions: a channel is picked from the list and stored by its key (playlist
+      and entry), with a fallback to the chosen screen when it is gone; autoplay must not delay
+      the first frame of the UI; and a screen that is hidden (see live-only sources above) is
+      not offered.
 - [ ] **tvOS focus engine work** *(surfaced)*. Full-width focus targets, no `Color.accentColor`
       for fills, layout mutations deferred out of the focus animation context. **Audited and
       partly fixed:** no accent-colour fills anywhere; the remote-driven callbacks are deferred;
