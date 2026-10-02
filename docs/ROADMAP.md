@@ -226,7 +226,7 @@ The first milestone where Panop is usable.
       Season grouping is in the portable package, tested on a real panel-shaped response. Looked
       at on iOS and Apple TV; UI tests cover the grid, resume and series on iOS, and the grids on
       tvOS. **Not verified:** the episode list against a real provider panel (no panel to
-      test with), and M3U episodes are not grouped into series yet (the open item in M1).
+      test with). M3U episodes are grouped into series (see M1).
       **Not done:** a detail page for a film (plot, cast, rating), and groups or categories.
 - [ ] **Search** across the catalog. Needs SQLite FTS or bounded predicates with a fetch limit;
       an unbounded sort defeats the limit entirely.
@@ -266,8 +266,9 @@ The first milestone where Panop is usable.
       stream and a start position set at open time. Plays raw MPEG-TS over HTTP and, checked by
       hand, the 3sat and ZDF HLS streams (3sat joins in 0.75 s, ZDF in 3.2 s). Its own HTTP
       reconnect is switched off: that policy is the coordinator's. Tests on macOS, iOS and tvOS.
-      **Not done:** PiP and Now Playing, channel-switch latency against the other
-      engines, and any real provider stream.
+      Now Playing and PiP are wired for the player (see M4), and
+      channel-switch latency against the other engines is measured (M3). **Not done:** any real
+      provider stream.
 - [x] **Subtitle text from LumeEngine**. The engine hands back text and draws nothing, so
       `LumePlaybackEngine` looks the cue up against the playback clock ten times a second, only
       while subtitles are on, and `SubtitleOverlay` draws it above the controls. AVPlayer and
@@ -525,7 +526,7 @@ Things needing a human answer before the milestone that depends on them.
 - [ ] **Apple Developer Program team.** Blocks M5 entirely, and device builds generally.
 - [ ] **Bundle identifier.** Currently `com.panop.Panop`, baked into entitlements.
 - [ ] **Copyright holder name** in `LICENSE`, currently "Nico Kuhno".
-- [ ] **Install the iOS and tvOS platforms** so those builds can be verified at all:
+- [x] **Install the iOS and tvOS platforms** so those builds can be verified at all (both installed, all test scripts run):
       `xcodebuild -downloadPlatform iOS` and `-downloadPlatform tvOS`.
 - [ ] **Buy KSPlayer's LGPL licence?** Only if its Metal renderer proves worth it after M2.
 - [ ] **Metadata enrichment** (TMDB artwork, ratings) and **scrobbling** (Trakt, Simkl). Both
