@@ -10,11 +10,22 @@ public struct HTTPRequest: Sendable, Equatable {
     public var url: URL
     public var headers: [String: String]
     public var timeout: TimeInterval
+    /// `GET` unless a call to an API says otherwise.
+    public var method: String
+    public var body: Data?
 
-    public init(url: URL, headers: [String: String] = [:], timeout: TimeInterval = 60) {
+    public init(
+        url: URL,
+        headers: [String: String] = [:],
+        timeout: TimeInterval = 60,
+        method: String = "GET",
+        body: Data? = nil
+    ) {
         self.url = url
         self.headers = headers
         self.timeout = timeout
+        self.method = method
+        self.body = body
     }
 }
 
@@ -112,6 +123,8 @@ public struct URLSessionTransport: HTTPTransport {
 
     private func urlRequest(for request: HTTPRequest) -> URLRequest {
         var urlRequest = URLRequest(url: request.url, timeoutInterval: request.timeout)
+        urlRequest.httpMethod = request.method
+        urlRequest.httpBody = request.body
         for (name, value) in request.headers {
             urlRequest.setValue(value, forHTTPHeaderField: name)
         }

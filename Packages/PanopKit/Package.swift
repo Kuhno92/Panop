@@ -25,7 +25,8 @@ let package = Package(
         .library(name: "PanopEPG", targets: ["PanopEPG"]),
         .library(name: "PanopCatalog", targets: ["PanopCatalog"]),
         .library(name: "PanopPlayback", targets: ["PanopPlayback"]),
-        .library(name: "PanopDiscover", targets: ["PanopDiscover"])
+        .library(name: "PanopDiscover", targets: ["PanopDiscover"]),
+        .library(name: "PanopSimkl", targets: ["PanopSimkl"])
     ],
     targets: [
         .target(name: "PanopCore"),
@@ -38,6 +39,8 @@ let package = Package(
         ),
         .target(name: "PanopPlayback", dependencies: ["PanopCore"]),
         .target(name: "PanopDiscover", dependencies: ["PanopCore"]),
+        // Kept apart so a licence decision about Simkl can drop it without touching the rest.
+        .target(name: "PanopSimkl", dependencies: ["PanopCore", "PanopDiscover"]),
 
         .testTarget(name: "PanopCoreTests", dependencies: ["PanopCore"]),
         .testTarget(name: "PanopPlaylistTests", dependencies: ["PanopPlaylist"]),
@@ -48,7 +51,8 @@ let package = Package(
             dependencies: ["PanopCatalog", "PanopCore", "PanopXtream", "PanopEPG", "PanopPlaylist"]
         ),
         .testTarget(name: "PanopPlaybackTests", dependencies: ["PanopPlayback"]),
-        .testTarget(name: "PanopDiscoverTests", dependencies: ["PanopDiscover", "PanopCore"])
+        .testTarget(name: "PanopDiscoverTests", dependencies: ["PanopDiscover", "PanopCore"]),
+        .testTarget(name: "PanopSimklTests", dependencies: ["PanopSimkl", "PanopDiscover", "PanopCore"])
     ],
     swiftLanguageModes: [.v6]
 )

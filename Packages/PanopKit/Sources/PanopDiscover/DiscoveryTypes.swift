@@ -69,11 +69,14 @@ public struct TrendingEntry: Sendable, Equatable {
     public var tmdbID: Int
     /// Higher is more popular.
     public var score: Double
+    /// Where the list's own page for the title is, for the lists whose terms ask for a link back.
+    public var link: String?
 
-    public init(kind: MediaKind, tmdbID: Int, score: Double) {
+    public init(kind: MediaKind, tmdbID: Int, score: Double, link: String? = nil) {
         self.kind = kind
         self.tmdbID = tmdbID
         self.score = score
+        self.link = link
     }
 }
 
