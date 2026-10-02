@@ -16,11 +16,28 @@ struct HomeView: View {
 
     @State private var showingAdd = false
     @State private var playing: PlaybackTarget?
+    @State private var search = ""
 
     /// A rail is a glance, not a list: the list is a tab away.
     private let railLimit = 20
 
     var body: some View {
+        Group {
+            if search.trimmingCharacters(in: .whitespaces).isEmpty {
+                rails
+            } else {
+                SearchView(query: search)
+            }
+        }
+        .navigationTitle("Home")
+        .modifier(HomeSearch(text: $search, isOffered: !library.playlists.isEmpty))
+        .sheet(isPresented: $showingAdd) {
+            NavigationStack { AddPlaylistView() }
+        }
+        .modifier(PlayerPresentation(target: $playing))
+    }
+
+    private var rails: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 32) {
                 if library.playlists.isEmpty {
@@ -58,11 +75,6 @@ struct HomeView: View {
             }
             .padding(.vertical)
         }
-        .navigationTitle("Home")
-        .sheet(isPresented: $showingAdd) {
-            NavigationStack { AddPlaylistView() }
-        }
-        .modifier(PlayerPresentation(target: $playing))
     }
 
     /// Unfinished films and episodes, without the one the banner already offers.
@@ -106,6 +118,25 @@ struct HomeView: View {
     private var browseButton: some View {
         Button("Browse all channels", systemImage: "tv", action: onBrowse)
             .padding(.horizontal)
+    }
+}
+
+/// Search across everything, once there is something to search: before the first source there is
+/// nothing to find, and on Apple TV the keyboard would sit above the welcome message.
+private struct HomeSearch: ViewModifier {
+    @Binding var text: String
+    let isOffered: Bool
+
+    func body(content: Content) -> some View {
+        #if os(tvOS)
+            if isOffered {
+                content.searchable(text: $text, prompt: "Channels, movies, series")
+            } else {
+                content
+            }
+        #else
+            content.searchable(text: $text, prompt: "Channels, movies, series")
+        #endif
     }
 }
 

@@ -207,10 +207,10 @@ Getting a real provider's content into the app. Nothing else can be tested until
 
 The first milestone where Panop is usable.
 
-- [ ] **Live TV list** with provider groups *(asked for)*. **Partly done:** Live TV shows the
+- [x] **Live TV list** with provider groups *(asked for)*. **Partly done:** Live TV shows the
       channels of every source, or one chosen source (remembered, and offered only when there
       are several), sorted by name, with search and a page that grows as you scroll up to a
-      5,000 row cap. Still to do: filtering by the provider's group. An earlier placeholder took
+      5,000 row cap. Filtering by the provider's group is done (the Category button, M2). An earlier placeholder took
       the first 200 rows it found, which showed only the first playlist's channels.
       Names sort on a stored `nameKey` (case and accents folded at import) because SwiftData's
       default string sort is localised and no index can serve it. Measured on 107k channels
@@ -239,8 +239,13 @@ The first milestone where Panop is usable.
       name or provider order; 5 query tests, UI tests on iOS). **Not verified:** that an
       existing store gains those two indexes cleanly. **Not done:** a backdrop image, a
       trailer, and counts next to the category names.
-- [ ] **Search** across the catalog. Needs SQLite FTS or bounded predicates with a fetch limit;
-      an unbounded sort defeats the limit entirely.
+- [x] **Search** across the catalog. Home has a search field; typing replaces its rails with
+      matches for live channels, movies and series together (12 per kind, none drawn when a kind
+      has no match), each the same bounded, indexed fetch its own screen uses, 250 ms after typing
+      stops. Tapping plays a channel, opens a film's page, or opens a series. UI tests on iOS.
+      It is on Home rather than a tab of its own because an iPhone shows five tabs, and a sixth
+      pushed Settings into "More". **Not done:** matching on more than the name (plot, cast), and
+      ranking: results are in name order.
 - [x] **Engine coordinator** *(surfaced)*: owns the ordered fallback list, reconnect and
       backoff. Never inside an adapter (ADR 0002). Portable (`PanopPlayback`), tested with a
       scripted fake engine in 0.2 s. A format rejection moves to the next engine without a retry;

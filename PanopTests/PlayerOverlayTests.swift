@@ -4,7 +4,7 @@ import MediaPlayer
 import PanopPlayback
 import Testing
 
-@Suite("Player overlay")
+@Suite("Player overlay", .engineGate)
 @MainActor
 struct PlayerOverlayTests {
     private func makeModel(
@@ -219,7 +219,7 @@ final class RecordingNowPlaying: NowPlayingPublishing {
     }
 }
 
-@Suite("Now Playing")
+@Suite("Now Playing", .engineGate)
 @MainActor
 struct NowPlayingTests {
     private func playing(
@@ -345,7 +345,7 @@ struct NowPlayingTests {
     }
 }
 
-@Suite("System Now Playing", .serialized)
+@Suite("System Now Playing", .serialized, .engineGate)
 @MainActor
 struct SystemNowPlayingTests {
     @Test
@@ -384,7 +384,7 @@ struct SystemNowPlayingTests {
     }
 }
 
-@Suite("AirPlay")
+@Suite("AirPlay", .engineGate)
 @MainActor
 struct AirPlayTests {
     private func model(_ makeEngine: @escaping PlaybackCoordinator.EngineFactory) -> PlayerModel {

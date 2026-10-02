@@ -161,7 +161,7 @@ struct EngineRegistryTests {
     }
 }
 
-@Suite("Player model", .serialized)
+@Suite("Player model", .serialized, .engineGate)
 @MainActor
 struct PlayerModelTests {
     private func wav(seconds: Double) throws -> URL {
