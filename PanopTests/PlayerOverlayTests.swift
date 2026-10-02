@@ -178,6 +178,49 @@ struct PlayerOverlayTests {
         await model.stop()
     }
 
+    @Test
+    func `a menu, the AirPlay picker and focus each hold the controls, and all must let go`() async {
+        let model = await playing(ScriptedEngine(), timeout: .milliseconds(60))
+
+        model.holdControls(true, reason: "airplay")
+        model.holdControls(true, reason: "focus")
+        try? await Task.sleep(for: .milliseconds(250))
+        #expect(model.controlsVisible, "held twice, so up well past the timeout")
+
+        model.holdControls(false, reason: "focus")
+        try? await Task.sleep(for: .milliseconds(250))
+        #expect(model.controlsVisible, "the picker is still open, whatever focus did")
+
+        model.holdControls(false, reason: "airplay")
+        #expect(await waitFor { !model.controlsVisible }, "once everything lets go the countdown runs")
+        await model.stop()
+    }
+
+    @Test
+    func `the same reason holding twice is one hold, released once`() async {
+        let model = await playing(ScriptedEngine(), timeout: .milliseconds(60))
+
+        model.holdControls(true, reason: "audio")
+        model.holdControls(true, reason: "audio")
+        model.holdControls(false, reason: "audio")
+
+        #expect(await waitFor { !model.controlsVisible })
+        await model.stop()
+    }
+
+    @Test
+    func `a track menu holds the controls up while it is open and releases them when it closes`() async {
+        let model = await playing(ScriptedEngine(), timeout: .milliseconds(60))
+
+        model.holdControls(true, reason: "subtitles")
+        try? await Task.sleep(for: .milliseconds(250))
+        #expect(model.controlsVisible)
+
+        model.holdControls(false, reason: "subtitles")
+        #expect(await waitFor { !model.controlsVisible })
+        await model.stop()
+    }
+
     // MARK: - Clock text
 
     @Test(arguments: [

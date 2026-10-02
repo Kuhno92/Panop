@@ -481,6 +481,14 @@ The brief called performance a key concept. For IPTV this concentrates in one nu
       background call per read). 8 model tests, UI tests on iOS and tvOS. **Not seen on a
       display by eye.** **Not done:** a collapsed rail per category as an overview, and per-title
       rating on the poster.
+- [x] **Controls stay up behind an open menu** *(reported)*. The player's controls hid after a few
+      seconds with the AirPlay picker, or the audio or subtitle choice, open on top of them,
+      taking it away. Holds now have a reason (focus, `airplay`, `audio`, `subtitles`), and the bar
+      comes down only when none is left. AirPlay reports the route picker opening and closing
+      through its delegate; on iOS and macOS the audio and subtitle choices are popovers with
+      known state, because a SwiftUI `Menu` cannot say when it is open (Apple TV keeps its menus,
+      held by focus). 3 unit tests and an iOS UI test (menu open past twice the timeout). **Not
+      verified:** the AirPlay picker itself, which is a system dialog no test can open.
 - [ ] **tvOS focus engine work** *(surfaced)*. Full-width focus targets, no `Color.accentColor`
       for fills, layout mutations deferred out of the focus animation context. **Audited and
       partly fixed:** no accent-colour fills anywhere; the remote-driven callbacks are deferred;

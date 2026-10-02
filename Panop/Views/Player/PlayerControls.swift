@@ -69,7 +69,7 @@ struct PlayerControls: View {
 
             #if !os(tvOS)
                 if model.supportsAirPlay {
-                    AirPlayButton()
+                    AirPlayButton { model.holdControls($0, reason: "airplay") }
                         .frame(width: 28, height: 28)
                         .accessibilityLabel("AirPlay")
                 }
@@ -127,48 +127,75 @@ struct PlayerControls: View {
             .font(.caption.monospacedDigit())
     }
 
+    /// One choice among a stream's tracks, as the controls show it.
+    private struct Choice {
+        var symbol: String
+        var label: String
+        /// What holds the bar up while the choice is open.
+        var reason: String
+        var focus: Control
+        var noneTitle: String
+        var tracks: [TrackDescriptor]
+        var selected: String?
+        var select: (String?) -> Void
+    }
+
     @ViewBuilder
     private var tracks: some View {
         if model.audioTracks.count > 1 {
-            Menu {
-                Button {
-                    model.selectAudio(id: nil)
-                } label: {
-                    checked("Default", model.selectedAudioID == nil)
-                }
-                ForEach(model.audioTracks) { track in
-                    Button {
-                        model.selectAudio(id: track.id)
-                    } label: {
-                        checked(track.label, model.selectedAudioID == track.id)
-                    }
-                }
-            } label: {
-                Image(systemName: "speaker.wave.2").font(.title3)
-            }
-            .trackFocus($focused, .audio)
-            .accessibilityLabel("Audio")
+            trackChoice(Choice(
+                symbol: "speaker.wave.2",
+                label: "Audio",
+                reason: "audio",
+                focus: .audio,
+                noneTitle: "Default",
+                tracks: model.audioTracks,
+                selected: model.selectedAudioID,
+                select: model.selectAudio(id:)
+            ))
         }
         if !model.subtitleTracks.isEmpty {
+            trackChoice(Choice(
+                symbol: "captions.bubble",
+                label: "Subtitles",
+                reason: "subtitles",
+                focus: .subtitles,
+                noneTitle: "Off",
+                tracks: model.subtitleTracks,
+                selected: model.selectedSubtitleID,
+                select: model.selectSubtitle(id:)
+            ))
+        }
+    }
+
+    /// A choice among a stream's tracks. Apple TV uses a menu, which the remote's focus already
+    /// holds the bar up for. Elsewhere it is a popover whose open state is known, so the bar can
+    /// be held up while it is open: a plain `Menu` never says when it is showing, and the bar
+    /// would go after a few seconds, taking the menu with it.
+    @ViewBuilder
+    private func trackChoice(_ choice: Choice) -> some View {
+        #if os(tvOS)
             Menu {
-                Button {
-                    model.selectSubtitle(id: nil)
-                } label: {
-                    checked("Off", model.selectedSubtitleID == nil)
-                }
-                ForEach(model.subtitleTracks) { track in
-                    Button {
-                        model.selectSubtitle(id: track.id)
-                    } label: {
-                        checked(track.label, model.selectedSubtitleID == track.id)
-                    }
+                Button { choice.select(nil) } label: { checked(choice.noneTitle, choice.selected == nil) }
+                ForEach(choice.tracks) { track in
+                    Button { choice.select(track.id) } label: { checked(track.label, choice.selected == track.id) }
                 }
             } label: {
-                Image(systemName: "captions.bubble").font(.title3)
+                Image(systemName: choice.symbol).font(.title3)
             }
-            .trackFocus($focused, .subtitles)
-            .accessibilityLabel("Subtitles")
-        }
+            .trackFocus($focused, choice.focus)
+            .accessibilityLabel(choice.label)
+        #else
+            TrackPopoverButton(
+                symbol: choice.symbol,
+                label: choice.label,
+                noneTitle: choice.noneTitle,
+                tracks: choice.tracks,
+                selected: choice.selected,
+                select: choice.select,
+                onPresenting: { model.holdControls($0, reason: choice.reason) }
+            )
+        #endif
     }
 
     @ViewBuilder
@@ -193,3 +220,58 @@ private extension View {
         #endif
     }
 }
+
+#if !os(tvOS)
+    /// The button for a track choice, and the popover it opens. Reports when the popover is open.
+    private struct TrackPopoverButton: View {
+        let symbol: String
+        let label: String
+        let noneTitle: String
+        let tracks: [TrackDescriptor]
+        let selected: String?
+        let select: (String?) -> Void
+        let onPresenting: (Bool) -> Void
+
+        @State private var showing = false
+
+        var body: some View {
+            Button { showing = true } label: {
+                Image(systemName: symbol).font(.title3)
+            }
+            .accessibilityLabel(label)
+            .popover(isPresented: $showing) {
+                VStack(alignment: .leading, spacing: 4) {
+                    option(noneTitle, isSelected: selected == nil, id: nil)
+                    ForEach(tracks) { track in
+                        option(track.label, isSelected: selected == track.id, id: track.id)
+                    }
+                }
+                .padding(12)
+                .frame(minWidth: 180, alignment: .leading)
+                .foregroundStyle(.primary)
+                // On an iPhone a popover would otherwise become a full sheet.
+                .presentationCompactAdaptation(.popover)
+            }
+            // Closing it however it closes, including a tap outside, lets the bar go.
+            .onChange(of: showing) { onPresenting(showing) }
+        }
+
+        private func option(_ title: String, isSelected: Bool, id: String?) -> some View {
+            Button {
+                select(id)
+                showing = false
+            } label: {
+                HStack {
+                    Text(title)
+                    Spacer(minLength: 16)
+                    if isSelected {
+                        Image(systemName: "checkmark")
+                    }
+                }
+                .padding(.vertical, 6)
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+        }
+    }
+#endif

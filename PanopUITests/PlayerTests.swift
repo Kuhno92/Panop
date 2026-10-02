@@ -100,5 +100,25 @@ final class PlayerTests: PanopUITestCase {
             app.windows.firstMatch.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
             XCTAssertTrue(close.waitForExistence(timeout: 5), "a tap did not bring the controls back")
         }
+
+        func testTheControlsStayUpWhileAnAudioMenuIsOpen() {
+            waitForChannels()
+            channel("3sat").tap()
+            let close = app.buttons["Close"]
+            XCTAssertTrue(close.waitForExistence(timeout: 15))
+
+            app.buttons["Audio"].tap()
+            let english = app.buttons["English"]
+            XCTAssertTrue(english.waitForExistence(timeout: 10), "the audio choices did not open")
+
+            // Twice the timeout and more: the bar would have gone, and the menu with it.
+            Thread.sleep(forTimeInterval: 7)
+            XCTAssertTrue(english.exists, "the open menu went with the controls")
+            XCTAssertTrue(close.exists, "the controls hid while a menu was open")
+
+            // Choosing closes it, and then the bar goes on its own again.
+            english.tap()
+            XCTAssertTrue(close.waitForNonExistence(timeout: 12), "the controls never hid after the menu closed")
+        }
     }
 #endif

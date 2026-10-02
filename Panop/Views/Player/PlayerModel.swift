@@ -30,6 +30,8 @@ final class PlayerModel {
     private(set) var controlsVisible = true
     /// Set while something in the controls has focus. The controls do not hide under it.
     private(set) var controlsHeld = false
+    /// What is holding the controls up, by reason.
+    private var holds: Set<String> = []
 
     private let coordinator: PlaybackCoordinator
     private let request: PlaybackRequest
@@ -237,10 +239,20 @@ final class PlayerModel {
     /// Keeps the controls up while a person is working them, then starts the countdown
     /// from the moment they let go. On Apple TV the remote moves focus between controls,
     /// and a bar that vanished under it would take the focus with it.
-    func holdControls(_ held: Bool) {
-        guard held != controlsHeld else { return }
-        controlsHeld = held
+    ///
+    /// Several things can hold the bar at once (focus, the AirPlay picker, a track menu), each under
+    /// its own `reason`, and it comes down only once none of them does. One letting go must not
+    /// release what another is still holding.
+    func holdControls(_ held: Bool, reason: String = "focus") {
         if held {
+            holds.insert(reason)
+        } else {
+            holds.remove(reason)
+        }
+        let nowHeld = !holds.isEmpty
+        guard nowHeld != controlsHeld else { return }
+        controlsHeld = nowHeld
+        if nowHeld {
             hideTask?.cancel()
             controlsVisible = true
         } else {
