@@ -92,6 +92,11 @@ Scripts/worktree.sh remove feat/epg-parser
 # App tests (SwiftData, so they cannot live in the portable package). ~10 s on macOS
 Scripts/test-app.sh [macos|ios|tvos]
 
+# The loop between edits: only the tests the change can affect (uncommitted files, or
+# --since REV). Package change -> package tests; any app change -> macOS app tests (~30 s);
+# a screen change -> that screen's UI suites on iOS. The full matrix is for the end of the work.
+Scripts/test-changed.sh [--since REV] [--dry-run]
+
 # Catalog import benchmarks: Release build, macOS, prints a results table
 Scripts/test-app.sh --benchmark
 
