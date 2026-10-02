@@ -3,7 +3,11 @@
 <plist version="1.0">
 <dict>
 	<!-- Panop has no accounts of its own, no analytics and no advertising. A playlist's address and
-	     login stay in the device Keychain and are sent only to the provider the person chose. -->
+	     login stay in the device Keychain and are sent only to the provider the person chose.
+	     Two things go to Simkl (simkl.com), and only with Simkl's own client id: a public trending
+	     list is fetched the same way for everyone, and, once the person connects their own Simkl
+	     account, the films and episodes they finish are recorded there. Suggestions are computed on
+	     the device and nothing about what is watched leaves it otherwise. -->
 	<key>NSPrivacyTracking</key>
 	<false/>
 	<key>NSPrivacyTrackingDomains</key>

@@ -15,13 +15,14 @@ The repo is being built up in stages. **Only check off what actually exists**; d
 command works because it is documented below.
 
 - [x] Repo skeleton, docs, lint tooling, ADRs
-- [x] `Packages/PanopKit`: PanopCore, PanopPlaylist, PanopPlayback, PanopXtream, PanopEPG, PanopCatalog (306 tests passing)
+- [x] `Packages/PanopKit`: PanopCore, PanopPlaylist, PanopPlayback, PanopXtream, PanopEPG, PanopCatalog, PanopDiscover, PanopSimkl (366 tests passing)
 - [x] `Panop.xcodeproj` and the app target (builds and launches on **macOS and iOS**)
-- [x] `SwiftDataCatalogStore` and the `PanopTests` target (328 tests, passing on macOS, iOS and tvOS)
+- [x] `SwiftDataCatalogStore` and the `PanopTests` target (406 tests, passing on macOS; the iOS and tvOS runs last checked at 328)
 - [x] Playback coordinator (portable, `PanopPlayback`) and the AVPlayer adapter. Channels play from the Live TV list. AVPlayer cannot read raw MPEG-TS, so those streams fall through to VLC; Xtream live streams play in AVPlayer directly because the panel offers HLS
 - [x] VLCKit adapter (4.0.0-a24, the only SwiftPM line; an alpha). Plays raw MPEG-TS over HTTP, so M3U live streams now work, verified on real transport-stream bytes through the coordinator
 - [x] LumeEngine adapter (submodule `vendor/LumeEngine`, pinned to v0.2.2, dynamic and embedded). Plays raw MPEG-TS and HLS; verified on macOS, iOS and tvOS. PiP and the AirPlay picker are wired for AVPlayer (iOS, macOS) but neither is seen working on a device (KSPlayer stays unlinked)
 - [x] Playlist import wired to the catalog container: add by Xtream login, M3U link or M3U file, Keychain credentials, background sync. The screens launch and are covered by service-level tests, but have not been driven by hand or by UI tests yet
+- [x] Discovery rails on Home, Movies and Series, computed on the device from the library and the viewing history (`PanopDiscover`, `Panop/Services/Discovery`; ADR 0008). Simkl is wired in (`PanopSimkl`: public trending list, device-flow sign-in, finished titles sent, the person's lists read) but **dormant until `SimklConfig.clientID` is set**, and none of it has run against Simkl's live API with an account
 
 `docs/ROADMAP.md` is the full feature list, ordered into milestones and traced back to the
 original requirements. **Check it before starting work**, and tick items there as they land.
@@ -191,6 +192,8 @@ Packages/PanopKit/     PORTABLE core. Foundation only. No Apple-only frameworks.
 ├── PanopXtream        Xtream Codes client, behind HTTPTransport
 ├── PanopEPG           XMLTV pull parser
 ├── PanopCatalog       Import/reconcile orchestration, behind CatalogStore
+├── PanopDiscover      Rail builder: trending, because-you-watched, genres, classics (pure)
+├── PanopSimkl         Simkl client: trending files, device sign-in, history, lists
 └── PanopPlayback      PlaybackEngine protocol + PlaybackEngineKind
 
 Panop/                 Apple app target. SwiftUI + SwiftData.

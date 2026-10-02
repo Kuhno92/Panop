@@ -554,6 +554,23 @@ The brief called performance a key concept. For IPTV this concentrates in one nu
       covered:** macOS (needs an accessibility grant), the Add Playlist flow, Settings, and
       playback itself, since the test engine draws no picture.
 
+- [x] **Discovery rails** *(asked for)*: Netflix-style rails built only from the person's own
+      library. Trending, because you watched, new releases, top rated, genre, franchise, classics,
+      decades, a pick of the day and what was watched most; on Home, and at the top of Movies and
+      Series. The provider's own year, rating, genre, cast, TMDB id and adult flag feed them; adult
+      titles are never suggested. Computed off the main thread, cached on disk, rebuilt after a
+      change. A Settings switch turns them off and "Forget what I watched" clears the history they
+      learn from. **Not done:** running the build against the real 10,000-title library to time it
+      and measure memory (the benchmark needs the provider login in the environment), UI tests of
+      the rails (the seeded test library has no films), and "Next up" and rating-based seeds from Simkl.
+- [x] **Simkl** *(asked for)*: public trending list (named as Simkl's, with a link to each title),
+      sign-in by code and QR code, finished films and episodes recorded on the account in batches
+      that survive being offline, and the person's plan-to-watch list as a rail. **Dormant until the
+      app is registered at Simkl and `SimklConfig.clientID` is set.** Unit-tested against stubs
+      only: the list response shape, the sign-in and the history call have not met the live API.
+      Free below $150 a month of revenue, a licence above (see THIRD-PARTY-NOTICES.md); all of it is
+      in `PanopSimkl`, which can be dropped.
+
 ---
 
 ## M5 — Sync
