@@ -1,12 +1,22 @@
+import SwiftData
 import SwiftUI
 
-enum AppTab: Hashable {
+nonisolated enum AppTab: Hashable {
     case home, live, movies, series, settings
 }
 
 struct RootView: View {
     @Environment(PlaylistLibrary.self) private var library
-    @State private var selection: AppTab = UITestMode.startTab ?? .home
+    @Environment(UserStateStore.self) private var userState
+    @Environment(\.modelContext) private var catalog
+    @State private var selection: AppTab
+    @State private var autoplay: PlaybackTarget?
+
+    init() {
+        // The screen it opens on is known from the settings alone, so the first frame is the
+        // right one. `applyStartupPlan` corrects it if that screen turns out not to be offered.
+        _selection = State(initialValue: UITestMode.startTab ?? StartupPreference.current(offersVOD: true).tab)
+    }
 
     var body: some View {
         TabView(selection: $selection) {
@@ -20,14 +30,17 @@ struct RootView: View {
                     LiveTVView()
                 }
             }
-            Tab("Movies", systemImage: "film", value: AppTab.movies) {
-                NavigationStack {
-                    VODBrowseView(kind: .movie)
+            // Only when some source has films and series to show.
+            if library.offersVOD {
+                Tab("Movies", systemImage: "film", value: AppTab.movies) {
+                    NavigationStack {
+                        VODBrowseView(kind: .movie)
+                    }
                 }
-            }
-            Tab("Series", systemImage: "rectangle.stack", value: AppTab.series) {
-                NavigationStack {
-                    VODBrowseView(kind: .series)
+                Tab("Series", systemImage: "rectangle.stack", value: AppTab.series) {
+                    NavigationStack {
+                        VODBrowseView(kind: .series)
+                    }
                 }
             }
             Tab("Settings", systemImage: "gearshape", value: AppTab.settings) {
@@ -36,12 +49,39 @@ struct RootView: View {
                 }
             }
         }
+        .onChange(of: library.offersVOD) { _, offered in
+            // A screen that went away cannot stay selected.
+            if !offered, selection == .movies || selection == .series {
+                selection = .home
+            }
+        }
         #if os(macOS)
         .modifier(DebugPlayerWindowOpener())
         #endif
         // Playlists the user added keep themselves current without being asked.
         // The work runs on the sync service's actor, not here.
         .task { await library.refreshStale(maxAge: 12 * 3600) }
+        .modifier(PlayerPresentation(target: $autoplay))
+        .task { applyStartupPlan() }
+    }
+}
+
+private extension RootView {
+    /// Carries out the launch plan once the library is known: a screen that is not offered
+    /// becomes Home, and a chosen channel starts playing.
+    ///
+    /// The channel comes from the catalog already on disk, so nothing waits for a sync. One
+    /// that has gone since is simply not found, and Live TV shows instead.
+    @MainActor
+    func applyStartupPlan() {
+        // UI tests choose their own screen, and a stream would only get in their way.
+        guard !UITestMode.isActive else { return }
+        let plan = StartupPreference.current(offersVOD: library.offersVOD)
+        selection = plan.tab
+        guard let key = plan.channel else { return }
+        guard let channel = StartupPreference.channel(for: key, in: catalog) else { return }
+        userState.markPlayed(key)
+        autoplay = PlaybackTarget(entry: channel)
     }
 }
 

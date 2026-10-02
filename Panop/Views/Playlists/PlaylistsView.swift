@@ -192,11 +192,12 @@ struct PlaylistRow: View {
     // MARK: - Status
 
     private var subtitle: String {
-        switch playlist.kind {
+        let source = switch playlist.kind {
         case .xtream: "Xtream · \(playlist.displayHost)"
         case .remoteM3U: "M3U · \(playlist.displayHost)"
         case .localM3U: "M3U file"
         }
+        return playlist.includesVOD ? source : source + " · Live TV only"
     }
 
     @ViewBuilder

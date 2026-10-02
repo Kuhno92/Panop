@@ -18,6 +18,11 @@ class PanopUITestCase: XCTestCase {
         "live"
     }
 
+    /// Seed the playlist as a live-only source, which hides the Movies and Series tabs.
+    var liveOnly: Bool {
+        false
+    }
+
     override func setUpWithError() throws {
         continueAfterFailure = false
         // Driving a Mac app needs an accessibility grant that is only given interactively.
@@ -30,6 +35,9 @@ class PanopUITestCase: XCTestCase {
         app.launchArguments = ["-panop-uitest"]
         app.launchEnvironment["PANOP_CONTROLS_TIMEOUT"] = String(controlsTimeout)
         app.launchEnvironment["PANOP_START_TAB"] = startTab
+        if liveOnly {
+            app.launchEnvironment["PANOP_LIVE_ONLY"] = "1"
+        }
         app.launch()
     }
 

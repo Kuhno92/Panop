@@ -81,11 +81,14 @@ public struct CatalogImporter: Sendable {
     /// - Parameters:
     ///   - force: import even when the digest is unchanged.
     ///   - streamName: what to call the channel when the source is a single stream.
+    ///   - includeVOD: false keeps live channels only. The rest of the file is still read, since
+    ///     an M3U file offers no way to fetch part of it, but none of it is stored.
     public func importM3U(
         playlist: String,
         source: M3USource,
         force: Bool = false,
-        streamName: String? = nil
+        streamName: String? = nil,
+        includeVOD: Bool = true
     ) async throws -> ImportReport {
         let file = try await prepare(source)
         defer {
@@ -109,6 +112,7 @@ public struct CatalogImporter: Sendable {
             trackers[kind] = try await KindTracker(kind: kind, before: store.entryCount(kind: kind, playlist: playlist))
         }
         var counts = ParseCounts()
+        counts.keepsVOD = includeVOD
         let header: PlaylistHeader = if let kind = Self.hlsKind(atPath: file.path) {
             try await acceptSingleStream(
                 kind: kind,
@@ -177,7 +181,13 @@ public struct CatalogImporter: Sendable {
                 counts: &counts
             )
         }
-        try await accept(parser.finish(), base: base, playlist: playlist, trackers: &trackers, counts: &counts)
+        try await accept(
+            parser.finish(),
+            base: base,
+            playlist: playlist,
+            trackers: &trackers,
+            counts: &counts
+        )
         for kind in MediaKind.allCases {
             try await flush(&trackers[kind, default: KindTracker(kind: kind, before: 0)], playlist: playlist)
         }
@@ -195,6 +205,10 @@ public struct CatalogImporter: Sendable {
             // An entry with no playable address is not a channel. Counted, not hidden.
             guard var entry = EntryMapping.entry(from: item, base: base) else {
                 counts.skipped += 1
+                continue
+            }
+            // Left out by the user's choice, so it is neither stored nor counted as unusable.
+            if !counts.keepsVOD, entry.kind != .live {
                 continue
             }
             // Where it stands in the file, which is the order the provider put its channels in.
@@ -350,4 +364,6 @@ private struct ParseCounts {
     var position = 0
     /// The series already made from episodes met so far, so each is made once.
     var seriesSeen: Set<String> = []
+    /// False for a live-only source: films and episodes are read past and not stored.
+    var keepsVOD = true
 }

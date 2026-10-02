@@ -21,7 +21,11 @@ extension CatalogImporter {
     /// - Throws: ``XtreamError/authenticationFailed`` for bad credentials, or
     ///   ``CatalogError/everySectionFailed(firstFailure:)`` when nothing
     ///   imported. Partial failure is returned in the report instead.
-    public func importXtream(playlist: String, credentials: ProviderCredentials) async throws -> ImportReport {
+    public func importXtream(
+        playlist: String,
+        credentials: ProviderCredentials,
+        includeVOD: Bool = true
+    ) async throws -> ImportReport {
         let client = try XtreamClient(credentials: credentials, transport: transport)
         _ = try await client.authenticate()
 
@@ -30,7 +34,7 @@ extension CatalogImporter {
         try await store.saveSyncState(state, playlist: playlist)
 
         var reports: [KindReport] = []
-        for kind in [MediaKind.live, .movie, .series] {
+        for kind in includeVOD ? [MediaKind.live, .movie, .series] : [.live] {
             do {
                 try await reports.append(importSection(
                     kind,

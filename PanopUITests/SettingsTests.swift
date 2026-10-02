@@ -23,6 +23,25 @@ final class SettingsTests: PanopUITestCase {
             add(shot)
         }
 
+        func testAStartupChannelCanBeChosen() {
+            waitForChannels()
+            app.tabBars.buttons["Settings"].tap()
+
+            let picker = app.buttons.matching(NSPredicate(format: "label CONTAINS 'When Panop opens'")).firstMatch
+            XCTAssertTrue(picker.waitForExistence(timeout: 10), "no startup setting. Screen:\n\(app.debugDescription)")
+            picker.tap()
+            app.buttons["Play a channel"].tap()
+
+            let row = app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Channel'")).firstMatch
+            XCTAssertTrue(row.waitForExistence(timeout: 10), "choosing a channel to play did not offer to pick one")
+            row.tap()
+            XCTAssertTrue(app.buttons["3sat"].waitForExistence(timeout: 10), "the channel list did not appear")
+            app.buttons["3sat"].tap()
+
+            let chosen = app.buttons.matching(NSPredicate(format: "label CONTAINS '3sat'")).firstMatch
+            XCTAssertTrue(chosen.waitForExistence(timeout: 10), "the chosen channel is not shown in Settings")
+        }
+
         func testWithNothingPlayedTheStatisticsSaySo() {
             waitForChannels()
 

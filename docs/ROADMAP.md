@@ -392,19 +392,25 @@ The brief called performance a key concept. For IPTV this concentrates in one nu
       both, and, on iOS, starring, playing and finding both on Home. **Not done:** a hero for
       the channel last watched, artwork beyond logos, a rail per group or per source, and
       movie and series rails, which wait for those screens.
-- [ ] **Live-only sources: make VOD optional** *(asked for)*. When adding a source, an option to
-      load live TV only. A live-only source skips the movie and series part of the import (less
-      to download, parse and store). If no source with VOD is present, the Movies and Series
-      tabs are not shown at all, on every platform, and come back when a source with VOD is
-      added. Open questions: where the choice lives (per source, changeable later, with the VOD
-      rows dropped when it is turned off), and what Xtream does (skip the VOD and series
-      calls) against M3U (skip entries that are not live, which still means reading the file).
-- [ ] **Startup behaviour** *(asked for)*. Settings options for what the app does on launch: open
-      a chosen screen (Home, Live TV, Movies or Series) or start playing a chosen channel in
-      Live TV. Open questions: a channel is picked from the list and stored by its key (playlist
-      and entry), with a fallback to the chosen screen when it is gone; autoplay must not delay
-      the first frame of the UI; and a screen that is hidden (see live-only sources above) is
-      not offered.
+- [x] **Live-only sources: make VOD optional** *(asked for)*. The add form has a "Live TV only"
+      switch. Such a source skips the movie and series part of the import: an Xtream panel is
+      never asked for them (two of three large downloads saved), and an M3U file is still read
+      through but none of its films or episodes is stored, nor counted as unusable. With no
+      source that has VOD, the Movies and Series tabs are not shown (and Home is selected if one
+      was open); with no source at all they stay, since there is nothing to hide yet. The
+      playlist row says "Live TV only". Package tests for both importers and the descriptor,
+      app tests for the library, UI tests on iOS and tvOS (tabs hidden, and present for a full
+      source). **Not done:** switching an existing source between live-only and full (delete
+      and add it again for now): turning VOD off must remove the rows without tripping the
+      mass-removal safety check, and turning it on must force a re-import.
+- [x] **Startup behaviour** *(asked for)*. Settings has "When Panop opens": Home, Live TV, Movies,
+      Series, or Play a channel, which adds a searchable picker for the channel. The screen is
+      known from the settings alone so the first frame is the right one; a channel starts from
+      the catalog already on disk (no wait for a sync), and one that has since gone leaves Live
+      TV showing. Movies and Series are not offered, and fall back to Home, when no source has
+      them. 7 tests for the plan and the lookup, and a UI test on iOS for choosing the channel.
+      **Not verified:** the channel actually starting at launch (UI tests choose their own
+      screen and skip it, since the playlist id is random), by hand on a device.
 - [ ] **tvOS focus engine work** *(surfaced)*. Full-width focus targets, no `Color.accentColor`
       for fills, layout mutations deferred out of the focus animation context. **Audited and
       partly fixed:** no accent-colour fills anywhere; the remote-driven callbacks are deferred;

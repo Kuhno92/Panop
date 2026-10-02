@@ -12,12 +12,22 @@ public struct PlaylistDescriptor: Sendable, Equatable {
     public var guideURL: String?
     /// What to call the channel if the source turns out to be a single stream.
     public var name: String?
+    /// False for a source added to carry live TV only: its movies and series are not fetched,
+    /// parsed or stored. For an Xtream panel that saves two of the three large downloads.
+    public var includeVOD: Bool
 
-    public init(id: String, source: PlaylistSource, guideURL: String? = nil, name: String? = nil) {
+    public init(
+        id: String,
+        source: PlaylistSource,
+        guideURL: String? = nil,
+        name: String? = nil,
+        includeVOD: Bool = true
+    ) {
         self.id = id
         self.source = source
         self.guideURL = guideURL
         self.name = name
+        self.includeVOD = includeVOD
     }
 }
 
@@ -112,7 +122,8 @@ extension CatalogImporter {
                 playlist: playlist.id,
                 source: .remote(url, redacting: secrets),
                 force: force,
-                streamName: playlist.name
+                streamName: playlist.name,
+                includeVOD: playlist.includeVOD
             )
             let guideURL = Self.guideURL(advertised: report.epgURLs, configured: playlist.guideURL)
             secrets += guideURL.map(URLSecrets.values(in:)) ?? []
@@ -123,7 +134,8 @@ extension CatalogImporter {
                 playlist: playlist.id,
                 source: .file(path: path),
                 force: force,
-                streamName: playlist.name
+                streamName: playlist.name,
+                includeVOD: playlist.includeVOD
             )
             let guideURL = Self.guideURL(advertised: report.epgURLs, configured: playlist.guideURL)
             return CatalogImportResult(
@@ -133,7 +145,11 @@ extension CatalogImporter {
             )
 
         case let .xtream(credentials):
-            let report = try await importXtream(playlist: playlist.id, credentials: credentials)
+            let report = try await importXtream(
+                playlist: playlist.id,
+                credentials: credentials,
+                includeVOD: playlist.includeVOD
+            )
             let guideURL = try XtreamClient(credentials: credentials, transport: transport).guideURL()
             return CatalogImportResult(
                 report: report,

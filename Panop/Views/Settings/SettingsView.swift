@@ -25,6 +25,8 @@ struct SettingsView: View {
                 Text("Library")
             }
 
+            StartupSection()
+
             Section {
                 Picker("Engine", selection: selectedEngine) {
                     // `selectable`: only engines with a working adapter. KSPlayer is

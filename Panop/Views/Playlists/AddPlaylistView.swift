@@ -27,6 +27,7 @@ struct AddPlaylistView: View {
     @State private var password = ""
     @State private var pickedFile: URL?
     @State private var showingFilePicker = false
+    @State private var liveOnly = false
     @State private var isAdding = false
     @State private var errorMessage: String?
 
@@ -48,6 +49,15 @@ struct AddPlaylistView: View {
             #if !os(tvOS)
                 case .m3uFile: fileFields
             #endif
+            }
+
+            Section {
+                Toggle("Live TV only", isOn: $liveOnly)
+            } footer: {
+                Text(
+                    "Skips the movies and series: they are not downloaded or stored, and the Movies and "
+                        + "Series tabs are hidden unless another source has them."
+                )
             }
 
             if let errorMessage {
@@ -157,7 +167,7 @@ struct AddPlaylistView: View {
         isAdding = true
         Task {
             do {
-                try await library.add(draft)
+                try await library.add(draft, includeVOD: !liveOnly)
                 dismiss()
             } catch {
                 errorMessage = error.localizedDescription

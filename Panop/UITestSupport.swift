@@ -1,6 +1,9 @@
 import Foundation
 import PanopCore
 import PanopPlayback
+#if canImport(UIKit)
+    import UIKit
+#endif
 
 /// A deterministic app for the UI tests, selected by the launch argument `-panop-uitest`.
 ///
@@ -10,6 +13,14 @@ import PanopPlayback
 enum UITestMode {
     #if DEBUG
         static let isActive = ProcessInfo.processInfo.arguments.contains("-panop-uitest")
+
+        /// A UI test waits for every animation to settle before it looks at the screen, so
+        /// removing them makes each step shorter without changing what is being checked.
+        static func disableAnimations() {
+            #if canImport(UIKit)
+                UIView.setAnimationsEnabled(false)
+            #endif
+        }
 
         /// How long the player's controls stay up, set by the test through the environment
         /// `PANOP_CONTROLS_TIMEOUT` (seconds). The real four seconds is shorter than a UI test
@@ -57,7 +68,10 @@ enum UITestMode {
         /// The simulator keeps UserDefaults between launches, and Live TV remembers its filters.
         /// A test that left it on Favourites must not decide what the next one sees.
         static func resetPreferences() {
-            for key in ["liveListMode", "liveSourceFilter", "liveSortOrder", "playbackEngine"] {
+            for key in [
+                "liveListMode", "liveSourceFilter", "liveSortOrder", "playbackEngine",
+                StartupPreference.actionKey, StartupPreference.channelKey, StartupPreference.channelNameKey
+            ] {
                 UserDefaults.standard.removeObject(forKey: key)
             }
         }
@@ -86,7 +100,8 @@ enum UITestMode {
             let file = FileManager.default.temporaryDirectory.appendingPathComponent("uitest-\(UUID().uuidString).m3u")
             do {
                 try text.write(to: file, atomically: true, encoding: .utf8)
-                _ = try await services.library.add(.m3uFile(name: "Test Source", fileURL: file))
+                let liveOnly = ProcessInfo.processInfo.environment["PANOP_LIVE_ONLY"] == "1"
+                _ = try await services.library.add(.m3uFile(name: "Test Source", fileURL: file), includeVOD: !liveOnly)
             } catch {
                 assertionFailure("UI test seed failed: \(error)")
             }

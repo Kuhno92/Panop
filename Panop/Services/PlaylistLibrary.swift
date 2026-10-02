@@ -69,9 +69,16 @@ final class PlaylistLibrary {
                 name: $0.name,
                 kind: $0.kind,
                 displayHost: $0.displayHost,
-                createdAt: $0.createdAt
+                createdAt: $0.createdAt,
+                includesVOD: $0.includesVOD
             )
         }
+    }
+
+    /// Whether any source has movies and series to show. The Movies and Series screens are
+    /// offered only then. With no source at all there is nothing to hide yet.
+    var offersVOD: Bool {
+        playlists.isEmpty || playlists.contains(where: \.includesVOD)
     }
 
     // MARK: - Adding
@@ -80,8 +87,11 @@ final class PlaylistLibrary {
     ///
     /// Xtream credentials are checked against the panel first, so a typo is
     /// reported here rather than as a failed sync minutes later.
+    ///
+    /// - Parameter includeVOD: false for a source that is only wanted for its live channels:
+    ///   movies and series are then not downloaded, parsed or stored.
     @discardableResult
-    func add(_ draft: PlaylistDraft) async throws -> PlaylistSummary {
+    func add(_ draft: PlaylistDraft, includeVOD: Bool = true) async throws -> PlaylistSummary {
         let id = UUID().uuidString
         let prepared = try await prepare(draft, id: id)
 
@@ -97,7 +107,8 @@ final class PlaylistLibrary {
             kind: prepared.kind,
             displayHost: prepared.host,
             localFileName: prepared.localFileName,
-            sortOrder: playlists.count
+            sortOrder: playlists.count,
+            includesVOD: includeVOD
         )
         context.insert(record)
         do {
@@ -123,7 +134,8 @@ final class PlaylistLibrary {
             name: prepared.name,
             kind: prepared.kind,
             displayHost: prepared.host,
-            createdAt: record.createdAt
+            createdAt: record.createdAt,
+            includesVOD: includeVOD
         )
     }
 
@@ -225,20 +237,28 @@ final class PlaylistLibrary {
         switch record.kind {
         case .remoteM3U:
             guard let url = secret?.url else { return nil }
-            return PlaylistDescriptor(id: id, source: .remoteM3U(url), guideURL: secret?.guideURL, name: record.name)
+            return PlaylistDescriptor(
+                id: id,
+                source: .remoteM3U(url),
+                guideURL: secret?.guideURL,
+                name: record.name,
+                includeVOD: record.includesVOD
+            )
         case .localM3U:
             guard let file = record.localFileName else { return nil }
             return PlaylistDescriptor(
                 id: id,
                 source: .localM3U(path: directory.appendingPathComponent(file).path),
-                name: record.name
+                name: record.name,
+                includeVOD: record.includesVOD
             )
         case .xtream:
             guard let secret, let url = secret.url, let user = secret.username,
                   let password = secret.password else { return nil }
             return PlaylistDescriptor(
                 id: id,
-                source: .xtream(ProviderCredentials(baseURL: url, username: user, password: password))
+                source: .xtream(ProviderCredentials(baseURL: url, username: user, password: password)),
+                includeVOD: record.includesVOD
             )
         }
     }

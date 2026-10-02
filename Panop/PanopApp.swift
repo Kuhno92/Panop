@@ -38,6 +38,7 @@ struct PanopApp: App {
             #if DEBUG
                 if UITestMode.isActive {
                     UITestMode.resetPreferences()
+                    UITestMode.disableAnimations()
                     let seeded = services
                     Task { await UITestMode.seed(seeded) }
                 }

@@ -20,6 +20,9 @@ final class PlaylistRecord {
     var localFileName: String?
     var createdAt: Date = Date.distantPast
     var sortOrder: Int = 0
+    /// False for a source added to carry live TV only. Defaulted, so a store made before this
+    /// existed still opens, with every source as it was: movies and series included.
+    var includesVOD: Bool = true
 
     init(
         id: String,
@@ -28,7 +31,8 @@ final class PlaylistRecord {
         displayHost: String,
         localFileName: String? = nil,
         createdAt: Date = .now,
-        sortOrder: Int = 0
+        sortOrder: Int = 0,
+        includesVOD: Bool = true
     ) {
         self.id = id
         self.name = name
@@ -37,6 +41,7 @@ final class PlaylistRecord {
         self.localFileName = localFileName
         self.createdAt = createdAt
         self.sortOrder = sortOrder
+        self.includesVOD = includesVOD
     }
 
     var kind: PlaylistKind {
@@ -58,4 +63,5 @@ nonisolated struct PlaylistSummary: Identifiable, Equatable, Sendable {
     var kind: PlaylistKind
     var displayHost: String
     var createdAt: Date
+    var includesVOD = true
 }
