@@ -95,6 +95,7 @@ struct VODBrowseView: View {
             rails: isSearching || group != nil ? [] : discovery.rails
                 .filter { ($0.mediaKind ?? discovery.rows[$0.keys.first ?? ""]?.kind) == kind },
             railRows: discovery.rows,
+            railLinks: discovery.trendingLinks,
             onSelect: select,
             onAdd: { showingAdd = true }
         )
@@ -236,6 +237,7 @@ private struct VODGrid: View {
     let isSyncing: Bool
     let rails: [Rail]
     let railRows: [String: CatalogRow]
+    let railLinks: [String: URL]
     let onSelect: (CatalogRow) -> Void
     let onAdd: () -> Void
 
@@ -247,6 +249,7 @@ private struct VODGrid: View {
         isSyncing: Bool,
         rails: [Rail],
         railRows: [String: CatalogRow],
+        railLinks: [String: URL],
         onSelect: @escaping (CatalogRow) -> Void,
         onAdd: @escaping () -> Void
     ) {
@@ -257,6 +260,7 @@ private struct VODGrid: View {
         self.isSyncing = isSyncing
         self.rails = rails
         self.railRows = railRows
+        self.railLinks = railLinks
         self.onSelect = onSelect
         self.onAdd = onAdd
     }
@@ -265,7 +269,7 @@ private struct VODGrid: View {
         ScrollView {
             LazyVStack(alignment: .leading, spacing: Self.spacing, pinnedViews: Self.pinnedHeadings) {
                 ForEach(rails) { rail in
-                    PosterRail(rail: rail, rows: railRows, onSelect: onSelect)
+                    PosterRail(rail: rail, rows: railRows, links: railLinks, onSelect: onSelect)
                 }
                 ForEach(model.sections) { section in
                     Section {

@@ -92,6 +92,16 @@ Not linked into the shipped app. Vendored via the root `Package.swift`.
 
 ---
 
+## Online services
+
+Not code in the build, but data the app fetches.
+
+| Service | Use | Terms |
+|---|---|---|
+| Simkl (https://simkl.com) | Public trending lists, shown under Simkl's name with a link to each title's Simkl page | https://api.simkl.org/api-rules: free for non-commercial apps and for commercial apps earning under $150 a month; above that a commercial licence is required. All Simkl code is in `PanopSimkl`, which can be dropped. |
+
+---
+
 ## Not a dependency
 
 `reference/` holds clones kept for occasional design reference. They are gitignored, are not

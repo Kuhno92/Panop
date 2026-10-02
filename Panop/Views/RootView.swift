@@ -14,6 +14,7 @@ struct RootView: View {
     /// One set of rails for Home, Movies and Series, built off the main thread (see `DiscoveryModel`).
     @State private var discovery = DiscoveryModel()
     @AppStorage(DiscoveryModel.enabledKey) private var showsSuggestions = true
+    @AppStorage(DiscoveryModel.trendingKey) private var showsTrending = true
 
     init() {
         // The screen it opens on is known from the settings alone, so the first frame is the
@@ -65,6 +66,9 @@ struct RootView: View {
         // The work runs on the sync service's actor, not here.
         .task { await library.refreshStale(maxAge: 12 * 3600) }
         .environment(discovery)
+        .task(id: showsTrending && showsSuggestions) {
+            await discovery.loadTrending(enabled: showsTrending && showsSuggestions, source: .panop)
+        }
         .onChange(of: showsSuggestions, initial: true) { discovery.isEnabled = showsSuggestions }
         // Rebuilt whenever what the rails are made from changes; an unchanged context is ignored. The
         // playlists are part of the key: they may load after the first pass, and nothing else would rerun it.

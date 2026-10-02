@@ -64,7 +64,7 @@ public struct DiscoverySeed: Sendable, Equatable {
 }
 
 /// One place on a list of what is popular, matched to the library by the title's TMDB id.
-public struct TrendingEntry: Sendable, Equatable {
+public struct TrendingEntry: Sendable, Equatable, Codable {
     public var kind: MediaKind
     public var tmdbID: Int
     /// Higher is more popular.

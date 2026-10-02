@@ -14,6 +14,7 @@ struct SettingsView: View {
     @Environment(PlaylistLibrary.self) private var library
     @Environment(UserStateStore.self) private var userState
     @AppStorage(DiscoveryModel.enabledKey) private var showsSuggestions = true
+    @AppStorage(DiscoveryModel.trendingKey) private var showsTrending = true
     @State private var confirmingForget = false
 
     var body: some View {
@@ -55,12 +56,16 @@ struct SettingsView: View {
 
             Section {
                 Toggle("Show suggestions", isOn: $showsSuggestions)
+                Toggle("Show what's trending on Simkl", isOn: $showsTrending)
+                    .disabled(!showsSuggestions)
                 Button("Forget what I watched", role: .destructive) { confirmingForget = true }
             } header: {
                 Text("Suggestions")
             } footer: {
                 Text(
-                    "Suggestions are chosen on this device from your own library and what you watch. Nothing about it is sent anywhere."
+                    "Suggestions are chosen on this device from your own library and what you watch. "
+                        + "What is trending is Simkl's public list, fetched the same way for everyone. "
+                        + "Nothing about you or what you watch is sent."
                 )
             }
             .confirmationDialog(

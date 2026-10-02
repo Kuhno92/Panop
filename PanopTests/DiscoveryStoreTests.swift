@@ -161,8 +161,8 @@ struct RailHeadingTests {
             RailHeading.title(for: Rail(kind: kind, keys: [], subject: subject))
         }
 
-        #expect(title(.trending(.movie)) == "Trending movies")
-        #expect(title(.trending(.series)) == "Trending series")
+        #expect(title(.trending(.movie)) == "Trending movies on Simkl")
+        #expect(title(.trending(.series)) == "Trending series on Simkl")
         #expect(title(.becauseYouWatched(seed: "k"), "DE - Reacher (2022) (US)") == "Because you watched Reacher")
         #expect(title(.newReleases(.series)) == "New series")
         #expect(title(.mostWatched) == "Watch again")

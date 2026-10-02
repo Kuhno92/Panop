@@ -24,6 +24,7 @@
 		AAAA000000000000000000F8 /* LumeEngine in Frameworks */ = {isa = PBXBuildFile; productRef = AAAA000000000000000000CC /* LumeEngine */; };
 		AAAA000000000000000000F9 /* PanopDiscover in Frameworks */ = {isa = PBXBuildFile; productRef = AAAA000000000000000000CD /* PanopDiscover */; };
 		AAAA000000000000000000FA /* LumeEngine in Embed Frameworks */ = {isa = PBXBuildFile; productRef = AAAA000000000000000000CB /* LumeEngine */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		BBBB000000000000000000A1 /* PanopSimkl in Frameworks */ = {isa = PBXBuildFile; productRef = BBBB000000000000000000A2 /* PanopSimkl */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -93,6 +94,7 @@
 				AAAA000000000000000000D6 /* PanopEPG in Frameworks */,
 				AAAA000000000000000000D7 /* PanopCatalog in Frameworks */,
 				AAAA000000000000000000D8 /* PanopDiscover in Frameworks */,
+				BBBB000000000000000000A1 /* PanopSimkl in Frameworks */,
 				AAAA000000000000000000F6 /* VLCKit in Frameworks */,
 				AAAA000000000000000000F7 /* LumeEngine in Frameworks */,
 			);
@@ -170,6 +172,7 @@
 				AAAA000000000000000000C6 /* PanopEPG */,
 				AAAA000000000000000000C7 /* PanopCatalog */,
 				AAAA000000000000000000CD /* PanopDiscover */,
+				BBBB000000000000000000A2 /* PanopSimkl */,
 				AAAA000000000000000000C8 /* VLCKit */,
 				AAAA000000000000000000CB /* LumeEngine */,
 			);
@@ -626,6 +629,10 @@
 		AAAA000000000000000000CD /* PanopDiscover */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = PanopDiscover;
+		};
+		BBBB000000000000000000A2 /* PanopSimkl */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PanopSimkl;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

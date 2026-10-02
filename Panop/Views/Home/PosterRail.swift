@@ -7,7 +7,7 @@ nonisolated enum RailHeading {
     static func title(for rail: Rail) -> String {
         switch rail.kind {
         case let .trending(kind):
-            kind == .series ? "Trending series" : "Trending movies"
+            kind == .series ? "Trending series on Simkl" : "Trending movies on Simkl"
         case .becauseYouWatched:
             "Because you watched \(display(rail.subject))"
         case let .newReleases(kind):
@@ -41,6 +41,8 @@ nonisolated enum RailHeading {
 struct PosterRail: View {
     let rail: Rail
     let rows: [String: CatalogRow]
+    /// Simkl's page for a title, for the trending rails.
+    var links: [String: URL] = [:]
     let onSelect: (CatalogRow) -> Void
 
     var body: some View {
@@ -54,7 +56,7 @@ struct PosterRail: View {
                 ScrollView(.horizontal, showsIndicators: false) {
                     LazyHStack(alignment: .top, spacing: Self.spacing) {
                         ForEach(items) { row in
-                            RailPoster(row: row) { onSelect(row) }
+                            RailPoster(row: row, link: link(for: row)) { onSelect(row) }
                         }
                     }
                     .padding(.horizontal)
@@ -63,6 +65,12 @@ struct PosterRail: View {
                 }
             }
         }
+    }
+
+    /// Only a trending rail carries Simkl's data, so only there is there a page to link to.
+    private func link(for row: CatalogRow) -> URL? {
+        guard case .trending = rail.kind, let id = row.tmdbID else { return nil }
+        return links[DiscoveryModel.linkKey(kind: row.kind, tmdbID: id)]
     }
 
     private static var spacing: CGFloat {
@@ -84,6 +92,7 @@ struct PosterRail: View {
 
 private struct RailPoster: View {
     let row: CatalogRow
+    let link: URL?
     let action: () -> Void
 
     var body: some View {
@@ -105,6 +114,11 @@ private struct RailPoster: View {
         .buttonStyle(.plain)
         #endif
         .accessibilityLabel(RailHeading.display(row.name))
+        .contextMenu {
+            if let link {
+                Link("View on Simkl", destination: link)
+            }
+        }
     }
 
     private static var width: CGFloat {

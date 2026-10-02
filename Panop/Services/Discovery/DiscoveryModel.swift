@@ -2,6 +2,7 @@ import Foundation
 import Observation
 import PanopCore
 import PanopDiscover
+import PanopSimkl
 import SwiftData
 
 /// The rails Home shows. Draws the last result at once and rebuilds in the background when what they
@@ -18,6 +19,55 @@ final class DiscoveryModel {
     }
 
     static let enabledKey = "showSuggestions"
+    /// The Settings switch for the one rail that asks the network (Simkl's public trending list).
+    static let trendingKey = "showTrending"
+
+    /// Where Simkl lists a title, by `linkKey`, for the lists whose terms ask for a link back.
+    private(set) var trendingLinks: [String: URL] = [:]
+    @ObservationIgnored private var trending: [TrendingEntry] = []
+    @ObservationIgnored private var trendingStore: TrendingStore?
+
+    static func linkKey(kind: MediaKind, tmdbID: Int) -> String {
+        "\(kind.rawValue)|\(tmdbID)"
+    }
+
+    /// Takes the trending lists: the saved ones at once, then fresh ones if the saved are old. With the
+    /// switch off nothing is read, asked for or shown.
+    func loadTrending(
+        enabled: Bool,
+        source: SimklTrendingSource,
+        cacheURL: URL? = TrendingStore.defaultCacheURL
+    ) async {
+        guard enabled else {
+            setTrending([])
+            return
+        }
+        let store = trendingStore ?? TrendingStore(source: source, cacheURL: cacheURL)
+        trendingStore = store
+        if let saved = await store.cached() {
+            setTrending(saved.entries)
+        }
+        if let fresh = await store.refreshIfStale() {
+            setTrending(fresh.entries)
+        }
+    }
+
+    private func setTrending(_ entries: [TrendingEntry]) {
+        guard entries != trending else { return }
+        trending = entries
+        trendingLinks = Dictionary(
+            entries.compactMap { entry in
+                entry.link.flatMap(URL.init(string:)).map { (Self.linkKey(kind: entry.kind, tmdbID: entry.tmdbID), $0) }
+            },
+            uniquingKeysWith: { first, _ in first }
+        )
+        if var context = lastContext {
+            context.trending = entries
+            lastContext = context
+            scheduleBuild()
+        }
+    }
+
     private(set) var rows: [String: CatalogRow] = [:]
     /// `loading` until the first result, cached or built, has arrived.
     private(set) var phase = CatalogListModel.Phase.loading
@@ -58,6 +108,8 @@ final class DiscoveryModel {
 
     /// Builds for `context` unless it is the one already shown.
     func update(_ context: DiscoveryContext) {
+        var context = context
+        context.trending = trending
         guard context != lastContext else { return }
         lastContext = context
         scheduleBuild()
