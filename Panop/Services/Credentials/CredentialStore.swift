@@ -46,7 +46,19 @@ nonisolated struct KeychainCredentialStore: CredentialStore {
     }
 
     func save(_ secret: PlaylistSecret, for playlist: String) throws {
-        let data = try JSONEncoder().encode(secret)
+        try saveData(JSONEncoder().encode(secret), for: playlist)
+    }
+
+    func load(for playlist: String) throws -> PlaylistSecret? {
+        guard let found = try loadData(for: playlist) else { return nil }
+        guard let secret = try? JSONDecoder().decode(PlaylistSecret.self, from: found) else {
+            throw CredentialStoreError.corrupt
+        }
+        return secret
+    }
+
+    /// Any bytes under an account name, for secrets that are not a playlist's.
+    func saveData(_ data: Data, for playlist: String) throws {
         try withKeychain { dataProtection in
             let query = query(playlist, dataProtection: dataProtection)
             let update = SecItemUpdate(query as CFDictionary, [kSecValueData as String: data] as CFDictionary)
@@ -60,7 +72,7 @@ nonisolated struct KeychainCredentialStore: CredentialStore {
         }
     }
 
-    func load(for playlist: String) throws -> PlaylistSecret? {
+    func loadData(for playlist: String) throws -> Data? {
         var found: Data?
         try withKeychain(alsoTryFallbackIfNotFound: true) { dataProtection in
             var query = query(playlist, dataProtection: dataProtection)
@@ -73,11 +85,7 @@ nonisolated struct KeychainCredentialStore: CredentialStore {
             }
             return status
         }
-        guard let found else { return nil }
-        guard let secret = try? JSONDecoder().decode(PlaylistSecret.self, from: found) else {
-            throw CredentialStoreError.corrupt
-        }
-        return secret
+        return found
     }
 
     func delete(for playlist: String) throws {
