@@ -46,11 +46,29 @@ struct LiveTVView: View {
     private var spec: ListSpec {
         switch mode {
         case .all:
-            ListSpec(kind: .live, source: selectedSource?.id, search: search, order: order, group: group)
+            ListSpec(
+                kind: .live,
+                source: selectedSource?.id,
+                search: search,
+                order: order,
+                group: group,
+                hidden: userState.hidden,
+                hiddenGroups: userState.hiddenCategories(of: .live)
+            )
         case .favourites:
-            ListSpec(kind: .live, restrictedTo: entryIDs(of: Array(userState.favorites)))
+            ListSpec(
+                kind: .live,
+                restrictedTo: entryIDs(of: Array(userState.favorites)),
+                hidden: userState.hidden,
+                hiddenGroups: userState.hiddenCategories(of: .live)
+            )
         case .recents:
-            ListSpec(kind: .live, restrictedTo: entryIDs(of: userState.recents))
+            ListSpec(
+                kind: .live,
+                restrictedTo: entryIDs(of: userState.recents),
+                hidden: userState.hidden,
+                hiddenGroups: userState.hiddenCategories(of: .live)
+            )
         }
     }
 
@@ -65,6 +83,7 @@ struct LiveTVView: View {
     var body: some View {
         LiveChannelList(
             spec: spec,
+            group: $group,
             mode: mode,
             modeRaw: $storedMode,
             orderRaw: $storedOrder,
@@ -93,15 +112,20 @@ struct LiveTVView: View {
                 }
             }
         )
+        .safeAreaInset(edge: .top, spacing: 0) {
+            // Apple TV has no room above its list, so there the chips are the list's first row.
+            #if !os(tvOS)
+                if mode == .all, !library.playlists.isEmpty {
+                    CategoryChips(kind: .live, source: selectedSource?.id, group: $group)
+                }
+            #endif
+        }
         .navigationTitle(selectedSource?.name ?? "Live TV")
         .modifier(ChannelSearch(text: $search, isOffered: !library.playlists.isEmpty))
         .toolbar {
             if !library.playlists.isEmpty {
                 ToolbarItem { modeMenu }
                 ToolbarItem { orderMenu }
-                if mode == .all {
-                    ToolbarItem { CategoryButton(kind: .live, source: selectedSource?.id, group: $group) }
-                }
             }
             if hasSeveralSources {
                 ToolbarItem { sourceMenu }
@@ -173,6 +197,7 @@ private struct LiveChannelList: View {
     let emptyState: LiveEmptyState
     let problems: [LiveEmptyState.Problem]
     let spec: ListSpec
+    @Binding var group: String?
     let onPlay: (CatalogRow) -> Void
     let onPlayTarget: (PlaybackTarget) -> Void
     let onAdd: () -> Void
@@ -180,6 +205,7 @@ private struct LiveChannelList: View {
 
     init(
         spec: ListSpec,
+        group: Binding<String?>,
         mode: LiveListMode,
         modeRaw: Binding<String>,
         orderRaw: Binding<String>,
@@ -195,6 +221,7 @@ private struct LiveChannelList: View {
         onRetry: @escaping ([String]) -> Void
     ) {
         self.spec = spec
+        _group = group
         self.mode = mode
         _modeRaw = modeRaw
         _orderRaw = orderRaw
@@ -227,6 +254,10 @@ private struct LiveChannelList: View {
                         }
                     }
                     .pickerStyle(.segmented)
+                    if mode == .all {
+                        CategoryChips(kind: .live, source: sourceID, group: $group)
+                            .listRowInsets(EdgeInsets())
+                    }
                 }
             #endif
             // Channels are showing, but a source behind them could not be updated: say so,
@@ -249,6 +280,7 @@ private struct LiveChannelList: View {
                 .contextMenu {
                     favoriteButton(key)
                     Button("Programme Guide", systemImage: "calendar") { guideFor = channel }
+                    Button("Hide Channel", systemImage: "eye.slash") { userState.setHidden(true, for: key) }
                 }
                 #if !os(tvOS)
                 .swipeActions(edge: .leading) { favoriteButton(key).tint(.yellow) }

@@ -34,6 +34,12 @@ final class UserStateStore {
     private(set) var progress: [String: Progress] = [:]
     /// Keys of the films and episodes seen to the end, or marked as seen.
     private(set) var watched: Set<String> = []
+    /// Keys of the entries the person has hidden from the lists.
+    private(set) var hidden: Set<String> = []
+    /// Categories the person hid, and where they placed the others, by kind (see
+    /// `UserStateStore+Categories`).
+    var hiddenCategoryNames: [String: Set<String>] = [:]
+    var categoryPositions: [String: [String: Int]] = [:]
     private var engines: [String: PlaybackEngineKind] = [:]
 
     static let recentLimit = 50
@@ -41,7 +47,7 @@ final class UserStateStore {
     /// Beyond it the oldest go.
     static let retainedPlays = 200
 
-    private let context: ModelContext
+    let context: ModelContext
 
     init(context: ModelContext) {
         self.context = context
@@ -115,6 +121,20 @@ final class UserStateStore {
         commit()
     }
 
+    func isHidden(_ key: String) -> Bool {
+        hidden.contains(key)
+    }
+
+    /// Hides an entry from every list, or shows it again. Its favourite, history and resume point
+    /// are kept, so showing it again loses nothing.
+    func setHidden(_ isHidden: Bool, for key: String, at date: Date = .now) {
+        guard let row = state(for: key) ?? (isHidden ? insert(key) : nil) else { return }
+        row.isHidden = isHidden
+        row.updatedAt = date
+        removeIfEmpty(row)
+        commit()
+    }
+
     func isWatched(_ key: String) -> Bool {
         watched.contains(key)
     }
@@ -160,6 +180,8 @@ final class UserStateStore {
             uniquingKeysWith: { first, _ in first }
         )
         watched = Set(rows.filter(\.isWatched).map(\.streamID))
+        hidden = Set(rows.filter(\.isHidden).map(\.streamID))
+        loadCategoryPreferences()
         engines = Dictionary(
             rows.compactMap { row in PlaybackEngineKind(rawValue: row.rememberedEngine).map { (row.streamID, $0) } },
             uniquingKeysWith: { first, _ in first }
@@ -187,7 +209,7 @@ final class UserStateStore {
 
     private func removeIfEmpty(_ row: UserContentState) {
         if !row.isFavorite, row.lastPlayedAt == .distantPast, row.positionSeconds == 0, row.rememberedEngine.isEmpty,
-           !row.isWatched
+           !row.isWatched, !row.isHidden
         {
             context.delete(row)
         }
@@ -197,7 +219,7 @@ final class UserStateStore {
     private func trimPlays() {
         let rows = (try? context.fetch(FetchDescriptor<UserContentState>())) ?? []
         let plays = rows
-            .filter { !$0.isFavorite && $0.lastPlayedAt > .distantPast }
+            .filter { !$0.isFavorite && !$0.isHidden && !$0.isWatched && $0.lastPlayedAt > .distantPast }
             .sorted { $0.lastPlayedAt > $1.lastPlayedAt }
         for row in plays.dropFirst(Self.retainedPlays) {
             context.delete(row)
@@ -206,7 +228,7 @@ final class UserStateStore {
 
     /// Saves, then refreshes what the screens read. If the save fails, what was in memory is
     /// thrown away and re-read, so the screen never shows a state the disk does not have.
-    private func commit() {
+    func commit() {
         do {
             try context.save()
         } catch {

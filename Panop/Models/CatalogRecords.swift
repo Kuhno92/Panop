@@ -154,6 +154,8 @@ final class CatalogCategoryRecord {
     var id: String
     var name: String
     var parentID: String?
+    /// Where the provider lists it. Optional, so a store made before this existed still opens.
+    var sortNumber: Int?
 
     init(playlist: String, category: CatalogCategory) {
         self.playlist = playlist
@@ -161,10 +163,15 @@ final class CatalogCategoryRecord {
         id = category.id
         name = category.name
         parentID = category.parentID
+        sortNumber = category.sortNumber
     }
 
     func apply(_ category: CatalogCategory) -> Bool {
         var changed = false
+        if sortNumber != category.sortNumber {
+            sortNumber = category.sortNumber
+            changed = true
+        }
         if name != category.name {
             name = category.name
             changed = true

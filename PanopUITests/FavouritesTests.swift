@@ -26,7 +26,8 @@ final class FavouritesTests: PanopUITestCase {
             XCUIRemote.shared.press(.select)
             XCTAssertTrue(app.descendants(matching: .any)["Favourite"].firstMatch.waitForExistence(timeout: 10))
 
-            // Back up past the Sort row to the filter row, over to Favourites.
+            // Back up past the category chips and the Sort row to the filter row, over to Favourites.
+            XCUIRemote.shared.press(.up)
             XCUIRemote.shared.press(.up)
             XCUIRemote.shared.press(.up)
             // Focus enters the row near where it came from, so go to the first segment first,
@@ -66,6 +67,27 @@ final class FavouritesTests: PanopUITestCase {
             app.buttons["Favourites"].tap()
 
             XCTAssertTrue(app.staticTexts["No favourites yet"].waitForExistence(timeout: 10))
+        }
+    #endif
+
+    #if !os(tvOS)
+        func testAHiddenChannelLeavesTheListAndComesBackFromSettings() {
+            waitForChannels()
+            channel("3sat").press(forDuration: 1.2)
+            XCTAssertTrue(app.buttons["Hide Channel"].waitForExistence(timeout: 10), "no Hide in the row's menu")
+            app.buttons["Hide Channel"].tap()
+            XCTAssertTrue(channel("3sat").waitForNonExistence(timeout: 10), "a hidden channel is still listed")
+
+            app.tabBars.buttons["Settings"].tap()
+            app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Hidden'")).firstMatch.tap()
+            XCTAssertTrue(
+                app.staticTexts["3sat"].waitForExistence(timeout: 10),
+                "the hidden channel is not listed in Settings"
+            )
+            app.buttons["Show"].tap()
+
+            app.tabBars.buttons["Live TV"].tap()
+            XCTAssertTrue(channel("3sat").waitForExistence(timeout: 10), "a channel shown again is not back")
         }
     #endif
 }

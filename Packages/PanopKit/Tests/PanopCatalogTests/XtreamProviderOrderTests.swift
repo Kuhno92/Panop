@@ -41,3 +41,53 @@ struct XtreamProviderOrderTests {
         #expect(order(.series) == ["Alf", "Zed"], "series carried no number before, and fell back to the alphabet")
     }
 }
+
+@Suite("Category order")
+struct CategoryOrderTests {
+    private let credentials = ProviderCredentials(baseURL: "http://panel.example", username: "u", password: "p")
+
+    @Test
+    func `an Xtream panel's categories keep the order it listed them in`() async throws {
+        let store = InMemoryCatalogStore()
+        let panel = StubTransport { request in
+            guard let action = query(request, "action") else {
+                return (200, #"{"user_info":{"username":"u","auth":1,"status":"Active"}}"#)
+            }
+            return switch action {
+            case "get_live_categories":
+                (200, #"[{"category_id":"9","category_name":"Sport"},{"category_id":"2","category_name":"News"}]"#)
+            case "get_live_streams":
+                (200, #"[{"stream_id":1,"name":"A","category_id":"2"}]"#)
+            default: (200, "[]")
+            }
+        }
+
+        _ = try await CatalogImporter(store: store, transport: panel)
+            .importXtream(playlist: "x", credentials: credentials)
+
+        let live = await store.allCategories(playlist: "x").filter { $0.kind == .live }
+            .sorted { ($0.sortNumber ?? .max) < ($1.sortNumber ?? .max) }
+        #expect(live.map(\.name) == ["Sport", "News"], "not alphabetical, and not by id")
+        #expect(live.map(\.sortNumber) == [1, 2])
+    }
+
+    @Test
+    func `an M3U file's groups are ordered by first appearance`() async throws {
+        let store = InMemoryCatalogStore()
+        let text = """
+        #EXTM3U
+        #EXTINF:-1 group-title="Zeta",One
+        http://h/live/1.ts
+        #EXTINF:-1 group-title="Alpha",Two
+        http://h/live/2.ts
+        #EXTINF:-1 group-title="Zeta",Three
+        http://h/live/3.ts
+        """
+        let importer = CatalogImporter(store: store, transport: StubTransport { _ in (404, "") })
+
+        _ = try await importer.importM3U(playlist: "p", source: .file(path: writeTemporaryFile(text)))
+
+        let live = await store.allCategories(playlist: "p").sorted { ($0.sortNumber ?? .max) < ($1.sortNumber ?? .max) }
+        #expect(live.map(\.name) == ["Zeta", "Alpha"])
+    }
+}

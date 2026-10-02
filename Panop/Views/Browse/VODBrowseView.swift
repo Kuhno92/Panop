@@ -32,7 +32,13 @@ struct VODBrowseView: View {
 
     var body: some View {
         VODGrid(
-            spec: ListSpec(kind: kind, search: search, group: group),
+            spec: ListSpec(
+                kind: kind,
+                search: search,
+                group: group,
+                hidden: userState.hidden,
+                hiddenGroups: userState.hiddenCategories(of: kind)
+            ),
             kind: kind,
             isSearching: isSearching,
             hasPlaylists: !library.playlists.isEmpty,
@@ -42,9 +48,9 @@ struct VODBrowseView: View {
         )
         .navigationTitle(title)
         .modifier(VODSearch(text: $search, isOffered: !library.playlists.isEmpty))
-        .toolbar {
+        .safeAreaInset(edge: .top, spacing: 0) {
             if !library.playlists.isEmpty {
-                ToolbarItem { CategoryButton(kind: kind, source: nil, group: $group) }
+                CategoryChips(kind: kind, source: nil, group: $group)
             }
         }
         .navigationDestination(item: $openSeries) { SeriesDetailView(series: $0) }
@@ -269,6 +275,11 @@ private struct VODCard: View {
                 )
             }
             // A series entry is a show, which is watched through its episodes.
+            Button {
+                userState.setHidden(true, for: key)
+            } label: {
+                Label("Hide", systemImage: "eye.slash")
+            }
             if kind == .movie {
                 Button {
                     userState.setWatched(!isWatched, for: key)

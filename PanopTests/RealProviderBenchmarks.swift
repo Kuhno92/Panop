@@ -97,6 +97,10 @@ struct RealProviderBenchmarks {
         )
 
         let context = ModelContext(catalog.container)
+        for kind in [MediaKind.live, .movie, .series] {
+            let names = LiveChannelQuery.categoryNames(kind: kind, source: nil, in: context)
+            record("REAL categories for \(kind.rawValue): \(names.count): \(names.prefix(4))")
+        }
         for order in [LiveOrder.name, .provider] {
             let page = LiveChannelQuery.descriptor(
                 source: nil,

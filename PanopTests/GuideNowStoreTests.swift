@@ -5,7 +5,7 @@ import PanopEPG
 import SwiftData
 import Testing
 
-@Suite("Guide now store", .serialized)
+@Suite("Guide now store", .serialized, .engineGate)
 @MainActor
 struct GuideNowStoreTests {
     private func populate(_ catalog: OnDiskCatalog) async throws {

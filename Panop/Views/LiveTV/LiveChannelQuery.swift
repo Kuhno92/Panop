@@ -143,10 +143,12 @@ nonisolated enum LiveChannelQuery {
         }
     }
 
-    /// The category names to offer for one kind, from one source or all, in name order.
+    /// The category names to offer for one kind, from one source or all, in the order the provider
+    /// lists them (by name where it gave no order, and last).
     ///
     /// Read from the small category table rather than from the entries, which would mean
-    /// scanning every row. Two sources can both have "News", and it is one choice.
+    /// scanning every row. Two sources can both have "News", and it is one choice, placed where
+    /// its earliest listing puts it.
     static func categoryNames(kind: MediaKind, source: String?, in context: ModelContext) -> [String] {
         let raw = kind.rawValue
         var descriptor: FetchDescriptor<CatalogCategoryRecord> = if let source {
@@ -155,8 +157,16 @@ nonisolated enum LiveChannelQuery {
             FetchDescriptor(predicate: #Predicate { $0.kindRaw == raw })
         }
         descriptor.fetchLimit = maxCategories
-        let names = ((try? context.fetch(descriptor)) ?? []).map(\.name).filter { !$0.isEmpty }
-        return Set(names).sorted { $0.localizedStandardCompare($1) == .orderedAscending }
+        var position: [String: Int] = [:]
+        for category in (try? context.fetch(descriptor)) ?? [] where !category.name.isEmpty {
+            position[category.name] = Swift.min(position[category.name] ?? .max, category.sortNumber ?? .max)
+        }
+        return position.keys.sorted { lhs, rhs in
+            if position[lhs] != position[rhs] {
+                return (position[lhs] ?? .max) < (position[rhs] ?? .max)
+            }
+            return lhs.localizedStandardCompare(rhs) == .orderedAscending
+        }
     }
 
     /// Real panels have hundreds of categories. This only stops a pathological one.

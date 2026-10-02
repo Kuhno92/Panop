@@ -88,12 +88,16 @@ public struct CatalogCategory: Sendable, Equatable, Hashable {
     public var kind: MediaKind
     public var name: String
     public var parentID: String?
+    /// Where the provider lists it, from 1. The order a provider chose is the order its own apps
+    /// show, and is lost if categories are sorted by name.
+    public var sortNumber: Int?
 
-    public init(id: String, kind: MediaKind, name: String, parentID: String? = nil) {
+    public init(id: String, kind: MediaKind, name: String, parentID: String? = nil, sortNumber: Int? = nil) {
         self.id = id
         self.kind = kind
         self.name = name
         self.parentID = parentID
+        self.sortNumber = sortNumber
     }
 }
 

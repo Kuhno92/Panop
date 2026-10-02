@@ -451,6 +451,24 @@ The brief called performance a key concept. For IPTV this concentrates in one nu
       them. 7 tests for the plan and the lookup, and a UI test on iOS for choosing the channel.
       **Not verified:** the channel actually starting at launch (UI tests choose their own
       screen and skip it, since the playlist id is random), by hand on a device.
+- [x] **Categories as chips, with editing** *(asked for)*. Live TV, Movies and Series show the
+      provider's categories as a row of chips, in the order the provider lists them (a category's
+      position is stored at import: the panel's list order, or an M3U file's first appearance).
+      Two buttons pinned beside the chips (outside the scrolling row, so always in view) open the
+      searchable list (past 12 categories) and an **editor** where each category can be moved
+      up or down or hidden, with a reset to the provider's order. A hidden category's chip and
+      its entries leave the lists, favourites, recents and search. The choices are per kind and
+      name, kept in the person's own state (`CategoryPreference`). Unit tests for the rules,
+      persistence and paging past hidden categories; UI tests on iOS for hiding and moving.
+      **Not verified on a Mac by eye:** the editor sheet (an explicit size is set for it there).
+- [x] **Provider dividers and hiding a channel** *(asked for)*. Providers put heading entries
+      in their channel lists, such as `##### DE SPORTS #####`. Nothing but the name tells them
+      apart (every other field of one matched a real channel's, on a real provider), so an entry
+      whose name is fenced by three or more of the same decoration character at both ends
+      (`#`, `=`, `-`, `*`, `★`...) is not imported. A provider that decorates differently is
+      not recognised, so any channel, film or series can also be **hidden by hand** from its
+      menu and shown again from Settings, Hidden; hidden entries stay out of every list and
+      search, and keep their favourite, history and resume point.
 - [ ] **tvOS focus engine work** *(surfaced)*. Full-width focus targets, no `Color.accentColor`
       for fills, layout mutations deferred out of the focus animation context. **Audited and
       partly fixed:** no accent-colour fills anywhere; the remote-driven callbacks are deferred;

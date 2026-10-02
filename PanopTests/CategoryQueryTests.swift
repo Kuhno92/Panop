@@ -26,13 +26,13 @@ struct CategoryQueryTests {
             entry("b1", "Echo", group: "News")
         ], playlist: "q")
         try await catalog.store.upsertCategories([
-            CatalogCategory(id: "News", kind: .live, name: "News"),
-            CatalogCategory(id: "Sport", kind: .live, name: "Sport"),
+            CatalogCategory(id: "News", kind: .live, name: "News", sortNumber: 2),
+            CatalogCategory(id: "Sport", kind: .live, name: "Sport", sortNumber: 1),
             CatalogCategory(id: "Films", kind: .movie, name: "Films")
         ], playlist: "p")
         try await catalog.store.upsertCategories([
-            CatalogCategory(id: "n", kind: .live, name: "News"),
-            CatalogCategory(id: "w", kind: .live, name: "Weather")
+            CatalogCategory(id: "n", kind: .live, name: "News", sortNumber: 3),
+            CatalogCategory(id: "w", kind: .live, name: "Weather", sortNumber: 1)
         ], playlist: "q")
     }
 
@@ -107,8 +107,9 @@ struct CategoryQueryTests {
         try await populate(catalog)
         let context = ModelContext(catalog.container)
 
-        #expect(LiveChannelQuery.categoryNames(kind: .live, source: nil, in: context) == ["News", "Sport", "Weather"])
-        #expect(LiveChannelQuery.categoryNames(kind: .live, source: "q", in: context) == ["News", "Weather"])
+        // Sport and Weather are both first in their sources; News is second in one and third in the other.
+        #expect(LiveChannelQuery.categoryNames(kind: .live, source: nil, in: context) == ["Sport", "Weather", "News"])
+        #expect(LiveChannelQuery.categoryNames(kind: .live, source: "q", in: context) == ["Weather", "News"])
         #expect(LiveChannelQuery.categoryNames(kind: .movie, source: nil, in: context) == ["Films"])
     }
 

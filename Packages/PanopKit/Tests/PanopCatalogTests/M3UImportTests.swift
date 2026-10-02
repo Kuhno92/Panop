@@ -41,7 +41,8 @@ struct M3UImportTests {
         #expect(await store.allCategories(playlist: playlistID) == [CatalogCategory(
             id: "News",
             kind: .live,
-            name: "News"
+            name: "News",
+            sortNumber: 1
         )])
     }
 

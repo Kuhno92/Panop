@@ -32,10 +32,20 @@ struct SearchView: View {
     var body: some View {
         List {
             if isSearching {
-                SearchSection(kind: .live, title: "Channels", term: term, limit: Self.perSection, onSelect: select)
+                SearchSection(
+                    kind: .live, title: "Channels", term: term, limit: Self.perSection,
+                    hidden: userState.hidden, hiddenGroups: userState.hiddenCategories(of: .live), onSelect: select
+                )
                 if library.offersVOD {
-                    SearchSection(kind: .movie, title: "Movies", term: term, limit: Self.perSection, onSelect: select)
-                    SearchSection(kind: .series, title: "Series", term: term, limit: Self.perSection, onSelect: select)
+                    SearchSection(
+                        kind: .movie, title: "Movies", term: term, limit: Self.perSection,
+                        hidden: userState.hidden, hiddenGroups: userState.hiddenCategories(of: .movie), onSelect: select
+                    )
+                    SearchSection(
+                        kind: .series, title: "Series", term: term, limit: Self.perSection,
+                        hidden: userState.hidden, hiddenGroups: userState.hiddenCategories(of: .series),
+                        onSelect: select
+                    )
                 }
             }
         }
@@ -84,6 +94,8 @@ struct SearchView: View {
 private struct SearchSection: View {
     @Query private var matches: [CatalogEntryRecord]
     let title: String
+    let hidden: Set<String>
+    let hiddenGroups: Set<String>
     let onSelect: (CatalogEntryRecord) -> Void
 
     init(
@@ -91,17 +103,25 @@ private struct SearchSection: View {
         title: String,
         term: String,
         limit: Int,
+        hidden: Set<String>,
+        hiddenGroups: Set<String>,
         onSelect: @escaping (CatalogEntryRecord) -> Void
     ) {
+        self.hidden = hidden
+        self.hiddenGroups = hiddenGroups
         _matches = Query(LiveChannelQuery.descriptor(kind: kind, source: nil, search: term, limit: limit))
         self.title = title
         self.onSelect = onSelect
     }
 
     var body: some View {
-        if !matches.isEmpty {
+        let shown = matches.filter {
+            !hidden.contains(UserStateStore.key(playlist: $0.playlist, entry: $0.id))
+                && !($0.groupName.map(hiddenGroups.contains) ?? false)
+        }
+        if !shown.isEmpty {
             Section(title) {
-                ForEach(matches) { item in
+                ForEach(shown) { item in
                     Button { onSelect(item) } label: {
                         HStack(spacing: 12) {
                             ChannelLogo(address: item.iconURL)

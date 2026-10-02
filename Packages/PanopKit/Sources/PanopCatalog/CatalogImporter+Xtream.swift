@@ -103,7 +103,7 @@ extension CatalogImporter {
         let categories = try await fetchCategories()
         let names = Dictionary(categories.map { ($0.id, $0.name) }, uniquingKeysWith: { first, _ in first })
         try await store.upsertCategories(
-            categories.map { EntryMapping.category(from: $0, kind: kind) },
+            categories.enumerated().map { EntryMapping.category(from: $1, kind: kind, position: $0 + 1) },
             playlist: playlist
         )
 
@@ -111,7 +111,12 @@ extension CatalogImporter {
         // sweep: the removals below are only reached on a clean finish.
         for try await batch in rows {
             for item in batch {
-                tracker.add(map(item, names))
+                let entry = map(item, names)
+                // A divider the provider put between blocks of channels: not an entry.
+                if EntryMapping.isDivider(entry.name) {
+                    continue
+                }
+                tracker.add(entry)
             }
             try await flush(&tracker, playlist: playlist)
         }

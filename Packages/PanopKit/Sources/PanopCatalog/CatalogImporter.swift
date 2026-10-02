@@ -136,7 +136,9 @@ public struct CatalogImporter: Sendable {
         var reports: [KindReport] = []
         for kind in MediaKind.allCases {
             guard let tracker = trackers[kind] else { continue }
-            let categories = tracker.groups.sorted().map { CatalogCategory(id: $0, kind: kind, name: $0) }
+            let categories = tracker.groupOrder.enumerated().map {
+                CatalogCategory(id: $1, kind: kind, name: $1, sortNumber: $0 + 1)
+            }
             try await store.upsertCategories(categories, playlist: playlist)
             try await sweepCategories(kind: kind, keeping: Set(tracker.groups), playlist: playlist)
 
@@ -209,6 +211,10 @@ public struct CatalogImporter: Sendable {
             }
             // Left out by the user's choice, so it is neither stored nor counted as unusable.
             if !counts.keepsVOD, entry.kind != .live {
+                continue
+            }
+            // A divider the provider put between blocks of channels: not an entry, and not unusable.
+            if EntryMapping.isDivider(entry.name) {
                 continue
             }
             // Where it stands in the file, which is the order the provider put its channels in.
@@ -317,13 +323,15 @@ struct KindTracker {
     var pending: [CatalogEntry] = []
     /// M3U only: distinct group titles, which become the categories.
     var groups = Set<String>()
+    /// The same groups in the order the file first named them, which is the order they are shown in.
+    var groupOrder: [String] = []
 
     mutating func add(_ entry: CatalogEntry) {
         pending.append(entry)
         seen.insert(CatalogID.hash64(entry.id))
         imported += 1
-        if let group = entry.groupID {
-            groups.insert(group)
+        if let group = entry.groupID, groups.insert(group).inserted {
+            groupOrder.append(group)
         }
     }
 }

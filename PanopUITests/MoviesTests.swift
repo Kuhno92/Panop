@@ -22,6 +22,14 @@ final class MoviesTests: PanopUITestCase {
         attach("movies-grid")
     }
 
+    func testTheProvidersCategoriesAreChipsAboveTheFilms() {
+        XCTAssertTrue(poster("Alien").waitForExistence(timeout: 30))
+
+        XCTAssertTrue(app.buttons["All"].waitForExistence(timeout: 10), "no category chips")
+        XCTAssertTrue(app.buttons["Films"].exists, "the source's category is not a chip")
+        XCTAssertTrue(app.buttons["Classics"].exists, "the source's other category is not a chip")
+    }
+
     #if !os(tvOS)
         func testOpeningAFilmShowsItsPage() {
             XCTAssertTrue(poster("Dune").waitForExistence(timeout: 30))

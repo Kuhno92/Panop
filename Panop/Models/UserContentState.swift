@@ -29,6 +29,9 @@ final class UserContentState {
     var rememberedEngine: String = ""
     /// Seen to the end, or marked so. Defaulted, so a store made before this existed still opens.
     var isWatched: Bool = false
+    /// Hidden by the person from every list, for an entry that is no use to them, such as a
+    /// divider a provider put in its channel list. Defaulted, so an older store still opens.
+    var isHidden: Bool = false
 
     init(
         streamID: String = "",

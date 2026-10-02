@@ -361,3 +361,65 @@ struct EngineMemoryStoreTests {
         #expect(store.isFavorite("p|c"))
     }
 }
+
+@Suite("Hidden entries")
+@MainActor
+struct HiddenEntriesTests {
+    private let channel = UserStateStore.key(playlist: "p", entry: "divider")
+
+    private func makeStore(_ container: ModelContainer? = nil) throws -> UserStateStore {
+        try UserStateStore(context: ModelContext(container ?? PanopContainers.makeCloud(inMemory: true)))
+    }
+
+    @Test
+    func `an entry can be hidden and shown again`() throws {
+        let store = try makeStore()
+
+        store.setHidden(true, for: channel)
+        #expect(store.isHidden(channel))
+        #expect(store.hidden == [channel])
+
+        store.setHidden(false, for: channel)
+        #expect(!store.isHidden(channel))
+        #expect(store.hidden.isEmpty)
+    }
+
+    @Test
+    func `hiding survives a new launch`() throws {
+        let container = try PanopContainers.makeCloud(inMemory: true)
+        try makeStore(container).setHidden(true, for: channel)
+
+        #expect(try makeStore(container).isHidden(channel))
+    }
+
+    @Test
+    func `showing it again leaves no row behind, and keeps a favourite`() throws {
+        let container = try PanopContainers.makeCloud(inMemory: true)
+        let store = try makeStore(container)
+        store.setHidden(true, for: channel)
+        store.setHidden(false, for: channel)
+        #expect(try ModelContext(container).fetchCount(FetchDescriptor<UserContentState>()) == 0)
+
+        store.toggleFavorite(channel)
+        store.setHidden(true, for: channel)
+        store.setHidden(false, for: channel)
+        #expect(store.isFavorite(channel))
+    }
+
+    @Test
+    func `a hidden entry is not dropped by the limit on kept plays`() throws {
+        let store = try makeStore()
+        store.markPlayed(channel, at: Date(timeIntervalSince1970: 1))
+        store.setHidden(true, for: channel)
+
+        // More plays than are kept: the oldest go, but not what is hidden.
+        for index in 0 ..< UserStateStore.retainedPlays + 20 {
+            store.markPlayed(
+                UserStateStore.key(playlist: "p", entry: "c\(index)"),
+                at: Date(timeIntervalSince1970: Double(index + 10))
+            )
+        }
+
+        #expect(store.isHidden(channel))
+    }
+}

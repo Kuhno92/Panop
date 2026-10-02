@@ -116,7 +116,7 @@ enum UITestMode {
                     "http://127.0.0.1:9/live/\(index).ts"
             }
             lines += movieNames.enumerated().map { index, name in
-                "#EXTINF:5400 tvg-id=\"m\(index)\" group-title=\"Films\",\(name)\nhttp://127.0.0.1:9/movie/u/p/\(index).mp4"
+                "#EXTINF:5400 tvg-id=\"m\(index)\" group-title=\"\(index < 3 ? "Films" : "Classics")\",\(name)\nhttp://127.0.0.1:9/movie/u/p/\(index).mp4"
             }
             lines += seriesNames.enumerated().map { index, name in
                 "#EXTINF:2700 tvg-id=\"s\(index)\" group-title=\"Shows\",\(name)\nhttp://127.0.0.1:9/series/u/p/\(index).mkv"

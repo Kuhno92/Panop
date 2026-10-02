@@ -30,6 +30,9 @@ final class CatalogListModel {
     @ObservationIgnored private var reader: CatalogReader?
     @ObservationIgnored private var spec: ListSpec?
     @ObservationIgnored private var generation = 0
+    /// How many rows have been read from the catalog, which is more than `rows.count` by the
+    /// hidden ones left out. The next page starts here, or it would read some twice.
+    @ObservationIgnored private var consumed = 0
     @ObservationIgnored private var reachedEnd = false
     @ObservationIgnored private var loadingMore = false
     @ObservationIgnored private var loadTask: Task<Void, Never>?
@@ -53,6 +56,7 @@ final class CatalogListModel {
         guard spec != self.spec, let reader else { return }
         self.spec = spec
         generation += 1
+        consumed = 0
         reachedEnd = false
         loadingMore = false
         loadTask?.cancel()
@@ -61,7 +65,8 @@ final class CatalogListModel {
             let page = await reader.rows(spec, offset: 0, limit: Self.firstPage)
             guard !Task.isCancelled, let self, current == generation else { return }
             // The old rows stay until these arrive, so a changed filter does not flash empty.
-            rows = page
+            rows = Self.visible(page, in: spec)
+            consumed = page.count
             phase = .loaded
             reachedEnd = spec.restrictedTo != nil || page.count < Self.firstPage
         }
@@ -74,13 +79,22 @@ final class CatalogListModel {
               let spec, let reader else { return }
         loadingMore = true
         let current = generation
-        let offset = rows.count
+        let offset = consumed
         Task { [weak self] in
             let page = await reader.rows(spec, offset: offset, limit: Self.nextPage)
             guard let self, current == generation else { return }
-            rows.append(contentsOf: page)
+            rows.append(contentsOf: Self.visible(page, in: spec))
+            consumed += page.count
             reachedEnd = page.count < Self.nextPage
             loadingMore = false
+        }
+    }
+
+    /// The page without what the person has hidden, an entry at a time or a category at a time.
+    private static func visible(_ page: [CatalogRow], in spec: ListSpec) -> [CatalogRow] {
+        guard !spec.hidden.isEmpty || !spec.hiddenGroups.isEmpty else { return page }
+        return page.filter { row in
+            !spec.hidden.contains(row.id) && !(row.groupName.map(spec.hiddenGroups.contains) ?? false)
         }
     }
 
@@ -111,10 +125,12 @@ final class CatalogListModel {
     private func refresh() async {
         guard let spec, let reader else { return }
         let current = generation
-        let count = Swift.max(rows.count, Self.firstPage)
-        let fresh = await reader.rows(spec, offset: 0, limit: count)
+        let count = Swift.max(consumed, Self.firstPage)
+        let raw = await reader.rows(spec, offset: 0, limit: count)
+        let fresh = Self.visible(raw, in: spec)
         guard current == generation, fresh != rows else { return }
         rows = fresh
-        reachedEnd = spec.restrictedTo != nil || fresh.count < count
+        consumed = raw.count
+        reachedEnd = spec.restrictedTo != nil || raw.count < count
     }
 }

@@ -41,7 +41,6 @@ final class LiveTVTests: PanopUITestCase {
     #if !os(tvOS)
         func testANarrowedCategoryShowsOnlyItsChannels() {
             waitForChannels()
-            app.buttons["Category"].tap()
             XCTAssertTrue(app.buttons["Other"].waitForExistence(timeout: 10), "the seeded category is not offered")
             app.buttons["Other"].tap()
 
@@ -67,6 +66,45 @@ final class LiveTVTests: PanopUITestCase {
                 "the next programme is not listed"
             )
             XCTAssertTrue(app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Watch'")).firstMatch.exists)
+        }
+    #endif
+
+    #if !os(tvOS)
+        func testACategoryCanBeHiddenAndTheListFollows() {
+            waitForChannels()
+            app.buttons["Edit categories"].tap()
+            XCTAssertTrue(
+                app.buttons["Hide Germany"].waitForExistence(timeout: 10),
+                "the editor does not offer the seeded category. Screen:\n\(app.debugDescription)"
+            )
+            app.buttons["Hide Germany"].tap()
+            app.buttons["Done"].tap()
+
+            XCTAssertTrue(
+                channel("3sat").waitForNonExistence(timeout: 10),
+                "a channel of a hidden category is still listed"
+            )
+            XCTAssertFalse(app.buttons["Germany"].exists, "the hidden category is still a chip")
+
+            // And back: the editor still lists it, and showing it returns its channels.
+            app.buttons["Edit categories"].tap()
+            app.buttons["Show Germany"].tap()
+            app.buttons["Done"].tap()
+            XCTAssertTrue(
+                channel("3sat").waitForExistence(timeout: 10),
+                "a category shown again did not bring its channels"
+            )
+        }
+
+        func testACategoryCanBeMovedEarlier() {
+            waitForChannels()
+            app.buttons["Edit categories"].tap()
+            XCTAssertTrue(app.buttons["Move Other up"].waitForExistence(timeout: 10))
+            app.buttons["Move Other up"].tap()
+
+            // Other is now first, so its own "up" is gone and Germany's "down" is the one that is not.
+            XCTAssertFalse(app.buttons["Move Other up"].isEnabled, "Other did not become first")
+            app.buttons["Done"].tap()
         }
     #endif
 }

@@ -104,7 +104,43 @@ enum EntryMapping {
         )
     }
 
-    static func category(from category: XtreamCategory, kind: MediaKind) -> CatalogCategory {
-        CatalogCategory(id: category.id, kind: kind, name: category.name, parentID: category.parentID)
+    /// A provider's visual divider: a "channel" that is only a heading between blocks of real
+    /// ones, such as `##### DE SPORTS #####`, `=== NEWS ===` or `★★★ KIDS ★★★`.
+    ///
+    /// Nothing but the name tells it apart. On a real provider every other field of a divider
+    /// (kind, category, logo slot, guide, even a stream address that answers) was identical to a
+    /// channel's. So the name is read for what dividers have in common: a run of three or more of
+    /// the same decoration character, neither letter nor digit, at the start *and* at the end,
+    /// or nothing but such a run. A single `#` or a dash in a real name does not qualify, and
+    /// neither does a name decorated at one end only.
+    ///
+    /// A provider that decorates differently is not recognised. That is what hiding a channel by
+    /// hand is for.
+    static func isDivider(_ name: String) -> Bool {
+        let characters = Array(name.trimmingCharacters(in: .whitespacesAndNewlines))
+        guard characters.count >= 3 else { return false }
+        let lead = decorationRun(characters)
+        let trail = decorationRun(characters.reversed())
+        if lead == characters.count {
+            return lead >= 5
+        }
+        return lead >= 3 && trail >= 3
+    }
+
+    /// How many times the first character repeats, if it is decoration; otherwise 0.
+    private static func decorationRun(_ characters: some Sequence<Character>) -> Int {
+        guard let first = characters.first(where: { _ in true }),
+              !first.isLetter, !first.isNumber, !first.isWhitespace, first != "." else { return 0 }
+        return characters.prefix { $0 == first }.count
+    }
+
+    static func category(from category: XtreamCategory, kind: MediaKind, position: Int? = nil) -> CatalogCategory {
+        CatalogCategory(
+            id: category.id,
+            kind: kind,
+            name: category.name,
+            parentID: category.parentID,
+            sortNumber: position
+        )
     }
 }

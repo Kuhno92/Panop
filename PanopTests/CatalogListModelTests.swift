@@ -5,7 +5,7 @@ import PanopCore
 import SwiftData
 import Testing
 
-@Suite("Paged list model", .serialized)
+@Suite("Paged list model", .serialized, .engineGate)
 @MainActor
 struct CatalogListModelTests {
     private func populate(_ catalog: OnDiskCatalog, count: Int, playlist: String = "p") async throws {
@@ -131,5 +131,62 @@ struct CatalogListModelTests {
         )
 
         #expect(await settle { model.rows.count == 11 && model.rows.first?.name == "Renamed" })
+    }
+
+    @Test
+    func `hidden entries are left out and paging neither repeats nor loses the rest`() async throws {
+        let catalog = try OnDiskCatalog()
+        defer { catalog.cleanUp() }
+        try await populate(catalog, count: 300)
+        // Ten hidden among the first page, and some further down.
+        let hidden = Set((0 ..< 10).map { "p|c\($0 * 5)" } + ["p|c100", "p|c200"])
+        let model = CatalogListModel()
+        model.show(ListSpec(kind: .live, hidden: hidden), in: catalog.container)
+        #expect(await settle { model.phase == .loaded })
+        #expect(model.rows.count == CatalogListModel.firstPage - 10, "ten of the first page's rows were hidden")
+
+        // Scroll to the end, page after page.
+        let deadline = ContinuousClock.now + .seconds(10)
+        while model.rows.count < 300 - hidden.count, ContinuousClock.now < deadline {
+            if let last = model.rows.last {
+                model.rowAppeared(last)
+            }
+            try await Task.sleep(for: .milliseconds(20))
+        }
+
+        let names = model.rows.map(\.name)
+        #expect(names.count == 300 - hidden.count)
+        #expect(Set(names).count == names.count, "no row read twice")
+        #expect(!model.rows.contains { hidden.contains($0.id) })
+    }
+
+    @Test
+    func `the entries of a hidden category are left out, and the rest page through whole`() async throws {
+        let catalog = try OnDiskCatalog()
+        defer { catalog.cleanUp() }
+        _ = try await catalog.store.upsertEntries(
+            (0 ..< 200).map {
+                CatalogEntry(
+                    id: "c\($0)", kind: .live, name: "Channel \($0)",
+                    groupName: $0 % 4 == 0 ? "Adult" : "General", sortNumber: $0 + 1
+                )
+            },
+            playlist: "p"
+        )
+        let model = CatalogListModel()
+        model.show(ListSpec(kind: .live, hiddenGroups: ["Adult"]), in: catalog.container)
+        #expect(await settle { model.phase == .loaded })
+
+        let deadline = ContinuousClock.now + .seconds(10)
+        while model.rows.count < 150, ContinuousClock.now < deadline {
+            if let last = model.rows.last {
+                model.rowAppeared(last)
+            }
+            try await Task.sleep(for: .milliseconds(20))
+        }
+
+        #expect(model.rows.count == 150, "a quarter were in the hidden category")
+        #expect(model.rows.allSatisfy { $0.groupName == "General" })
+        #expect(Set(model.rows.map(\.id)).count == 150)
     }
 }

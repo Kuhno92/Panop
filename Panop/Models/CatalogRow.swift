@@ -53,20 +53,25 @@ nonisolated struct CatalogRow: Identifiable, Hashable, Sendable {
 /// What a list asks the catalog for. Plain values, so it can cross to the reader's thread, which
 /// builds the fetch from it there.
 nonisolated struct ListSpec: Hashable, Sendable {
-    var kind: MediaKind
+    /// Nil for any kind, which only a fixed set (see `restrictedTo`) can ask for.
+    var kind: MediaKind?
     var source: String?
     var search = ""
     var order = LiveOrder.provider
     var group: String?
     /// A fixed set of entry ids (favourites, recents), not paged: they are few.
     var restrictedTo: [String]?
+    /// Keys (playlist and entry) the person has hidden, left out of what is read.
+    var hidden: Set<String> = []
+    /// Names of categories the person has hidden: their entries are left out too.
+    var hiddenGroups: Set<String> = []
 
     func descriptor() -> FetchDescriptor<CatalogEntryRecord> {
         if let restrictedTo {
             return LiveChannelQuery.descriptor(restrictedTo: restrictedTo, kind: kind)
         }
         return LiveChannelQuery.descriptor(
-            kind: kind,
+            kind: kind ?? .live,
             source: source,
             search: search,
             limit: LiveChannelQuery.maxRows,
@@ -86,6 +91,11 @@ actor CatalogReader {
 
     init(container: ModelContainer) {
         self.container = container
+    }
+
+    /// The category names for a kind, in the provider's order (see `LiveChannelQuery.categoryNames`).
+    func categoryNames(kind: MediaKind, source: String?) -> [String] {
+        LiveChannelQuery.categoryNames(kind: kind, source: source, in: ModelContext(container))
     }
 
     func rows(_ spec: ListSpec, offset: Int, limit: Int) -> [CatalogRow] {

@@ -12,6 +12,7 @@ struct SettingsView: View {
     }
 
     @Environment(PlaylistLibrary.self) private var library
+    @Environment(UserStateStore.self) private var userState
 
     var body: some View {
         Form {
@@ -20,6 +21,13 @@ struct SettingsView: View {
                     PlaylistsView()
                 } label: {
                     LabeledContent("Playlists", value: library.playlists.count.formatted())
+                }
+                if !userState.hidden.isEmpty {
+                    NavigationLink {
+                        HiddenEntriesView()
+                    } label: {
+                        LabeledContent("Hidden", value: userState.hidden.count.formatted())
+                    }
                 }
             } header: {
                 Text("Library")
