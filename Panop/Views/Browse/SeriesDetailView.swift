@@ -150,7 +150,7 @@ struct SeriesDetailView: View {
     }
 
     private func play(_ episode: Episode, name: String, key: String, at position: Double?) {
-        userState.markPlayed(key)
+        userState.markPlayed(key, parent: UserStateStore.key(playlist: series.playlist, entry: series.entryID))
         playing = PlaybackTarget(
             playlist: series.playlist,
             entryID: episode.entryID,

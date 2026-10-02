@@ -32,6 +32,11 @@ final class UserContentState {
     /// Hidden by the person from every list, for an entry that is no use to them, such as a
     /// divider a provider put in its channel list. Defaulted, so an older store still opens.
     var isHidden: Bool = false
+    /// How many times it has been opened. Defaulted, so an older store still opens.
+    var playCount: Int = 0
+    /// For an episode, the key of the series it belongs to, so what is watched can be told by show
+    /// and not by episode. Empty for everything else.
+    var parentKey: String = ""
 
     init(
         streamID: String = "",

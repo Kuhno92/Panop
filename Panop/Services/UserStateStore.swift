@@ -38,6 +38,8 @@ final class UserStateStore {
     private(set) var hidden: Set<String> = []
     /// Categories the person hid, and where they placed the others, by kind (see
     /// `UserStateStore+Categories`).
+    /// What was opened, and when, how often and under which series (see `UserStateStore+Taste`).
+    var plays: [String: PlaySignal] = [:]
     var hiddenCategoryNames: [String: Set<String>] = [:]
     var categoryPositions: [String: [String: Int]] = [:]
     private var engines: [String: PlaybackEngineKind] = [:]
@@ -76,10 +78,17 @@ final class UserStateStore {
         commit()
     }
 
-    /// Notes that a channel was opened.
-    func markPlayed(_ key: String, at date: Date = .now) {
+    /// Notes that a channel, film or episode was opened.
+    ///
+    /// - Parameter parent: for an episode, the key of its series, which is what recommendations are
+    ///   drawn from: a person watches shows, not episodes.
+    func markPlayed(_ key: String, parent: String? = nil, at date: Date = .now) {
         let row = state(for: key) ?? insert(key)
         row.lastPlayedAt = date
+        row.playCount += 1
+        if let parent {
+            row.parentKey = parent
+        }
         row.updatedAt = date
         trimPlays()
         commit()
@@ -181,6 +190,12 @@ final class UserStateStore {
         )
         watched = Set(rows.filter(\.isWatched).map(\.streamID))
         hidden = Set(rows.filter(\.isHidden).map(\.streamID))
+        plays = Dictionary(
+            rows.filter { $0.lastPlayedAt > .distantPast }.map {
+                ($0.streamID, PlaySignal(lastPlayedAt: $0.lastPlayedAt, times: $0.playCount, parentKey: $0.parentKey))
+            },
+            uniquingKeysWith: { first, _ in first }
+        )
         loadCategoryPreferences()
         engines = Dictionary(
             rows.compactMap { row in PlaybackEngineKind(rawValue: row.rememberedEngine).map { (row.streamID, $0) } },
