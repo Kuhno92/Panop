@@ -130,5 +130,7 @@ struct SimklClientTests {
             .flatMap { URLComponents(url: $0.url, resolvingAgainstBaseURL: false)?.queryItems }
         #expect(query?.contains { $0.name == "date_from" && $0.value == "2026-05-01T10:00:00Z" } == true)
         #expect(query?.contains { $0.name == "client_id" && $0.value == "cid" } == true)
+        #expect(query?.contains { $0.name == "extended" } == false, "ids_only would drop the status")
+        #expect(query?.contains { $0.name == "next_watch_info" && $0.value == "yes" } == true)
     }
 }

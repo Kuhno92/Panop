@@ -111,10 +111,9 @@ public struct SimklClient: Sendable {
 
     /// Films and shows on the person's lists. `since` limits it to what changed after that timestamp.
     public func library(since: String? = nil) async throws -> [SimklListItem] {
-        var query = [
-            URLQueryItem(name: "extended", value: "ids_only"),
-            URLQueryItem(name: "next_watch_info", value: "yes")
-        ]
+        // No `extended`: ids_only would leave out the status and the next-episode marker, which is
+        // what the rails are made of. The default carries them, with the ids, and no episode lists.
+        var query = [URLQueryItem(name: "next_watch_info", value: "yes")]
         if let since {
             query.append(URLQueryItem(name: "date_from", value: since))
         }

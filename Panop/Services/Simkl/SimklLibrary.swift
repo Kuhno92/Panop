@@ -3,6 +3,10 @@ import Observation
 import PanopSimkl
 
 private struct LibrarySnapshot: Codable {
+    /// Bumped when what is asked of Simkl changes, so lists saved from an older request are fetched again.
+    static let currentFormat = 2
+
+    var format: Int?
     var activities: String
     var items: [SimklListItem]
 }
@@ -40,7 +44,7 @@ final class SimklLibrary {
         guard let fresh = try? await library() else { return }
         items = fresh
         seen = latest
-        save(LibrarySnapshot(activities: latest, items: fresh))
+        save(LibrarySnapshot(format: LibrarySnapshot.currentFormat, activities: latest, items: fresh))
     }
 
     /// Forgets the lists, for when the account is disconnected: they were that account's.
@@ -62,7 +66,8 @@ final class SimklLibrary {
 
     private static func load(_ url: URL?) -> LibrarySnapshot? {
         guard let url, let data = try? Data(contentsOf: url) else { return nil }
-        return try? JSONDecoder().decode(LibrarySnapshot.self, from: data)
+        let snapshot = try? JSONDecoder().decode(LibrarySnapshot.self, from: data)
+        return snapshot?.format == LibrarySnapshot.currentFormat ? snapshot : nil
     }
 
     nonisolated static var defaultCacheURL: URL? {

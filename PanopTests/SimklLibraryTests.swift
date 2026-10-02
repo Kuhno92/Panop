@@ -80,6 +80,24 @@ struct SimklLibraryTests {
     }
 
     @Test
+    func `lists saved by an older request are fetched again`() async throws {
+        let location = url()
+        defer { try? FileManager.default.removeItem(at: location.deletingLastPathComponent()) }
+        try FileManager.default.createDirectory(
+            at: location.deletingLastPathComponent(),
+            withIntermediateDirectories: true
+        )
+        try Data(#"{"activities":"A","items":[]}"#.utf8).write(to: location)
+        let counter = Counter(stamp: "A")
+
+        let library = make(counter, at: location)
+        await library.refresh()
+
+        #expect(counter.counts.library == 1, "the same stamp, but the saved lists were made by an older request")
+        #expect(library.items.count == 1)
+    }
+
+    @Test
     func `clearing forgets the lists and the stamp`() async {
         let location = url()
         defer { try? FileManager.default.removeItem(at: location.deletingLastPathComponent()) }
