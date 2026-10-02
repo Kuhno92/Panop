@@ -291,8 +291,10 @@ The first milestone where Panop is usable.
       play starts over. A film left part-way asks "Resume from 32:10" or "Start over" in the
       grids; Home's banner and cards resume without asking. Live channels never resume. Held
       in the cloud container with the favourites. 8 store tests, 4 for the throttling, and UI
-      tests for resume and start over. **Not done:** a "Continue watching" rail ordered by
-      progress, and a mark for watched films.
+      tests for resume and start over. Home now has a **Continue watching** rail
+      of the films and episodes left part-way, the one watched last first, each card with a
+      progress bar (`UserStateStore.continueWatching`, 2 tests). **Not done:** a mark for
+      watched films.
 
 ---
 

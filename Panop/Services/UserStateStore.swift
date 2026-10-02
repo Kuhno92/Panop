@@ -77,6 +77,16 @@ final class UserStateStore {
         commit()
     }
 
+    /// Films and episodes left part-way, the one watched last first. A point whose title is
+    /// missing from the recents (they keep only the latest fifty) comes after the rest.
+    var continueWatching: [String] {
+        let rank = Dictionary(recents.enumerated().map { ($1, $0) }, uniquingKeysWith: { first, _ in first })
+        return progress.keys.sorted { lhs, rhs in
+            let (left, right) = (rank[lhs] ?? .max, rank[rhs] ?? .max)
+            return left == right ? lhs < rhs : left < right
+        }
+    }
+
     /// Where to resume `key`, or nil to start from the beginning.
     func resumePosition(for key: String) -> Double? {
         progress[key]?.position

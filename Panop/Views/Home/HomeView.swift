@@ -32,9 +32,18 @@ struct HomeView: View {
                         ContinueBanner(key: last, onPlay: play)
                     }
                     ChannelRail(
+                        title: "Continue watching",
+                        keys: Array(continueKeys.prefix(railLimit)),
+                        keepsOrder: true,
+                        showsProgress: true,
+                        onPlay: play
+                    )
+                    ChannelRail(
                         title: "Recently watched",
-                        // The most recent channel is the banner above, so it is not shown twice.
-                        keys: Array(userState.recents.dropFirst().prefix(railLimit)),
+                        // The most recent channel is the banner above, and a film left part-way is
+                        // in the rail above, so neither is shown twice.
+                        keys: Array(userState.recents.dropFirst().filter { userState.progress[$0] == nil }
+                            .prefix(railLimit)),
                         keepsOrder: true,
                         onPlay: play
                     )
@@ -54,6 +63,11 @@ struct HomeView: View {
             NavigationStack { AddPlaylistView() }
         }
         .modifier(PlayerPresentation(target: $playing))
+    }
+
+    /// Unfinished films and episodes, without the one the banner already offers.
+    private var continueKeys: [String] {
+        userState.continueWatching.filter { $0 != userState.recents.first }
     }
 
     private func play(_ channel: CatalogEntryRecord) {
@@ -104,12 +118,21 @@ struct ChannelRail: View {
     let keys: [String]
     /// Recents are shown in the order they were watched; favourites by name.
     let keepsOrder: Bool
+    /// Draws how far through each title someone got, for the films and episodes left part-way.
+    var showsProgress = false
     let onPlay: (CatalogEntryRecord) -> Void
 
-    init(title: String, keys: [String], keepsOrder: Bool, onPlay: @escaping (CatalogEntryRecord) -> Void) {
+    init(
+        title: String,
+        keys: [String],
+        keepsOrder: Bool,
+        showsProgress: Bool = false,
+        onPlay: @escaping (CatalogEntryRecord) -> Void
+    ) {
         self.title = title
         self.keys = keys
         self.keepsOrder = keepsOrder
+        self.showsProgress = showsProgress
         self.onPlay = onPlay
         _channels = Query(LiveChannelQuery.descriptor(
             restrictedTo: Array(Set(keys.map(UserStateStore.entryID(in:)))),
@@ -141,7 +164,11 @@ struct ChannelRail: View {
                 ScrollView(.horizontal, showsIndicators: false) {
                     LazyHStack(spacing: Self.spacing) {
                         ForEach(shown) { channel in
-                            ChannelCard(channel: channel, isFavorite: userState.isFavorite(key(of: channel))) {
+                            ChannelCard(
+                                channel: channel,
+                                isFavorite: userState.isFavorite(key(of: channel)),
+                                progress: showsProgress ? userState.progress[key(of: channel)]?.fraction : nil
+                            ) {
                                 onPlay(channel)
                             }
                         }
@@ -175,6 +202,8 @@ struct ChannelRail: View {
 struct ChannelCard: View {
     let channel: CatalogEntryRecord
     let isFavorite: Bool
+    /// 0 to 1 for a title left part-way; nil draws no bar.
+    var progress: Double?
     let action: () -> Void
 
     @Environment(UserStateStore.self) private var userState
@@ -191,6 +220,16 @@ struct ChannelCard: View {
             }
             .padding(12)
             .frame(width: Self.width)
+            .overlay(alignment: .bottom) {
+                if let progress {
+                    ProgressView(value: progress)
+                        .progressViewStyle(.linear)
+                        .padding(.horizontal, 12)
+                        .padding(.bottom, 6)
+                        .accessibilityLabel("Watched")
+                        .accessibilityValue(progress.formatted(.percent.precision(.fractionLength(0))))
+                }
+            }
             .overlay(alignment: .topTrailing) {
                 if isFavorite {
                     Image(systemName: "star.fill")

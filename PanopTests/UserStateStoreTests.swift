@@ -179,6 +179,35 @@ struct ResumePointTests {
     }
 
     @Test
+    func `unfinished titles are listed the one watched last first`() throws {
+        let store = try makeStore()
+        let other = UserStateStore.key(playlist: "p", entry: "episode")
+        let finished = UserStateStore.key(playlist: "p", entry: "done")
+        let base = Date(timeIntervalSince1970: 1_000_000)
+        store.markPlayed(film, at: base)
+        store.saveProgress(film, position: 600, duration: 7200, at: base)
+        store.markPlayed(other, at: base.addingTimeInterval(60))
+        store.saveProgress(other, position: 300, duration: 2400, at: base.addingTimeInterval(60))
+        store.markPlayed(finished, at: base.addingTimeInterval(120))
+        store.saveProgress(finished, position: 2390, duration: 2400, at: base.addingTimeInterval(120))
+
+        #expect(store.continueWatching == [other, film], "the finished one is not offered")
+    }
+
+    @Test
+    func `a point with no recent play still counts, after the others`() throws {
+        let store = try makeStore()
+        let other = UserStateStore.key(playlist: "p", entry: "episode")
+        store.markPlayed(other)
+        store.saveProgress(other, position: 300, duration: 2400)
+        store.saveProgress(film, position: 600, duration: 7200)
+        store.reload()
+
+        #expect(store.continueWatching.first == other)
+        #expect(store.continueWatching.contains(film))
+    }
+
+    @Test
     func `it survives a new launch`() throws {
         let container = try PanopContainers.makeCloud(inMemory: true)
         UserStateStore(context: ModelContext(container)).saveProgress(film, position: 600, duration: 3600)
