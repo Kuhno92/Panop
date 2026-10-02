@@ -14,12 +14,10 @@ struct HomeView: View {
     /// Takes the person to the full channel list.
     let onBrowse: () -> Void
 
-    @Environment(\.modelContext) private var catalog
+    @Environment(DiscoveryModel.self) private var discovery
     @State private var showingAdd = false
     @State private var playing: PlaybackTarget?
     @State private var search = ""
-    /// The rails drawn from the library; built off the main thread (see `DiscoveryModel`).
-    @State private var discovery = DiscoveryModel()
     @State private var openMovie: MovieReference?
     @State private var openSeries: SeriesReference?
 
@@ -35,13 +33,6 @@ struct HomeView: View {
             }
         }
         .navigationTitle("Home")
-        // Rebuilt whenever what the rails are made from changes; an unchanged context is ignored.
-        // The playlists are part of the key: they may load after the first pass, and nothing else would rerun it.
-        .task(id: [userState.revision, library.playlists.count]) {
-            guard !library.playlists.isEmpty else { return }
-            discovery.start(container: catalog.container)
-            discovery.update(DiscoveryContext.current(userState))
-        }
         .navigationDestination(item: $openMovie) { MovieDetailView(movie: $0) }
         .navigationDestination(item: $openSeries) { SeriesDetailView(series: $0) }
         .modifier(HomeSearch(text: $search, isOffered: !library.playlists.isEmpty))

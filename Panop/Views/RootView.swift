@@ -11,6 +11,8 @@ struct RootView: View {
     @Environment(\.modelContext) private var catalog
     @State private var selection: AppTab
     @State private var autoplay: PlaybackTarget?
+    /// One set of rails for Home, Movies and Series, built off the main thread (see `DiscoveryModel`).
+    @State private var discovery = DiscoveryModel()
 
     init() {
         // The screen it opens on is known from the settings alone, so the first frame is the
@@ -61,6 +63,14 @@ struct RootView: View {
         // Playlists the user added keep themselves current without being asked.
         // The work runs on the sync service's actor, not here.
         .task { await library.refreshStale(maxAge: 12 * 3600) }
+        .environment(discovery)
+        // Rebuilt whenever what the rails are made from changes; an unchanged context is ignored. The
+        // playlists are part of the key: they may load after the first pass, and nothing else would rerun it.
+        .task(id: [userState.revision, library.playlists.count]) {
+            guard !library.playlists.isEmpty else { return }
+            discovery.start(container: catalog.container)
+            discovery.update(DiscoveryContext.current(userState))
+        }
         .modifier(PlayerPresentation(target: $autoplay))
         .task { applyStartupPlan() }
     }

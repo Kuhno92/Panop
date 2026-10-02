@@ -1,4 +1,5 @@
 import PanopCore
+import PanopDiscover
 import SwiftData
 import SwiftUI
 
@@ -15,6 +16,7 @@ struct VODBrowseView: View {
     @Environment(PlaylistLibrary.self) private var library
     @Environment(UserStateStore.self) private var userState
     @Environment(SyncStatusCenter.self) private var status
+    @Environment(DiscoveryModel.self) private var discovery
 
     @Environment(\.modelContext) private var catalog
 
@@ -89,6 +91,10 @@ struct VODBrowseView: View {
             isSearching: isSearching,
             hasPlaylists: !library.playlists.isEmpty,
             isSyncing: status.isAnySyncing,
+            // Suggestions are for browsing: a search or a chosen category wants its own titles.
+            rails: isSearching || group != nil ? [] : discovery.rails
+                .filter { ($0.mediaKind ?? discovery.rows[$0.keys.first ?? ""]?.kind) == kind },
+            railRows: discovery.rows,
             onSelect: select,
             onAdd: { showingAdd = true }
         )
@@ -228,6 +234,8 @@ private struct VODGrid: View {
     let isSearching: Bool
     let hasPlaylists: Bool
     let isSyncing: Bool
+    let rails: [Rail]
+    let railRows: [String: CatalogRow]
     let onSelect: (CatalogRow) -> Void
     let onAdd: () -> Void
 
@@ -237,6 +245,8 @@ private struct VODGrid: View {
         isSearching: Bool,
         hasPlaylists: Bool,
         isSyncing: Bool,
+        rails: [Rail],
+        railRows: [String: CatalogRow],
         onSelect: @escaping (CatalogRow) -> Void,
         onAdd: @escaping () -> Void
     ) {
@@ -245,6 +255,8 @@ private struct VODGrid: View {
         self.isSearching = isSearching
         self.hasPlaylists = hasPlaylists
         self.isSyncing = isSyncing
+        self.rails = rails
+        self.railRows = railRows
         self.onSelect = onSelect
         self.onAdd = onAdd
     }
@@ -252,6 +264,9 @@ private struct VODGrid: View {
     var body: some View {
         ScrollView {
             LazyVStack(alignment: .leading, spacing: Self.spacing, pinnedViews: Self.pinnedHeadings) {
+                ForEach(rails) { rail in
+                    PosterRail(rail: rail, rows: railRows, onSelect: onSelect)
+                }
                 ForEach(model.sections) { section in
                     Section {
                         LazyVGrid(

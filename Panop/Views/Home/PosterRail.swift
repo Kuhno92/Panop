@@ -1,3 +1,4 @@
+import PanopCore
 import PanopDiscover
 import SwiftUI
 
@@ -112,5 +113,21 @@ private struct RailPoster: View {
         #else
             110
         #endif
+    }
+}
+
+extension Rail {
+    /// Whether the rail holds films or series, for a screen that shows only its own. Nil for the rails
+    /// that mix both.
+    nonisolated var mediaKind: MediaKind? {
+        switch kind {
+        case let .trending(kind), let .newReleases(kind), let .topRated(kind), let .genre(kind, _),
+             let .classics(kind), let .decade(kind, _), let .pickOfTheDay(kind):
+            kind
+        case .franchise:
+            .movie
+        case .becauseYouWatched, .mostWatched:
+            nil
+        }
     }
 }
