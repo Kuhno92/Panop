@@ -400,9 +400,12 @@ The brief called performance a key concept. For IPTV this concentrates in one nu
       states for no playlist and for nothing watched or starred yet. Each rail is a bounded
       fetch by entry id; an empty rail is not drawn. Looked at on iOS and Apple TV (a card style
       on tvOS, so a focused card lifts). UI tests cover the empty state and its Browse button on
-      both, and, on iOS, starring, playing and finding both on Home. **Not done:** a hero for
-      the channel last watched, artwork beyond logos, a rail per group or per source, and
-      movie and series rails, which wait for those screens.
+      both, and, on iOS, starring, playing and finding both on Home. The "Continue watching" banner is now a **hero**, its
+      artwork enlarged and softened behind it (`BackdropView`), and a film's page shows the
+      panel's backdrop when it has one. **Not verified by eye:** how either looks on a real
+      screen; the UI tests only show nothing broke. **Not done:** artwork beyond what the
+      catalog holds (channels have only logos, so their hero is a tint of the logo), a rail
+      per group or per source, and movie and series rails.
 - [x] **Live-only sources: make VOD optional** *(asked for)*. The add form has a "Live TV only"
       switch. Such a source skips the movie and series part of the import: an Xtream panel is
       never asked for them (two of three large downloads saved), and an M3U file is still read

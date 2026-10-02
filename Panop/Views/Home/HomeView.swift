@@ -312,6 +312,12 @@ struct ContinueBanner: View {
                         .font(.title2)
                 }
                 .padding(16)
+                // The artwork, enlarged and softened, as the hero's background.
+                .background {
+                    BackdropView(address: channel.iconURL, blurred: true)
+                        .opacity(0.35)
+                        .clipShape(RoundedRectangle(cornerRadius: 18))
+                }
                 .contentShape(Rectangle())
             }
             #if os(tvOS)

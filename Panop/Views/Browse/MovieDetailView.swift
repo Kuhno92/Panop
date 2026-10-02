@@ -98,6 +98,12 @@ struct MovieDetailView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
+                // Only when the panel has one: a blank grey box would say nothing.
+                if let backdrop = info?.backdropURLs.first {
+                    BackdropView(address: backdrop)
+                        .aspectRatio(16.0 / 9.0, contentMode: .fit)
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                }
                 header
                 actions
                 if let plot = info?.plot ?? movie.plot, !plot.isEmpty {
