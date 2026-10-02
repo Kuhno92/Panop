@@ -24,7 +24,8 @@ let package = Package(
         .library(name: "PanopXtream", targets: ["PanopXtream"]),
         .library(name: "PanopEPG", targets: ["PanopEPG"]),
         .library(name: "PanopCatalog", targets: ["PanopCatalog"]),
-        .library(name: "PanopPlayback", targets: ["PanopPlayback"])
+        .library(name: "PanopPlayback", targets: ["PanopPlayback"]),
+        .library(name: "PanopDiscover", targets: ["PanopDiscover"])
     ],
     targets: [
         .target(name: "PanopCore"),
@@ -36,6 +37,7 @@ let package = Package(
             dependencies: ["PanopCore", "PanopPlaylist", "PanopXtream", "PanopEPG"]
         ),
         .target(name: "PanopPlayback", dependencies: ["PanopCore"]),
+        .target(name: "PanopDiscover", dependencies: ["PanopCore"]),
 
         .testTarget(name: "PanopCoreTests", dependencies: ["PanopCore"]),
         .testTarget(name: "PanopPlaylistTests", dependencies: ["PanopPlaylist"]),
@@ -45,7 +47,8 @@ let package = Package(
             name: "PanopCatalogTests",
             dependencies: ["PanopCatalog", "PanopCore", "PanopXtream", "PanopEPG", "PanopPlaylist"]
         ),
-        .testTarget(name: "PanopPlaybackTests", dependencies: ["PanopPlayback"])
+        .testTarget(name: "PanopPlaybackTests", dependencies: ["PanopPlayback"]),
+        .testTarget(name: "PanopDiscoverTests", dependencies: ["PanopDiscover", "PanopCore"])
     ],
     swiftLanguageModes: [.v6]
 )
