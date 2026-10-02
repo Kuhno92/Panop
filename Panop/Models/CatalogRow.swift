@@ -25,6 +25,11 @@ nonisolated struct CatalogRow: Identifiable, Hashable, Sendable {
     var archiveDays: Int?
     var rating: Double?
     var plot: String?
+    var tmdbID: Int?
+    var isAdult: Bool
+    var year: Int?
+    var genre: String?
+    var cast: String?
 
     /// Playlist and entry together, the same key the favourites and resume points use.
     var id: String {
@@ -47,6 +52,11 @@ nonisolated struct CatalogRow: Identifiable, Hashable, Sendable {
         archiveDays = record.archiveDays
         rating = record.rating
         plot = record.plot
+        tmdbID = record.tmdbID == 0 ? nil : record.tmdbID
+        isAdult = record.isAdult
+        year = record.year
+        genre = record.genre
+        cast = record.cast
     }
 }
 

@@ -38,6 +38,17 @@ public struct CatalogEntry: Sendable, Equatable, Hashable {
     public var seriesID: String?
     public var seasonNumber: Int?
     public var episodeNumber: Int?
+    /// The title's id at TMDB when the provider gives it: an exact key for matching the entry to
+    /// other lists of titles. Nothing here ever contacts TMDB.
+    public var tmdbID: Int?
+    /// Adult content, by the provider's own flag or the name of its category. Kept out of
+    /// anything suggested to the person.
+    public var isAdult: Bool
+    /// The release year: the provider's, or the one written in the title.
+    public var year: Int?
+    /// As the provider writes it, such as `Krimi / Drama`.
+    public var genre: String?
+    public var cast: String?
 
     public init(
         id: String,
@@ -58,7 +69,12 @@ public struct CatalogEntry: Sendable, Equatable, Hashable {
         plot: String? = nil,
         seriesID: String? = nil,
         seasonNumber: Int? = nil,
-        episodeNumber: Int? = nil
+        episodeNumber: Int? = nil,
+        tmdbID: Int? = nil,
+        isAdult: Bool = false,
+        year: Int? = nil,
+        genre: String? = nil,
+        cast: String? = nil
     ) {
         self.id = id
         self.kind = kind
@@ -79,6 +95,11 @@ public struct CatalogEntry: Sendable, Equatable, Hashable {
         self.seriesID = seriesID
         self.seasonNumber = seasonNumber
         self.episodeNumber = episodeNumber
+        self.tmdbID = tmdbID
+        self.isAdult = isAdult
+        self.year = year
+        self.genre = genre
+        self.cast = cast
     }
 }
 

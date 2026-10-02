@@ -52,7 +52,12 @@ final class CatalogEntryRecord {
         [\.kindRaw, \.groupName, \.sortNumber, \.nameKey, \.id],
         // The same, newest first and best rated first, for the movie and series screens.
         [\.kindRaw, \.groupName, \.addedAt, \.nameKey, \.id],
-        [\.kindRaw, \.groupName, \.rating, \.nameKey, \.id]
+        [\.kindRaw, \.groupName, \.rating, \.nameKey, \.id],
+        // What is suggested to the person: not adult, best rated or newest first, a few hundred at a
+        // time, and the match against a list of title ids.
+        [\.kindRaw, \.isAdult, \.rating, \.nameKey, \.id],
+        [\.kindRaw, \.isAdult, \.year, \.rating, \.nameKey, \.id],
+        [\.kindRaw, \.tmdbID]
     )
 
     var playlist: String
@@ -79,6 +84,16 @@ final class CatalogEntryRecord {
     var seriesID: String?
     var seasonNumber: Int?
     var episodeNumber: Int?
+    /// The title's id at TMDB, when the provider gives it, to match it against other lists. 0 for
+    /// none, not nil: SwiftData cannot evaluate an optional inside a predicate that tests set
+    /// membership (it crashes), and this is exactly the column such a predicate is for.
+    var tmdbID: Int = 0
+    /// Defaulted, so a store made before this existed still opens: such rows read as not adult
+    /// until the next import fills them in.
+    var isAdult: Bool = false
+    var year: Int?
+    var genre: String?
+    var cast: String?
 
     init(playlist: String, entry: CatalogEntry) {
         self.playlist = playlist
@@ -102,6 +117,11 @@ final class CatalogEntryRecord {
         seriesID = entry.seriesID
         seasonNumber = entry.seasonNumber
         episodeNumber = entry.episodeNumber
+        tmdbID = entry.tmdbID ?? 0
+        isAdult = entry.isAdult
+        year = entry.year
+        genre = entry.genre
+        cast = entry.cast
     }
 
     var kind: MediaKind {
@@ -143,6 +163,11 @@ final class CatalogEntryRecord {
         assign(\.seriesID, entry.seriesID)
         assign(\.seasonNumber, entry.seasonNumber)
         assign(\.episodeNumber, entry.episodeNumber)
+        assign(\.tmdbID, entry.tmdbID ?? 0)
+        assign(\.isAdult, entry.isAdult)
+        assign(\.year, entry.year)
+        assign(\.genre, entry.genre)
+        assign(\.cast, entry.cast)
         return changed
     }
 }

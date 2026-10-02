@@ -237,7 +237,8 @@ public struct CatalogImporter: Sendable {
                         groupName: entry.groupName,
                         iconURL: entry.iconURL,
                         // Where its first episode stands, so the provider's order places the show.
-                        sortNumber: entry.sortNumber
+                        sortNumber: entry.sortNumber,
+                        isAdult: entry.isAdult
                     )
                     var shellTracker = trackers[.series] ?? KindTracker(kind: .series, before: 0)
                     trackers[.series] = nil

@@ -107,6 +107,16 @@ public struct XtreamMovie: Sendable, Equatable, Hashable, Decodable {
     /// File extension the stream is served as, such as `mkv`.
     public var containerExtension: String?
     public var directSource: String?
+    /// The film's id at TMDB, which panels fill from their own metadata. Only used to match it
+    /// against other lists of films, never to contact TMDB.
+    public var tmdbID: Int?
+    public var year: Int?
+    /// The panel's own flag for adult content.
+    public var isAdult: Bool
+    /// Most panels leave these empty in the list; some fill them.
+    public var genre: String?
+    public var cast: String?
+    public var director: String?
 
     public init(
         streamID: Int,
@@ -117,7 +127,13 @@ public struct XtreamMovie: Sendable, Equatable, Hashable, Decodable {
         categoryID: String? = nil,
         added: Date? = nil,
         containerExtension: String? = nil,
-        directSource: String? = nil
+        directSource: String? = nil,
+        tmdbID: Int? = nil,
+        year: Int? = nil,
+        isAdult: Bool = false,
+        genre: String? = nil,
+        cast: String? = nil,
+        director: String? = nil
     ) {
         self.streamID = streamID
         self.name = name
@@ -128,12 +144,19 @@ public struct XtreamMovie: Sendable, Equatable, Hashable, Decodable {
         self.added = added
         self.containerExtension = containerExtension
         self.directSource = directSource
+        self.tmdbID = tmdbID
+        self.year = year
+        self.isAdult = isAdult
+        self.genre = genre
+        self.cast = cast
+        self.director = director
     }
 
     private enum CodingKeys: String, CodingKey {
         case streamID = "stream_id", name, number = "num", iconURL = "stream_icon", rating
         case categoryID = "category_id", added, containerExtension = "container_extension"
         case directSource = "direct_source"
+        case tmdbID = "tmdb_id", year, isAdult = "is_adult", genre, cast, director
     }
 
     public init(from decoder: any Decoder) throws {
@@ -150,6 +173,12 @@ public struct XtreamMovie: Sendable, Equatable, Hashable, Decodable {
         added = container.lenientDate(.added)
         containerExtension = container.lenientString(.containerExtension)
         directSource = container.lenientString(.directSource)
+        tmdbID = container.lenientInt(.tmdbID).flatMap { $0 > 0 ? $0 : nil }
+        year = container.lenientInt(.year).flatMap { (1888 ... 2100).contains($0) ? $0 : nil }
+        isAdult = container.lenientBool(.isAdult) ?? false
+        genre = container.lenientString(.genre)
+        cast = container.lenientString(.cast)
+        director = container.lenientString(.director)
     }
 }
 
@@ -170,6 +199,8 @@ public struct XtreamSeries: Sendable, Equatable, Hashable, Decodable {
     public var backdropURLs: [String]
     /// Where the panel lists it, which is the order its own apps show.
     public var number: Int?
+    /// The series' id at TMDB, for matching against other lists of series. Never used to contact TMDB.
+    public var tmdbID: Int?
 
     public init(
         seriesID: Int,
@@ -184,7 +215,8 @@ public struct XtreamSeries: Sendable, Equatable, Hashable, Decodable {
         categoryID: String? = nil,
         lastModified: Date? = nil,
         backdropURLs: [String] = [],
-        number: Int? = nil
+        number: Int? = nil,
+        tmdbID: Int? = nil
     ) {
         self.seriesID = seriesID
         self.name = name
@@ -199,13 +231,14 @@ public struct XtreamSeries: Sendable, Equatable, Hashable, Decodable {
         self.lastModified = lastModified
         self.backdropURLs = backdropURLs
         self.number = number
+        self.tmdbID = tmdbID
     }
 
     private enum CodingKeys: String, CodingKey {
         case seriesID = "series_id", name, coverURL = "cover", plot, cast, director, genre
         case releaseDate, releaseDateSnake = "release_date", rating
         case categoryID = "category_id", lastModified = "last_modified", backdropURLs = "backdrop_path"
-        case number = "num"
+        case number = "num", tmdbID = "tmdb_id"
     }
 
     public init(from decoder: any Decoder) throws {
@@ -227,6 +260,7 @@ public struct XtreamSeries: Sendable, Equatable, Hashable, Decodable {
         lastModified = container.lenientDate(.lastModified)
         backdropURLs = container.lenientStrings(.backdropURLs)
         number = container.lenientInt(.number)
+        tmdbID = container.lenientInt(.tmdbID).flatMap { $0 > 0 ? $0 : nil }
     }
 }
 

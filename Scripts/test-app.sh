@@ -79,6 +79,14 @@ case "$platform" in
         ;;
 esac
 
+# On macOS the tests are hosted inside the app, and a test bundle signed one way will not load
+# into an app signed another (different Team IDs). A project that names a development team signs
+# the app with it, while the bundle is ad hoc, so tests sign everything ad hoc and do not depend on
+# whose team is set.
+if [[ "$platform" == macos ]]; then
+    flags+=(CODE_SIGN_IDENTITY=- DEVELOPMENT_TEAM=)
+fi
+
 # PANOP_ONLY=LiveStreamSmokeTests runs one suite (or Suite/test) instead of everything;
 # a comma-separated list runs several.
 if [[ -n "${PANOP_ONLY:-}" ]]; then

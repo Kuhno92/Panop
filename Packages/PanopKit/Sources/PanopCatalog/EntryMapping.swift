@@ -23,7 +23,9 @@ enum EntryMapping {
             epgKey: attributes.tvgID.flatMap { $0.isEmpty ? nil : EPGKey.normalize($0) },
             streamURL: url,
             hasArchive: attributes.catchup.map { !$0.isEmpty } ?? false,
-            archiveDays: attributes.catchupDays.flatMap { Int($0) }
+            archiveDays: attributes.catchupDays.flatMap { Int($0) },
+            isAdult: TitleMetadata.isAdultCategory(group),
+            year: TitleMetadata.year(fromTitle: playlistEntry.name)
         )
     }
 
@@ -54,12 +56,13 @@ enum EntryMapping {
     }
 
     static func entry(from stream: XtreamLiveStream, groups: [String: String]) -> CatalogEntry {
-        CatalogEntry(
+        let group = stream.categoryID.flatMap { groups[$0] }
+        return CatalogEntry(
             id: CatalogID.xtream("live", stream.streamID),
             kind: .live,
             name: stream.name,
             groupID: stream.categoryID,
-            groupName: stream.categoryID.flatMap { groups[$0] },
+            groupName: group,
             iconURL: stream.iconURL,
             epgKey: stream.epgChannelID.map(EPGKey.normalize),
             streamURL: stream.directSource,
@@ -67,40 +70,56 @@ enum EntryMapping {
             sortNumber: stream.number,
             hasArchive: stream.hasArchive,
             archiveDays: stream.archiveDays,
-            addedAt: stream.added
+            addedAt: stream.added,
+            // A panel does not flag its adult channels (on a real one, every channel in "FOR ADULTS"
+            // said it was not), so the category's name is what tells.
+            isAdult: TitleMetadata.isAdultCategory(group)
         )
     }
 
     static func entry(from movie: XtreamMovie, groups: [String: String]) -> CatalogEntry {
-        CatalogEntry(
+        let group = movie.categoryID.flatMap { groups[$0] }
+        return CatalogEntry(
             id: CatalogID.xtream("movie", movie.streamID),
             kind: .movie,
             name: movie.name,
             groupID: movie.categoryID,
-            groupName: movie.categoryID.flatMap { groups[$0] },
+            groupName: group,
             iconURL: movie.iconURL,
             streamURL: movie.directSource,
             remoteID: String(movie.streamID),
             containerExtension: movie.containerExtension,
             sortNumber: movie.number,
             addedAt: movie.added,
-            rating: movie.rating
+            rating: movie.rating,
+            tmdbID: movie.tmdbID,
+            isAdult: movie.isAdult || TitleMetadata.isAdultCategory(group),
+            // The title often carries it ("Backrooms (2026)") when the panel's field is empty.
+            year: movie.year ?? TitleMetadata.year(fromTitle: movie.name),
+            genre: movie.genre,
+            cast: movie.cast
         )
     }
 
     static func entry(from series: XtreamSeries, groups: [String: String]) -> CatalogEntry {
-        CatalogEntry(
+        let group = series.categoryID.flatMap { groups[$0] }
+        return CatalogEntry(
             id: CatalogID.xtream("series", series.seriesID),
             kind: .series,
             name: series.name,
             groupID: series.categoryID,
-            groupName: series.categoryID.flatMap { groups[$0] },
+            groupName: group,
             iconURL: series.coverURL,
             remoteID: String(series.seriesID),
             sortNumber: series.number,
             addedAt: series.lastModified,
             rating: series.rating,
-            plot: series.plot
+            plot: series.plot,
+            tmdbID: series.tmdbID,
+            isAdult: TitleMetadata.isAdultCategory(group),
+            year: TitleMetadata.year(fromDate: series.releaseDate) ?? TitleMetadata.year(fromTitle: series.name),
+            genre: series.genre,
+            cast: series.cast
         )
     }
 
