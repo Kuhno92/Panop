@@ -97,6 +97,15 @@ actor SyncService {
         await center.clear(playlist)
     }
 
+    /// Removes a playlist's movies and series, after stopping any sync that might write them back.
+    func dropVOD(_ playlist: String) async throws {
+        tasks[playlist]?.cancel()
+        await tasks[playlist]?.value
+        tasks[playlist] = nil
+        try await CatalogImporter(store: store, transport: transport).dropVOD(playlist: playlist)
+        await center.clear(playlist)
+    }
+
     /// Carries out a removal the safety check held back, after the user agreed.
     func confirm(_ removal: DeferredRemoval, playlist: String) async throws {
         let importer = CatalogImporter(store: store, transport: transport)

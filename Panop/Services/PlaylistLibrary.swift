@@ -299,6 +299,37 @@ final class PlaylistLibrary {
         return nil
     }
 
+    /// Turns movies and series on or off for an existing source.
+    ///
+    /// Off removes the ones already stored, and the next updates leave them out. On fetches
+    /// them: a full re-import, since an unchanged M3U file would otherwise be skipped.
+    ///
+    /// - Returns: nil on success, or a message for the user.
+    @discardableResult
+    func setIncludesVOD(_ includes: Bool, for id: String) async -> String? {
+        guard let record = try? fetchRecord(id), record.includesVOD != includes else { return nil }
+        if !includes {
+            // Rows first: if they cannot be removed the source stays as it was.
+            do {
+                try await sync.dropVOD(id)
+            } catch {
+                return "The movies and series could not be removed. Nothing was changed, so you can try again."
+            }
+        }
+        record.includesVOD = includes
+        do {
+            try context.save()
+        } catch {
+            context.rollback()
+            return "That setting could not be saved."
+        }
+        reload()
+        if includes {
+            await refresh(id, force: true)
+        }
+        return nil
+    }
+
     func confirm(_ removal: DeferredRemoval, playlist: String) async throws {
         try await sync.confirm(removal, playlist: playlist)
     }

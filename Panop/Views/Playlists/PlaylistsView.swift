@@ -186,6 +186,16 @@ struct PlaylistRow: View {
             }
         }
         Divider()
+        if playlist.includesVOD {
+            Button("Live TV Only", systemImage: "tv") {
+                Task { await library.setIncludesVOD(false, for: playlist.id) }
+            }
+        } else {
+            Button("Include Movies and Series", systemImage: "film") {
+                Task { await library.setIncludesVOD(true, for: playlist.id) }
+            }
+        }
+        Divider()
         Button("Delete…", systemImage: "trash", role: .destructive, action: onDelete)
     }
 

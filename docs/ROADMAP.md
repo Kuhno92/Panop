@@ -400,9 +400,10 @@ The brief called performance a key concept. For IPTV this concentrates in one nu
       was open); with no source at all they stay, since there is nothing to hide yet. The
       playlist row says "Live TV only". Package tests for both importers and the descriptor,
       app tests for the library, UI tests on iOS and tvOS (tabs hidden, and present for a full
-      source). **Not done:** switching an existing source between live-only and full (delete
-      and add it again for now): turning VOD off must remove the rows without tripping the
-      mass-removal safety check, and turning it on must force a re-import.
+      source). An existing source can be switched
+      from its menu ("Live TV Only" and "Include Movies and Series"): off removes the stored
+      movies, series and their categories (not through the sweep, so the mass-removal check
+      does not hold it back), on forces a full re-import. 2 package tests and 1 app test.
 - [x] **Startup behaviour** *(asked for)*. Settings has "When Panop opens": Home, Live TV, Movies,
       Series, or Play a channel, which adds a searchable picker for the channel. The screen is
       known from the settings alone so the first frame is the right one; a channel starts from

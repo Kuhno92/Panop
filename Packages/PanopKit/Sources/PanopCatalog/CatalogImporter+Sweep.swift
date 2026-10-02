@@ -103,4 +103,31 @@ extension CatalogImporter {
         }
         return (staleCount, 0)
     }
+
+    /// Removes every movie and series entry of a playlist, with their categories, because the
+    /// user turned them off for it.
+    ///
+    /// Not a sweep, so the mass-removal safety check does not apply: that check guards against
+    /// a bad download emptying the catalog, and this is the person asking for exactly that part
+    /// to go. Live channels are not touched.
+    public func dropVOD(playlist: String) async throws {
+        for kind in [MediaKind.movie, .series] {
+            while true {
+                let page = try await store.entryIDs(
+                    kind: kind,
+                    playlist: playlist,
+                    after: nil,
+                    limit: Self.sweepPageSize
+                )
+                if page.isEmpty {
+                    break
+                }
+                try await store.removeEntries(ids: page, playlist: playlist)
+            }
+            let categories = try await store.categoryIDs(kind: kind, playlist: playlist)
+            if !categories.isEmpty {
+                try await store.removeCategories(ids: categories, kind: kind, playlist: playlist)
+            }
+        }
+    }
 }

@@ -45,4 +45,25 @@ struct LiveOnlySourceTests {
         #expect(!library.offersVOD, "and they go again when the last source with them is deleted")
         await app.services.sync.waitForCompletion(live.id)
     }
+
+    @Test
+    func `turning movies off removes them, and turning them on brings them back`() async throws {
+        let app = try TestApp(transport: FakePanel(live: 5, movies: 3).transport())
+        defer { app.cleanUp() }
+        let library = app.services.library
+        let store = app.services.catalogStore
+        let playlist = try await library.add(.xtream(name: "P", baseURL: panel, username: "a", password: "b"))
+        await app.services.sync.waitForCompletion(playlist.id)
+        #expect(try await store.entryCount(kind: .movie, playlist: playlist.id) == 3)
+
+        #expect(await library.setIncludesVOD(false, for: playlist.id) == nil)
+        #expect(try await store.entryCount(kind: .movie, playlist: playlist.id) == 0)
+        #expect(try await store.entryCount(kind: .live, playlist: playlist.id) == 5, "channels stay")
+        #expect(!library.offersVOD)
+
+        #expect(await library.setIncludesVOD(true, for: playlist.id) == nil)
+        await app.services.sync.waitForCompletion(playlist.id)
+        #expect(try await store.entryCount(kind: .movie, playlist: playlist.id) == 3)
+        #expect(library.offersVOD)
+    }
 }

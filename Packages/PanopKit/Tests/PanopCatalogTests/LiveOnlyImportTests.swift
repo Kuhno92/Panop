@@ -100,3 +100,44 @@ struct LiveOnlyImportTests {
         #expect(await store.allEntries(playlist: "x").map(\.id) == ["live:1"])
     }
 }
+
+@Suite("Turning VOD off for a source")
+struct DropVODTests {
+    @Test
+    func `movies, series and their categories go, and live channels stay`() async throws {
+        let store = InMemoryCatalogStore()
+        let text = """
+        #EXTM3U
+        #EXTINF:-1 group-title="News",Live One
+        http://h/live/1.ts
+        #EXTINF:5400 group-title="Films",A Film
+        http://h/movie/u/p/2.mp4
+        #EXTINF:2400 group-title="Shows",Show S01E01
+        http://h/series/u/p/3.mp4
+        """
+        let importer = CatalogImporter(store: store, transport: StubTransport { _ in (404, "") })
+        _ = try await importer.importM3U(playlist: "p", source: .file(path: writeTemporaryFile(text)))
+        #expect(await store.allEntries(playlist: "p").count == 4, "the channel, the film, the episode and its show")
+
+        try await importer.dropVOD(playlist: "p")
+
+        #expect(await store.allEntries(playlist: "p").map(\.name) == ["Live One"])
+        #expect(await store.allCategories(playlist: "p").map(\.name) == ["News"])
+    }
+
+    @Test
+    func `more than a page of rows is removed`() async throws {
+        let store = InMemoryCatalogStore()
+        let lines = (0 ..< CatalogImporter.sweepPageSize + 50)
+            .map { "#EXTINF:5400,Film \($0)\nhttp://h/movie/u/p/\($0).mp4" }
+        let importer = CatalogImporter(store: store, transport: StubTransport { _ in (404, "") })
+        _ = try await importer.importM3U(
+            playlist: "p",
+            source: .file(path: writeTemporaryFile("#EXTM3U\n" + lines.joined(separator: "\n")))
+        )
+
+        try await importer.dropVOD(playlist: "p")
+
+        #expect(await store.allEntries(playlist: "p").isEmpty)
+    }
+}
