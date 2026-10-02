@@ -13,6 +13,7 @@
 		AAAA000000000000000000D5 /* PanopXtream in Frameworks */ = {isa = PBXBuildFile; productRef = AAAA000000000000000000C5 /* PanopXtream */; };
 		AAAA000000000000000000D6 /* PanopEPG in Frameworks */ = {isa = PBXBuildFile; productRef = AAAA000000000000000000C6 /* PanopEPG */; };
 		AAAA000000000000000000D7 /* PanopCatalog in Frameworks */ = {isa = PBXBuildFile; productRef = AAAA000000000000000000C7 /* PanopCatalog */; };
+		AAAA000000000000000000D8 /* PanopDiscover in Frameworks */ = {isa = PBXBuildFile; productRef = AAAA000000000000000000CD /* PanopDiscover */; };
 		AAAA000000000000000000F1 /* PanopCore in Frameworks */ = {isa = PBXBuildFile; productRef = AAAA000000000000000000C2 /* PanopCore */; };
 		AAAA000000000000000000F2 /* PanopPlaylist in Frameworks */ = {isa = PBXBuildFile; productRef = AAAA000000000000000000C3 /* PanopPlaylist */; };
 		AAAA000000000000000000F3 /* PanopXtream in Frameworks */ = {isa = PBXBuildFile; productRef = AAAA000000000000000000C5 /* PanopXtream */; };
@@ -21,6 +22,7 @@
 		AAAA000000000000000000F6 /* VLCKit in Frameworks */ = {isa = PBXBuildFile; productRef = AAAA000000000000000000C8 /* VLCKit */; };
 		AAAA000000000000000000F7 /* LumeEngine in Frameworks */ = {isa = PBXBuildFile; productRef = AAAA000000000000000000CB /* LumeEngine */; };
 		AAAA000000000000000000F8 /* LumeEngine in Frameworks */ = {isa = PBXBuildFile; productRef = AAAA000000000000000000CC /* LumeEngine */; };
+		AAAA000000000000000000F9 /* PanopDiscover in Frameworks */ = {isa = PBXBuildFile; productRef = AAAA000000000000000000CD /* PanopDiscover */; };
 		AAAA000000000000000000FA /* LumeEngine in Embed Frameworks */ = {isa = PBXBuildFile; productRef = AAAA000000000000000000CB /* LumeEngine */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
@@ -90,6 +92,7 @@
 				AAAA000000000000000000D5 /* PanopXtream in Frameworks */,
 				AAAA000000000000000000D6 /* PanopEPG in Frameworks */,
 				AAAA000000000000000000D7 /* PanopCatalog in Frameworks */,
+				AAAA000000000000000000D8 /* PanopDiscover in Frameworks */,
 				AAAA000000000000000000F6 /* VLCKit in Frameworks */,
 				AAAA000000000000000000F7 /* LumeEngine in Frameworks */,
 			);
@@ -104,6 +107,7 @@
 				AAAA000000000000000000F3 /* PanopXtream in Frameworks */,
 				AAAA000000000000000000F4 /* PanopEPG in Frameworks */,
 				AAAA000000000000000000F5 /* PanopCatalog in Frameworks */,
+				AAAA000000000000000000F9 /* PanopDiscover in Frameworks */,
 				AAAA000000000000000000F8 /* LumeEngine in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -165,6 +169,7 @@
 				AAAA000000000000000000C5 /* PanopXtream */,
 				AAAA000000000000000000C6 /* PanopEPG */,
 				AAAA000000000000000000C7 /* PanopCatalog */,
+				AAAA000000000000000000CD /* PanopDiscover */,
 				AAAA000000000000000000C8 /* VLCKit */,
 				AAAA000000000000000000CB /* LumeEngine */,
 			);
@@ -194,6 +199,7 @@
 				AAAA000000000000000000C5 /* PanopXtream */,
 				AAAA000000000000000000C6 /* PanopEPG */,
 				AAAA000000000000000000C7 /* PanopCatalog */,
+				AAAA000000000000000000CD /* PanopDiscover */,
 				AAAA000000000000000000CC /* LumeEngine */,
 			);
 			productName = PanopTests;
@@ -616,6 +622,10 @@
 			isa = XCSwiftPackageProductDependency;
 			package = AAAA000000000000000000CA /* XCLocalSwiftPackageReference "vendor/LumeEngine" */;
 			productName = LumeEngine;
+		};
+		AAAA000000000000000000CD /* PanopDiscover */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PanopDiscover;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

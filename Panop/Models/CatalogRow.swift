@@ -8,7 +8,7 @@ import SwiftData
 /// it, so a list built on records can only be fed from the main thread, and reading a page of
 /// them there costs about 30 microseconds a row. A page read on a background context and handed
 /// over as values leaves the main thread only the drawing.
-nonisolated struct CatalogRow: Identifiable, Hashable, Sendable {
+nonisolated struct CatalogRow: Identifiable, Hashable, Sendable, Codable {
     var playlist: String
     /// The entry's id within its playlist. Not unique across playlists: see ``id``.
     var entryID: String
@@ -54,7 +54,7 @@ nonisolated struct CatalogRow: Identifiable, Hashable, Sendable {
         plot = record.plot
         tmdbID = record.tmdbID == 0 ? nil : record.tmdbID
         isAdult = record.isAdult
-        year = record.year
+        year = record.year == 0 ? nil : record.year
         genre = record.genre
         cast = record.cast
     }

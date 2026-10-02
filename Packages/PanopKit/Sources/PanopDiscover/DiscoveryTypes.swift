@@ -127,7 +127,7 @@ public struct DiscoveryInput: Sendable {
     }
 }
 
-public enum RailKind: Sendable, Hashable {
+public enum RailKind: Sendable, Hashable, Codable {
     case trending(MediaKind)
     case becauseYouWatched(seed: String)
     case newReleases(MediaKind)
@@ -142,7 +142,7 @@ public enum RailKind: Sendable, Hashable {
 
 /// A row of titles under one heading. It holds keys, in the order to show them; the app looks the
 /// titles up.
-public struct Rail: Sendable, Equatable, Identifiable {
+public struct Rail: Sendable, Equatable, Identifiable, Codable {
     public var kind: RailKind
     public var keys: [String]
     /// What the heading is about: the title it was drawn from, the genre, the franchise.

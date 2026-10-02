@@ -14,9 +14,14 @@ struct HomeView: View {
     /// Takes the person to the full channel list.
     let onBrowse: () -> Void
 
+    @Environment(\.modelContext) private var catalog
     @State private var showingAdd = false
     @State private var playing: PlaybackTarget?
     @State private var search = ""
+    /// The rails drawn from the library; built off the main thread (see `DiscoveryModel`).
+    @State private var discovery = DiscoveryModel()
+    @State private var openMovie: MovieReference?
+    @State private var openSeries: SeriesReference?
 
     /// A rail is a glance, not a list: the list is a tab away.
     private let railLimit = 20
@@ -30,6 +35,14 @@ struct HomeView: View {
             }
         }
         .navigationTitle("Home")
+        // Rebuilt whenever what the rails are made from changes; an unchanged context is ignored.
+        .task(id: userState.revision) {
+            guard !library.playlists.isEmpty else { return }
+            discovery.start(container: catalog.container)
+            discovery.update(DiscoveryContext.current(userState))
+        }
+        .navigationDestination(item: $openMovie) { MovieDetailView(movie: $0) }
+        .navigationDestination(item: $openSeries) { SeriesDetailView(series: $0) }
         .modifier(HomeSearch(text: $search, isOffered: !library.playlists.isEmpty))
         .sheet(isPresented: $showingAdd) {
             NavigationStack { AddPlaylistView() }
@@ -42,35 +55,44 @@ struct HomeView: View {
             VStack(alignment: .leading, spacing: 32) {
                 if library.playlists.isEmpty {
                     noPlaylist
-                } else if userState.recents.isEmpty, userState.favorites.isEmpty {
-                    nothingYet
                 } else {
-                    if let last = userState.recents.first {
-                        ContinueBanner(key: last, onPlay: play)
+                    let hasHistory = !userState.recents.isEmpty || !userState.favorites.isEmpty
+                    if hasHistory {
+                        if let last = userState.recents.first {
+                            ContinueBanner(key: last, onPlay: play)
+                        }
+                        ChannelRail(
+                            title: "Continue watching",
+                            keys: Array(continueKeys.prefix(railLimit)),
+                            keepsOrder: true,
+                            showsProgress: true,
+                            onPlay: play
+                        )
+                        ChannelRail(
+                            title: "Recently watched",
+                            // The most recent channel is the banner above, and a film left part-way is
+                            // in the rail above, so neither is shown twice.
+                            keys: Array(userState.recents.dropFirst().filter { userState.progress[$0] == nil }
+                                .prefix(railLimit)),
+                            keepsOrder: true,
+                            onPlay: play
+                        )
+                        ChannelRail(
+                            title: "Favourites",
+                            keys: Array(userState.favorites),
+                            keepsOrder: false,
+                            onPlay: play
+                        )
                     }
-                    ChannelRail(
-                        title: "Continue watching",
-                        keys: Array(continueKeys.prefix(railLimit)),
-                        keepsOrder: true,
-                        showsProgress: true,
-                        onPlay: play
-                    )
-                    ChannelRail(
-                        title: "Recently watched",
-                        // The most recent channel is the banner above, and a film left part-way is
-                        // in the rail above, so neither is shown twice.
-                        keys: Array(userState.recents.dropFirst().filter { userState.progress[$0] == nil }
-                            .prefix(railLimit)),
-                        keepsOrder: true,
-                        onPlay: play
-                    )
-                    ChannelRail(
-                        title: "Favourites",
-                        keys: Array(userState.favorites),
-                        keepsOrder: false,
-                        onPlay: play
-                    )
-                    browseButton
+                    // Suggestions drawn from the library itself.
+                    ForEach(discovery.rails) { rail in
+                        PosterRail(rail: rail, rows: discovery.rows, onSelect: open)
+                    }
+                    if !hasHistory, discovery.rails.isEmpty, discovery.phase == .loaded {
+                        nothingYet
+                    } else {
+                        browseButton
+                    }
                 }
             }
             .padding(.vertical)
@@ -80,6 +102,26 @@ struct HomeView: View {
     /// Unfinished films and episodes, without the one the banner already offers.
     private var continueKeys: [String] {
         userState.continueWatching.filter { $0 != userState.recents.first }
+    }
+
+    /// A suggested title: a film opens its page, a show its episodes, an episode that stands alone plays.
+    private func open(_ row: CatalogRow) {
+        switch row.kind {
+        case .movie:
+            openMovie = MovieReference(row)
+        case .series where (row.streamURL ?? "").isEmpty:
+            openSeries = SeriesReference(
+                playlist: row.playlist,
+                entryID: row.entryID,
+                remoteID: row.remoteID,
+                name: row.name,
+                posterURL: row.iconURL,
+                plot: row.plot
+            )
+        default:
+            userState.markPlayed(row.id)
+            playing = PlaybackTarget(row: row)
+        }
     }
 
     private func play(_ channel: CatalogEntryRecord) {

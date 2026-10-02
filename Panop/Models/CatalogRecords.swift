@@ -91,7 +91,8 @@ final class CatalogEntryRecord {
     /// Defaulted, so a store made before this existed still opens: such rows read as not adult
     /// until the next import fills them in.
     var isAdult: Bool = false
-    var year: Int?
+    /// The release year, 0 for unknown: like `tmdbID`, a plain integer so a predicate can compare it.
+    var year: Int = 0
     var genre: String?
     var cast: String?
 
@@ -119,7 +120,7 @@ final class CatalogEntryRecord {
         episodeNumber = entry.episodeNumber
         tmdbID = entry.tmdbID ?? 0
         isAdult = entry.isAdult
-        year = entry.year
+        year = entry.year ?? 0
         genre = entry.genre
         cast = entry.cast
     }
@@ -165,7 +166,7 @@ final class CatalogEntryRecord {
         assign(\.episodeNumber, entry.episodeNumber)
         assign(\.tmdbID, entry.tmdbID ?? 0)
         assign(\.isAdult, entry.isAdult)
-        assign(\.year, entry.year)
+        assign(\.year, entry.year ?? 0)
         assign(\.genre, entry.genre)
         assign(\.cast, entry.cast)
         return changed

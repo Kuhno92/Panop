@@ -38,6 +38,9 @@ final class UserStateStore {
     private(set) var hidden: Set<String> = []
     /// Categories the person hid, and where they placed the others, by kind (see
     /// `UserStateStore+Categories`).
+    /// Counts every change to what the person has watched, marked, hidden or arranged, so a screen
+    /// that builds something from it can tell, cheaply, that it is out of date.
+    private(set) var revision = 0
     /// What was opened, and when, how often and under which series (see `UserStateStore+Taste`).
     var plays: [String: PlaySignal] = [:]
     var hiddenCategoryNames: [String: Set<String>] = [:]
@@ -244,6 +247,7 @@ final class UserStateStore {
     /// Saves, then refreshes what the screens read. If the save fails, what was in memory is
     /// thrown away and re-read, so the screen never shows a state the disk does not have.
     func commit() {
+        revision += 1
         do {
             try context.save()
         } catch {
