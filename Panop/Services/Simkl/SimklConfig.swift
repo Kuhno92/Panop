@@ -6,7 +6,7 @@ import PanopSimkl
 nonisolated enum SimklConfig {
     /// The public id of Panop's registration at https://simkl.com/settings/developer/. Empty until the app
     /// is registered, and while it is empty nothing is asked of Simkl and no Simkl rail or login is offered.
-    static let clientID = ""
+    static let clientID = "e7fc78a9f51d1011e6a0a9507550de40def4dbb49b9db8ab932cf7070b12bf78"
 
     static var isConfigured: Bool {
         !clientID.isEmpty
