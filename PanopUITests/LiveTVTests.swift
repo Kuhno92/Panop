@@ -36,4 +36,16 @@ final class LiveTVTests: PanopUITestCase {
             )
         }
     #endif
+
+    #if !os(tvOS)
+        func testANarrowedCategoryShowsOnlyItsChannels() {
+            waitForChannels()
+            app.buttons["Category"].tap()
+            XCTAssertTrue(app.buttons["Other"].waitForExistence(timeout: 10), "the seeded category is not offered")
+            app.buttons["Other"].tap()
+
+            XCTAssertTrue(channel("Channel 10").waitForExistence(timeout: 10), "the category's channels did not show")
+            XCTAssertFalse(channel("3sat").exists, "a channel from another category is still listed")
+        }
+    #endif
 }

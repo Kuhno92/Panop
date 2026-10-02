@@ -26,8 +26,14 @@ enum LiveChannelQuery {
         source: String?,
         search: String,
         limit: Int,
-        order: LiveOrder = .name
+        order: LiveOrder = .name,
+        group: String? = nil
     ) -> FetchDescriptor<CatalogEntryRecord> {
+        if let group {
+            var descriptor = groupDescriptor(kind: kind, source: source, group: group, search: search, order: order)
+            descriptor.fetchLimit = Swift.min(Swift.max(limit, 1), maxRows)
+            return descriptor
+        }
         // Series are listed as shows: an episode grouped under its show is reached through the show.
         if kind == .series {
             return seriesDescriptor(source: source, search: search, limit: limit, order: order)
@@ -92,6 +98,69 @@ enum LiveChannelQuery {
         descriptor.fetchLimit = maxRows
         return descriptor
     }
+
+    /// One category's rows. An episode grouped under a show is left out whatever the kind
+    /// (only an M3U episode has a `seriesID`, so for live and movies it is always true), which
+    /// keeps this to one predicate shape per source and search instead of one per kind too.
+    private static func groupDescriptor(
+        kind: MediaKind,
+        source: String?,
+        group: String,
+        search: String,
+        order: LiveOrder
+    ) -> FetchDescriptor<CatalogEntryRecord> {
+        let raw = kind.rawValue
+        let term = CatalogEntryRecord.nameKey(for: search.trimmingCharacters(in: .whitespacesAndNewlines))
+        let sort = Self.sort(for: order)
+        return switch (source, term.isEmpty) {
+        case let (source?, true):
+            FetchDescriptor(
+                predicate: #Predicate {
+                    $0.kindRaw == raw && $0.groupName == group && $0.playlist == source && $0.seriesID == nil
+                },
+                sortBy: sort
+            )
+        case let (source?, false):
+            FetchDescriptor(
+                predicate: #Predicate {
+                    $0.kindRaw == raw && $0.groupName == group && $0.playlist == source && $0.seriesID == nil
+                        && $0.nameKey.contains(term)
+                },
+                sortBy: sort
+            )
+        case (nil, true):
+            FetchDescriptor(
+                predicate: #Predicate { $0.kindRaw == raw && $0.groupName == group && $0.seriesID == nil },
+                sortBy: sort
+            )
+        case (nil, false):
+            FetchDescriptor(
+                predicate: #Predicate {
+                    $0.kindRaw == raw && $0.groupName == group && $0.seriesID == nil && $0.nameKey.contains(term)
+                },
+                sortBy: sort
+            )
+        }
+    }
+
+    /// The category names to offer for one kind, from one source or all, in name order.
+    ///
+    /// Read from the small category table rather than from the entries, which would mean
+    /// scanning every row. Two sources can both have "News", and it is one choice.
+    static func categoryNames(kind: MediaKind, source: String?, in context: ModelContext) -> [String] {
+        let raw = kind.rawValue
+        var descriptor: FetchDescriptor<CatalogCategoryRecord> = if let source {
+            FetchDescriptor(predicate: #Predicate { $0.kindRaw == raw && $0.playlist == source })
+        } else {
+            FetchDescriptor(predicate: #Predicate { $0.kindRaw == raw })
+        }
+        descriptor.fetchLimit = maxCategories
+        let names = ((try? context.fetch(descriptor)) ?? []).map(\.name).filter { !$0.isEmpty }
+        return Set(names).sorted { $0.localizedStandardCompare($1) == .orderedAscending }
+    }
+
+    /// Real panels have hundreds of categories. This only stops a pathological one.
+    static let maxCategories = 5000
 
     private static func sort(for order: LiveOrder) -> [SortDescriptor<CatalogEntryRecord>] {
         switch order {

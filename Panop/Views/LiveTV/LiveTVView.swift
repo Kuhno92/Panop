@@ -14,6 +14,7 @@ struct LiveTVView: View {
     @AppStorage("liveListMode") private var storedMode = LiveListMode.all.rawValue
     @AppStorage("liveSortOrder") private var storedOrder = LiveOrder.name.rawValue
     @State private var search = ""
+    @State private var group: String?
     @State private var limit = LiveChannelQuery.pageSize
     @State private var showingAdd = false
     @State private var playing: PlaybackTarget?
@@ -46,7 +47,13 @@ struct LiveTVView: View {
     private var descriptor: FetchDescriptor<CatalogEntryRecord> {
         switch mode {
         case .all:
-            LiveChannelQuery.descriptor(source: selectedSource?.id, search: search, limit: limit, order: order)
+            LiveChannelQuery.descriptor(
+                source: selectedSource?.id,
+                search: search,
+                limit: limit,
+                order: order,
+                group: group
+            )
         case .favourites:
             LiveChannelQuery.descriptor(restrictedTo: entryIDs(of: Array(userState.favorites)))
         case .recents:
@@ -99,6 +106,9 @@ struct LiveTVView: View {
             if !library.playlists.isEmpty {
                 ToolbarItem { modeMenu }
                 ToolbarItem { orderMenu }
+                if mode == .all {
+                    ToolbarItem { CategoryButton(kind: .live, source: selectedSource?.id, group: $group) }
+                }
             }
             if hasSeveralSources {
                 ToolbarItem { sourceMenu }
@@ -106,7 +116,12 @@ struct LiveTVView: View {
         }
         // A new filter or search starts from the top, not from wherever the last
         // list had been scrolled and grown to.
-        .onChange(of: storedSource) { limit = LiveChannelQuery.pageSize }
+        .onChange(of: storedSource) {
+            limit = LiveChannelQuery.pageSize
+            // The category may not exist in the other source.
+            group = nil
+        }
+        .onChange(of: group) { limit = LiveChannelQuery.pageSize }
         .onChange(of: storedMode) { limit = LiveChannelQuery.pageSize }
         .onChange(of: storedOrder) { limit = LiveChannelQuery.pageSize }
         .onChange(of: search) { limit = LiveChannelQuery.pageSize }

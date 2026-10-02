@@ -232,7 +232,13 @@ The first milestone where Panop is usable.
       Start over, favourite and watched. What the catalog holds shows at once; a provider
       panel's extra details (`get_vod_info`, lenient decoding, 6 tests) are fetched when the
       page opens. An M3U source has nothing more to fetch. UI tests on iOS (page, resume and
-      start over through it). **Not done:** groups or categories, a backdrop image, a trailer.
+      start over through it). Live TV, Movies and Series have a **Category** button that
+      opens a searchable list of the source's categories (read from the small category table,
+      one entry per name across sources) and narrows the list to one, together with source,
+      search and sort, through the same bounded fetch (two new indexes on kind, category and
+      name or provider order; 5 query tests, UI tests on iOS). **Not verified:** that an
+      existing store gains those two indexes cleanly. **Not done:** a backdrop image, a
+      trailer, and counts next to the category names.
 - [ ] **Search** across the catalog. Needs SQLite FTS or bounded predicates with a fetch limit;
       an unbounded sort defeats the limit entirely.
 - [x] **Engine coordinator** *(surfaced)*: owns the ordered fallback list, reconnect and

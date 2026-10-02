@@ -46,7 +46,10 @@ final class CatalogEntryRecord {
         // The Series screen lists the entries that are not episodes of another entry, by name.
         [\.kindRaw, \.seriesID, \.nameKey, \.id],
         // And a series' episodes, in order.
-        [\.playlist, \.seriesID, \.seasonNumber, \.episodeNumber]
+        [\.playlist, \.seriesID, \.seasonNumber, \.episodeNumber],
+        // A list narrowed to one category, in either order.
+        [\.kindRaw, \.groupName, \.nameKey, \.id],
+        [\.kindRaw, \.groupName, \.sortNumber, \.nameKey, \.id]
     )
 
     var playlist: String

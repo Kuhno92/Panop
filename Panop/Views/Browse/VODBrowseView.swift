@@ -15,6 +15,7 @@ struct VODBrowseView: View {
     @Environment(SyncStatusCenter.self) private var status
 
     @State private var search = ""
+    @State private var group: String?
     @State private var limit = LiveChannelQuery.pageSize
     @State private var playing: PlaybackTarget?
     @State private var resume: ResumeChoice?
@@ -32,7 +33,13 @@ struct VODBrowseView: View {
 
     var body: some View {
         VODGrid(
-            descriptor: LiveChannelQuery.descriptor(kind: kind, source: nil, search: search, limit: limit),
+            descriptor: LiveChannelQuery.descriptor(
+                kind: kind,
+                source: nil,
+                search: search,
+                limit: limit,
+                group: group
+            ),
             kind: kind,
             isSearching: isSearching,
             hasPlaylists: !library.playlists.isEmpty,
@@ -44,6 +51,12 @@ struct VODBrowseView: View {
         .navigationTitle(title)
         .modifier(VODSearch(text: $search, isOffered: !library.playlists.isEmpty))
         .onChange(of: search) { limit = LiveChannelQuery.pageSize }
+        .onChange(of: group) { limit = LiveChannelQuery.pageSize }
+        .toolbar {
+            if !library.playlists.isEmpty {
+                ToolbarItem { CategoryButton(kind: kind, source: nil, group: $group) }
+            }
+        }
         .navigationDestination(item: $openSeries) { SeriesDetailView(series: $0) }
         .navigationDestination(item: $openMovie) { MovieDetailView(movie: $0) }
         .sheet(isPresented: $showingAdd) {
