@@ -123,7 +123,9 @@ no network or stream. Three things learned the hard way:
   focused button covering its neighbour on Apple TV).
 
 ```bash
-# Reclaim disk from build caches. Dry run by default; keeps the hook tooling
+# Reclaim disk from build caches and leftover simulator clones. Dry run by default; keeps the hook tooling
+# (test-app.sh and test-ui.sh already remove their clones on exit; after an xcodebuild test of
+# your own run Scripts/clean-test-clones.sh)
 Scripts/clean-caches.sh [--apply]
 ```
 

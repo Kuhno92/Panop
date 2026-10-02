@@ -54,6 +54,8 @@ if [[ -n "${PANOP_ONLY:-}" ]]; then
 fi
 
 log="$(mktemp -t panop-ui-test)"
+# Whatever happens, leave no simulator clones behind (see the script).
+trap '"$ROOT/Scripts/clean-test-clones.sh"' EXIT
 echo "==> UI tests on $wanted (log: $log)"
 
 # xcodebuild clones the device for parallel testing, and a clone that fails to start leaves the

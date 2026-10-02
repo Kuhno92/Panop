@@ -97,6 +97,8 @@ if [[ -n "${PANOP_ONLY:-}" ]]; then
 fi
 
 log="$(mktemp -t panop-test)"
+# Whatever happens, leave no simulator clones behind (see the script).
+trap '"$ROOT/Scripts/clean-test-clones.sh"' EXIT
 echo "==> Testing on $platform (log: $log)"
 
 # The test host sometimes never starts its tests and xcodebuild then waits for it forever: the
@@ -111,6 +113,7 @@ for attempt in 1 2 3; do
         -project Panop.xcodeproj \
         -scheme PanopTests \
         -destination "$destination" \
+        -parallel-testing-enabled NO \
         -derivedDataPath "${DD_BASE}-test-${platform}$([[ $benchmark -eq 1 ]] && echo -bench)" \
         -clonedSourcePackagesDirPath "$SHARED_SPM" \
         ${flags[@]+"${flags[@]}"} >"$log" 2>&1 &

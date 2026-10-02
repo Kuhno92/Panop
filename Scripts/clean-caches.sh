@@ -6,7 +6,10 @@
 #   Scripts/clean-caches.sh --apply    delete it
 #
 # Deleted: per-build DerivedData under /tmp/panop-dd-*, Xcode's Panop-*
-# DerivedData (minus SourcePackages), and SwiftPM scratch in every worktree.
+# DerivedData (minus SourcePackages), SwiftPM scratch in every worktree, and the simulator
+# clones xcodebuild leaves in ~/Library/Developer/XCTestDevices (the test scripts also remove
+# them on exit). Clones are APFS copies that share the original's blocks, so `du` overstates
+# what they cost.
 #
 # Kept on purpose:
 #   ~/Library/Developer/Panop-SharedSPM   re-downloading VLCKit alone is ~865 MB
@@ -82,6 +85,11 @@ while read -r wt; do
     # A worktree's own PanopKit scratch dir is disposable too.
     reap "$wt/Packages/PanopKit/.build"
 done < <(git -C "$ROOT" worktree list --porcelain | sed -n 's/^worktree //p')
+
+echo "Simulator clones left by xcodebuild test"
+clones="$(xcrun simctl --set "$HOME/Library/Developer/XCTestDevices" list devices 2>/dev/null | grep -c Clone || true)"
+printf '  %s clone(s) in ~/Library/Developer/XCTestDevices\n' "$clones"
+if [[ $apply -eq 1 ]]; then "$ROOT/Scripts/clean-test-clones.sh"; fi
 
 echo
 if [[ $apply -eq 1 ]]; then
