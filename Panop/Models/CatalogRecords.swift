@@ -49,7 +49,10 @@ final class CatalogEntryRecord {
         [\.playlist, \.seriesID, \.seasonNumber, \.episodeNumber],
         // A list narrowed to one category, in either order.
         [\.kindRaw, \.groupName, \.nameKey, \.id],
-        [\.kindRaw, \.groupName, \.sortNumber, \.nameKey, \.id]
+        [\.kindRaw, \.groupName, \.sortNumber, \.nameKey, \.id],
+        // The same, newest first and best rated first, for the movie and series screens.
+        [\.kindRaw, \.groupName, \.addedAt, \.nameKey, \.id],
+        [\.kindRaw, \.groupName, \.rating, \.nameKey, \.id]
     )
 
     var playlist: String

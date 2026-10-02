@@ -155,7 +155,7 @@ struct LiveTVView: View {
     private var orderMenu: some View {
         Menu {
             Picker("Sort", selection: $storedOrder) {
-                ForEach(LiveOrder.allCases) { order in
+                ForEach(LiveOrder.forChannels) { order in
                     Text(order.title).tag(order.rawValue)
                 }
             }
@@ -249,7 +249,7 @@ private struct LiveChannelList: View {
                     }
                     .pickerStyle(.segmented)
                     Picker("Sort", selection: $orderRaw) {
-                        ForEach(LiveOrder.allCases) { order in
+                        ForEach(LiveOrder.forChannels) { order in
                             Text(order.title).tag(order.rawValue)
                         }
                     }

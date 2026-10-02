@@ -469,6 +469,18 @@ The brief called performance a key concept. For IPTV this concentrates in one nu
       not recognised, so any channel, film or series can also be **hidden by hand** from its
       menu and shown again from Settings, Hidden; hidden entries stay out of every list and
       search, and keep their favourite, history and resume point.
+- [x] **Movies and Series by category, with source and sort** *(asked for)*. With every category
+      selected the screens show the first category's titles under its heading, then the second's,
+      and so on, in the order the categories are arranged (the person's, else the provider's),
+      with the entries that have no category last under "Other"; a chosen category is just its own
+      titles under its heading, and headings stay pinned while scrolling (not on Apple TV).
+      The sort applies within each category: provider's order, recently added, by name, top rated
+      (two more indexes). A source menu appears with several sources that have films; both
+      choices are remembered. A large first category does not hold up the first screen: the
+      read fills across categories until it has enough rows (`CategorySectionsModel`, one
+      background call per read). 8 model tests, UI tests on iOS and tvOS. **Not seen on a
+      display by eye.** **Not done:** a collapsed rail per category as an overview, and per-title
+      rating on the poster.
 - [ ] **tvOS focus engine work** *(surfaced)*. Full-width focus targets, no `Color.accentColor`
       for fills, layout mutations deferred out of the focus animation context. **Audited and
       partly fixed:** no accent-colour fills anywhere; the remote-driven callbacks are deferred;

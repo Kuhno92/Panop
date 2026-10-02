@@ -143,6 +143,47 @@ nonisolated enum LiveChannelQuery {
         }
     }
 
+    /// The rows that belong to no category, for the end of a list that is shown category by category.
+    static func ungroupedDescriptor(
+        kind: MediaKind,
+        source: String?,
+        search: String,
+        order: LiveOrder
+    ) -> FetchDescriptor<CatalogEntryRecord> {
+        let raw = kind.rawValue
+        let term = CatalogEntryRecord.nameKey(for: search.trimmingCharacters(in: .whitespacesAndNewlines))
+        let sort = Self.sort(for: order)
+        return switch (source, term.isEmpty) {
+        case let (source?, true):
+            FetchDescriptor(
+                predicate: #Predicate {
+                    $0.kindRaw == raw && $0.groupName == nil && $0.playlist == source && $0.seriesID == nil
+                },
+                sortBy: sort
+            )
+        case let (source?, false):
+            FetchDescriptor(
+                predicate: #Predicate {
+                    $0.kindRaw == raw && $0.groupName == nil && $0.playlist == source && $0.seriesID == nil
+                        && $0.nameKey.contains(term)
+                },
+                sortBy: sort
+            )
+        case (nil, true):
+            FetchDescriptor(
+                predicate: #Predicate { $0.kindRaw == raw && $0.groupName == nil && $0.seriesID == nil },
+                sortBy: sort
+            )
+        case (nil, false):
+            FetchDescriptor(
+                predicate: #Predicate {
+                    $0.kindRaw == raw && $0.groupName == nil && $0.seriesID == nil && $0.nameKey.contains(term)
+                },
+                sortBy: sort
+            )
+        }
+    }
+
     /// The category names to offer for one kind, from one source or all, in the order the provider
     /// lists them (by name where it gave no order, and last).
     ///
@@ -174,6 +215,19 @@ nonisolated enum LiveChannelQuery {
 
     private static func sort(for order: LiveOrder) -> [SortDescriptor<CatalogEntryRecord>] {
         switch order {
+        case .recentlyAdded:
+            // Newest first; the entries with no date last, then by name so the order is stable.
+            [
+                SortDescriptor(\CatalogEntryRecord.addedAt, order: .reverse),
+                SortDescriptor(\CatalogEntryRecord.nameKey, comparator: .lexical),
+                SortDescriptor(\CatalogEntryRecord.id, comparator: .lexical)
+            ]
+        case .rating:
+            [
+                SortDescriptor(\CatalogEntryRecord.rating, order: .reverse),
+                SortDescriptor(\CatalogEntryRecord.nameKey, comparator: .lexical),
+                SortDescriptor(\CatalogEntryRecord.id, comparator: .lexical)
+            ]
         case .name:
             [
                 SortDescriptor(\CatalogEntryRecord.nameKey, comparator: .lexical),
@@ -251,6 +305,15 @@ nonisolated enum LiveChannelQuery {
 /// How the channel list is ordered.
 nonisolated enum LiveOrder: String, CaseIterable, Identifiable {
     case provider, name
+    /// Newest first, by the date the provider says it added the entry. Movies and series.
+    case recentlyAdded
+    /// Highest rated first. Movies and series.
+    case rating
+
+    /// What the channel list offers: channels have neither an added date nor a rating worth sorting by.
+    static let forChannels: [LiveOrder] = [.provider, .name]
+    /// What the movie and series screens offer.
+    static let forFilms: [LiveOrder] = [.provider, .recentlyAdded, .name, .rating]
 
     var id: String {
         rawValue
@@ -260,6 +323,8 @@ nonisolated enum LiveOrder: String, CaseIterable, Identifiable {
         switch self {
         case .name: "By name"
         case .provider: "Provider's order"
+        case .recentlyAdded: "Recently added"
+        case .rating: "Top rated"
         }
     }
 }

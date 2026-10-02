@@ -30,7 +30,35 @@ final class MoviesTests: PanopUITestCase {
         XCTAssertTrue(app.buttons["Classics"].exists, "the source's other category is not a chip")
     }
 
+    func testFilmsAreShownUnderTheirCategoryHeadings() {
+        XCTAssertTrue(poster("Alien").waitForExistence(timeout: 30))
+
+        // A heading for each category, as well as the chip that narrows to it.
+        XCTAssertTrue(app.staticTexts["Films"].waitForExistence(timeout: 10), "no heading for the first category")
+        XCTAssertTrue(app.staticTexts["Classics"].exists, "no heading for the second category")
+    }
+
     #if !os(tvOS)
+        func testTheSortOffersWhatFilmsCanBeSortedBy() {
+            XCTAssertTrue(poster("Alien").waitForExistence(timeout: 30))
+
+            app.buttons["Sort"].tap()
+
+            XCTAssertTrue(app.buttons["Recently added"].waitForExistence(timeout: 10), "no sort by date added")
+            XCTAssertTrue(app.buttons["By name"].exists)
+            XCTAssertTrue(app.buttons["Top rated"].exists)
+            XCTAssertTrue(app.buttons["Provider's order"].exists)
+        }
+
+        func testChoosingACategoryShowsOnlyItsHeading() {
+            XCTAssertTrue(poster("Alien").waitForExistence(timeout: 30))
+
+            app.buttons["Classics"].tap()
+
+            XCTAssertTrue(poster("Dune").waitForExistence(timeout: 10), "the chosen category's film is missing")
+            XCTAssertTrue(poster("Alien").waitForNonExistence(timeout: 10), "another category's film is still there")
+        }
+
         func testOpeningAFilmShowsItsPage() {
             XCTAssertTrue(poster("Dune").waitForExistence(timeout: 30))
             poster("Dune").tap()

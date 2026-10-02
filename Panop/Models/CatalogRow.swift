@@ -65,10 +65,19 @@ nonisolated struct ListSpec: Hashable, Sendable {
     var hidden: Set<String> = []
     /// Names of categories the person has hidden: their entries are left out too.
     var hiddenGroups: Set<String> = []
+    /// Only the entries with no category (see `LiveChannelQuery.ungroupedDescriptor`).
+    var ungrouped = false
 
     func descriptor() -> FetchDescriptor<CatalogEntryRecord> {
         if let restrictedTo {
             return LiveChannelQuery.descriptor(restrictedTo: restrictedTo, kind: kind)
+        }
+        if ungrouped {
+            var descriptor = LiveChannelQuery.ungroupedDescriptor(
+                kind: kind ?? .live, source: source, search: search, order: order
+            )
+            descriptor.fetchLimit = LiveChannelQuery.maxRows
+            return descriptor
         }
         return LiveChannelQuery.descriptor(
             kind: kind ?? .live,
@@ -79,6 +88,26 @@ nonisolated struct ListSpec: Hashable, Sendable {
             group: group
         )
     }
+}
+
+/// One category's rows within a list shown category by category. `name` is nil for the entries
+/// that belong to none.
+nonisolated struct CategorySection: Identifiable, Hashable, Sendable {
+    var name: String?
+    var rows: [CatalogRow]
+
+    var id: String {
+        name.map { "c:\($0)" } ?? "none"
+    }
+}
+
+/// What one read of a list shown category by category found, and where to carry on from.
+nonisolated struct SectionBatch: Sendable {
+    var sections: [CategorySection]
+    /// Which category the next read starts in, and how far into it.
+    var step: Int
+    var offset: Int
+    var finished: Bool
 }
 
 /// Reads pages of the catalog off the main thread.
@@ -96,6 +125,43 @@ actor CatalogReader {
     /// The category names for a kind, in the provider's order (see `LiveChannelQuery.categoryNames`).
     func categoryNames(kind: MediaKind, source: String?) -> [String] {
         LiveChannelQuery.categoryNames(kind: kind, source: source, in: ModelContext(container))
+    }
+
+    /// Reads a list category by category, in the order of `steps`, until at least `minimum` rows
+    /// are found or there are no more. All on this actor, so the main thread is not involved until
+    /// the result is handed over.
+    func sections(_ steps: [ListSpec], step start: Int, offset startOffset: Int, minimum: Int, pageSize: Int)
+        -> SectionBatch
+    {
+        let context = ModelContext(container)
+        var sections: [CategorySection] = []
+        var found = 0
+        var step = start
+        var offset = startOffset
+        while found < minimum, step < steps.count {
+            let spec = steps[step]
+            var descriptor = spec.descriptor()
+            descriptor.fetchOffset = offset
+            descriptor.fetchLimit = Swift.max(Swift.min(pageSize, LiveChannelQuery.maxRows - offset), 0)
+            let page = descriptor.fetchLimit == 0 ? [] : ((try? context.fetch(descriptor)) ?? []).map(CatalogRow.init)
+            let visible = spec.hidden.isEmpty ? page : page.filter { !spec.hidden.contains($0.id) }
+            if !visible.isEmpty {
+                let name = spec.ungrouped ? nil : spec.group
+                if sections.last?.name == name, sections.last != nil {
+                    sections[sections.count - 1].rows += visible
+                } else {
+                    sections.append(CategorySection(name: name, rows: visible))
+                }
+                found += visible.count
+            }
+            offset += page.count
+            // A short page is the end of this category.
+            if page.count < pageSize || offset >= LiveChannelQuery.maxRows {
+                step += 1
+                offset = 0
+            }
+        }
+        return SectionBatch(sections: sections, step: step, offset: offset, finished: step >= steps.count)
     }
 
     func rows(_ spec: ListSpec, offset: Int, limit: Int) -> [CatalogRow] {
