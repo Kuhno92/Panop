@@ -15,7 +15,7 @@ The repo is being built up in stages. **Only check off what actually exists**; d
 command works because it is documented below.
 
 - [x] Repo skeleton, docs, lint tooling, ADRs
-- [x] `Packages/PanopKit`: PanopCore, PanopPlaylist, PanopPlayback, PanopXtream, PanopEPG, PanopCatalog (286 tests passing)
+- [x] `Packages/PanopKit`: PanopCore, PanopPlaylist, PanopPlayback, PanopXtream, PanopEPG, PanopCatalog (298 tests passing)
 - [x] `Panop.xcodeproj` and the app target (builds and launches on **macOS and iOS**)
 - [x] `SwiftDataCatalogStore` and the `PanopTests` target (304 tests, passing on macOS, iOS and tvOS)
 - [x] Playback coordinator (portable, `PanopPlayback`) and the AVPlayer adapter. Channels play from the Live TV list. AVPlayer cannot read raw MPEG-TS, so those streams fall through to VLC; Xtream live streams play in AVPlayer directly because the panel offers HLS

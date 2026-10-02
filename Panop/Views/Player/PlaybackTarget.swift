@@ -7,6 +7,16 @@ import PanopXtream
 ///
 /// A snapshot rather than the model object, so the player does not hold a live
 /// SwiftData record while it runs, and so a request can be built off the main actor.
+/// A programme that has already aired, to be played from the panel's archive instead of live.
+///
+/// Holds no address and no login, so it can ride in a window's saved value.
+nonisolated struct CatchupWindow: Hashable, Codable, Sendable {
+    var start: Date
+    var minutes: Int
+    /// The panel's own time zone, which its archive addresses are written in.
+    var timeZoneID: String?
+}
+
 nonisolated struct PlaybackTarget: Identifiable, Equatable, Hashable, Sendable {
     var playlist: String
     var entryID: String
@@ -21,6 +31,8 @@ nonisolated struct PlaybackTarget: Identifiable, Equatable, Hashable, Sendable {
     /// time, not applied by seeking afterwards: seeking a running connection makes some
     /// providers drop it.
     var resumeAt: Double?
+    /// Set to play an aired programme of this channel from the archive.
+    var catchup: CatchupWindow?
 
     var id: String {
         "\(playlist)|\(entryID)"
@@ -42,6 +54,7 @@ nonisolated struct PlayerWindowRequest: Codable, Hashable {
     var remoteID: String?
     var containerExtension: String?
     var resumeAt: Double?
+    var catchup: CatchupWindow?
 
     init(_ target: PlaybackTarget) {
         playlist = target.playlist
@@ -51,6 +64,7 @@ nonisolated struct PlayerWindowRequest: Codable, Hashable {
         remoteID = target.remoteID
         containerExtension = target.containerExtension
         resumeAt = target.resumeAt
+        catchup = target.catchup
     }
 
     /// The target to play, given the address if the catalog has one for this item.
@@ -60,10 +74,12 @@ nonisolated struct PlayerWindowRequest: Codable, Hashable {
             entryID: entryID,
             kind: kind,
             name: name,
-            streamURL: streamURL,
+            // The live address the catalog holds is not the archive's.
+            streamURL: catchup == nil ? streamURL : nil,
             remoteID: remoteID,
             containerExtension: containerExtension,
-            resumeAt: resumeAt
+            resumeAt: resumeAt,
+            catchup: catchup
         )
     }
 }
@@ -150,14 +166,7 @@ nonisolated enum PlaybackRequestBuilder {
 
         switch target.kind {
         case .live:
-            return PlaybackRequest(mediaKind: .live) { engine in
-                let format: XtreamClient.LiveFormat = engine == .avPlayer ? .hls : .transportStream
-                return PlaybackItem(
-                    url: client.liveURL(streamID: remote, format: format)?.absoluteString ?? "",
-                    title: target.name,
-                    mediaKind: .live
-                )
-            }
+            return liveRequest(for: target, client: client, remote: remote)
         case .movie:
             let ext = target.containerExtension
             let resume = target.resumeAt
@@ -171,6 +180,31 @@ nonisolated enum PlaybackRequestBuilder {
             }
         case .series, .unknown:
             throw PlaybackTargetError.notPlayable("Open the series to pick an episode.")
+        }
+    }
+
+    /// A channel live, or, when the target names an aired programme, from the panel's archive.
+    private static func liveRequest(for target: PlaybackTarget, client: XtreamClient, remote: Int) -> PlaybackRequest {
+        if let catchup = target.catchup {
+            // Played as a stream with no scrubber: whether a panel's archive can be sought
+            // is not something this can know.
+            let url = client.catchupURL(
+                streamID: remote,
+                start: catchup.start,
+                minutes: catchup.minutes,
+                timeZone: catchup.timeZoneID.flatMap(TimeZone.init(identifier:))
+            )
+            return PlaybackRequest(mediaKind: .live) { _ in
+                PlaybackItem(url: url?.absoluteString ?? "", title: target.name, mediaKind: .live)
+            }
+        }
+        return PlaybackRequest(mediaKind: .live) { engine in
+            let format: XtreamClient.LiveFormat = engine == .avPlayer ? .hls : .transportStream
+            return PlaybackItem(
+                url: client.liveURL(streamID: remote, format: format)?.absoluteString ?? "",
+                title: target.name,
+                mediaKind: .live
+            )
         }
     }
 }

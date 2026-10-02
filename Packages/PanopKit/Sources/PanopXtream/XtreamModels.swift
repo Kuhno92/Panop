@@ -393,6 +393,9 @@ public struct XtreamAccount: Sendable, Equatable {
     public var maxConnections: Int?
     public var activeConnections: Int?
     public var allowedFormats: [String]
+    /// The time zone the panel keeps its clock in, such as `Europe/Berlin`. Catch-up addresses
+    /// are written in it, not in the viewer's.
+    public var timeZoneID: String?
 
     public init(
         username: String,
@@ -401,7 +404,8 @@ public struct XtreamAccount: Sendable, Equatable {
         isTrial: Bool = false,
         maxConnections: Int? = nil,
         activeConnections: Int? = nil,
-        allowedFormats: [String] = []
+        allowedFormats: [String] = [],
+        timeZoneID: String? = nil
     ) {
         self.username = username
         self.status = status
@@ -410,6 +414,7 @@ public struct XtreamAccount: Sendable, Equatable {
         self.maxConnections = maxConnections
         self.activeConnections = activeConnections
         self.allowedFormats = allowedFormats
+        self.timeZoneID = timeZoneID
     }
 }
 

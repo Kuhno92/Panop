@@ -521,6 +521,15 @@ Features real users expect that the brief did not name. All *(surfaced)*.
       as the hour turns (it is read when the row appears), the schedule on tvOS (the menu is
       there, but no UI test drives it), and a reminder or record action.
 - [ ] **Catch-up and timeshift**. Xtream supports it; the M3U attributes are already parsed.
+      **Catch-up for Xtream is built**: a channel the panel archives (`tv_archive`) lists the
+      programmes that aired within its window under "Earlier" in its guide, and tapping one plays
+      it from the start through the panel's timeshift address (`XtreamClient.catchupURL`, written
+      in the panel's time zone, read from the login answer). The aired programme travels as a
+      `CatchupWindow` (no address, no login) so a Mac player window can rebuild it. 4 package
+      tests, 5 app tests. **Not verified:** against a real panel, in particular that its archive
+      honours the advertised time zone. **Not done:** seeking (played as a stream with no
+      scrubber), M3U catch-up (`catchup-source` templates differ per provider), and timeshift
+      (pausing and rewinding live).
 - [x] **Multiple playlists** and switching between them. Several sources can be added, and Live TV shows all of them or one chosen source (M2); each can be refreshed or deleted from Playlists.
 - [ ] **Profiles**. Shared family devices, especially Apple TV.
 - [ ] **Parental controls**. A PIN cannot ride iCloud Keychain to tvOS, so it goes through the

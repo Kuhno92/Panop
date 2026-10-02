@@ -1,3 +1,5 @@
+import PanopCore
+import PanopXtream
 import SwiftData
 import SwiftUI
 
@@ -32,11 +34,17 @@ struct NowOnAirLine: View {
 struct ChannelGuideView: View {
     let channel: CatalogEntryRecord
     let onPlay: (CatalogEntryRecord) -> Void
+    let onPlayTarget: (PlaybackTarget) -> Void
 
+    @Environment(PlaylistLibrary.self) private var library
     @Environment(\.modelContext) private var catalog
     @Environment(\.dismiss) private var dismiss
     @State private var programmes: [ProgrammeSnapshot] = []
+    @State private var aired: [ProgrammeSnapshot] = []
     @State private var loaded = false
+    /// The panel's time zone, learned when the guide opens, for the archive's addresses.
+    @State private var panelTimeZone: String?
+    @State private var catchupFailed = false
 
     /// A day's worth is plenty to browse; more is a longer scroll with nothing to decide.
     private static let limit = 60
@@ -56,9 +64,28 @@ struct ChannelGuideView: View {
                     }
                 }
             }
+            if !aired.isEmpty {
+                Section {
+                    ForEach(aired) { programme in
+                        Button { watch(programme) } label: {
+                            row(programme).contentShape(Rectangle())
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityHint("Watch from the start")
+                    }
+                } header: {
+                    Text("Earlier")
+                } footer: {
+                    if catchupFailed {
+                        Text("The provider could not be reached for this programme.")
+                    } else {
+                        Text("Tap a programme to watch it from the start.")
+                    }
+                }
+            }
         }
         .overlay {
-            if loaded, programmes.isEmpty {
+            if loaded, programmes.isEmpty, aired.isEmpty {
                 ContentUnavailableView(
                     "No guide for this channel",
                     systemImage: "calendar",
@@ -78,7 +105,42 @@ struct ChannelGuideView: View {
                     in: catalog
                 )
                 loaded = true
+                await loadArchive()
             }
+    }
+
+    // MARK: - Catch-up
+
+    /// A channel the panel archives: the programmes that aired within its window, and the
+    /// panel's time zone to address them in. Xtream only: an M3U playlist's catch-up is a
+    /// template that differs from provider to provider.
+    private func loadArchive() async {
+        guard channel.hasArchive, let days = channel.archiveDays, days > 0,
+              case let .xtream(credentials)? = try? library.descriptor(for: channel.playlist)?.source
+        else { return }
+        aired = GuideLookup.aired(
+            playlist: channel.playlist,
+            epgKey: channel.epgKey,
+            days: days,
+            limit: Self.limit,
+            in: catalog
+        )
+        guard !aired.isEmpty,
+              let client = try? XtreamClient(credentials: credentials, transport: URLSessionTransport())
+        else { return }
+        panelTimeZone = try? await client.authenticate().timeZoneID
+    }
+
+    private func watch(_ programme: ProgrammeSnapshot) {
+        var target = PlaybackTarget(entry: channel)
+        target.name = "\(channel.name) · \(programme.title)"
+        target.catchup = CatchupWindow(
+            start: programme.start,
+            minutes: Int((programme.stop.timeIntervalSince(programme.start) / 60).rounded(.up)),
+            timeZoneID: panelTimeZone
+        )
+        dismiss()
+        onPlayTarget(target)
     }
 
     private func row(_ programme: ProgrammeSnapshot) -> some View {

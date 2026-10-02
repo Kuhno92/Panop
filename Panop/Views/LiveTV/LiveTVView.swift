@@ -91,6 +91,7 @@ struct LiveTVView: View {
                 userState.markPlayed(UserStateStore.key(playlist: $0.playlist, entry: $0.id))
                 playing = PlaybackTarget(entry: $0)
             },
+            onPlayTarget: { playing = $0 },
             onAdd: { showingAdd = true },
             onRetry: { ids in
                 Task {
@@ -189,6 +190,7 @@ private struct LiveChannelList: View {
     let problems: [LiveEmptyState.Problem]
     @Binding var limit: Int
     let onPlay: (CatalogEntryRecord) -> Void
+    let onPlayTarget: (PlaybackTarget) -> Void
     let onAdd: () -> Void
     let onRetry: ([String]) -> Void
 
@@ -205,6 +207,7 @@ private struct LiveChannelList: View {
         problems: [LiveEmptyState.Problem],
         limit: Binding<Int>,
         onPlay: @escaping (CatalogEntryRecord) -> Void,
+        onPlayTarget: @escaping (PlaybackTarget) -> Void,
         onAdd: @escaping () -> Void,
         onRetry: @escaping ([String]) -> Void
     ) {
@@ -220,6 +223,7 @@ private struct LiveChannelList: View {
         self.problems = problems
         _limit = limit
         self.onPlay = onPlay
+        self.onPlayTarget = onPlayTarget
         self.onAdd = onAdd
         self.onRetry = onRetry
     }
@@ -281,7 +285,7 @@ private struct LiveChannelList: View {
         }
         .sheet(item: $guideFor) { channel in
             NavigationStack {
-                ChannelGuideView(channel: channel, onPlay: onPlay)
+                ChannelGuideView(channel: channel, onPlay: onPlay, onPlayTarget: onPlayTarget)
                     .toolbar {
                         ToolbarItem(placement: .cancellationAction) {
                             Button("Done") { guideFor = nil }

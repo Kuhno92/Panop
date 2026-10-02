@@ -87,3 +87,24 @@ struct GuideLookupTests {
         #expect(ProgrammeSnapshot(start: now, stop: now, title: "Zero").fraction(at: now) == 0)
     }
 }
+
+/// A programme to store, relative to a fixed "now" chosen by the test.
+struct EPGProgrammeFixture {
+    var title: String
+    var start: Date
+    var hours: Double
+
+    @MainActor
+    static func store(_ fixtures: [EPGProgrammeFixture], channel: String, playlist: String, in catalog: OnDiskCatalog)
+        async throws
+    {
+        _ = try await catalog.store.upsertProgrammes(fixtures.map {
+            EPGProgramme(
+                channelID: channel,
+                start: $0.start,
+                stop: $0.start.addingTimeInterval($0.hours * 3600),
+                title: $0.title
+            )
+        }, playlist: playlist)
+    }
+}

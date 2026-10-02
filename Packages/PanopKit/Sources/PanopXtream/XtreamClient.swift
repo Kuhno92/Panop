@@ -46,7 +46,9 @@ public struct XtreamClient: Sendable {
             isTrial: Self.int(info["is_trial"]) == 1,
             maxConnections: Self.int(info["max_connections"]),
             activeConnections: Self.int(info["active_cons"]),
-            allowedFormats: (info["allowed_output_formats"] as? [String]) ?? []
+            allowedFormats: (info["allowed_output_formats"] as? [String]) ?? [],
+            timeZoneID: ((object["server_info"] as? [String: Any])?["timezone"] as? String)
+                .flatMap { $0.isEmpty ? nil : $0 }
         )
     }
 
@@ -145,6 +147,24 @@ public struct XtreamClient: Sendable {
 
     public func episodeURL(episodeID: String, containerExtension: String?) -> URL? {
         streamURL(kind: "series", id: episodeID, fileExtension: containerExtension ?? "mp4")
+    }
+
+    /// Where a programme that has already aired plays from, for a channel the panel archives.
+    ///
+    /// The start is written in the panel's own time zone (see ``XtreamAccount/timeZoneID``), to
+    /// the minute, and the length is in minutes. A panel that ignores the zone it advertises
+    /// would give the wrong programme: that cannot be told from here.
+    public func catchupURL(streamID: Int, start: Date, minutes: Int, timeZone: TimeZone?) -> URL? {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = timeZone ?? TimeZone(identifier: "UTC")
+        formatter.dateFormat = "yyyy-MM-dd:HH-mm"
+        // Digits, hyphens and a colon: left as they are, since panels expect the colon literally.
+        let segments = [
+            "timeshift", Self.encodePathSegment(credentials.username), Self.encodePathSegment(credentials.password),
+            String(max(minutes, 1)), formatter.string(from: start), "\(streamID).ts"
+        ]
+        return URL(string: root.absoluteString + "/" + segments.joined(separator: "/"))
     }
 
     // MARK: - Internals
