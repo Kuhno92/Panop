@@ -78,7 +78,13 @@ struct HomeView: View {
                     }
                     // Suggestions drawn from the library itself.
                     ForEach(discovery.rails) { rail in
-                        PosterRail(rail: rail, rows: discovery.rows, links: discovery.trendingLinks, onSelect: open)
+                        PosterRail(
+                            rail: rail,
+                            rows: discovery.rows,
+                            links: discovery.trendingLinks,
+                            nextEpisodes: discovery.nextEpisodes,
+                            onSelect: open
+                        )
                     }
                     if !hasHistory, discovery.rails.isEmpty, discovery.phase == .loaded {
                         nothingYet

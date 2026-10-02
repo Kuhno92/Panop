@@ -26,6 +26,9 @@ final class DiscoveryModel {
     private(set) var trendingLinks: [String: URL] = [:]
     @ObservationIgnored private var trending: [TrendingEntry] = []
     @ObservationIgnored private var planned: [TrendingEntry] = []
+    @ObservationIgnored private var watching: [TrendingEntry] = []
+    /// The next episode to watch of each followed show, by `linkKey`, for the caption under its poster.
+    private(set) var nextEpisodes: [String: SimklNextEpisode] = [:]
     @ObservationIgnored private var finishedElsewhere: Set<Int> = []
     @ObservationIgnored private var trendingStore: TrendingStore?
 
@@ -59,12 +62,27 @@ final class DiscoveryModel {
         let planned = items.filter { $0.status == .plantowatch }.enumerated().map { index, item in
             TrendingEntry(kind: item.kind, tmdbID: item.tmdbID, score: Double(items.count - index))
         }
+        // Most recently watched first; a show with a new episode out, which Simkl dates later than the
+        // last one watched, is as likely to be near the top as any.
+        let followed = items.filter { $0.status == .watching && $0.next != nil }
+            .sorted { ($0.lastWatchedAt ?? "") > ($1.lastWatchedAt ?? "") }
+        let watching = followed.enumerated().map { index, item in
+            TrendingEntry(kind: item.kind, tmdbID: item.tmdbID, score: Double(followed.count - index))
+        }
+        nextEpisodes = Dictionary(
+            followed.compactMap { item in
+                item.next.map { (Self.linkKey(kind: item.kind, tmdbID: item.tmdbID), $0) }
+            },
+            uniquingKeysWith: { first, _ in first }
+        )
         let finished = Set(items.filter { $0.status == .completed }.map(\.tmdbID))
-        guard planned != self.planned || finished != finishedElsewhere else { return }
+        guard planned != self.planned || watching != self.watching || finished != finishedElsewhere else { return }
         self.planned = planned
+        self.watching = watching
         finishedElsewhere = finished
         if var context = lastContext {
             context.planned = planned
+            context.watching = watching
             context.finishedElsewhere = finished
             lastContext = context
             scheduleBuild()
@@ -130,6 +148,7 @@ final class DiscoveryModel {
         var context = context
         context.trending = trending
         context.planned = planned
+        context.watching = watching
         context.finishedElsewhere = finishedElsewhere
         guard context != lastContext else { return }
         lastContext = context

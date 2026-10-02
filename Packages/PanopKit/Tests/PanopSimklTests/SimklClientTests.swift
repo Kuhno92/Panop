@@ -92,7 +92,10 @@ struct SimklClientTests {
     func `the lists are read leniently, films and shows, skipping what has no TMDB id`() async throws {
         let body = """
         {"shows":[
-          {"status":"watching","user_rating":9,"next_to_watch":"S01E04","show":{"title":"A","ids":{"simkl":1,"tmdb":"1399"}}},
+          {"status":"watching","user_rating":9,"next_to_watch":"S01E04","last_watched_at":"2026-09-01T10:00:00Z",
+           "show":{"title":"A","ids":{"simkl":1,"tmdb":"1399"}}},
+          {"status":"watching","next_to_watch_info":{"title":"x","season":2,"episode":5,"date":"2026-10-01T00:00:00Z"},
+           "show":{"ids":{"tmdb":77}}},
           {"status":"completed","show":{"title":"B","ids":{"simkl":2}}},
           {"status":"nonsense","show":{"ids":{"tmdb":5}}},
           {"broken":true}],
@@ -103,8 +106,15 @@ struct SimklClientTests {
         let items = try await client(Echo(body: body)).library()
 
         #expect(items == [
-            SimklListItem(kind: .series, tmdbID: 1399, status: .watching, rating: 9, nextToWatch: "S01E04"),
-            SimklListItem(kind: .movie, tmdbID: 603, status: .plantowatch, rating: nil, nextToWatch: nil)
+            SimklListItem(
+                kind: .series, tmdbID: 1399, status: .watching, rating: 9,
+                next: SimklNextEpisode(season: 1, number: 4), lastWatchedAt: "2026-09-01T10:00:00Z"
+            ),
+            SimklListItem(
+                kind: .series, tmdbID: 77, status: .watching,
+                next: SimklNextEpisode(season: 2, number: 5, airDate: "2026-10-01T00:00:00Z")
+            ),
+            SimklListItem(kind: .movie, tmdbID: 603, status: .plantowatch, rating: nil)
         ])
     }
 

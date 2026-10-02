@@ -75,6 +75,32 @@ struct RailBuilderTests {
         #expect(rail(.onYourList, in: rails)?.keys.count == 4)
     }
 
+    @Test
+    func `next up lists the shows being followed, even ones the history marks as started, and comes first`() {
+        let shows = (1 ... 3).map { title($0, .series, tmdb: 300 + $0) }
+        let watching = [
+            TrendingEntry(kind: .series, tmdbID: 302, score: 3),
+            TrendingEntry(kind: .series, tmdbID: 301, score: 2)
+        ]
+
+        let rails = build(DiscoveryInput(
+            titles: shows, unavailable: ["p|series:1", "p|series:2"], watching: watching, now: now
+        ))
+
+        #expect(rails.first?.kind == .nextUp)
+        #expect(rails.first?.keys == ["p|series:2", "p|series:1"])
+    }
+
+    @Test
+    func `a followed show that is hidden or adult is still left out`() {
+        let shows = [title(1, .series, tmdb: 301), title(2, .series, tmdb: 302, adult: true)]
+        let watching = [301, 302].map { TrendingEntry(kind: .series, tmdbID: $0, score: 1) }
+
+        let rails = build(DiscoveryInput(titles: shows, hidden: ["p|series:1"], watching: watching, now: now))
+
+        #expect(rail(.nextUp, in: rails) == nil)
+    }
+
     // MARK: - Trending
 
     @Test

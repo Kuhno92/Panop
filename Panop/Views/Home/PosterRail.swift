@@ -1,11 +1,14 @@
 import PanopCore
 import PanopDiscover
+import PanopSimkl
 import SwiftUI
 
 /// The heading of a rail, in words.
 nonisolated enum RailHeading {
     static func title(for rail: Rail) -> String {
         switch rail.kind {
+        case .nextUp:
+            "Next up on Simkl"
         case .onYourList:
             "On your Simkl list"
         case let .trending(kind):
@@ -45,6 +48,8 @@ struct PosterRail: View {
     let rows: [String: CatalogRow]
     /// Simkl's page for a title, for the trending rails.
     var links: [String: URL] = [:]
+    /// The episode to watch next, by the same key, for the rail of followed shows.
+    var nextEpisodes: [String: SimklNextEpisode] = [:]
     let onSelect: (CatalogRow) -> Void
 
     var body: some View {
@@ -58,7 +63,7 @@ struct PosterRail: View {
                 ScrollView(.horizontal, showsIndicators: false) {
                     LazyHStack(alignment: .top, spacing: Self.spacing) {
                         ForEach(items) { row in
-                            RailPoster(row: row, link: link(for: row)) { onSelect(row) }
+                            RailPoster(row: row, link: link(for: row), caption: caption(for: row)) { onSelect(row) }
                         }
                     }
                     .padding(.horizontal)
@@ -73,6 +78,11 @@ struct PosterRail: View {
     private func link(for row: CatalogRow) -> URL? {
         guard case .trending = rail.kind, let id = row.tmdbID else { return nil }
         return links[DiscoveryModel.linkKey(kind: row.kind, tmdbID: id)]
+    }
+
+    private func caption(for row: CatalogRow) -> String? {
+        guard case .nextUp = rail.kind, let id = row.tmdbID else { return nil }
+        return nextEpisodes[DiscoveryModel.linkKey(kind: row.kind, tmdbID: id)]?.label
     }
 
     private static var spacing: CGFloat {
@@ -95,6 +105,7 @@ struct PosterRail: View {
 private struct RailPoster: View {
     let row: CatalogRow
     let link: URL?
+    let caption: String?
     let action: () -> Void
 
     var body: some View {
@@ -107,6 +118,11 @@ private struct RailPoster: View {
                     .lineLimit(2)
                     .multilineTextAlignment(.leading)
                     .frame(width: Self.width, alignment: .leading)
+                if let caption {
+                    Text(caption)
+                        .font(.caption2.bold())
+                        .foregroundStyle(.secondary)
+                }
             }
             .contentShape(Rectangle())
         }
@@ -142,7 +158,7 @@ extension Rail {
             kind
         case .franchise:
             .movie
-        case .becauseYouWatched, .mostWatched, .onYourList:
+        case .becauseYouWatched, .mostWatched, .onYourList, .nextUp:
             nil
         }
     }

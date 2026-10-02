@@ -27,15 +27,44 @@ public struct SimklListItem: Sendable, Equatable, Codable {
     public var status: Status
     /// 1 to 10, when they rated it.
     public var rating: Int?
-    /// For a show being watched, the episode they are up to, as `S01E04`.
-    public var nextToWatch: String?
+    /// For a show being watched, the episode they are up to.
+    public var next: SimklNextEpisode?
+    /// When they last watched something of it, as Simkl writes it: sorts the same as the date.
+    public var lastWatchedAt: String?
 
-    public init(kind: MediaKind, tmdbID: Int, status: Status, rating: Int? = nil, nextToWatch: String? = nil) {
+    public init(
+        kind: MediaKind,
+        tmdbID: Int,
+        status: Status,
+        rating: Int? = nil,
+        next: SimklNextEpisode? = nil,
+        lastWatchedAt: String? = nil
+    ) {
         self.kind = kind
         self.tmdbID = tmdbID
         self.status = status
         self.rating = rating
-        self.nextToWatch = nextToWatch
+        self.next = next
+        self.lastWatchedAt = lastWatchedAt
+    }
+}
+
+/// The episode of a show that a person watches next.
+public struct SimklNextEpisode: Sendable, Equatable, Codable {
+    public var season: Int
+    public var number: Int
+    /// When it aired or airs, as Simkl writes it. A recent date marks a new release.
+    public var airDate: String?
+
+    public init(season: Int, number: Int, airDate: String? = nil) {
+        self.season = season
+        self.number = number
+        self.airDate = airDate
+    }
+
+    /// `S02E05`.
+    public var label: String {
+        "S\(season)E\(number)"
     }
 }
 
@@ -181,6 +210,8 @@ private struct Entry: Decodable {
     var status: String?
     var userRating: Int?
     var nextToWatch: String?
+    var nextInfo: NextInfo?
+    var lastWatchedAt: String?
     var show: EntryStub?
     var movie: EntryStub?
 
@@ -188,12 +219,32 @@ private struct Entry: Decodable {
         case status, show, movie
         case userRating = "user_rating"
         case nextToWatch = "next_to_watch"
+        case nextInfo = "next_to_watch_info"
+        case lastWatchedAt = "last_watched_at"
     }
 
     func item(_ kind: MediaKind) -> SimklListItem? {
         guard let id = (kind == .movie ? movie : show)?.ids?.tmdb, id > 0,
               let status = status.flatMap(SimklListItem.Status.init) else { return nil }
-        return SimklListItem(kind: kind, tmdbID: id, status: status, rating: userRating, nextToWatch: nextToWatch)
+        return SimklListItem(
+            kind: kind,
+            tmdbID: id,
+            status: status,
+            rating: userRating,
+            next: nextEpisode,
+            lastWatchedAt: lastWatchedAt
+        )
+    }
+
+    /// From the detailed marker when Simkl sends it, else from the plain `S01E04` one.
+    private var nextEpisode: SimklNextEpisode? {
+        if let info = nextInfo, let season = info.season, let number = info.episode {
+            return SimklNextEpisode(season: season, number: number, airDate: info.date)
+        }
+        guard let text = nextToWatch,
+              let match = text.range(of: #"^[Ss](\d+)[Ee](\d+)$"#, options: .regularExpression) else { return nil }
+        let parts = text[match].dropFirst().split(whereSeparator: { $0 == "E" || $0 == "e" }).compactMap { Int($0) }
+        return parts.count == 2 ? SimklNextEpisode(season: parts[0], number: parts[1]) : nil
     }
 }
 
@@ -211,5 +262,20 @@ private struct EntryIDs: Decodable {
         // A number in one file and a string in another.
         tmdb = (try? container.decodeIfPresent(Int.self, forKey: .tmdb))
             ?? (try? container.decodeIfPresent(String.self, forKey: .tmdb)).flatMap { $0.flatMap(Int.init) }
+    }
+}
+
+private struct NextInfo: Decodable {
+    var season: Int?
+    var episode: Int?
+    var date: String?
+
+    private enum Keys: String, CodingKey { case season, episode, date }
+
+    init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: Keys.self)
+        season = (try? container.decodeIfPresent(Int.self, forKey: .season))
+        episode = (try? container.decodeIfPresent(Int.self, forKey: .episode))
+        date = (try? container.decodeIfPresent(String.self, forKey: .date))
     }
 }

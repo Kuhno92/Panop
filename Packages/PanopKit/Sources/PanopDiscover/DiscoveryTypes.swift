@@ -106,6 +106,8 @@ public struct DiscoveryInput: Sendable {
     public var trending: [TrendingEntry]
     /// Titles the person plans to watch, by TMDB id, in the order they keep them.
     public var planned: [TrendingEntry]
+    /// Shows they are in the middle of, most recently watched first.
+    public var watching: [TrendingEntry]
     /// TMDB ids of what they have finished somewhere else: never suggested.
     public var finishedElsewhere: Set<Int>
     public var playCounts: [PlayCount]
@@ -120,6 +122,7 @@ public struct DiscoveryInput: Sendable {
         hiddenCategories: [MediaKind: Set<String>] = [:],
         trending: [TrendingEntry] = [],
         planned: [TrendingEntry] = [],
+        watching: [TrendingEntry] = [],
         finishedElsewhere: Set<Int> = [],
         playCounts: [PlayCount] = [],
         now: Date
@@ -132,6 +135,7 @@ public struct DiscoveryInput: Sendable {
         self.hiddenCategories = hiddenCategories
         self.trending = trending
         self.planned = planned
+        self.watching = watching
         self.finishedElsewhere = finishedElsewhere
         self.playCounts = playCounts
         self.now = now
@@ -139,6 +143,8 @@ public struct DiscoveryInput: Sendable {
 }
 
 public enum RailKind: Sendable, Hashable, Codable {
+    /// Shows the person is part-way through, with the next episode to watch.
+    case nextUp
     /// What the person plans to watch, from their own list.
     case onYourList
     case trending(MediaKind)
@@ -166,6 +172,7 @@ public struct Rail: Sendable, Equatable, Identifiable, Codable {
         case let .trending(kind): "trending.\(kind.rawValue)"
         case let .becauseYouWatched(seed): "because.\(seed)"
         case let .newReleases(kind): "new.\(kind.rawValue)"
+        case .nextUp: "nextUp"
         case .onYourList: "onYourList"
         case .mostWatched: "mostWatched"
         case let .topRated(kind): "top.\(kind.rawValue)"

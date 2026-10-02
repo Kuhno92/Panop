@@ -1,5 +1,6 @@
 import PanopCore
 import PanopPlaylist
+import PanopSimkl
 import PanopXtream
 import SwiftData
 import SwiftUI
@@ -16,6 +17,7 @@ struct SeriesDetailView: View {
     @Environment(PlaylistLibrary.self) private var library
     @Environment(UserStateStore.self) private var userState
     @Environment(SimklSync.self) private var simkl
+    @Environment(DiscoveryModel.self) private var discovery
     @Environment(\.modelContext) private var catalog
 
     /// An episode as the screen needs it, whichever playlist it came from.
@@ -86,20 +88,38 @@ struct SeriesDetailView: View {
                     description: Text("Nothing is listed for this series.")
                 )
             } else {
-                List {
-                    if let plot = series.plot ?? plot, !plot.isEmpty {
-                        Section { Text(plot).font(.callout).foregroundStyle(.secondary) }
-                    }
-                    ForEach(seasons) { season in
-                        Section(season.title) {
-                            ForEach(season.episodes) { episode in
-                                episodeRow(episode, season: season)
+                ScrollViewReader { proxy in
+                    List {
+                        if let plot = series.plot ?? plot, !plot.isEmpty {
+                            Section { Text(plot).font(.callout).foregroundStyle(.secondary) }
+                        }
+                        ForEach(seasons) { season in
+                            Section(season.title) {
+                                ForEach(season.episodes) { episode in
+                                    episodeRow(episode, season: season)
+                                        .id(Self.rowID(season: season.number, episode: episode.number))
+                                }
                             }
+                        }
+                    }
+                    // Straight to where the person left off, when their Simkl account says where that is.
+                    .task(id: seasons.count) {
+                        if let next = upNext {
+                            proxy.scrollTo(Self.rowID(season: next.season, episode: next.number), anchor: .top)
                         }
                     }
                 }
             }
         }
+    }
+
+    private static func rowID(season: Int, episode: Int) -> String {
+        "s\(season)e\(episode)"
+    }
+
+    /// The episode Simkl says is next for this show, once the show is known by its TMDB id.
+    private var upNext: SimklNextEpisode? {
+        series.tmdbID.flatMap { discovery.nextEpisodes[DiscoveryModel.linkKey(kind: .series, tmdbID: $0)] }
     }
 
     private func episodeRow(_ episode: Episode, season: Season) -> some View {
@@ -111,6 +131,13 @@ struct SeriesDetailView: View {
             VStack(alignment: .leading, spacing: 6) {
                 HStack {
                     Text("\(episode.number). \(episode.title)")
+                    if let next = upNext, next.season == season.number, next.number == episode.number {
+                        Text("Up next")
+                            .font(.caption2.bold())
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 2)
+                            .background(.tint.opacity(0.2), in: Capsule())
+                    }
                     Spacer()
                     if userState.isWatched(key) {
                         Image(systemName: "checkmark.circle.fill")

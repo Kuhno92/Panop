@@ -3,6 +3,7 @@ import Foundation
 import PanopCatalog
 import PanopCore
 import PanopDiscover
+import PanopSimkl
 import SwiftData
 import Testing
 
@@ -111,6 +112,22 @@ struct DiscoveryStoreTests {
     }
 
     @Test
+    func `followed shows come first, even ones the history marks as started`() async throws {
+        let catalog = try OnDiskCatalog()
+        defer { catalog.cleanUp() }
+        try await populate(catalog)
+        var context = context(unavailable: ["p|s3"])
+        context.watching = [5003, 5007, 5001].enumerated().map {
+            TrendingEntry(kind: .series, tmdbID: $1, score: Double(10 - $0))
+        }
+
+        let result = await store(catalog).build(context)
+
+        #expect(result.rails.first?.kind == .nextUp)
+        #expect(result.rails.first?.keys == ["p|s3", "p|s7", "p|s1"])
+    }
+
+    @Test
     func `hidden entries, hidden categories and what is unavailable are never in a rail`() async throws {
         let catalog = try OnDiskCatalog()
         defer { catalog.cleanUp() }
@@ -210,5 +227,31 @@ struct DiscoveryModelSwitchTests {
 
         model.isEnabled = false
         #expect(model.rails.isEmpty)
+    }
+}
+
+@Suite("Next up from Simkl")
+@MainActor
+struct NextUpModelTests {
+    @Test
+    func `the followed shows are ordered by when they were last watched and carry their next episode`() {
+        let model = DiscoveryModel()
+
+        model.setSimklLists([
+            SimklListItem(
+                kind: .series, tmdbID: 1, status: .watching,
+                next: SimklNextEpisode(season: 1, number: 2), lastWatchedAt: "2026-09-01T10:00:00Z"
+            ),
+            SimklListItem(
+                kind: .series, tmdbID: 2, status: .watching,
+                next: SimklNextEpisode(season: 3, number: 4), lastWatchedAt: "2026-10-01T10:00:00Z"
+            ),
+            SimklListItem(kind: .series, tmdbID: 3, status: .watching), // nothing to watch next
+            SimklListItem(kind: .series, tmdbID: 4, status: .completed)
+        ])
+
+        #expect(model.nextEpisodes.count == 2)
+        #expect(model.nextEpisodes[DiscoveryModel.linkKey(kind: .series, tmdbID: 2)]?.label == "S3E4")
+        #expect(model.nextEpisodes[DiscoveryModel.linkKey(kind: .series, tmdbID: 3)] == nil)
     }
 }

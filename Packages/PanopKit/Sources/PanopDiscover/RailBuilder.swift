@@ -22,7 +22,10 @@ public enum RailBuilder {
             rails.append(Rail(kind: kind, keys: fresh.map(\.key), subject: subject))
         }
 
-        add(.onYourList, onYourList(in: pool, input: input), minimum: rules.minimumPersonalRailSize)
+        // A show being followed is one the person has started, so it is drawn from the pool that
+        // keeps watched titles: the history that hides it elsewhere is what puts it here.
+        add(.nextUp, matching(input.watching, in: watchedPool), minimum: 1)
+        add(.onYourList, matching(input.planned, in: pool), minimum: rules.minimumPersonalRailSize)
         for kind in kinds {
             add(.trending(kind), trending(for: kind, in: pool, input: input))
         }
@@ -103,15 +106,15 @@ public enum RailBuilder {
 
     // MARK: - The rails
 
-    /// The titles on the person's own list that the library has, in the order they keep them.
-    private static func onYourList(in pool: [DiscoveryTitle], input: DiscoveryInput) -> [DiscoveryTitle] {
+    /// The titles of `list` that the library has, in the order of the list's scores.
+    private static func matching(_ list: [TrendingEntry], in pool: [DiscoveryTitle]) -> [DiscoveryTitle] {
         var byID: [String: DiscoveryTitle] = [:]
         for title in pool {
             if let id = title.tmdbID {
                 byID["\(title.kind.rawValue)|\(id)"] = title
             }
         }
-        return input.planned.sorted { ($0.score, $1.tmdbID) > ($1.score, $0.tmdbID) }
+        return list.sorted { ($0.score, $1.tmdbID) > ($1.score, $0.tmdbID) }
             .compactMap { byID["\($0.kind.rawValue)|\($0.tmdbID)"] }
     }
 

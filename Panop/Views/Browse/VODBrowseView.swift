@@ -1,5 +1,6 @@
 import PanopCore
 import PanopDiscover
+import PanopSimkl
 import SwiftData
 import SwiftUI
 
@@ -96,6 +97,7 @@ struct VODBrowseView: View {
                 .filter { ($0.mediaKind ?? discovery.rows[$0.keys.first ?? ""]?.kind) == kind },
             railRows: discovery.rows,
             railLinks: discovery.trendingLinks,
+            nextEpisodes: discovery.nextEpisodes,
             onSelect: select,
             onAdd: { showingAdd = true }
         )
@@ -240,6 +242,7 @@ private struct VODGrid: View {
     let rails: [Rail]
     let railRows: [String: CatalogRow]
     let railLinks: [String: URL]
+    let nextEpisodes: [String: SimklNextEpisode]
     let onSelect: (CatalogRow) -> Void
     let onAdd: () -> Void
 
@@ -252,6 +255,7 @@ private struct VODGrid: View {
         rails: [Rail],
         railRows: [String: CatalogRow],
         railLinks: [String: URL],
+        nextEpisodes: [String: SimklNextEpisode],
         onSelect: @escaping (CatalogRow) -> Void,
         onAdd: @escaping () -> Void
     ) {
@@ -263,6 +267,7 @@ private struct VODGrid: View {
         self.rails = rails
         self.railRows = railRows
         self.railLinks = railLinks
+        self.nextEpisodes = nextEpisodes
         self.onSelect = onSelect
         self.onAdd = onAdd
     }
@@ -271,7 +276,13 @@ private struct VODGrid: View {
         ScrollView {
             LazyVStack(alignment: .leading, spacing: Self.spacing, pinnedViews: Self.pinnedHeadings) {
                 ForEach(rails) { rail in
-                    PosterRail(rail: rail, rows: railRows, links: railLinks, onSelect: onSelect)
+                    PosterRail(
+                        rail: rail,
+                        rows: railRows,
+                        links: railLinks,
+                        nextEpisodes: nextEpisodes,
+                        onSelect: onSelect
+                    )
                 }
                 ForEach(model.sections) { section in
                     Section {
