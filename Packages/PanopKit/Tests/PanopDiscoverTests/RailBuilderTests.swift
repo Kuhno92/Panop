@@ -35,6 +35,46 @@ struct RailBuilderTests {
         rails.first { $0.kind == kind }
     }
 
+    // MARK: - The person's own list
+
+    @Test
+    func `the planned list keeps its order, films and shows together, and comes first`() {
+        let films = (1 ... 4).map { title($0, tmdb: 100 + $0) }
+        let shows = (1 ... 2).map { title($0, .series, tmdb: 200 + $0) }
+        let planned = [
+            TrendingEntry(kind: .series, tmdbID: 201, score: 6),
+            TrendingEntry(kind: .movie, tmdbID: 104, score: 5),
+            TrendingEntry(kind: .movie, tmdbID: 999, score: 4), // not in the library
+            TrendingEntry(kind: .movie, tmdbID: 102, score: 3),
+            TrendingEntry(kind: .series, tmdbID: 202, score: 2)
+        ]
+
+        let rails = build(DiscoveryInput(titles: films + shows, planned: planned, now: now))
+
+        #expect(rails.first?.kind == .onYourList)
+        #expect(rails.first?.keys == ["p|series:1", "p|movie:4", "p|movie:2", "p|series:2"])
+    }
+
+    @Test
+    func `a list with fewer than three titles in the library draws no rail`() {
+        let films = (1 ... 4).map { title($0, tmdb: 100 + $0) }
+        let planned = [101, 102].map { TrendingEntry(kind: .movie, tmdbID: $0, score: 1) }
+
+        #expect(rail(.onYourList, in: build(DiscoveryInput(titles: films, planned: planned, now: now))) == nil)
+    }
+
+    @Test
+    func `what was finished elsewhere is never suggested, not even from the planned list`() {
+        let films = (1 ... 6).map { title($0, tmdb: 100 + $0) }
+        let planned = (1 ... 6).map { TrendingEntry(kind: .movie, tmdbID: 100 + $0, score: Double($0)) }
+
+        let rails = build(DiscoveryInput(titles: films, planned: planned, finishedElsewhere: [103, 105], now: now))
+
+        let keys = Set(rails.flatMap(\.keys))
+        #expect(!keys.contains("p|movie:3") && !keys.contains("p|movie:5"))
+        #expect(rail(.onYourList, in: rails)?.keys.count == 4)
+    }
+
     // MARK: - Trending
 
     @Test

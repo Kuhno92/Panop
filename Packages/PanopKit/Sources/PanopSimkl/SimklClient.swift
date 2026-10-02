@@ -17,8 +17,8 @@ public enum SimklWatched: Sendable, Equatable, Codable {
 }
 
 /// Where a title stands on the person's Simkl lists.
-public struct SimklListItem: Sendable, Equatable {
-    public enum Status: String, Sendable {
+public struct SimklListItem: Sendable, Equatable, Codable {
+    public enum Status: String, Sendable, Codable {
         case watching, plantowatch, completed, hold, dropped
     }
 
@@ -29,12 +29,24 @@ public struct SimklListItem: Sendable, Equatable {
     public var rating: Int?
     /// For a show being watched, the episode they are up to, as `S01E04`.
     public var nextToWatch: String?
+
+    public init(kind: MediaKind, tmdbID: Int, status: Status, rating: Int? = nil, nextToWatch: String? = nil) {
+        self.kind = kind
+        self.tmdbID = tmdbID
+        self.status = status
+        self.rating = rating
+        self.nextToWatch = nextToWatch
+    }
 }
 
 /// What changed on the account, by list, as Simkl's own timestamps. Compared as text: they are only
 /// ever checked for being different from the ones saved last time.
 public struct SimklActivities: Sendable, Equatable, Codable {
     public var all: String
+
+    public init(all: String) {
+        self.all = all
+    }
 }
 
 /// Calls to the person's Simkl account. Each takes the token afresh from `token`, which is where

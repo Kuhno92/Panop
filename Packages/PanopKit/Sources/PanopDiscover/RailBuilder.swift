@@ -22,6 +22,7 @@ public enum RailBuilder {
             rails.append(Rail(kind: kind, keys: fresh.map(\.key), subject: subject))
         }
 
+        add(.onYourList, onYourList(in: pool, input: input), minimum: rules.minimumPersonalRailSize)
         for kind in kinds {
             add(.trending(kind), trending(for: kind, in: pool, input: input))
         }
@@ -69,6 +70,9 @@ public enum RailBuilder {
         if let category = title.category, input.hiddenCategories[title.kind]?.contains(category) == true {
             return false
         }
+        if let id = title.tmdbID, input.finishedElsewhere.contains(id) {
+            return false
+        }
         return includingWatched || !input.unavailable.contains(title.key)
     }
 
@@ -98,6 +102,18 @@ public enum RailBuilder {
     }
 
     // MARK: - The rails
+
+    /// The titles on the person's own list that the library has, in the order they keep them.
+    private static func onYourList(in pool: [DiscoveryTitle], input: DiscoveryInput) -> [DiscoveryTitle] {
+        var byID: [String: DiscoveryTitle] = [:]
+        for title in pool {
+            if let id = title.tmdbID {
+                byID["\(title.kind.rawValue)|\(id)"] = title
+            }
+        }
+        return input.planned.sorted { ($0.score, $1.tmdbID) > ($1.score, $0.tmdbID) }
+            .compactMap { byID["\($0.kind.rawValue)|\($0.tmdbID)"] }
+    }
 
     private static func trending(
         for kind: MediaKind,

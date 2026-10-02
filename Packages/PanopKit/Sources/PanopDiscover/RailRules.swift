@@ -5,6 +5,8 @@ import Foundation
 public struct RailRules: Sendable, Equatable {
     /// A rail with fewer titles than this is not drawn.
     public var minimumRailSize = 5
+    /// The person's own list is worth showing with fewer: each title on it is one they chose.
+    public var minimumPersonalRailSize = 3
     /// Titles in a rail.
     public var railSize = 20
 

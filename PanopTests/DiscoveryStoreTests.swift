@@ -93,6 +93,24 @@ struct DiscoveryStoreTests {
     }
 
     @Test
+    func `the planned list joins the library by TMDB id and what was finished elsewhere is left out`() async throws {
+        let catalog = try OnDiskCatalog()
+        defer { catalog.cleanUp() }
+        try await populate(catalog)
+        var context = context()
+        context.planned = [1010, 1020, 1030, 1040, 77777].enumerated().map {
+            TrendingEntry(kind: .movie, tmdbID: $1, score: Double(10 - $0))
+        }
+        context.finishedElsewhere = [1020]
+
+        let result = await store(catalog).build(context)
+
+        let rail = try #require(result.rails.first { $0.kind == .onYourList })
+        #expect(rail.keys == ["p|m10", "p|m30", "p|m40"])
+        #expect(!result.rails.flatMap(\.keys).contains("p|m20"))
+    }
+
+    @Test
     func `hidden entries, hidden categories and what is unavailable are never in a rail`() async throws {
         let catalog = try OnDiskCatalog()
         defer { catalog.cleanUp() }

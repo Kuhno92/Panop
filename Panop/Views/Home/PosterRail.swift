@@ -6,6 +6,8 @@ import SwiftUI
 nonisolated enum RailHeading {
     static func title(for rail: Rail) -> String {
         switch rail.kind {
+        case .onYourList:
+            "On your Simkl list"
         case let .trending(kind):
             kind == .series ? "Trending series on Simkl" : "Trending movies on Simkl"
         case .becauseYouWatched:
@@ -140,7 +142,7 @@ extension Rail {
             kind
         case .franchise:
             .movie
-        case .becauseYouWatched, .mostWatched:
+        case .becauseYouWatched, .mostWatched, .onYourList:
             nil
         }
     }

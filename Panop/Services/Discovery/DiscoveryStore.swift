@@ -13,6 +13,9 @@ nonisolated struct DiscoveryContext: Equatable, Sendable {
     var hidden: Set<String>
     var hiddenCategories: [MediaKind: Set<String>]
     var trending: [TrendingEntry]
+    /// On the person's own Simkl list to watch, and what they have finished there.
+    var planned: [TrendingEntry] = []
+    var finishedElsewhere: Set<Int> = []
     /// Days since 1970. The date, not the moment: rails change at most daily, so a context made a
     /// minute later is the same one.
     var day: Int
@@ -71,7 +74,7 @@ actor DiscoveryStore {
             sort: SortDescriptor(\.year, order: .reverse),
             minimumYear: year - 1
         ))
-        add(trendingRecords(context, discovery.trending))
+        add(trendingRecords(context, discovery.trending + discovery.planned))
         // What the history points at, wherever it falls, and the neighbourhood of the strongest seeds.
         let known = seedAndPlayRecords(context, discovery)
         add(known)
@@ -100,6 +103,8 @@ actor DiscoveryStore {
             hidden: discovery.hidden,
             hiddenCategories: discovery.hiddenCategories,
             trending: discovery.trending,
+            planned: discovery.planned,
+            finishedElsewhere: discovery.finishedElsewhere,
             playCounts: discovery.playCounts,
             now: discovery.now
         ))

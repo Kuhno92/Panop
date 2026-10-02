@@ -25,6 +25,8 @@ final class DiscoveryModel {
     /// Where Simkl lists a title, by `linkKey`, for the lists whose terms ask for a link back.
     private(set) var trendingLinks: [String: URL] = [:]
     @ObservationIgnored private var trending: [TrendingEntry] = []
+    @ObservationIgnored private var planned: [TrendingEntry] = []
+    @ObservationIgnored private var finishedElsewhere: Set<Int> = []
     @ObservationIgnored private var trendingStore: TrendingStore?
 
     static func linkKey(kind: MediaKind, tmdbID: Int) -> String {
@@ -49,6 +51,23 @@ final class DiscoveryModel {
         }
         if let fresh = await store.refreshIfStale() {
             setTrending(fresh.entries)
+        }
+    }
+
+    /// What the person's Simkl lists say: the titles they plan to watch, and those they have finished.
+    func setSimklLists(_ items: [SimklListItem]) {
+        let planned = items.filter { $0.status == .plantowatch }.enumerated().map { index, item in
+            TrendingEntry(kind: item.kind, tmdbID: item.tmdbID, score: Double(items.count - index))
+        }
+        let finished = Set(items.filter { $0.status == .completed }.map(\.tmdbID))
+        guard planned != self.planned || finished != finishedElsewhere else { return }
+        self.planned = planned
+        finishedElsewhere = finished
+        if var context = lastContext {
+            context.planned = planned
+            context.finishedElsewhere = finished
+            lastContext = context
+            scheduleBuild()
         }
     }
 
@@ -110,6 +129,8 @@ final class DiscoveryModel {
     func update(_ context: DiscoveryContext) {
         var context = context
         context.trending = trending
+        context.planned = planned
+        context.finishedElsewhere = finishedElsewhere
         guard context != lastContext else { return }
         lastContext = context
         scheduleBuild()

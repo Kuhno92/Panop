@@ -17,6 +17,7 @@ struct RootView: View {
     @State private var discovery = DiscoveryModel()
     @State private var simkl: SimklAccount
     @State private var simklSync: SimklSync
+    @State private var simklLibrary: SimklLibrary
     @AppStorage(SimklSync.enabledKey) private var sendsWatched = true
     @AppStorage(DiscoveryModel.enabledKey) private var showsSuggestions = true
     @AppStorage(DiscoveryModel.trendingKey) private var showsTrending = true
@@ -33,6 +34,10 @@ struct RootView: View {
         let client = SimklClient(transport: transport, app: SimklConfig.app) { await account.accessToken() }
         _simkl = State(initialValue: account)
         _simklSync = State(initialValue: SimklSync(send: { try await client.addHistory($0) }))
+        _simklLibrary = State(initialValue: SimklLibrary(
+            activities: { try await client.activities() },
+            library: { try await client.library() }
+        ))
     }
 
     var body: some View {
@@ -88,10 +93,13 @@ struct RootView: View {
             simklSync.isEnabled = sendsWatched && simkl.isConnected
             if simkl.isConnected {
                 simklSync.flushIfNeeded()
+                await simklLibrary.refresh()
             } else {
                 simklSync.discardQueue()
+                simklLibrary.clear()
             }
         }
+        .onChange(of: simklLibrary.items, initial: true) { discovery.setSimklLists(simklLibrary.items) }
         .task(id: showsTrending && showsSuggestions) {
             await discovery.loadTrending(enabled: showsTrending && showsSuggestions, source: .panop)
         }
