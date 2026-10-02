@@ -293,8 +293,9 @@ The first milestone where Panop is usable.
       in the cloud container with the favourites. 8 store tests, 4 for the throttling, and UI
       tests for resume and start over. Home now has a **Continue watching** rail
       of the films and episodes left part-way, the one watched last first, each card with a
-      progress bar (`UserStateStore.continueWatching`, 2 tests). **Not done:** a mark for
-      watched films.
+      progress bar (`UserStateStore.continueWatching`, 2 tests). A film or episode seen to the
+      end, or marked by hand in its context menu, shows a green check (`UserContentState.isWatched`,
+      3 tests).
 
 ---
 

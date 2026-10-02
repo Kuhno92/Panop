@@ -208,6 +208,39 @@ struct ResumePointTests {
     }
 
     @Test
+    func `reaching the end marks it watched, and the mark outlives the cleared point`() throws {
+        let store = try makeStore()
+        store.saveProgress(film, position: 1000, duration: 7200)
+
+        store.saveProgress(film, position: 7100, duration: 7200)
+
+        #expect(store.isWatched(film))
+        #expect(store.resumePosition(for: film) == nil)
+    }
+
+    @Test
+    func `marking by hand works both ways, and marking seen drops the resume point`() throws {
+        let store = try makeStore()
+        store.saveProgress(film, position: 1000, duration: 7200)
+
+        store.setWatched(true, for: film)
+        #expect(store.isWatched(film))
+        #expect(store.resumePosition(for: film) == nil)
+
+        store.setWatched(false, for: film)
+        #expect(!store.isWatched(film))
+        #expect(store.progress.isEmpty)
+    }
+
+    @Test
+    func `a watched mark survives a new launch`() throws {
+        let container = try PanopContainers.makeCloud(inMemory: true)
+        UserStateStore(context: ModelContext(container)).setWatched(true, for: film)
+
+        #expect(UserStateStore(context: ModelContext(container)).isWatched(film))
+    }
+
+    @Test
     func `it survives a new launch`() throws {
         let container = try PanopContainers.makeCloud(inMemory: true)
         UserStateStore(context: ModelContext(container)).saveProgress(film, position: 600, duration: 3600)
@@ -262,8 +295,14 @@ struct ResumePointTests {
     func `a point that is cleared leaves no row behind, unless it was starred or watched`() throws {
         let container = try PanopContainers.makeCloud(inMemory: true)
         let store = UserStateStore(context: ModelContext(container))
+        // Too early to keep: nothing to resume and nothing seen.
+        store.saveProgress(film, position: 3, duration: 7200)
+        #expect(try ModelContext(container).fetchCount(FetchDescriptor<UserContentState>()) == 0)
+        // Seen to the end: the row stays, as the watched mark.
         store.saveProgress(film, position: 1000, duration: 7200)
         store.saveProgress(film, position: 7199, duration: 7200)
+        #expect(try ModelContext(container).fetchCount(FetchDescriptor<UserContentState>()) == 1)
+        store.setWatched(false, for: film)
         #expect(try ModelContext(container).fetchCount(FetchDescriptor<UserContentState>()) == 0)
 
         store.markPlayed(film)

@@ -32,6 +32,8 @@ final class UserStateStore {
     }
 
     private(set) var progress: [String: Progress] = [:]
+    /// Keys of the films and episodes seen to the end, or marked as seen.
+    private(set) var watched: Set<String> = []
     private var engines: [String: PlaybackEngineKind] = [:]
 
     static let recentLimit = 50
@@ -102,9 +104,30 @@ final class UserStateStore {
         let finished = length > 0 &&
             (position >= length * Self.finishedFraction || length - position < Self.finishedTail)
         let worthKeeping = position >= Self.minimumToKeep && !finished
-        guard let row = state(for: key) ?? (worthKeeping ? insert(key) : nil) else { return }
+        guard let row = state(for: key) ?? (worthKeeping || finished ? insert(key) : nil) else { return }
+        if finished {
+            row.isWatched = true
+        }
         row.positionSeconds = worthKeeping ? position : 0
         row.durationSeconds = worthKeeping ? length : 0
+        row.updatedAt = date
+        removeIfEmpty(row)
+        commit()
+    }
+
+    func isWatched(_ key: String) -> Bool {
+        watched.contains(key)
+    }
+
+    /// Marks a film or episode as seen, or not. Marking it seen drops any resume point, since
+    /// there is nothing left to resume.
+    func setWatched(_ isWatched: Bool, for key: String, at date: Date = .now) {
+        guard let row = state(for: key) ?? (isWatched ? insert(key) : nil) else { return }
+        row.isWatched = isWatched
+        if isWatched {
+            row.positionSeconds = 0
+            row.durationSeconds = 0
+        }
         row.updatedAt = date
         removeIfEmpty(row)
         commit()
@@ -136,6 +159,7 @@ final class UserStateStore {
             },
             uniquingKeysWith: { first, _ in first }
         )
+        watched = Set(rows.filter(\.isWatched).map(\.streamID))
         engines = Dictionary(
             rows.compactMap { row in PlaybackEngineKind(rawValue: row.rememberedEngine).map { (row.streamID, $0) } },
             uniquingKeysWith: { first, _ in first }
@@ -162,7 +186,9 @@ final class UserStateStore {
     }
 
     private func removeIfEmpty(_ row: UserContentState) {
-        if !row.isFavorite, row.lastPlayedAt == .distantPast, row.positionSeconds == 0, row.rememberedEngine.isEmpty {
+        if !row.isFavorite, row.lastPlayedAt == .distantPast, row.positionSeconds == 0, row.rememberedEngine.isEmpty,
+           !row.isWatched
+        {
             context.delete(row)
         }
     }

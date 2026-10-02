@@ -111,6 +111,11 @@ struct SeriesDetailView: View {
                 HStack {
                     Text("\(episode.number). \(episode.title)")
                     Spacer()
+                    if userState.isWatched(key) {
+                        Image(systemName: "checkmark.circle.fill")
+                            .foregroundStyle(.green)
+                            .accessibilityLabel("Watched")
+                    }
                     if let seconds = episode.seconds, seconds > 0 {
                         Text(PlayerTime.text(Double(seconds))).font(.caption).foregroundStyle(.secondary)
                     }
@@ -123,6 +128,14 @@ struct SeriesDetailView: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+        .contextMenu {
+            let seen = userState.isWatched(key)
+            Button {
+                userState.setWatched(!seen, for: key)
+            } label: {
+                Label(seen ? "Mark as Not Watched" : "Mark as Watched", systemImage: seen ? "eye.slash" : "eye")
+            }
+        }
     }
 
     private func select(_ episode: Episode, season: Season, key: String) {
