@@ -2,6 +2,15 @@ import XCTest
 
 final class SettingsTests: PanopUITestCase {
     #if !os(tvOS)
+        /// Settings is a long list, and a row below the fold is not in the accessibility tree yet.
+        private func openPlaybackStatistics() {
+            let row = app.buttons["Playback Statistics"]
+            for _ in 0 ..< 5 where !row.exists {
+                app.swipeUp()
+            }
+            row.tap()
+        }
+
         func testPlayingAChannelShowsUpInThePlaybackStatistics() {
             waitForChannels()
             channel("3sat").tap()
@@ -10,7 +19,7 @@ final class SettingsTests: PanopUITestCase {
             app.buttons["Close"].tap()
 
             app.tabBars.buttons["Settings"].tap()
-            app.buttons["Playback Statistics"].tap()
+            openPlaybackStatistics()
 
             XCTAssertTrue(
                 app.staticTexts["Viewing sessions"].waitForExistence(timeout: 10),
@@ -46,7 +55,7 @@ final class SettingsTests: PanopUITestCase {
             waitForChannels()
 
             app.tabBars.buttons["Settings"].tap()
-            app.buttons["Playback Statistics"].tap()
+            openPlaybackStatistics()
 
             XCTAssertTrue(app.staticTexts["Nothing yet"].waitForExistence(timeout: 10))
         }
