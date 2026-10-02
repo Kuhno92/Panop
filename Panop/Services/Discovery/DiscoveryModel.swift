@@ -9,7 +9,15 @@ import SwiftData
 @MainActor
 @Observable
 final class DiscoveryModel {
-    private(set) var rails: [Rail] = []
+    private(set) var built: [Rail] = []
+    /// The Settings switch for suggestions.
+    var isEnabled = true
+    /// What the screens draw: nothing when the person turned suggestions off.
+    var rails: [Rail] {
+        isEnabled ? built : []
+    }
+
+    static let enabledKey = "showSuggestions"
     private(set) var rows: [String: CatalogRow] = [:]
     /// `loading` until the first result, cached or built, has arrived.
     private(set) var phase = CatalogListModel.Phase.loading
@@ -43,7 +51,7 @@ final class DiscoveryModel {
         }
         Task { [weak self] in
             let cached = await store.cached()
-            guard let self, let cached, rails.isEmpty else { return }
+            guard let self, let cached, built.isEmpty else { return }
             apply(cached)
         }
     }
@@ -77,8 +85,8 @@ final class DiscoveryModel {
     }
 
     private func apply(_ result: DiscoveryResult) {
-        if result.rails != rails {
-            rails = result.rails
+        if result.rails != built {
+            built = result.rails
         }
         if result.rows != rows {
             rows = result.rows

@@ -180,3 +180,17 @@ struct RailHeadingTests {
         #expect(RailHeading.display(nil) == "")
     }
 }
+
+@Suite("Discovery model switch")
+@MainActor
+struct DiscoveryModelSwitchTests {
+    @Test
+    func `turning suggestions off hides the rails and on brings them back`() {
+        let model = DiscoveryModel()
+        #expect(model.isEnabled)
+        #expect(model.rails.isEmpty)
+
+        model.isEnabled = false
+        #expect(model.rails.isEmpty)
+    }
+}

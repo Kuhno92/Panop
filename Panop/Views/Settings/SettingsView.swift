@@ -13,6 +13,8 @@ struct SettingsView: View {
 
     @Environment(PlaylistLibrary.self) private var library
     @Environment(UserStateStore.self) private var userState
+    @AppStorage(DiscoveryModel.enabledKey) private var showsSuggestions = true
+    @State private var confirmingForget = false
 
     var body: some View {
         Form {
@@ -48,6 +50,26 @@ struct SettingsView: View {
             } footer: {
                 Text(
                     "Panop tries your choice first, and falls back through the other players when a stream will not start."
+                )
+            }
+
+            Section {
+                Toggle("Show suggestions", isOn: $showsSuggestions)
+                Button("Forget what I watched", role: .destructive) { confirmingForget = true }
+            } header: {
+                Text("Suggestions")
+            } footer: {
+                Text(
+                    "Suggestions are chosen on this device from your own library and what you watch. Nothing about it is sent anywhere."
+                )
+            }
+            .confirmationDialog(
+                "Forget what you watched?", isPresented: $confirmingForget, titleVisibility: .visible
+            ) {
+                Button("Forget", role: .destructive) { userState.forgetViewingHistory() }
+            } message: {
+                Text(
+                    "Recently watched, watched marks and the suggestions based on them go. Favourites and hidden titles stay."
                 )
             }
 
