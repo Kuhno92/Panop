@@ -35,10 +35,10 @@ final class DiscoveryModel {
     /// switch off nothing is read, asked for or shown.
     func loadTrending(
         enabled: Bool,
-        source: SimklTrendingSource,
+        source: SimklTrendingSource?,
         cacheURL: URL? = TrendingStore.defaultCacheURL
     ) async {
-        guard enabled else {
+        guard enabled, let source else {
             setTrending([])
             return
         }

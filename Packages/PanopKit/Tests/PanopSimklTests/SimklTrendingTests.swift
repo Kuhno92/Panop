@@ -40,7 +40,7 @@ struct SimklTrendingTests {
     """
 
     private func source(_ transport: Canned) -> SimklTrendingSource {
-        SimklTrendingSource(transport: transport, userAgent: "Panop/1.0")
+        SimklTrendingSource(transport: transport, app: SimklApp(clientID: "abc", version: "1.0"))
     }
 
     @Test
@@ -62,11 +62,13 @@ struct SimklTrendingTests {
         _ = try await source(transport).trending(.series)
 
         let urls = transport.requests.map(\.url.absoluteString)
+        let query = "?client_id=abc&app-name=panop&app-version=1.0"
         #expect(urls == [
-            "https://data.simkl.in/discover/trending/movies/month_100.json",
-            "https://data.simkl.in/discover/trending/tv/week_100.json"
+            "https://data.simkl.in/discover/trending/movies/month_100.json" + query,
+            "https://data.simkl.in/discover/trending/tv/week_100.json" + query
         ])
-        #expect(transport.requests.allSatisfy { $0.headers["User-Agent"] == "Panop/1.0" })
+        #expect(transport.requests.allSatisfy { $0.headers["User-Agent"] == "panop/1.0" })
+        #expect(transport.requests.allSatisfy { $0.headers["Authorization"] == nil })
     }
 
     @Test

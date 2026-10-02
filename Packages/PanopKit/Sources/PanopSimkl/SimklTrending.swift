@@ -19,12 +19,11 @@ public struct SimklTrendingSource: Sendable {
     static let site = "https://simkl.com"
 
     private let transport: any HTTPTransport
-    private let userAgent: String
+    private let app: SimklApp
 
-    /// - Parameter userAgent: names the app and its version, as Simkl's rules ask.
-    public init(transport: any HTTPTransport, userAgent: String) {
+    public init(transport: any HTTPTransport, app: SimklApp) {
         self.transport = transport
-        self.userAgent = userAgent
+        self.app = app
     }
 
     /// The most popular titles of one kind, most popular first. Entries without a TMDB id are left out,
@@ -32,12 +31,13 @@ public struct SimklTrendingSource: Sendable {
     public func trending(_ kind: MediaKind, period: Period = .week) async throws -> [TrendingEntry] {
         guard kind == .movie || kind == .series else { return [] }
         let path = kind == .movie ? "movies" : "tv"
-        guard let url = URL(string: "\(Self.host)/discover/trending/\(path)/\(period.rawValue)_100.json") else {
+        guard let url = app.url("\(Self.host)/discover/trending/\(path)/\(period.rawValue)_100.json") else {
             throw Failure.undecodable
         }
+        // No Authorization: these are cached files, the same for everyone.
         let response = try await transport.send(HTTPRequest(
             url: url,
-            headers: ["User-Agent": userAgent, "Accept": "application/json"],
+            headers: ["User-Agent": app.userAgent, "Accept": "application/json"],
             timeout: 20
         ))
         guard response.statusCode == 200 else { throw Failure.status(response.statusCode) }

@@ -1,0 +1,26 @@
+import Foundation
+import PanopCore
+import PanopSimkl
+
+/// How this build identifies itself to Simkl.
+nonisolated enum SimklConfig {
+    /// The public id of Panop's registration at https://simkl.com/settings/developer/. Empty until the app
+    /// is registered, and while it is empty nothing is asked of Simkl and no Simkl rail or login is offered.
+    static let clientID = ""
+
+    static var isConfigured: Bool {
+        !clientID.isEmpty
+    }
+
+    static var app: SimklApp {
+        let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "0"
+        return SimklApp(clientID: clientID, version: version)
+    }
+}
+
+extension SimklTrendingSource {
+    /// The source as the app uses it, or nil while the app has no Simkl registration.
+    static var panop: SimklTrendingSource? {
+        SimklConfig.isConfigured ? SimklTrendingSource(transport: URLSessionTransport(), app: SimklConfig.app) : nil
+    }
+}

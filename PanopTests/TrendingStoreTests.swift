@@ -8,7 +8,10 @@ import Testing
 @Suite("Trending store", .serialized)
 struct TrendingStoreTests {
     private func store(_ transport: StubTransport, cache: URL) -> TrendingStore {
-        TrendingStore(source: SimklTrendingSource(transport: transport, userAgent: "Panop/test"), cacheURL: cache)
+        TrendingStore(
+            source: SimklTrendingSource(transport: transport, app: SimklApp(clientID: "id", version: "test")),
+            cacheURL: cache
+        )
     }
 
     private func cacheURL() -> URL {

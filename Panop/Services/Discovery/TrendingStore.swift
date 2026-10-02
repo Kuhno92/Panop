@@ -54,11 +54,3 @@ actor TrendingStore {
             .appendingPathComponent("trending.json")
     }
 }
-
-extension SimklTrendingSource {
-    /// The source as the app uses it, naming itself as Simkl's rules ask.
-    static var panop: SimklTrendingSource {
-        let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "0"
-        return SimklTrendingSource(transport: URLSessionTransport(), userAgent: "Panop/\(version)")
-    }
-}
