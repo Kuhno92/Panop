@@ -68,3 +68,14 @@ custom_rules:
     included: "Packages/PanopKit/Sources/.*\\.swift"
     message: "PanopKit is the portable core and must not import Apple-only frameworks. Put this in the app target instead."
     severity: error
+  no_logging:
+    name: "Logging"
+    # A stream address and a playlist link usually carry the account's login. Nothing here logs,
+    # so none can reach a log, a diagnostic report or a crash report by that route. A new
+    # logging call has to be argued for, and must scrub what it prints.
+    regex: '\b(print|debugPrint|NSLog|os_log|dump)\s*\(|\bLogger\s*\('
+    included: "(Panop|Packages/PanopKit/Sources)/.*\\.swift"
+    # Tests and benchmarks print results, and handle no real login.
+    excluded: ".*Tests/.*"
+    message: "Do not log: addresses and errors can carry the account's login. See docs/ROADMAP.md, log redaction audit."
+    severity: error

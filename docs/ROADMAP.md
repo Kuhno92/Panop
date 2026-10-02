@@ -548,8 +548,17 @@ Features real users expect that the brief did not name. All *(surfaced)*.
 
 - [ ] App icon and marketing assets
 - [ ] Localisation via String Catalogs
-- [ ] `PrivacyInfo.xcprivacy` privacy manifest
-- [ ] Log redaction audit. Credentials must never reach a log or a diagnostic export.
+- [x] `PrivacyInfo.xcprivacy` privacy manifest: no tracking, no collected data, and the two
+      required-reason APIs the app uses (UserDefaults `CA92.1`, file timestamps `C617.1`, for the
+      image cache). Checked to ship in the built app. **Not checked:** the manifests of the
+      linked frameworks (VLCKit, LumeEngine), which a store upload validates separately.
+- [x] Log redaction audit. Credentials must never reach a log or a diagnostic export. **Audited**:
+      the app and the package make no logging call at all (and a lint rule, `no_logging`, now
+      fails the build on a new one); import errors are scrubbed of the account's login at their
+      source (Xtream, M3U download, guide); engine error text never reaches the screen, which
+      shows fixed wording by error code; the playback statistics file holds no addresses or
+      names. **Not covered:** any logging inside the vendored engines (libVLC, FFmpeg), and
+      a diagnostic export, which does not exist yet.
 - [ ] tvOS archive validation. Some failures appear only at upload, never in a normal build.
 - [ ] App Store listing and review notes. Player-only apps are legitimate, but the category
       draws scrutiny, so state clearly that Panop ships no content.
