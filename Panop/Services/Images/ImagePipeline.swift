@@ -40,7 +40,7 @@ actor ImagePipeline {
         }
     }
 
-    private final class Entry {
+    final class Entry {
         let image: CGImage
         init(_ image: CGImage) {
             self.image = image
@@ -59,7 +59,9 @@ actor ImagePipeline {
     private let fetch: Fetch
     private let disk: DiskImageCache
     private let limits: Limits
-    private let memory = NSCache<NSString, Entry>()
+    /// `NSCache` is safe to use from any thread, which is what lets a row ask for an image it
+    /// already has without a trip to this actor (see ``cachedImage(for:maxPixel:)``).
+    nonisolated(unsafe) let memory = NSCache<NSString, Entry>()
     private var flights: [String: Flight] = [:]
     private var failures: [String: Date] = [:]
     private var activeDownloads = 0
@@ -72,10 +74,24 @@ actor ImagePipeline {
         memory.totalCostLimit = limits.memoryBytes
     }
 
+    /// The memory cache's key: the address and the size, with no hashing, since a row asks for it
+    /// on every redraw.
+    nonisolated static func memoryKey(_ url: URL, _ maxPixel: Int) -> String {
+        "\(url.absoluteString)@\(maxPixel)"
+    }
+
+    /// The image if it is already in memory, answered at once on whatever thread asks.
+    ///
+    /// For a row that comes back into view: it can draw its logo in its first frame instead of
+    /// a placeholder and then the logo a moment later, which on a fast scroll reads as flicker.
+    nonisolated func cachedImage(for url: URL, maxPixel: Int) -> CGImage? {
+        memory.object(forKey: Self.memoryKey(url, maxPixel) as NSString)?.image
+    }
+
     /// The image no larger than `maxPixel` on its longest side, or nil if it cannot be had.
     func image(for url: URL, maxPixel: Int) async -> CGImage? {
         let diskKey = DiskImageCache.key(for: url)
-        let memoryKey = "\(diskKey)@\(maxPixel)"
+        let memoryKey = Self.memoryKey(url, maxPixel)
         if let hit = memory.object(forKey: memoryKey as NSString) {
             return hit.image
         }

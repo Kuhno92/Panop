@@ -333,6 +333,13 @@ The brief called performance a key concept. For IPTV this concentrates in one nu
       **provider's own** on Live TV, Movies and Series (the panel's `num`, now read for series
       too); "By name" is one choice in Sort. `RealProviderBenchmarks` repeats the measurements
       against any provider (login from the environment only, never stored).
+      Then nothing slow is left on the main thread while rows appear: the "Now:" line reads an
+      in-memory cache (`GuideNowStore`) filled by one background read for the rows on screen
+      (rows that scroll away first are never read), and a logo or poster already in memory is
+      drawn in the row's first frame (`ImagePipeline.cachedImage`) instead of a placeholder and
+      then the image. **Not measured:** tab switching and scrolling on a real display; an
+      attempt to host the screens in a hidden window never laid out rows, so its numbers were
+      discarded. Debug builds are several times slower than Release and are not a fair judge.
 - [ ] **Fast channel zapping** *(asked for, as "streaming performance")*. Time from channel
       select to first frame is the metric users judge an IPTV app on. **Measured, not yet
       improved.** Release build, this Mac, a fresh engine per zap, median of 8 over the real

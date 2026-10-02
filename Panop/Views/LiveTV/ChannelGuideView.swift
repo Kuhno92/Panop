@@ -8,25 +8,21 @@ import SwiftUI
 struct NowOnAirLine: View {
     let channel: CatalogRow
 
+    @Environment(\.guideNow) private var store
     @Environment(\.modelContext) private var catalog
-    @State private var current: ProgrammeSnapshot?
 
     var body: some View {
-        // Always present, so the row keeps one height whether or not the guide answers.
+        // Answered from memory. The programme is read in the background, and the line fills in
+        // when it arrives; until then it holds its height, so the row does not move.
+        let current = store.current(playlist: channel.playlist, epgKey: channel.epgKey)
         Text(current.map { "Now: \($0.title)" } ?? " ")
             .font(.caption)
             .foregroundStyle(.secondary)
             .lineLimit(1)
             .task(id: channel.id) {
-                let now = Date.now
-                current = GuideLookup.upcoming(
-                    playlist: channel.playlist,
-                    epgKey: channel.epgKey,
-                    after: now,
-                    limit: 1,
-                    in: catalog
-                ).first { $0.isOn(at: now) }
+                store.request(playlist: channel.playlist, epgKey: channel.epgKey, in: catalog.container)
             }
+            .onDisappear { store.withdraw(playlist: channel.playlist, epgKey: channel.epgKey) }
     }
 }
 

@@ -54,12 +54,7 @@ enum GuideLookup {
         //
         // What is on now began at or before now. The few latest starters are read, and those still
         // running kept, so a long programme overlapped by a short one is not missed.
-        var earlier = FetchDescriptor<EPGProgrammeRecord>(
-            predicate: #Predicate { $0.playlist == playlist && $0.channelKey == key && $0.start <= now },
-            sortBy: [SortDescriptor(\.start, order: .reverse)]
-        )
-        earlier.fetchLimit = 3
-        let onNow = ((try? context.fetch(earlier)) ?? []).filter { $0.stop > now }.sorted { $0.start < $1.start }
+        let onNow = onNowAll(playlist: playlist, key: key, at: now, in: context)
 
         var later = FetchDescriptor<EPGProgrammeRecord>(
             predicate: #Predicate { $0.playlist == playlist && $0.channelKey == key && $0.start > now },
@@ -69,6 +64,41 @@ enum GuideLookup {
         let following = later.fetchLimit == 0 ? [] : ((try? context.fetch(later)) ?? [])
 
         return (onNow + following).prefix(limit).map {
+            ProgrammeSnapshot(
+                start: $0.start,
+                stop: $0.stop,
+                title: $0.title,
+                subtitle: $0.subtitle,
+                details: $0.details
+            )
+        }
+    }
+
+    /// What is on at `now` on one channel: begun at or before it and not yet ended, soonest first.
+    ///
+    /// Nonisolated so the guide reader can use it off the main thread.
+    nonisolated static func onNowAll(
+        playlist: String,
+        key: String,
+        at now: Date,
+        in context: ModelContext
+    ) -> [EPGProgrammeRecord] {
+        var earlier = FetchDescriptor<EPGProgrammeRecord>(
+            predicate: #Predicate { $0.playlist == playlist && $0.channelKey == key && $0.start <= now },
+            sortBy: [SortDescriptor(\.start, order: .reverse)]
+        )
+        earlier.fetchLimit = 3
+        return ((try? context.fetch(earlier)) ?? []).filter { $0.stop > now }.sorted { $0.start < $1.start }
+    }
+
+    /// The one programme on now for a channel, or nil.
+    nonisolated static func onNow(
+        playlist: String,
+        epgKey: String,
+        at now: Date,
+        in context: ModelContext
+    ) -> ProgrammeSnapshot? {
+        onNowAll(playlist: playlist, key: epgKey, at: now, in: context).first.map {
             ProgrammeSnapshot(
                 start: $0.start,
                 stop: $0.stop,
