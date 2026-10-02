@@ -65,8 +65,10 @@ final class DiscoveryModel {
         buildTask?.cancel()
         generation += 1
         let current = generation
+        // The first result is not waited for: there is nothing on screen to protect from churn yet.
+        let delay = phase == .loading ? Duration.zero : Self.rebuildDelay
         buildTask = Task { [weak self] in
-            try? await Task.sleep(for: Self.rebuildDelay)
+            try? await Task.sleep(for: delay)
             guard !Task.isCancelled else { return }
             let result = await store.build(context)
             guard !Task.isCancelled, let self, current == generation else { return }

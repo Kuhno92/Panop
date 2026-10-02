@@ -36,7 +36,8 @@ struct HomeView: View {
         }
         .navigationTitle("Home")
         // Rebuilt whenever what the rails are made from changes; an unchanged context is ignored.
-        .task(id: userState.revision) {
+        // The playlists are part of the key: they may load after the first pass, and nothing else would rerun it.
+        .task(id: [userState.revision, library.playlists.count]) {
             guard !library.playlists.isEmpty else { return }
             discovery.start(container: catalog.container)
             discovery.update(DiscoveryContext.current(userState))
