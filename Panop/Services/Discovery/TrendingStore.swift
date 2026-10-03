@@ -6,6 +6,9 @@ import PanopSimkl
 nonisolated struct TrendingSnapshot: Codable, Equatable, Sendable {
     var fetchedAt: Date
     var entries: [TrendingEntry]
+    /// The lists made from the same files ("Top Box Office", "Best of Netflix"). Nil in a snapshot saved
+    /// before there were any, which is then read as out of date.
+    var lists: [CuratedList]?
 }
 
 /// The trending lists, kept on disk and fetched at most once in a while. Public and the same for
@@ -30,12 +33,12 @@ actor TrendingStore {
     /// New lists when the saved ones are older than `maxAge`, else nil. A failed fetch leaves the saved
     /// lists as they were and returns nil.
     func refreshIfStale(now: Date = .now) async -> TrendingSnapshot? {
-        if let saved = cached(), now.timeIntervalSince(saved.fetchedAt) < Self.maxAge {
+        // A snapshot saved before there were lists has none, and is fetched again however young it is.
+        if let saved = cached(), saved.lists != nil, now.timeIntervalSince(saved.fetchedAt) < Self.maxAge {
             return nil
         }
-        guard let movies = try? await source.trending(.movie),
-              let series = try? await source.trending(.series) else { return nil }
-        let snapshot = TrendingSnapshot(fetchedAt: now, entries: movies + series)
+        guard let made = try? await source.snapshot(now: now) else { return nil }
+        let snapshot = TrendingSnapshot(fetchedAt: now, entries: made.trending, lists: made.lists)
         save(snapshot)
         return snapshot
     }

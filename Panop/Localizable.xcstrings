@@ -218,6 +218,16 @@
         }
       }
     },
+    "Action": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Action"
+          }
+        }
+      }
+    },
     "Actions for %@": {
       "localizations": {
         "de": {
@@ -384,6 +394,46 @@
           "stringUnit": {
             "state": "translated",
             "value": "Weil du %@ gesehen hast"
+          }
+        }
+      }
+    },
+    "Best %@ Movies on Simkl": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Beste %@-Filme auf Simkl"
+          }
+        }
+      }
+    },
+    "Best %@ Series on Simkl": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Beste %@-Serien auf Simkl"
+          }
+        }
+      }
+    },
+    "Best Movies of the %@s on Simkl": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Beste Filme der %@er auf Simkl"
+          }
+        }
+      }
+    },
+    "Best of %@ on Simkl": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Das Beste von %@ auf Simkl"
           }
         }
       }
@@ -630,6 +680,16 @@
         }
       }
     },
+    "Comedy": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Komödie"
+          }
+        }
+      }
+    },
     "Connect Simkl": {
       "localizations": {
         "de": {
@@ -730,6 +790,26 @@
         }
       }
     },
+    "Crime": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Krimi"
+          }
+        }
+      }
+    },
+    "Currently Airing Series on Simkl": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aktuell laufende Serien auf Simkl"
+          }
+        }
+      }
+    },
     "Cyan": {
       "localizations": {
         "de": {
@@ -806,6 +886,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Fertig"
+          }
+        }
+      }
+    },
+    "Drama": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Drama"
           }
         }
       }
@@ -1020,6 +1110,26 @@
         }
       }
     },
+    "Hidden Gem Movies on Simkl": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geheimtipp-Filme auf Simkl"
+          }
+        }
+      }
+    },
+    "Hidden Gem Series on Simkl": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geheimtipp-Serien auf Simkl"
+          }
+        }
+      }
+    },
     "Hide": {
       "localizations": {
         "de": {
@@ -1080,6 +1190,16 @@
         }
       }
     },
+    "Horror": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Horror"
+          }
+        }
+      }
+    },
     "How fast channels start and how often they stall. Kept on this device only.": {
       "localizations": {
         "de": {
@@ -1096,6 +1216,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Import läuft … %@ Einträge"
+          }
+        }
+      }
+    },
+    "In Theatres Now on Simkl": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jetzt im Kino, auf Simkl"
           }
         }
       }
@@ -1186,6 +1316,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Groß"
+          }
+        }
+      }
+    },
+    "Latest DVD Releases on Simkl": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Neueste DVD-Veröffentlichungen auf Simkl"
           }
         }
       }
@@ -1316,6 +1456,26 @@
           "stringUnit": {
             "state": "translated",
             "value": "Mehr von %@"
+          }
+        }
+      }
+    },
+    "Most Watchlisted Movies on Simkl": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Meistgemerkte Filme auf Simkl"
+          }
+        }
+      }
+    },
+    "Most Watchlisted Series on Simkl": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Meistgemerkte Serien auf Simkl"
           }
         }
       }
@@ -1976,6 +2136,16 @@
         }
       }
     },
+    "Quick Watches on Simkl (90 min or less)": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kurz und gut auf Simkl (bis 90 Min.)"
+          }
+        }
+      }
+    },
     "Raise subtitles": {
       "localizations": {
         "de": {
@@ -2166,6 +2336,16 @@
         }
       }
     },
+    "Sci-Fi": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sci-Fi"
+          }
+        }
+      }
+    },
     "Search": {
       "localizations": {
         "de": {
@@ -2296,6 +2476,16 @@
         }
       }
     },
+    "Show Simkl's trending and best-of lists": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Simkls Trends und Bestenlisten anzeigen"
+          }
+        }
+      }
+    },
     "Show adult content": {
       "localizations": {
         "de": {
@@ -2312,16 +2502,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Vorschläge anzeigen"
-          }
-        }
-      }
-    },
-    "Show what's trending on Simkl": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Beliebtes auf Simkl anzeigen"
           }
         }
       }
@@ -2966,6 +3146,16 @@
         }
       }
     },
+    "Thriller": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thriller"
+          }
+        }
+      }
+    },
     "Time spent waiting for data": {
       "localizations": {
         "de": {
@@ -3002,6 +3192,36 @@
           "stringUnit": {
             "state": "translated",
             "value": "Zu viele Versuche. Versuche es um %@ erneut."
+          }
+        }
+      }
+    },
+    "Top Box Office Movies on Simkl": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kassenschlager auf Simkl"
+          }
+        }
+      }
+    },
+    "Top Rated Movies on Simkl": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bestbewertete Filme auf Simkl"
+          }
+        }
+      }
+    },
+    "Top Rated Series on Simkl": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bestbewertete Serien auf Simkl"
           }
         }
       }
@@ -3052,6 +3272,26 @@
           "stringUnit": {
             "state": "translated",
             "value": "Durchscheinend"
+          }
+        }
+      }
+    },
+    "Trending Movie Premieres on Simkl": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Beliebte Film-Premieren auf Simkl"
+          }
+        }
+      }
+    },
+    "Trending Series Premieres on Simkl": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Beliebte Serien-Premieren auf Simkl"
           }
         }
       }

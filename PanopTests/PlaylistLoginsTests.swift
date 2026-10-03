@@ -44,6 +44,14 @@ struct PlaylistLoginsDecisionTests {
     }
 
     @Test
+    func `the same login is always the same bytes`() {
+        let first = PlaylistLogins.encode(sample)
+        for _ in 0 ..< 100 {
+            #expect(PlaylistLogins.encode(sample) == first)
+        }
+    }
+
+    @Test
     func `nothing anywhere is nothing to do`() {
         #expect(PlaylistLogins.decide(local: nil, blob: nil, remembered: nil, uploading: true) == .none)
     }

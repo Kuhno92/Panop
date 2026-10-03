@@ -5,6 +5,77 @@ import SwiftUI
 
 /// The heading of a rail, in words.
 nonisolated enum RailHeading {
+    /// A list made from Simkl's. Each names Simkl, as its terms ask of anything shown from its data.
+    private static func curatedTitle(_ kind: MediaKind, _ id: String) -> String {
+        switch id {
+        case "boxOffice":
+            return String(localized: "Top Box Office Movies on Simkl")
+        case "inTheatres":
+            return String(localized: "In Theatres Now on Simkl")
+        case "justOnDVD":
+            return String(localized: "Latest DVD Releases on Simkl")
+        case "quickWatches":
+            return String(localized: "Quick Watches on Simkl (90 min or less)")
+        case "airing":
+            return String(localized: "Currently Airing Series on Simkl")
+        case "premieres":
+            return forKind(
+                kind,
+                series: String(localized: "Trending Series Premieres on Simkl"),
+                movies: String(localized: "Trending Movie Premieres on Simkl")
+            )
+        case "hiddenGems":
+            return forKind(
+                kind,
+                series: String(localized: "Hidden Gem Series on Simkl"),
+                movies: String(localized: "Hidden Gem Movies on Simkl")
+            )
+        case "topRated":
+            return forKind(
+                kind,
+                series: String(localized: "Top Rated Series on Simkl"),
+                movies: String(localized: "Top Rated Movies on Simkl")
+            )
+        case "mostWatchlisted":
+            return forKind(
+                kind,
+                series: String(localized: "Most Watchlisted Series on Simkl"),
+                movies: String(localized: "Most Watchlisted Movies on Simkl")
+            )
+        default:
+            if id.hasPrefix("genre.") {
+                let genre = genreName(String(id.dropFirst("genre.".count)))
+                return forKind(
+                    kind,
+                    series: String(localized: "Best \(genre) Series on Simkl"),
+                    movies: String(localized: "Best \(genre) Movies on Simkl")
+                )
+            }
+            if id.hasPrefix("decade.") {
+                let decade = String(id.dropFirst("decade.".count))
+                return String(localized: "Best Movies of the \(decade)s on Simkl")
+            }
+            if id.hasPrefix("network.") {
+                let network = String(id.dropFirst("network.".count))
+                return String(localized: "Best of \(network) on Simkl")
+            }
+            return id
+        }
+    }
+
+    private static func genreName(_ genre: String) -> String {
+        switch genre {
+        case "Action": String(localized: "Action")
+        case "Drama": String(localized: "Drama")
+        case "Comedy": String(localized: "Comedy")
+        case "Science Fiction": String(localized: "Sci-Fi")
+        case "Thriller": String(localized: "Thriller")
+        case "Horror": String(localized: "Horror")
+        case "Crime": String(localized: "Crime")
+        default: genre
+        }
+    }
+
     /// The wording for a series or for a film.
     private static func forKind(_ kind: MediaKind, series: String, movies: String) -> String {
         kind == .series ? series : movies
@@ -16,6 +87,8 @@ nonisolated enum RailHeading {
             String(localized: "Next up on Simkl")
         case .onYourList:
             String(localized: "On your Simkl list")
+        case let .curated(kind, id):
+            curatedTitle(kind, id)
         case let .trending(kind):
             forKind(
                 kind,
@@ -93,7 +166,11 @@ struct PosterRail: View {
 
     /// Only a trending rail carries Simkl's data, so only there is there a page to link to.
     private func link(for row: CatalogRow) -> URL? {
-        guard case .trending = rail.kind, let id = row.tmdbID else { return nil }
+        switch rail.kind {
+        case .trending, .curated: break
+        default: return nil
+        }
+        guard let id = row.tmdbID else { return nil }
         return links[DiscoveryModel.linkKey(kind: row.kind, tmdbID: id)]
     }
 
@@ -170,8 +247,11 @@ extension Rail {
     /// that mix both.
     nonisolated var mediaKind: MediaKind? {
         switch kind {
-        case let .trending(kind), let .newReleases(kind), let .topRated(kind), let .genre(kind, _),
-             let .classics(kind), let .decade(kind, _), let .pickOfTheDay(kind):
+        case let .trending(kind), let .newReleases(kind), let .topRated(kind), let .genre(kind, _), let .curated(
+            kind,
+            _
+        ),
+        let .classics(kind), let .decade(kind, _), let .pickOfTheDay(kind):
             kind
         case .franchise:
             .movie

@@ -80,6 +80,25 @@ public struct TrendingEntry: Sendable, Equatable, Codable {
     }
 }
 
+/// A named list of titles made elsewhere, such as "Top Box Office" or "Best of Netflix", in the order
+/// it ranks them, joined to the library by TMDB id like a trending list.
+public struct CuratedList: Sendable, Equatable, Codable {
+    /// Stable, so a rail keeps its identity between refreshes: `boxOffice`, `network.Netflix`, `genre.Action`.
+    public var id: String
+    public var kind: MediaKind
+    /// Shown near the top, on Home, and not only on the screen of its kind.
+    public var isHighlight: Bool
+    /// Best first. The scores only keep that order.
+    public var entries: [TrendingEntry]
+
+    public init(id: String, kind: MediaKind, isHighlight: Bool = false, entries: [TrendingEntry]) {
+        self.id = id
+        self.kind = kind
+        self.isHighlight = isHighlight
+        self.entries = entries
+    }
+}
+
 /// How often a title has been opened.
 public struct PlayCount: Sendable, Equatable {
     public var key: String
@@ -104,6 +123,8 @@ public struct DiscoveryInput: Sendable {
     /// Names of the categories the person hid, by kind.
     public var hiddenCategories: [MediaKind: Set<String>]
     public var trending: [TrendingEntry]
+    /// Lists made elsewhere (see `CuratedList`), each drawn as a rail of what the library has of it.
+    public var curated: [CuratedList]
     /// Titles the person plans to watch, by TMDB id, in the order they keep them.
     public var planned: [TrendingEntry]
     /// Shows they are in the middle of, most recently watched first.
@@ -121,6 +142,7 @@ public struct DiscoveryInput: Sendable {
         hidden: Set<String> = [],
         hiddenCategories: [MediaKind: Set<String>] = [:],
         trending: [TrendingEntry] = [],
+        curated: [CuratedList] = [],
         planned: [TrendingEntry] = [],
         watching: [TrendingEntry] = [],
         finishedElsewhere: Set<Int> = [],
@@ -134,6 +156,7 @@ public struct DiscoveryInput: Sendable {
         self.hidden = hidden
         self.hiddenCategories = hiddenCategories
         self.trending = trending
+        self.curated = curated
         self.planned = planned
         self.watching = watching
         self.finishedElsewhere = finishedElsewhere
@@ -148,6 +171,8 @@ public enum RailKind: Sendable, Hashable, Codable {
     /// What the person plans to watch, from their own list.
     case onYourList
     case trending(MediaKind)
+    /// A list made elsewhere, by its id.
+    case curated(MediaKind, String)
     case becauseYouWatched(seed: String)
     case newReleases(MediaKind)
     case mostWatched
@@ -170,6 +195,7 @@ public struct Rail: Sendable, Equatable, Identifiable, Codable {
     public var id: String {
         switch kind {
         case let .trending(kind): "trending.\(kind.rawValue)"
+        case let .curated(kind, id): "curated.\(kind.rawValue).\(id)"
         case let .becauseYouWatched(seed): "because.\(seed)"
         case let .newReleases(kind): "new.\(kind.rawValue)"
         case .nextUp: "nextUp"

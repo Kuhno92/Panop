@@ -101,7 +101,7 @@ struct SettingsView: View {
             Section {
                 Toggle("Show suggestions", isOn: $showsSuggestions)
                 if SimklConfig.isConfigured {
-                    Toggle("Show what's trending on Simkl", isOn: $showsTrending)
+                    Toggle("Show Simkl's trending and best-of lists", isOn: $showsTrending)
                         .disabled(!showsSuggestions)
                 }
                 Button("Forget what I watched", role: .destructive) { confirmingForget = true }

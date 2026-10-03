@@ -27,8 +27,12 @@ nonisolated enum SimklConfig {
 }
 
 extension SimklTrendingSource {
-    /// The source as the app uses it, or nil while the app has no Simkl registration.
+    /// The source as the app uses it, or nil while the app has no Simkl registration. Never under a test:
+    /// the lists are a few megabytes, and a test must not depend on a server.
+    @MainActor
     static var panop: SimklTrendingSource? {
-        SimklConfig.isConfigured ? SimklTrendingSource(transport: URLSessionTransport(), app: SimklConfig.app) : nil
+        let testing = ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil || UITestMode.isActive
+        guard SimklConfig.isConfigured, !testing else { return nil }
+        return SimklTrendingSource(transport: URLSessionTransport(), app: SimklConfig.app)
     }
 }

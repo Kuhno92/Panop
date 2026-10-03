@@ -19,8 +19,12 @@ nonisolated enum PlaylistLogins {
         case withdraw
     }
 
+    /// The same login is always the same bytes: logins are compared by their bytes to tell whether a
+    /// device and a record agree, and without sorted keys the encoder may write them in any order.
     static func encode(_ secret: PlaylistSecret) -> Data? {
-        try? JSONEncoder().encode(secret)
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = .sortedKeys
+        return try? encoder.encode(secret)
     }
 
     static func decode(_ data: Data) -> PlaylistSecret? {

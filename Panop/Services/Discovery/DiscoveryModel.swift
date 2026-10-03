@@ -25,6 +25,9 @@ final class DiscoveryModel {
     /// Where Simkl lists a title, by `linkKey`, for the lists whose terms ask for a link back.
     private(set) var trendingLinks: [String: URL] = [:]
     @ObservationIgnored private var trending: [TrendingEntry] = []
+    @ObservationIgnored private var curated: [CuratedList] = []
+    /// The ids of the lists worth a place on Home (`Rail.id`), the rest being for the Movies and Series screens.
+    private(set) var highlighted: Set<String> = []
     @ObservationIgnored private var planned: [TrendingEntry] = []
     @ObservationIgnored private var watching: [TrendingEntry] = []
     /// The next episode to watch of each followed show, by `linkKey`, for the caption under its poster.
@@ -44,16 +47,16 @@ final class DiscoveryModel {
         cacheURL: URL? = TrendingStore.defaultCacheURL
     ) async {
         guard enabled, let source else {
-            setTrending([])
+            setTrending([], lists: [])
             return
         }
         let store = trendingStore ?? TrendingStore(source: source, cacheURL: cacheURL)
         trendingStore = store
         if let saved = await store.cached() {
-            setTrending(saved.entries)
+            setTrending(saved.entries, lists: saved.lists ?? [])
         }
         if let fresh = await store.refreshIfStale() {
-            setTrending(fresh.entries)
+            setTrending(fresh.entries, lists: fresh.lists ?? [])
         }
     }
 
@@ -89,17 +92,21 @@ final class DiscoveryModel {
         }
     }
 
-    private func setTrending(_ entries: [TrendingEntry]) {
-        guard entries != trending else { return }
+    private func setTrending(_ entries: [TrendingEntry], lists: [CuratedList]) {
+        guard entries != trending || lists != curated else { return }
         trending = entries
+        curated = lists
+        // Every title that came from Simkl links back to its page there, wherever it is shown.
         trendingLinks = Dictionary(
-            entries.compactMap { entry in
+            (entries + lists.flatMap(\.entries)).compactMap { entry in
                 entry.link.flatMap(URL.init(string:)).map { (Self.linkKey(kind: entry.kind, tmdbID: entry.tmdbID), $0) }
             },
             uniquingKeysWith: { first, _ in first }
         )
+        highlighted = Set(lists.filter(\.isHighlight).map { "curated.\($0.kind.rawValue).\($0.id)" })
         if var context = lastContext {
             context.trending = entries
+            context.curated = lists
             lastContext = context
             scheduleBuild()
         }
@@ -163,6 +170,7 @@ final class DiscoveryModel {
     func update(_ context: DiscoveryContext) {
         var context = context
         context.trending = trending
+        context.curated = curated
         context.planned = planned
         context.watching = watching
         context.finishedElsewhere = finishedElsewhere

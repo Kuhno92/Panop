@@ -15,11 +15,25 @@ public enum RailBuilder {
 
         var rails: [Rail] = []
         var used = Set<String>()
-        func add(_ kind: RailKind, _ candidates: [DiscoveryTitle], subject: String? = nil, minimum: Int? = nil) {
-            let fresh = candidates.filter { !used.contains($0.key) }.prefix(rules.railSize)
+        /// - Parameter shared: a rail that may repeat what another has. A "Best of Netflix" is complete as
+        ///   it is: a title is in it even if "Top rated" has it too, which is not so of the rails built
+        ///   from the person's own history, where a title is in the first that wants it.
+        func add(
+            _ kind: RailKind,
+            _ candidates: [DiscoveryTitle],
+            subject: String? = nil,
+            minimum: Int? = nil,
+            shared: Bool = false
+        ) {
+            let fresh = candidates.filter { shared || !used.contains($0.key) }.prefix(rules.railSize)
             guard fresh.count >= (minimum ?? rules.minimumRailSize) else { return }
-            used.formUnion(fresh.map(\.key))
+            if !shared {
+                used.formUnion(fresh.map(\.key))
+            }
             rails.append(Rail(kind: kind, keys: fresh.map(\.key), subject: subject))
+        }
+        func addCurated(_ list: CuratedList) {
+            add(.curated(list.kind, list.id), matching(list.entries, in: pool), shared: true)
         }
 
         // A show being followed is one the person has started, so it is drawn from the pool that
@@ -29,6 +43,8 @@ public enum RailBuilder {
         for kind in kinds {
             add(.trending(kind), trending(for: kind, in: pool, input: input))
         }
+        // The lists worth a place on Home come with the trending ones, the rest after everything else.
+        input.curated.filter(\.isHighlight).forEach(addCurated)
         for (seed, title) in seedTitles(input).prefix(rules.becauseRails) {
             add(.becauseYouWatched(seed: seed.key), similar(to: title, in: pool, rules: rules), subject: title.name)
         }
@@ -57,6 +73,7 @@ public enum RailBuilder {
                 add(.pickOfTheDay(kind), [pick], minimum: 1)
             }
         }
+        input.curated.filter { !$0.isHighlight }.forEach(addCurated)
         return rails
     }
 

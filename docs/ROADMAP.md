@@ -564,17 +564,21 @@ The brief called performance a key concept. For IPTV this concentrates in one nu
       and measure memory (the benchmark needs the provider login in the environment), UI tests of
       the rails (the seeded test library has no films), and "Next up" and rating-based seeds from Simkl.
 - [x] **Simkl** *(asked for)*: public trending list (named as Simkl's, with a link to each title),
-      sign-in by code and QR code, finished films and episodes recorded on the account in batches
-      that survive being offline, and the person's plan-to-watch list as a rail. **Dormant until the
-      app is registered at Simkl and `SimklConfig.clientID` is set.** Unit-tested against stubs
-      only: the list response shape, the sign-in and the history call have not met the live API.
-      Free below $150 a month of revenue, a licence above (see THIRD-PARTY-NOTICES.md); all of it is
-      in `PanopSimkl`, which can be dropped.
-
----
-
-## M5 — Sync
-
+      **and the rows Simkl's own apps make from its public files**, all without a login: Top Box Office,
+      In Theatres Now, Latest DVD Releases, Hidden Gems, Top Rated, Most Watchlisted, Quick Watches and
+      Premieres for films; Best of Netflix, HBO, Disney+, Prime Video and Apple TV, Currently Airing and the
+      same quality rows for series; Best of a genre and of a decade. They are made here from three files
+      (this week's trending films and series, and the disc releases: 1 to 3 MB, fetched at most every six
+      hours) and joined to the library by TMDB id; each names Simkl and links back. Movie rows are on the
+      Movies screen, series rows on Series, and Home has the highlights (Top Box Office, Best of Netflix).
+      Against your library, Top Box Office has 83 of its 100 titles, Best of Netflix 20, Best of HBO 19; In
+      Theatres and Premieres match too few and stay hidden. The recipes (how each list is cut) are ours,
+      since Simkl names the rows but not how. Also: sign-in by code and QR code, finished films and episodes
+      recorded on the account in batches that survive being offline, the person's Plan to Watch list and
+      Next up as rails. **Dormant without the client id** (set now). The public files are tested live; the
+      account parts (recording, the lists, Next up) have run against stubs only.
+      Free below $150 a month of revenue, a licence above (see THIRD-PARTY-NOTICES.md); all of it is in
+      `PanopSimkl`, which can be dropped.
 - [ ] **Enable CloudKit mirroring** *(asked for, as "iCloud sync")* (ADR 0009). **Built, not yet run against
       iCloud.** The entitlements (`Config/Panop.entitlements`: CloudKit and the container
       `iCloud.com.panop.Panop`, push) are in the project, mirroring is chosen at launch from facts

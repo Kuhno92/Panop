@@ -26,6 +26,43 @@ public struct SimklTrendingSource: Sendable {
         self.app = app
     }
 
+    /// What the three public files give: the trending rail and the lists made from them.
+    public struct Snapshot: Sendable, Equatable, Codable {
+        public var trending: [TrendingEntry]
+        public var lists: [CuratedList]
+
+        public init(trending: [TrendingEntry], lists: [CuratedList]) {
+            self.trending = trending
+            self.lists = lists
+        }
+    }
+
+    /// Fetches this week's trending films and series (500 of each) and the latest disc releases, and makes
+    /// the trending rail and every list from them: 1 to 3 MB in all, so it is asked for rarely. A failure of
+    /// the films or the series is a failure; the disc releases alone may be missing.
+    public func snapshot(now: Date = .now) async throws -> Snapshot {
+        let movies = try await titles("trending/movies/week_500", kind: .movie)
+        let series = try await titles("trending/tv/week_500", kind: .series)
+        let dvd = await (try? titles("dvd/releases_500", kind: .movie)) ?? []
+        // The first hundred of each are what is trending; the rest are there for the lists to choose from.
+        let trending = SimklLists.entries(of: Array(movies.prefix(100))) + SimklLists
+            .entries(of: Array(series.prefix(100)))
+        return Snapshot(trending: trending, lists: SimklLists.build(movies: movies, series: series, dvd: dvd, now: now))
+    }
+
+    private func titles(_ path: String, kind: MediaKind) async throws -> [SimklTitle] {
+        guard let url = app.url("\(Self.host)/discover/\(path).json") else { throw Failure.undecodable }
+        // No Authorization: these are cached files, the same for everyone.
+        let response = try await transport.send(HTTPRequest(
+            url: url,
+            headers: ["User-Agent": app.userAgent, "Accept": "application/json"],
+            timeout: 30
+        ))
+        guard response.statusCode == 200 else { throw Failure.status(response.statusCode) }
+        guard let titles = SimklFile.titles(from: response.body, kind: kind) else { throw Failure.undecodable }
+        return titles
+    }
+
     /// The most popular titles of one kind, most popular first. Entries without a TMDB id are left out,
     /// since there is nothing to match them to a library by.
     public func trending(_ kind: MediaKind, period: Period = .week) async throws -> [TrendingEntry] {

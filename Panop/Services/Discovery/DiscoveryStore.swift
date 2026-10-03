@@ -13,6 +13,8 @@ nonisolated struct DiscoveryContext: Equatable, Sendable {
     var hidden: Set<String>
     var hiddenCategories: [MediaKind: Set<String>]
     var trending: [TrendingEntry]
+    /// Lists made from Simkl's, joined to the library like the trending ones.
+    var curated: [CuratedList] = []
     /// On the person's own Simkl list to watch, and what they have finished there.
     var planned: [TrendingEntry] = []
     var watching: [TrendingEntry] = []
@@ -75,7 +77,10 @@ actor DiscoveryStore {
             sort: SortDescriptor(\.year, order: .reverse),
             minimumYear: year - 1
         ))
-        add(trendingRecords(context, discovery.trending + discovery.planned + discovery.watching))
+        add(trendingRecords(
+            context,
+            discovery.trending + discovery.curated.flatMap(\.entries) + discovery.planned + discovery.watching
+        ))
         // What the history points at, wherever it falls, and the neighbourhood of the strongest seeds.
         let known = seedAndPlayRecords(context, discovery)
         add(known)
@@ -104,6 +109,7 @@ actor DiscoveryStore {
             hidden: discovery.hidden,
             hiddenCategories: discovery.hiddenCategories,
             trending: discovery.trending,
+            curated: discovery.curated,
             planned: discovery.planned,
             watching: discovery.watching,
             finishedElsewhere: discovery.finishedElsewhere,

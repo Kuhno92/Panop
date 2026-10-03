@@ -128,6 +128,35 @@ struct DiscoveryStoreTests {
     }
 
     @Test
+    func `lists made from Simkl's become rails of what the library has, in the list's order`() async throws {
+        let catalog = try OnDiskCatalog()
+        defer { catalog.cleanUp() }
+        try await populate(catalog)
+        var context = context()
+        func list(_ id: String, _ kind: MediaKind, _ ids: [Int]) -> CuratedList {
+            CuratedList(
+                id: id, kind: kind, isHighlight: id == "boxOffice",
+                entries: ids.enumerated().map { TrendingEntry(kind: kind, tmdbID: $1, score: Double(ids.count - $0)) }
+            )
+        }
+        context.curated = [
+            list("boxOffice", .movie, [1060, 1010, 55555, 1030, 1020, 1050, 1040]),
+            list("network.Netflix", .series, [5003, 5001, 5002, 5009, 5004, 5005])
+        ]
+
+        let result = await store(catalog).build(context)
+
+        let office = try #require(result.rails.first { $0.kind == .curated(.movie, "boxOffice") })
+        #expect(
+            office.keys == ["p|m60", "p|m10", "p|m30", "p|m20", "p|m50", "p|m40"],
+            "the list's order, the six the library has"
+        )
+        let netflix = try #require(result.rails.first { $0.kind == .curated(.series, "network.Netflix") })
+        #expect(netflix.keys.first == "p|s3")
+        #expect(result.rows["p|m60"] != nil, "and what is needed to draw them")
+    }
+
+    @Test
     func `hidden entries, hidden categories and what is unavailable are never in a rail`() async throws {
         let catalog = try OnDiskCatalog()
         defer { catalog.cleanUp() }
@@ -207,6 +236,14 @@ struct RailHeadingTests {
         #expect(title(.classics(.movie)) == "Classics")
         #expect(title(.decade(.movie, 1990)) == "Movies of the 1990s")
         #expect(title(.pickOfTheDay(.series)) == "Series pick of the day")
+        #expect(title(.curated(.movie, "boxOffice")) == "Top Box Office Movies on Simkl")
+        #expect(title(.curated(.series, "network.Netflix")) == "Best of Netflix on Simkl")
+        #expect(title(.curated(.series, "genre.Science Fiction")) == "Best Sci-Fi Series on Simkl")
+        #expect(title(.curated(.movie, "genre.Action")) == "Best Action Movies on Simkl")
+        #expect(title(.curated(.movie, "decade.1990")) == "Best Movies of the 1990s on Simkl", "no thousands separator")
+        #expect(title(.curated(.series, "topRated")) == "Top Rated Series on Simkl")
+        #expect(title(.curated(.movie, "justOnDVD")) == "Latest DVD Releases on Simkl")
+        #expect(title(.curated(.series, "airing")) == "Currently Airing Series on Simkl")
     }
 
     @Test

@@ -1,4 +1,5 @@
 import PanopCore
+import PanopDiscover
 import SwiftData
 import SwiftUI
 
@@ -80,7 +81,7 @@ struct HomeView: View {
                         )
                     }
                     // Suggestions drawn from the library itself.
-                    ForEach(discovery.rails) { rail in
+                    ForEach(discovery.rails.filter(showsOnHome)) { rail in
                         PosterRail(
                             rail: rail,
                             rows: discovery.rows,
@@ -103,6 +104,15 @@ struct HomeView: View {
     /// Unfinished films and episodes, without the one the banner already offers.
     private var continueKeys: [String] {
         userState.continueWatching.filter { $0 != userState.recents.first }
+    }
+
+    /// Every rail but the lists made from Simkl's, of which Home has only the highlights: the rest are for the
+    /// Movies and Series screens.
+    private func showsOnHome(_ rail: Rail) -> Bool {
+        if case .curated = rail.kind {
+            return discovery.highlighted.contains(rail.id)
+        }
+        return true
     }
 
     /// A suggested title: a film opens its page, a show its episodes, an episode that stands alone plays.

@@ -59,4 +59,60 @@ struct TrendingStoreTests {
         #expect(result == nil)
         #expect(await down.cached() == saved)
     }
+
+    @Test
+    func `the lists come with the trending entries, from the same files`() async throws {
+        let url = cacheURL()
+        defer { try? FileManager.default.removeItem(at: url.deletingLastPathComponent()) }
+        let transport = StubTransport { _ in (200, body) }
+
+        let fresh = try #require(await store(transport, cache: url).refreshIfStale())
+
+        #expect(fresh.lists != nil)
+        #expect(await store(transport, cache: url).cached()?.lists == fresh.lists)
+    }
+
+    @Test
+    func `lists saved before there were lists make a snapshot out of date, so they are fetched`() async throws {
+        let url = cacheURL()
+        defer { try? FileManager.default.removeItem(at: url.deletingLastPathComponent()) }
+        try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
+        let old = #"{"fetchedAt":\#(Date.now.timeIntervalSinceReferenceDate),"entries":[]}"#
+        try Data(old.utf8).write(to: url)
+        let transport = StubTransport { _ in (200, body) }
+
+        let refreshed = await store(transport, cache: url).refreshIfStale()
+
+        #expect(refreshed != nil, "an hour-old snapshot with no lists is still fetched again")
+        #expect(refreshed?.lists != nil)
+    }
+}
+
+@Suite("Simkl lists on Home", .serialized, .engineGate)
+@MainActor
+struct SimklListsOnHomeTests {
+    @Test
+    func `only the highlighted lists are marked for Home`() async throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(
+            UUID().uuidString,
+            isDirectory: true
+        )
+        let url = directory.appendingPathComponent("trending.json")
+        defer { try? FileManager.default.removeItem(at: directory) }
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        let lists = [
+            CuratedList(id: "boxOffice", kind: .movie, isHighlight: true, entries: []),
+            CuratedList(id: "topRated", kind: .movie, entries: [])
+        ]
+        let snapshot = TrendingSnapshot(fetchedAt: .now, entries: [], lists: lists)
+        try JSONEncoder().encode(snapshot).write(to: url)
+        let model = DiscoveryModel()
+        let source = SimklTrendingSource(
+            transport: StubTransport { _ in (200, "[]") }, app: SimklApp(clientID: "id", version: "test")
+        )
+
+        await model.loadTrending(enabled: true, source: source, cacheURL: url)
+
+        #expect(model.highlighted == ["curated.movie.boxOffice"])
+    }
 }
