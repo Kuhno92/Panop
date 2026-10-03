@@ -4,6 +4,23 @@ import PanopSimkl
 import SwiftData
 import SwiftUI
 
+/// A main tab shown as its icon alone. The name is still its accessibility label, so VoiceOver and the UI
+/// tests find it, and the icon is what is seen.
+struct MainTabLabel: View {
+    let title: LocalizedStringKey
+    let systemImage: String
+
+    init(_ title: LocalizedStringKey, systemImage: String) {
+        self.title = title
+        self.systemImage = systemImage
+    }
+
+    var body: some View {
+        Label(title, systemImage: systemImage)
+            .labelStyle(.iconOnly)
+    }
+}
+
 nonisolated enum AppTab: Hashable {
     case home, live, movies, series, settings
 }
@@ -48,33 +65,43 @@ struct RootView: View {
 
     var body: some View {
         TabView(selection: $selection) {
-            Tab("Home", systemImage: "house", value: AppTab.home) {
+            Tab(value: AppTab.home) {
                 NavigationStack {
                     HomeView(onBrowse: { selection = .live })
                 }
+            } label: {
+                MainTabLabel("Home", systemImage: "house")
             }
-            Tab("Live TV", systemImage: "tv", value: AppTab.live) {
+            Tab(value: AppTab.live) {
                 NavigationStack {
                     LiveTVView()
                 }
+            } label: {
+                MainTabLabel("Live TV", systemImage: "tv")
             }
             // Only when some source has films and series to show.
             if library.offersVOD {
-                Tab("Movies", systemImage: "film", value: AppTab.movies) {
+                Tab(value: AppTab.movies) {
                     NavigationStack {
                         VODBrowseView(kind: .movie)
                     }
+                } label: {
+                    MainTabLabel("Movies", systemImage: "film")
                 }
-                Tab("Series", systemImage: "rectangle.stack", value: AppTab.series) {
+                Tab(value: AppTab.series) {
                     NavigationStack {
                         VODBrowseView(kind: .series)
                     }
+                } label: {
+                    MainTabLabel("Series", systemImage: "rectangle.stack")
                 }
             }
-            Tab("Settings", systemImage: "gearshape", value: AppTab.settings) {
+            Tab(value: AppTab.settings) {
                 NavigationStack {
                     SettingsView()
                 }
+            } label: {
+                MainTabLabel("Settings", systemImage: "gearshape")
             }
         }
         // Everything under it starts again, so no screen shows the last person's lists.
