@@ -8,6 +8,14 @@ nonisolated enum SimklConfig {
     /// is registered, and while it is empty nothing is asked of Simkl and no Simkl rail or login is offered.
     static let clientID = "e7fc78a9f51d1011e6a0a9507550de40def4dbb49b9db8ab932cf7070b12bf78"
 
+    /// The Keychain, except under tests: a test host is signed differently from the app the person
+    /// connected with, so touching the real item makes macOS ask for a password and hangs the run.
+    @MainActor
+    static var tokenStore: any SimklTokenStore {
+        let testing = ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
+        return testing || UITestMode.isActive ? InMemorySimklTokenStore() : KeychainSimklTokenStore()
+    }
+
     static var isConfigured: Bool {
         !clientID.isEmpty
     }

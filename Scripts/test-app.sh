@@ -4,8 +4,10 @@
 #
 #   Scripts/test-app.sh                 macOS, the fast one
 #   Scripts/test-app.sh ios|tvos        an available simulator
-#   Scripts/test-app.sh --benchmark [catalog|playback]
-#                                       benchmarks: macOS, Release build. Both by default
+#   Scripts/test-app.sh --benchmark [catalog|playback|real]
+#                                       benchmarks: macOS, Release build. The first two by default.
+#                                       `real` needs TEST_RUNNER_PANOP_DEV_XTREAM='url|user|pass' in the
+#                                       environment and imports from that provider
 #
 # These are the tests that need SwiftData, so they cannot live in the portable
 # package. The logic tests are much faster: swift test --package-path Packages/PanopKit
@@ -30,7 +32,8 @@ for arg in "$@"; do
         --benchmark) benchmark=1 ;;
         catalog) suites=(CatalogBenchmarks) ;;
         playback) suites=(PlaybackBenchmarks) ;;
-        -h | --help) sed -n '2,13p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+        real) suites=(RealProviderBenchmarks) ;;
+        -h | --help) sed -n '2,11p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
         *) echo "unknown argument: $arg (see --help)" >&2; exit 2 ;;
     esac
 done

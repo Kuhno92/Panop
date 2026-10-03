@@ -2,6 +2,7 @@ import Foundation
 @testable import Panop
 import PanopCatalog
 import PanopCore
+import PanopDiscover
 import SwiftData
 import Testing
 
@@ -150,5 +151,87 @@ struct RealProviderBenchmarks {
         record(
             "REAL programmes stored for guide check: \((try? context.fetchCount(FetchDescriptor<EPGProgrammeRecord>())) ?? -1)"
         )
+    }
+
+    /// Resident memory of this process, in megabytes.
+    private func residentMegabytes() -> Double {
+        var info = mach_task_basic_info()
+        var count = mach_msg_type_number_t(MemoryLayout<mach_task_basic_info>.size / MemoryLayout<natural_t>.size)
+        let status = withUnsafeMutablePointer(to: &info) {
+            $0.withMemoryRebound(to: integer_t.self, capacity: Int(count)) {
+                task_info(mach_task_self_, task_flavor_t(MACH_TASK_BASIC_INFO), $0, &count)
+            }
+        }
+        return status == KERN_SUCCESS ? Double(info.resident_size) / 1_048_576 : -1
+    }
+
+    /// What building the suggestion rails costs on the real library, and what they come out as.
+    @Test
+    func `the suggestion rails against a real provider`() async throws {
+        let catalog = try OnDiskCatalog()
+        defer { catalog.cleanUp() }
+        let importer = CatalogImporter(store: catalog.store, transport: URLSessionTransport())
+        let descriptor = try PlaylistDescriptor(id: "real", source: .xtream(credentials()))
+        _ = try await importer.sync(descriptor)
+
+        // A history and a trending list of the kinds a person would have: a few shows watched, and the
+        // top of the library standing in for what is popular.
+        let context = ModelContext(catalog.container)
+        var series = FetchDescriptor<CatalogEntryRecord>(
+            predicate: #Predicate { $0.kindRaw == "series" && $0.isAdult == false && $0.seriesID == nil },
+            sortBy: [SortDescriptor(\.rating, order: .reverse)]
+        )
+        series.fetchLimit = 12
+        let seedRecords = try context.fetch(series)
+        let seeds = seedRecords.prefix(3).enumerated().map {
+            DiscoverySeed(key: "\($1.playlist)|\($1.id)", weight: 1 - Double($0) * 0.2)
+        }
+        var top = FetchDescriptor<CatalogEntryRecord>(
+            predicate: #Predicate { $0.tmdbID > 0 && $0.isAdult == false },
+            sortBy: [SortDescriptor(\.rating, order: .reverse)]
+        )
+        top.fetchLimit = 300
+        let popular = try context.fetch(top)
+        let trending = popular.enumerated().map {
+            TrendingEntry(kind: MediaKind(rawValue: $1.kindRaw) ?? .movie, tmdbID: $1.tmdbID, score: Double(300 - $0))
+        }
+        let discovery = DiscoveryContext(
+            seeds: seeds, playCounts: [], unavailable: Set(seeds.map(\.key)), hidden: [], hiddenCategories: [:],
+            trending: trending, day: Int(Date.now.timeIntervalSince1970 / 86400)
+        )
+
+        let store = DiscoveryStore(container: catalog.container, cacheURL: nil)
+        let before = residentMegabytes()
+        var timings: [Double] = []
+        var result = DiscoveryResult(rails: [], rows: [:])
+        for _ in 0 ..< 5 {
+            let clock = ContinuousClock()
+            let began = clock.now
+            result = await store.build(discovery)
+            let elapsed = clock.now - began
+            timings.append(Double(elapsed.components.seconds) * 1000 + Double(elapsed.components.attoseconds) / 1e15)
+        }
+        let after = residentMegabytes()
+        let sorted = timings.sorted()
+        record(String(
+            format: "REAL rails build over %d series, %d films: first %.0f ms, median %.0f ms, best %.0f ms; "
+                + "resident %.0f MB before, %.0f MB after",
+            (try? context.fetchCount(FetchDescriptor<CatalogEntryRecord>(
+                predicate: #Predicate { $0.kindRaw == "series" }
+            ))) ?? -1,
+            (try? context.fetchCount(FetchDescriptor<CatalogEntryRecord>(
+                predicate: #Predicate { $0.kindRaw == "movie" }
+            ))) ?? -1,
+            timings.first ?? 0, sorted[sorted.count / 2], sorted.first ?? 0, before, after
+        ))
+        let adult = result.rails.flatMap(\.keys).filter { result.rows[$0] == nil }.count
+        record(
+            "REAL rails: \(result.rails.count) rails, \(result.rows.count) distinct titles, \(adult) keys with no row"
+        )
+        for rail in result.rails {
+            record("REAL rail \(RailHeading.title(for: rail)): \(rail.keys.count) titles; "
+                + "first: \(rail.keys.prefix(3).compactMap { result.rows[$0]?.name })")
+        }
+        #expect(result.rows.values.allSatisfy { !$0.isAdult }, "an adult title reached a rail")
     }
 }

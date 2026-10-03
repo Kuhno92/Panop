@@ -29,7 +29,7 @@ struct RootView: View {
         let transport = URLSessionTransport()
         let account = SimklAccount(
             auth: SimklAuth(transport: transport, app: SimklConfig.app),
-            store: KeychainSimklTokenStore()
+            store: SimklConfig.tokenStore
         )
         let client = SimklClient(transport: transport, app: SimklConfig.app) { await account.accessToken() }
         _simkl = State(initialValue: account)
