@@ -1,3 +1,4 @@
+import PanopCatalog
 import PanopCore
 import PanopSimkl
 import SwiftData
@@ -20,6 +21,8 @@ struct RootView: View {
     @State private var simklLibrary: SimklLibrary
     @AppStorage(SimklSync.enabledKey) private var sendsWatched = true
     @AppStorage(DiscoveryModel.enabledKey) private var showsSuggestions = true
+    @AppStorage(UserStateStore.hideAdultKey) private var hidesAdult = true
+    @Environment(SyncStatusCenter.self) private var status
     @AppStorage(DiscoveryModel.trendingKey) private var showsTrending = true
 
     init() {
@@ -84,6 +87,15 @@ struct RootView: View {
         // The work runs on the sync service's actor, not here.
         .task { await library.refreshStale(maxAge: 12 * 3600) }
         .environment(discovery)
+        .onChange(of: hidesAdult, initial: true) { userState.hidesAdult = hidesAdult }
+        // Which categories a provider calls adult is read from the catalog, again after each sync.
+        .task(id: [library.playlists.count, status.isAnySyncing ? 1 : 0]) {
+            let reader = CatalogReader(container: catalog.container)
+            for kind in [MediaKind.live, .movie, .series] {
+                let names = await reader.categoryNames(kind: kind, source: nil)
+                userState.adultCategoryNames[kind.rawValue] = Set(names.filter(TitleMetadata.isAdultCategory))
+            }
+        }
         .environment(simkl)
         .environment(simklSync)
         // What is finished goes to Simkl only while connected and switched on; the queue belongs to the

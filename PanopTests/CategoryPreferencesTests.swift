@@ -14,6 +14,30 @@ struct CategoryPreferencesTests {
     }
 
     @Test
+    func `adult categories are hidden with the person's own while the switch is on, and shown when it is off`() throws {
+        let store = try makeStore()
+        store.adultCategoryNames[MediaKind.movie.rawValue] = ["VOD - ADULT +18"]
+        store.setCategoryHidden(true, name: "Documentaries", kind: .movie)
+
+        #expect(store.hiddenCategories(of: .movie) == ["VOD - ADULT +18", "Documentaries"])
+        #expect(store.visibleCategories(["Action", "VOD - ADULT +18", "Documentaries"], kind: .movie) == ["Action"])
+
+        store.hidesAdult = false
+
+        #expect(store.hiddenCategories(of: .movie) == ["Documentaries"])
+        #expect(store.userHiddenCategories(of: .movie) == ["Documentaries"])
+    }
+
+    @Test
+    func `adult categories of one kind do not hide another kind's`() throws {
+        let store = try makeStore()
+        store.adultCategoryNames[MediaKind.live.rawValue] = ["FOR ADULTS"]
+
+        #expect(store.hiddenCategories(of: .live) == ["FOR ADULTS"])
+        #expect(store.hiddenCategories(of: .series).isEmpty)
+    }
+
+    @Test
     func `with no choices the provider's order stands`() throws {
         let store = try makeStore()
 

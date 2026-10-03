@@ -223,6 +223,8 @@ struct CategoryEditor: View {
     var body: some View {
         let order = userState.arranged(providerOrder, kind: kind)
         let hidden = userState.hiddenCategories(of: kind)
+        // Hidden as adult content, by the Settings switch: not the person's choice here.
+        let locked = userState.hidesAdult ? userState.adultCategories(of: kind) : []
         List {
             Section {
                 ForEach(Array(order.enumerated()), id: \.element) { index, name in
@@ -246,12 +248,16 @@ struct CategoryEditor: View {
                         } label: {
                             Image(systemName: hidden.contains(name) ? "eye.slash" : "eye")
                         }
+                        .disabled(locked.contains(name))
                         .accessibilityLabel(hidden.contains(name) ? "Show \(name)" : "Hide \(name)")
                     }
                     .buttonStyle(.borderless)
                 }
             } footer: {
-                Text("A hidden category is left out of the lists and of search, along with what is in it.")
+                Text(
+                    "A hidden category is left out of the lists and of search, along with what is in it. "
+                        + "Adult categories stay hidden while Hide adult content is on in Settings."
+                )
             }
             Section {
                 Button("Reset to the provider's order", role: .destructive) {

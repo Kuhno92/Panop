@@ -15,6 +15,7 @@ struct SettingsView: View {
     @Environment(UserStateStore.self) private var userState
     @AppStorage(DiscoveryModel.enabledKey) private var showsSuggestions = true
     @AppStorage(DiscoveryModel.trendingKey) private var showsTrending = true
+    @AppStorage(UserStateStore.hideAdultKey) private var hidesAdult = true
     @State private var confirmingForget = false
 
     var body: some View {
@@ -32,8 +33,11 @@ struct SettingsView: View {
                         LabeledContent("Hidden", value: userState.hidden.count.formatted())
                     }
                 }
+                Toggle("Hide adult content", isOn: $hidesAdult)
             } header: {
                 Text("Library")
+            } footer: {
+                Text("Leaves out categories a provider names as adult, from the lists, search and suggestions.")
             }
 
             StartupSection()

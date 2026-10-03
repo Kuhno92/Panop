@@ -43,6 +43,10 @@ final class UserStateStore {
     private(set) var revision = 0
     /// What was opened, and when, how often and under which series (see `UserStateStore+Taste`).
     var plays: [String: PlaySignal] = [:]
+    /// Whether categories named as adult content are left out (the Settings switch, on by default).
+    var hidesAdult = true
+    /// Which categories those are, by kind, read from the catalog by whoever owns it.
+    var adultCategoryNames: [String: Set<String>] = [:]
     var hiddenCategoryNames: [String: Set<String>] = [:]
     var categoryPositions: [String: [String: Int]] = [:]
     private var engines: [String: PlaybackEngineKind] = [:]
@@ -50,6 +54,7 @@ final class UserStateStore {
     /// keeps another place (a Simkl account) in step.
     @ObservationIgnored var onFinished: ((_ key: String, _ date: Date) -> Void)?
 
+    static let hideAdultKey = "hideAdultContent"
     static let recentLimit = 50
     /// Played-but-not-favourite rows kept on disk, so recents can reach back past what shows.
     /// Beyond it the oldest go.

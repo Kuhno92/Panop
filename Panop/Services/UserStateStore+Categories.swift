@@ -7,8 +7,21 @@ import SwiftData
 /// The provider's own order is the starting point, and stays the order for anything the person
 /// has not placed. What they have placed comes first, in the order they chose.
 extension UserStateStore {
+    /// What is left out of the lists: the categories the person hid and, while adult content is
+    /// hidden, the ones named as adult. Everything that filters by category reads this.
     func hiddenCategories(of kind: MediaKind) -> Set<String> {
+        guard hidesAdult else { return userHiddenCategories(of: kind) }
+        return userHiddenCategories(of: kind).union(adultCategories(of: kind))
+    }
+
+    /// Only the categories the person chose to hide, for the screen where they manage them.
+    func userHiddenCategories(of kind: MediaKind) -> Set<String> {
         hiddenCategoryNames[kind.rawValue] ?? []
+    }
+
+    /// The categories a provider names as adult content, once read from the catalog.
+    func adultCategories(of kind: MediaKind) -> Set<String> {
+        adultCategoryNames[kind.rawValue] ?? []
     }
 
     /// Every category, the person's order first and then the provider's. Hidden ones included,

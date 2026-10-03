@@ -612,6 +612,7 @@ Features real users expect that the brief did not name. All *(surfaced)*.
       (pausing and rewinding live).
 - [x] **Multiple playlists** and switching between them. Several sources can be added, and Live TV shows all of them or one chosen source (M2); each can be refreshed or deleted from Playlists.
 - [ ] **Profiles**. Shared family devices, especially Apple TV.
+- [x] **Hide adult content** *(surfaced)*: a Settings switch, on by default, leaves categories a provider names as adult out of the lists, search and suggestions. A category the person hid themselves stays their own choice. **Not done:** a PIN to turn it off, which is the parental-controls item below.
 - [ ] **Parental controls**. A PIN cannot ride iCloud Keychain to tvOS, so it goes through the
       CloudKit container.
 - [ ] **Subtitles**. Plain text from LumeEngine is drawn now (M2); what is left is styling, positioning and bitmap subtitles. LumeEngine returns plain text only, with no positioning or styling and no
