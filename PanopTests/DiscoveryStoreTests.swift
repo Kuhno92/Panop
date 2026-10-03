@@ -244,6 +244,7 @@ struct RailHeadingTests {
         #expect(title(.curated(.series, "topRated")) == "Top Rated Series on Simkl")
         #expect(title(.curated(.movie, "justOnDVD")) == "Latest DVD Releases on Simkl")
         #expect(title(.curated(.series, "airing")) == "Currently Airing Series on Simkl")
+        #expect(title(.curated(.movie, "custom.11"), "Best 90s sci-fi") == "Your Simkl list: Best 90s sci-fi")
     }
 
     @Test

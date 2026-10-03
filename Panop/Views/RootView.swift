@@ -37,6 +37,8 @@ struct RootView: View {
     @State private var parental = ParentalControls.live()
     @State private var simklSync: SimklSync
     @State private var simklLibrary: SimklLibrary
+    private let simklClient: SimklClient
+    @AppStorage(SimklAccountListsStore.customKey) private var showsCustomLists = true
     @AppStorage(SimklSync.enabledKey) private var sendsWatched = true
     @AppStorage(DiscoveryModel.enabledKey) private var showsSuggestions = true
     @State private var profiles = ProfileStore()
@@ -55,6 +57,7 @@ struct RootView: View {
             store: SimklConfig.tokenStore
         )
         let client = SimklClient(transport: transport, app: SimklConfig.app) { await account.accessToken() }
+        simklClient = client
         _simkl = State(initialValue: account)
         _simklSync = State(initialValue: SimklSync(send: { try await client.addHistory($0) }))
         _simklLibrary = State(initialValue: SimklLibrary(
@@ -156,15 +159,26 @@ struct RootView: View {
         .environment(simklSync)
         // What is finished goes to Simkl only while connected and switched on; the queue belongs to the
         // account it was made for, so signing out drops it.
-        .task(id: [sendsWatched, simkl.isConnected]) {
+        .task(id: [sendsWatched, simkl.isConnected, showsTrending, showsSuggestions, showsCustomLists]) {
             userState.onFinished = { [simklSync] key, date in simklSync.finished(key, at: date) }
             simklSync.isEnabled = sendsWatched && simkl.isConnected
             if simkl.isConnected {
                 simklSync.flushIfNeeded()
                 await simklLibrary.refresh()
+                // Simkl's real rankings and the person's own lists. A refused login signs them out.
+                do {
+                    try await discovery.refreshAccountLists(
+                        client: simklClient,
+                        wantsRanked: showsTrending && showsSuggestions,
+                        wantsCustom: showsCustomLists && showsSuggestions
+                    )
+                } catch SimklError.unauthorized {
+                    await simkl.signOut()
+                } catch {}
             } else {
                 simklSync.discardQueue()
                 simklLibrary.clear()
+                await discovery.clearAccountLists()
             }
         }
         .onChange(of: simklLibrary.items, initial: true) { discovery.setSimklLists(simklLibrary.items) }

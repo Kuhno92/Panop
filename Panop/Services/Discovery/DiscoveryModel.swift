@@ -25,7 +25,15 @@ final class DiscoveryModel {
     /// Where Simkl lists a title, by `linkKey`, for the lists whose terms ask for a link back.
     private(set) var trendingLinks: [String: URL] = [:]
     @ObservationIgnored private var trending: [TrendingEntry] = []
-    @ObservationIgnored private var curated: [CuratedList] = []
+    /// The lists made from Simkl's public files, and what a connected account adds to them.
+    @ObservationIgnored private var baseCurated: [CuratedList] = []
+    @ObservationIgnored private var rankedLists: [CuratedList] = []
+    @ObservationIgnored private var customLists: [CuratedList] = []
+    @ObservationIgnored private var accountStore: SimklAccountListsStore?
+    /// Where the account's lists are kept. A property so a test can keep them out of the real folder.
+    @ObservationIgnored var accountCacheURL: URL? = SimklAccountListsStore.defaultCacheURL
+    /// The plan of the connected account, once known: custom lists are for PRO and VIP.
+    private(set) var simklPlan: SimklPlan?
     /// The ids of the lists worth a place on Home (`Rail.id`), the rest being for the Movies and Series screens.
     private(set) var highlighted: Set<String> = []
     @ObservationIgnored private var planned: [TrendingEntry] = []
@@ -93,23 +101,59 @@ final class DiscoveryModel {
     }
 
     private func setTrending(_ entries: [TrendingEntry], lists: [CuratedList]) {
-        guard entries != trending || lists != curated else { return }
+        guard entries != trending || lists != baseCurated else { return }
         trending = entries
-        curated = lists
+        baseCurated = lists
+        applyCurated()
+    }
+
+    /// The lists the rails are made from: Simkl's public ones, with the rankings of a connected account in
+    /// place of the same lists made from the files, and the account's own lists after them.
+    private func applyCurated() {
+        let lists = SimklAccountLists.merging(baseCurated, with: rankedLists) + customLists
         // Every title that came from Simkl links back to its page there, wherever it is shown.
         trendingLinks = Dictionary(
-            (entries + lists.flatMap(\.entries)).compactMap { entry in
+            (trending + lists.flatMap(\.entries)).compactMap { entry in
                 entry.link.flatMap(URL.init(string:)).map { (Self.linkKey(kind: entry.kind, tmdbID: entry.tmdbID), $0) }
             },
             uniquingKeysWith: { first, _ in first }
         )
         highlighted = Set(lists.filter(\.isHighlight).map { "curated.\($0.kind.rawValue).\($0.id)" })
         if var context = lastContext {
-            context.trending = entries
+            context.trending = trending
             context.curated = lists
             lastContext = context
             scheduleBuild()
         }
+    }
+
+    /// Fetches what the connected account adds, if it is out of date, and uses it. The rankings follow the
+    /// same switch as the other Simkl lists; the account's own lists have a switch of their own.
+    func refreshAccountLists(client: SimklClient, wantsRanked: Bool, wantsCustom: Bool) async throws {
+        let store = accountStore ?? SimklAccountListsStore(cacheURL: accountCacheURL)
+        accountStore = store
+        if let saved = await store.cached() {
+            use(saved, wantsRanked: wantsRanked, wantsCustom: wantsCustom)
+        }
+        if let fresh = try await store.refresh(client: client, wantsRanked: wantsRanked, wantsCustom: wantsCustom) {
+            use(fresh, wantsRanked: wantsRanked, wantsCustom: wantsCustom)
+        }
+    }
+
+    /// Drops what an account added, for when it is disconnected.
+    func clearAccountLists() async {
+        await (accountStore ?? SimklAccountListsStore(cacheURL: accountCacheURL)).clear()
+        rankedLists = []
+        customLists = []
+        simklPlan = nil
+        applyCurated()
+    }
+
+    private func use(_ snapshot: AccountListsSnapshot, wantsRanked: Bool, wantsCustom: Bool) {
+        rankedLists = wantsRanked ? snapshot.ranked : []
+        customLists = wantsCustom ? snapshot.custom : []
+        simklPlan = snapshot.plan
+        applyCurated()
     }
 
     private(set) var rows: [String: CatalogRow] = [:]
@@ -170,7 +214,7 @@ final class DiscoveryModel {
     func update(_ context: DiscoveryContext) {
         var context = context
         context.trending = trending
-        context.curated = curated
+        context.curated = SimklAccountLists.merging(baseCurated, with: rankedLists) + customLists
         context.planned = planned
         context.watching = watching
         context.finishedElsewhere = finishedElsewhere

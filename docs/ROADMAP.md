@@ -577,6 +577,14 @@ The brief called performance a key concept. For IPTV this concentrates in one nu
       recorded on the account in batches that survive being offline, the person's Plan to Watch list and
       Next up as rails. **Dormant without the client id** (set now). The public files are tested live; the
       account parts (recording, the lists, Next up) have run against stubs only.
+      **With an account connected**, the series network, film genre and decade rows become Simkl's own
+      rankings (its genre-browse endpoints, sorted by rank: a few hundred titles each instead of the top
+      500 trending), for Netflix, HBO, Apple TV and Prime Video (the networks Simkl documents a name for;
+      Disney+ stays as made from the files, since an unknown name would silently give the unfiltered list).
+      About 40 requests a day. **And the person's own custom lists** (PRO or VIP accounts only: Simkl returns
+      a placeholder to a free account, which the app reads as "no lists" and says so in Settings) each become
+      a rail on Home named as they named it, refreshed every six hours. Neither has run against a real
+      account: built from Simkl's documentation and tested against stubbed replies.
       Free below $150 a month of revenue, a licence above (see THIRD-PARTY-NOTICES.md); all of it is in
       `PanopSimkl`, which can be dropped.
 - [ ] **Enable CloudKit mirroring** *(asked for, as "iCloud sync")* (ADR 0009). **Built, not yet run against

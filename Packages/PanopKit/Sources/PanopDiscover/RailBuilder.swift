@@ -33,7 +33,7 @@ public enum RailBuilder {
             rails.append(Rail(kind: kind, keys: fresh.map(\.key), subject: subject))
         }
         func addCurated(_ list: CuratedList) {
-            add(.curated(list.kind, list.id), matching(list.entries, in: pool), shared: true)
+            add(.curated(list.kind, list.id), matching(list.entries, in: pool), subject: list.title, shared: true)
         }
 
         // A show being followed is one the person has started, so it is drawn from the pool that

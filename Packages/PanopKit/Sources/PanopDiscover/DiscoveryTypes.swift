@@ -88,13 +88,23 @@ public struct CuratedList: Sendable, Equatable, Codable {
     public var kind: MediaKind
     /// Shown near the top, on Home, and not only on the screen of its kind.
     public var isHighlight: Bool
+    /// What the list is called, for a list a person named themselves. Lists with an id of their own wording
+    /// leave it empty.
+    public var title: String?
     /// Best first. The scores only keep that order.
     public var entries: [TrendingEntry]
 
-    public init(id: String, kind: MediaKind, isHighlight: Bool = false, entries: [TrendingEntry]) {
+    public init(
+        id: String,
+        kind: MediaKind,
+        isHighlight: Bool = false,
+        title: String? = nil,
+        entries: [TrendingEntry]
+    ) {
         self.id = id
         self.kind = kind
         self.isHighlight = isHighlight
+        self.title = title
         self.entries = entries
     }
 }

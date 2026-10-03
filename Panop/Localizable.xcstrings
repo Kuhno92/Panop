@@ -810,6 +810,16 @@
         }
       }
     },
+    "Custom lists are for Simkl PRO and VIP accounts.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eigene Listen gibt es nur für Simkl-PRO- und VIP-Konten."
+          }
+        }
+      }
+    },
     "Cyan": {
       "localizations": {
         "de": {
@@ -2496,6 +2506,16 @@
         }
       }
     },
+    "Show my Simkl lists": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Meine Simkl-Listen anzeigen"
+          }
+        }
+      }
+    },
     "Show suggestions": {
       "localizations": {
         "de": {
@@ -3552,6 +3572,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Gelb"
+          }
+        }
+      }
+    },
+    "Your Simkl list: %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deine Simkl-Liste: %@"
           }
         }
       }

@@ -5,6 +5,12 @@ import SwiftUI
 
 /// The heading of a rail, in words.
 nonisolated enum RailHeading {
+    /// The name of one of the person's own lists, or nil for a list that is not one.
+    private static func customTitle(_ rail: Rail, _ id: String) -> String? {
+        guard id.hasPrefix("custom.") else { return nil }
+        return String(localized: "Your Simkl list: \(rail.subject ?? "")")
+    }
+
     /// A list made from Simkl's. Each names Simkl, as its terms ask of anything shown from its data.
     private static func curatedTitle(_ kind: MediaKind, _ id: String) -> String {
         switch id {
@@ -88,7 +94,8 @@ nonisolated enum RailHeading {
         case .onYourList:
             String(localized: "On your Simkl list")
         case let .curated(kind, id):
-            curatedTitle(kind, id)
+            // A list the person named themselves is called what they called it.
+            customTitle(rail, id) ?? curatedTitle(kind, id)
         case let .trending(kind):
             forKind(
                 kind,

@@ -8,6 +8,8 @@ public enum SimklError: Error, Equatable {
     case rateLimited(retryAfter: TimeInterval)
     case status(Int)
     case undecodable
+    /// A free account asked for something that is for PRO and VIP.
+    case premiumOnly
 }
 
 /// A film or episode the person finished, to be recorded on their Simkl account.
@@ -123,6 +125,11 @@ public struct SimklClient: Sendable {
     }
 
     // MARK: - Wire
+
+    /// A plain read of an authenticated endpoint, for the extensions of this client.
+    func get(_ path: String, query: [URLQueryItem] = []) async throws -> Data {
+        try await call(path, query: query)
+    }
 
     private func call(
         _ path: String,

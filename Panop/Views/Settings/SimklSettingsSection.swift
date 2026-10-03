@@ -6,7 +6,9 @@ import SwiftUI
 /// television needs no typing.
 struct SimklSettingsSection: View {
     @Environment(SimklAccount.self) private var account
+    @Environment(DiscoveryModel.self) private var discovery
     @AppStorage(SimklSync.enabledKey) private var sendsWatched = true
+    @AppStorage(SimklAccountListsStore.customKey) private var showsCustomLists = true
 
     var body: some View {
         Section {
@@ -18,6 +20,12 @@ struct SimklSettingsSection: View {
             case .connected:
                 LabeledContent("Simkl", value: "Connected")
                 Toggle("Send what I finish watching", isOn: $sendsWatched)
+                Toggle("Show my Simkl lists", isOn: $showsCustomLists)
+                if showsCustomLists, discovery.simklPlan == .free {
+                    Text("Custom lists are for Simkl PRO and VIP accounts.")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                }
                 Button("Disconnect", role: .destructive) { Task { await account.signOut() } }
             case let .failed(failure):
                 Text(failure == .codeExpired ? "The code ran out before it was approved." :
