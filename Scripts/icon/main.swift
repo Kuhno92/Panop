@@ -21,13 +21,25 @@ func color(_ hex: UInt32, _ alpha: CGFloat = 1) -> CGColor {
     )
 }
 
+/// Two looks for the same idea. `classic` is the plain outline; `modern` has depth, colour and light.
+/// Chosen with PANOP_ICON_STYLE, and `modern` unless told otherwise.
+let useClassic = ProcessInfo.processInfo.environment["PANOP_ICON_STYLE"] == "classic"
+
 /// The canvas is always 1024 points square; sizes are scaled when written.
 func draw(_ layer: Layer, in ctx: CGContext) {
     if layer == .background || layer == .full {
-        drawBackground(in: ctx)
+        if useClassic {
+            drawBackground(in: ctx)
+        } else {
+            drawModernBackground(in: ctx)
+        }
     }
     if layer == .eye || layer == .full {
-        drawEye(in: ctx)
+        if useClassic {
+            drawEye(in: ctx)
+        } else {
+            drawModernEye(in: ctx)
+        }
     }
 }
 

@@ -4,8 +4,10 @@
 #
 #   Scripts/make-app-icon.sh
 #
-# The drawing is Scripts/icon/make-icon.swift: change it there and run this again. The Contents.json
-# files in the catalog are written by hand and name the PNGs this script writes.
+# The drawing is Scripts/icon/main.swift: change it there and run this again. The Contents.json
+# files in the catalog are written by hand and name the images this script writes.
+#
+# The look is the modern one; PANOP_ICON_STYLE=classic draws the plain outline version instead.
 
 set -euo pipefail
 
@@ -14,7 +16,7 @@ CATALOG="$ROOT/Panop/Assets.xcassets"
 TOOL="$(mktemp -t panop-make-icon)"
 trap 'rm -f "$TOOL"' EXIT
 
-swiftc -O "$ROOT/Scripts/icon/make-icon.swift" -o "$TOOL"
+swiftc -O "$ROOT/Scripts/icon/main.swift" "$ROOT/Scripts/icon/modern.swift" -o "$TOOL"
 
 make() { "$TOOL" "$@"; }
 
