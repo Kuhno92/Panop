@@ -113,4 +113,22 @@ struct GuideNowStoreTests {
         #expect(!store.needs(playlist: "p", epgKey: nil))
         #expect(!store.needs(playlist: "p", epgKey: ""))
     }
+
+    @Test
+    func `the programme after the one on now is known too, and goes with it`() async throws {
+        let catalog = try OnDiskCatalog()
+        defer { catalog.cleanUp() }
+        try await populate(catalog)
+        let store = GuideNowStore()
+        store.request(playlist: "p", epgKey: "news", in: catalog.container)
+        #expect(await settle { store.current(playlist: "p", epgKey: "news") != nil })
+
+        #expect(store.next(playlist: "p", epgKey: "news")?.title == "Weather")
+        #expect(store.next(playlist: "p", epgKey: "nobody") == nil)
+
+        // Once what was on has ended the answer has run out, next with it.
+        let after = Date.now.addingTimeInterval(700)
+        #expect(store.next(playlist: "p", epgKey: "news", now: after) == nil)
+        #expect(store.needs(playlist: "p", epgKey: "news", now: after))
+    }
 }

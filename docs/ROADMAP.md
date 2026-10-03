@@ -592,14 +592,22 @@ The brief called performance a key concept. For IPTV this concentrates in one nu
 
 Features real users expect that the brief did not name. All *(surfaced)*.
 
-- [ ] **EPG / TV guide UI**. A player without a guide is half an app. **First part done**: a Live
-      TV row says "Now: <programme>" for a channel the guide covers, and its menu has
-      "Programme Guide", a schedule of what is on and what follows (up to 60 programmes, the one
-      on air marked and with its progress), with a Watch button. Each is one bounded read on the
-      (source, channel, start) index (4 lookup tests; UI test on iOS; tvOS runs unchanged).
-      **Not done:** a time grid across channels, a "next" line on the row, the line refreshing
-      as the hour turns (it is read when the row appears), the schedule on tvOS (the menu is
-      there, but no UI test drives it), and a reminder or record action.
+- [x] **EPG / TV guide UI** *(asked for)*. A Live TV row says what is on now **and what comes next**
+      (two lines that change as the hour turns, read again once an answer has run out). Its menu has
+      "Programme Guide", one channel's schedule, with a Watch button. And **TV Guide** (a button in the
+      Live TV toolbar, the first row on Apple TV) opens a **time grid for the channels of the current
+      list**: the same source, category, search and favourites as the list, a channel down the side that
+      stays in view, time along the top that stays in view, each programme as wide as it is long, a red
+      line for now, what is on highlighted with its progress, and what is coming up beside it for the next
+      ten hours. Tapping a programme opens it in full with a way to watch the channel; tapping a channel
+      plays it. Channels are read as they scroll into view, in batches, off the main thread, one bounded read
+      each on the (source, channel, start) index. A programme's title stays clear of the channel column
+      while its start is scrolled under it. On Apple TV the grid takes the whole screen and Menu closes it.
+      Tested: the layout arithmetic, the batching model, the lookups, UI tests on iOS and tvOS (the grid,
+      a programme's details, playing from it, the next line, and the channel schedule from the row menu on
+      Apple TV). **Not done:** a day picker (the grid shows from an hour ago to ten hours ahead), jumping to
+      a time, a filter for channels that have a guide, and a reminder or record action. **Not seen on a
+      real Apple TV or with a real provider's guide.**
 - [ ] **Catch-up and timeshift**. Xtream supports it; the M3U attributes are already parsed.
       **Catch-up for Xtream is built**: a channel the panel archives (`tv_archive`) lists the
       programmes that aired within its window under "Earlier" in its guide, and tapping one plays

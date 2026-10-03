@@ -91,6 +91,59 @@ enum GuideLookup {
         return ((try? context.fetch(earlier)) ?? []).filter { $0.stop > now }.sorted { $0.start < $1.start }
     }
 
+    /// What is on at `now` and what comes straight after it, in two small reads on the channel's index.
+    nonisolated static func nowAndNext(
+        playlist: String,
+        epgKey: String,
+        at now: Date,
+        in context: ModelContext
+    ) -> (now: ProgrammeSnapshot?, next: ProgrammeSnapshot?) {
+        let current = onNowAll(playlist: playlist, key: epgKey, at: now, in: context).first
+        // After the one on air, or the first to start if nothing is.
+        let boundary = current?.stop ?? now
+        var following = FetchDescriptor<EPGProgrammeRecord>(
+            predicate: #Predicate { $0.playlist == playlist && $0.channelKey == epgKey && $0.start >= boundary },
+            sortBy: [SortDescriptor(\.start)]
+        )
+        following.fetchLimit = 1
+        let next = (try? context.fetch(following))?.first
+        return (current.map(snapshot), next.map(snapshot))
+    }
+
+    /// The programmes of one channel that overlap `window`, in time order: the few that began before it and
+    /// are still running, then those that start inside it. Two reads that each walk the channel's index from
+    /// a point, as `upcoming` does, so the guide's size does not matter.
+    nonisolated static func programmes(
+        playlist: String,
+        epgKey: String,
+        in window: ClosedRange<Date>,
+        limit: Int,
+        context: ModelContext
+    ) -> [ProgrammeSnapshot] {
+        let begin = window.lowerBound
+        let end = window.upperBound
+        let running = onNowAll(playlist: playlist, key: epgKey, at: begin, in: context)
+        var inside = FetchDescriptor<EPGProgrammeRecord>(
+            predicate: #Predicate {
+                $0.playlist == playlist && $0.channelKey == epgKey && $0.start > begin && $0.start < end
+            },
+            sortBy: [SortDescriptor(\.start)]
+        )
+        inside.fetchLimit = limit
+        let later = (try? context.fetch(inside)) ?? []
+        return (running + later).prefix(limit).map(snapshot)
+    }
+
+    nonisolated static func snapshot(_ record: EPGProgrammeRecord) -> ProgrammeSnapshot {
+        ProgrammeSnapshot(
+            start: record.start,
+            stop: record.stop,
+            title: record.title,
+            subtitle: record.subtitle,
+            details: record.details
+        )
+    }
+
     /// The one programme on now for a channel, or nil.
     nonisolated static func onNow(
         playlist: String,

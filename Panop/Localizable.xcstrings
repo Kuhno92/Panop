@@ -122,6 +122,22 @@
         }
       }
     },
+    "%@, %@, %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@, %2$@, %3$@"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "%1$@, %2$@, %3$@"
+          }
+        }
+      }
+    },
     "%lld h %lld min": {
       "localizations": {
         "de": {
@@ -490,6 +506,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Sender"
+          }
+        }
+      }
+    },
+    "Channel schedule": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Senderprogramm"
           }
         }
       }
@@ -1410,6 +1436,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Als Nächstes auf Simkl"
+          }
+        }
+      }
+    },
+    "Next: %@ · %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Danach: %1$@ · %2$@"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Next: %1$@ · %2$@"
           }
         }
       }
@@ -2424,6 +2466,16 @@
         }
       }
     },
+    "TV Guide": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "TV-Programm"
+          }
+        }
+      }
+    },
     "TV guide address (optional)": {
       "localizations": {
         "de": {
@@ -3060,6 +3112,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Von Anfang an ansehen"
+          }
+        }
+      }
+    },
+    "Watch now": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jetzt ansehen"
           }
         }
       }

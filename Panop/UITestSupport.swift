@@ -130,21 +130,32 @@ enum UITestMode {
                     .m3uFile(name: "Test Source", fileURL: file),
                     includeVOD: !liveOnly
                 )
-                // A guide for 3sat (the third channel, `c2`), so its row can say what is on.
+                // A guide for a few channels, so a row can say what is on and the grid has something to draw.
+                // 3sat (`c2`) is the one the tests look at most.
                 let now = Date.now
-                _ = try await services.catalogStore.upsertProgrammes([
+                func programme(
+                    _ channel: String,
+                    _ title: String,
+                    from start: Double,
+                    to stop: Double
+                ) -> EPGProgramme {
                     EPGProgramme(
-                        channelID: "c2",
-                        start: now.addingTimeInterval(-1800),
-                        stop: now.addingTimeInterval(1800),
-                        title: "Seeded News"
-                    ),
-                    EPGProgramme(
-                        channelID: "c2",
-                        start: now.addingTimeInterval(1800),
-                        stop: now.addingTimeInterval(7200),
-                        title: "Seeded Film"
+                        channelID: channel,
+                        start: now.addingTimeInterval(start * 60),
+                        stop: now.addingTimeInterval(stop * 60),
+                        title: title
                     )
+                }
+                _ = try await services.catalogStore.upsertProgrammes([
+                    programme("c2", "Seeded News", from: -30, to: 30),
+                    programme("c2", "Seeded Film", from: 30, to: 120),
+                    programme("c2", "Seeded Late Show", from: 120, to: 180),
+                    programme("c0", "Morning Magazine", from: -60, to: 30),
+                    programme("c0", "Quiz Night", from: 30, to: 90),
+                    programme("c1", "Sunrise Talk", from: -15, to: 45),
+                    programme("c1", "Crime Series", from: 45, to: 135),
+                    programme("c3", "Art Documentary", from: -90, to: 60),
+                    programme("c3", "Opera Evening", from: 60, to: 210)
                 ], playlist: playlist.id)
             } catch {
                 assertionFailure("UI test seed failed: \(error)")

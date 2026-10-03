@@ -17,6 +17,7 @@ struct LiveTVView: View {
     @State private var group: String?
     @State private var showingAdd = false
     @State private var playing: PlaybackTarget?
+    @State private var showingGuide = false
 
     private var selectedSource: PlaylistSummary? {
         library.playlists.first { $0.id == storedSource }
@@ -104,6 +105,7 @@ struct LiveTVView: View {
             },
             onPlayTarget: { playing = $0 },
             onAdd: { showingAdd = true },
+            onShowGuide: { showingGuide = true },
             onRetry: { ids in
                 Task {
                     for id in ids {
@@ -124,6 +126,9 @@ struct LiveTVView: View {
         .modifier(ChannelSearch(text: $search, isOffered: !library.playlists.isEmpty))
         .toolbar {
             if !library.playlists.isEmpty {
+                ToolbarItem {
+                    Button("TV Guide", systemImage: "calendar") { showingGuide = true }
+                }
                 ToolbarItem { modeMenu }
                 ToolbarItem { orderMenu }
             }
@@ -136,6 +141,13 @@ struct LiveTVView: View {
         .sheet(isPresented: $showingAdd) {
             NavigationStack { AddPlaylistView() }
         }
+        .modifier(GuidePresentation(isPresented: $showingGuide) {
+            GuideGridView(spec: spec, narrow: {
+                LiveListNarrowing.rows(
+                    $0, mode: mode, sourceID: selectedSource?.id, search: search, userState: userState
+                )
+            })
+        })
         .modifier(PlayerPresentation(target: $playing))
     }
 
@@ -179,6 +191,38 @@ struct LiveTVView: View {
     }
 }
 
+/// What a Live TV list shows out of the rows read for it. All channels is the list as read. Favourites and
+/// recents were read by entry id alone, so they are narrowed by playlist, the chosen source and the search,
+/// and recents are put in the order they were watched. The guide grid uses the same, so it shows the channels
+/// the list does.
+@MainActor
+enum LiveListNarrowing {
+    static func rows(
+        _ rows: [CatalogRow],
+        mode: LiveListMode,
+        sourceID: String?,
+        search: String,
+        userState: UserStateStore
+    ) -> [CatalogRow] {
+        func matches(_ channel: CatalogRow) -> Bool {
+            if let sourceID, channel.playlist != sourceID {
+                return false
+            }
+            let term = CatalogEntryRecord.nameKey(for: search.trimmingCharacters(in: .whitespacesAndNewlines))
+            return term.isEmpty || channel.nameKey.contains(term)
+        }
+        switch mode {
+        case .all:
+            return rows
+        case .favourites:
+            return rows.filter { matches($0) && userState.isFavorite($0.id) }
+        case .recents:
+            let byKey = Dictionary(rows.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
+            return userState.recents.compactMap { byKey[$0] }.filter { matches($0) }
+        }
+    }
+}
+
 /// The list itself. Its `@Query` is rebuilt whenever the descriptor changes, which
 /// is how the source, the search and the growing page reach the database.
 private struct LiveChannelList: View {
@@ -201,6 +245,7 @@ private struct LiveChannelList: View {
     let onPlay: (CatalogRow) -> Void
     let onPlayTarget: (PlaybackTarget) -> Void
     let onAdd: () -> Void
+    let onShowGuide: () -> Void
     let onRetry: ([String]) -> Void
 
     init(
@@ -218,6 +263,7 @@ private struct LiveChannelList: View {
         onPlay: @escaping (CatalogRow) -> Void,
         onPlayTarget: @escaping (PlaybackTarget) -> Void,
         onAdd: @escaping () -> Void,
+        onShowGuide: @escaping () -> Void,
         onRetry: @escaping ([String]) -> Void
     ) {
         self.spec = spec
@@ -234,6 +280,7 @@ private struct LiveChannelList: View {
         self.onPlay = onPlay
         self.onPlayTarget = onPlayTarget
         self.onAdd = onAdd
+        self.onShowGuide = onShowGuide
         self.onRetry = onRetry
     }
 
@@ -242,6 +289,7 @@ private struct LiveChannelList: View {
             #if os(tvOS)
                 // Apple TV shows no toolbar here, so the filter is the first row instead.
                 if emptyState != .noPlaylists {
+                    Button("TV Guide", systemImage: "calendar", action: onShowGuide)
                     Picker("Show", selection: $modeRaw) {
                         ForEach(LiveListMode.allCases) { mode in
                             Text(mode.title).tag(mode.rawValue)
@@ -312,27 +360,8 @@ private struct LiveChannelList: View {
         }
     }
 
-    /// What the list shows. All channels is the list as read. Favourites and recents were read by
-    /// entry id alone, so they are narrowed here by playlist, the chosen source and the search,
-    /// and recents are put in the order they were watched.
     private var shown: [CatalogRow] {
-        switch mode {
-        case .all:
-            return model.rows
-        case .favourites:
-            return model.rows.filter { matches($0) && userState.isFavorite($0.id) }
-        case .recents:
-            let byKey = Dictionary(model.rows.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
-            return userState.recents.compactMap { byKey[$0] }.filter { matches($0) }
-        }
-    }
-
-    private func matches(_ channel: CatalogRow) -> Bool {
-        if let sourceID, channel.playlist != sourceID {
-            return false
-        }
-        let term = CatalogEntryRecord.nameKey(for: search.trimmingCharacters(in: .whitespacesAndNewlines))
-        return term.isEmpty || channel.nameKey.contains(term)
+        LiveListNarrowing.rows(model.rows, mode: mode, sourceID: sourceID, search: search, userState: userState)
     }
 
     private func favoriteButton(_ key: String) -> some View {
@@ -517,6 +546,21 @@ private struct ChannelSearch: ViewModifier {
             }
         #else
             content.searchable(text: $text, prompt: "Search channels")
+        #endif
+    }
+}
+
+/// Pushes the guide on a phone, tablet or Mac. On Apple TV it takes the whole screen instead: the tab bar
+/// and a large title would sit over a grid that pins its time bar to the top, and Menu closes it.
+private struct GuidePresentation<Guide: View>: ViewModifier {
+    @Binding var isPresented: Bool
+    @ViewBuilder let guide: () -> Guide
+
+    func body(content: Content) -> some View {
+        #if os(tvOS)
+            content.fullScreenCover(isPresented: $isPresented) { guide() }
+        #else
+            content.navigationDestination(isPresented: $isPresented) { guide() }
         #endif
     }
 }

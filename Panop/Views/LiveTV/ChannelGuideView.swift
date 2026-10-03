@@ -3,8 +3,8 @@ import PanopXtream
 import SwiftData
 import SwiftUI
 
-/// The line under a channel's name saying what is on now. Nothing at all for a channel the
-/// guide does not cover, so the row stays as it was.
+/// The two lines under a channel's name: what is on now, and what comes next. Nothing at all for a
+/// channel with no guide key, so its row stays as it was.
 struct NowOnAirLine: View {
     let channel: CatalogRow
 
@@ -12,17 +12,34 @@ struct NowOnAirLine: View {
     @Environment(\.modelContext) private var catalog
 
     var body: some View {
-        // Answered from memory. The programme is read in the background, and the line fills in
-        // when it arrives; until then it holds its height, so the row does not move.
-        let current = store.current(playlist: channel.playlist, epgKey: channel.epgKey)
-        Text(current.map { "Now: \($0.title)" } ?? " ")
-            .font(.caption)
-            .foregroundStyle(.secondary)
-            .lineLimit(1)
+        if channel.epgKey?.isEmpty == false {
+            // Answered from memory. The programmes are read in the background and the lines fill in when
+            // they arrive; until then they hold their height, so the row does not move. Looked at
+            // again every minute, so the line changes as a programme ends and the next begins, and
+            // reads again once what was known has run out.
+            TimelineView(.everyMinute) { timeline in
+                lines(at: timeline.date)
+                    .onChange(of: timeline.date) {
+                        store.request(playlist: channel.playlist, epgKey: channel.epgKey, in: catalog.container)
+                    }
+            }
             .task(id: channel.id) {
                 store.request(playlist: channel.playlist, epgKey: channel.epgKey, in: catalog.container)
             }
             .onDisappear { store.withdraw(playlist: channel.playlist, epgKey: channel.epgKey) }
+        }
+    }
+
+    private func lines(at moment: Date) -> some View {
+        let current = store.current(playlist: channel.playlist, epgKey: channel.epgKey, now: moment)
+        let next = store.next(playlist: channel.playlist, epgKey: channel.epgKey, now: moment)
+        return VStack(alignment: .leading, spacing: 1) {
+            Text(current.map { "Now: \($0.title)" } ?? " ")
+            Text(next.map { "Next: \($0.start.formatted(date: .omitted, time: .shortened)) · \($0.title)" } ?? " ")
+        }
+        .font(.caption)
+        .foregroundStyle(.secondary)
+        .lineLimit(1)
     }
 }
 

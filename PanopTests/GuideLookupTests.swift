@@ -86,6 +86,72 @@ struct GuideLookupTests {
         #expect(show.fraction(at: now.addingTimeInterval(7200)) == 1)
         #expect(ProgrammeSnapshot(start: now, stop: now, title: "Zero").fraction(at: now) == 0)
     }
+
+    @Test
+    func `now and next are the one on air and the one after it`() async throws {
+        let catalog = try OnDiskCatalog()
+        defer { catalog.cleanUp() }
+        try await populate(catalog)
+        let context = ModelContext(catalog.container)
+
+        let news = GuideLookup.nowAndNext(playlist: "p", epgKey: "news", at: now, in: context)
+        #expect(news.now?.title == "Headlines")
+        #expect(news.next?.title == "Weather")
+
+        // Between programmes: nothing on, and the next to start is next.
+        let gap = GuideLookup.nowAndNext(
+            playlist: "p",
+            epgKey: "news",
+            at: now.addingTimeInterval(-45 * 60),
+            in: context
+        )
+        #expect(gap.now?.title == "Earlier")
+        #expect(gap.next?.title == "Headlines")
+
+        // The last one has nothing after it, and a channel with no guide has neither.
+        let last = GuideLookup.nowAndNext(
+            playlist: "p",
+            epgKey: "news",
+            at: now.addingTimeInterval(100 * 60),
+            in: context
+        )
+        #expect(last.now?.title == "Film")
+        #expect(last.next == nil)
+        let none = GuideLookup.nowAndNext(playlist: "p", epgKey: "nobody", at: now, in: context)
+        #expect(none.now == nil && none.next == nil)
+    }
+
+    @Test
+    func `a window holds what is running at its start and what starts inside it, and no more`() async throws {
+        let catalog = try OnDiskCatalog()
+        defer { catalog.cleanUp() }
+        try await populate(catalog)
+        let context = ModelContext(catalog.container)
+        let window = now.addingTimeInterval(-10 * 60) ... now.addingTimeInterval(50 * 60)
+
+        let found = GuideLookup.programmes(playlist: "p", epgKey: "news", in: window, limit: 50, context: context)
+
+        // Headlines began before the window and runs into it; Film begins after it ends.
+        #expect(found.map(\.title) == ["Headlines", "Weather", "Film"] || found.map(\.title) == [
+            "Headlines",
+            "Weather"
+        ])
+        #expect(!found.map(\.title).contains("Earlier"))
+        #expect(!found.map(\.title).contains("Other Source"))
+    }
+
+    @Test
+    func `a window is cut at its limit and a channel with no guide has none`() async throws {
+        let catalog = try OnDiskCatalog()
+        defer { catalog.cleanUp() }
+        try await populate(catalog)
+        let context = ModelContext(catalog.container)
+        let window = now.addingTimeInterval(-60 * 60) ... now.addingTimeInterval(10 * 3600)
+
+        #expect(GuideLookup.programmes(playlist: "p", epgKey: "news", in: window, limit: 2, context: context)
+            .count == 2)
+        #expect(GuideLookup.programmes(playlist: "p", epgKey: "nobody", in: window, limit: 9, context: context).isEmpty)
+    }
 }
 
 /// A programme to store, relative to a fixed "now" chosen by the test.

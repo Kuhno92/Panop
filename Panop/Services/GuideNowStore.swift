@@ -15,6 +15,8 @@ final class GuideNowStore {
     /// What a channel has on, and until when. `nil` is "looked up, nothing on".
     private struct Entry {
         var programme: ProgrammeSnapshot?
+        /// What starts when `programme` ends, or the first to start when nothing is on.
+        var next: ProgrammeSnapshot?
         var validUntil: Date
     }
 
@@ -36,6 +38,12 @@ final class GuideNowStore {
     func current(playlist: String, epgKey: String?, now: Date = .now) -> ProgrammeSnapshot? {
         guard let epgKey, let entry = entries[Self.id(playlist, epgKey)], entry.validUntil > now else { return nil }
         return entry.programme.flatMap { $0.isOn(at: now) ? $0 : nil }
+    }
+
+    /// The programme after the one on now, if it is known. Reads memory only.
+    func next(playlist: String, epgKey: String?, now: Date = .now) -> ProgrammeSnapshot? {
+        guard let epgKey, let entry = entries[Self.id(playlist, epgKey)], entry.validUntil > now else { return nil }
+        return entry.next.flatMap { $0.start >= now || entry.programme?.isOn(at: now) == true ? $0 : nil }
     }
 
     /// Whether to ask: nothing known, or what was known has run out.
@@ -68,9 +76,14 @@ final class GuideNowStore {
             // One assignment for the lot, so a screenful of rows is one update, not twenty.
             var updated = entries
             let moment = Date.now
-            for (key, programme) in found {
-                let until = programme?.stop ?? moment.addingTimeInterval(Self.recheckAfter)
-                updated[Self.id(key.playlist, key.epgKey)] = Entry(programme: programme, validUntil: until)
+            for (key, answer) in found {
+                // Good until what is on ends. With nothing on, until what is next begins, or a look
+                // again soon in case a guide has just arrived.
+                let soon = moment.addingTimeInterval(Self.recheckAfter)
+                let until = answer.now?.stop ?? answer.next.map { min($0.start, soon) } ?? soon
+                updated[Self.id(key.playlist, key.epgKey)] = Entry(
+                    programme: answer.now, next: answer.next, validUntil: until
+                )
             }
             entries = updated
             inFlight.subtract(keys)
@@ -108,6 +121,12 @@ nonisolated struct GuideKey: Hashable, Sendable {
     var epgKey: String
 }
 
+/// What a channel has on, and what follows.
+nonisolated struct GuideAnswer: Sendable {
+    var now: ProgrammeSnapshot?
+    var next: ProgrammeSnapshot?
+}
+
 /// Reads the guide off the main thread, on a context of its own.
 actor GuideReader {
     private let container: ModelContainer
@@ -117,12 +136,13 @@ actor GuideReader {
     }
 
     /// What is on now for each channel asked about, in one pass over one context.
-    func now(_ keys: Set<GuideKey>) -> [GuideKey: ProgrammeSnapshot?] {
+    func now(_ keys: Set<GuideKey>) -> [GuideKey: GuideAnswer] {
         let context = ModelContext(container)
         let moment = Date.now
-        var found: [GuideKey: ProgrammeSnapshot?] = [:]
+        var found: [GuideKey: GuideAnswer] = [:]
         for key in keys {
-            found[key] = GuideLookup.onNow(playlist: key.playlist, epgKey: key.epgKey, at: moment, in: context)
+            let both = GuideLookup.nowAndNext(playlist: key.playlist, epgKey: key.epgKey, at: moment, in: context)
+            found[key] = GuideAnswer(now: both.now, next: both.next)
         }
         return found
     }
