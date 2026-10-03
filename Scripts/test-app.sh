@@ -87,7 +87,9 @@ esac
 # the app with it, while the bundle is ad hoc, so tests sign everything ad hoc and do not depend on
 # whose team is set.
 if [[ "$platform" == macos ]]; then
-    flags+=(CODE_SIGN_IDENTITY=- DEVELOPMENT_TEAM=)
+    # No entitlements either: an ad hoc build cannot carry the iCloud ones, and the app will not start with
+    # entitlements that no provisioning profile backs.
+    flags+=(CODE_SIGN_IDENTITY=- DEVELOPMENT_TEAM= CODE_SIGN_ENTITLEMENTS=)
 fi
 
 # PANOP_ONLY=LiveStreamSmokeTests runs one suite (or Suite/test) instead of everything;

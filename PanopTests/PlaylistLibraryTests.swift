@@ -484,3 +484,92 @@ private extension PlaylistSource {
         }
     }
 }
+
+/// What happens when another device changes the playlists and the change arrives.
+@Suite("Playlists changed on another device", .serialized)
+@MainActor
+struct RemotePlaylistChangeTests {
+    private func addPlaylist(_ app: TestApp) async throws -> PlaylistSummary {
+        let playlist = try await app.services.library.add(
+            .xtream(name: "Home", baseURL: panel, username: "alice", password: "s3cret")
+        )
+        await app.services.sync.waitForCompletion(playlist.id)
+        return playlist
+    }
+
+    @Test
+    func `a playlist removed elsewhere is removed here, with its channels, its login and what hangs off it`(
+    ) async throws {
+        let app = try TestApp(transport: FakePanel(live: 4, movies: 2).transport())
+        defer { app.cleanUp() }
+        let playlist = try await addPlaylist(app)
+        var removed: [String] = []
+        app.services.library.onRemoved = { removed.append($0) }
+
+        // The other device deleted it: the record is gone from the synced store.
+        let other = ModelContext(app.cloud)
+        for record in try other.fetch(FetchDescriptor<PlaylistRecord>()) {
+            other.delete(record)
+        }
+        try other.save()
+        await app.services.library.applyRemoteChanges()
+
+        #expect(app.services.library.playlists.isEmpty)
+        #expect(try await app.services.catalogStore.entryCount(kind: .live, playlist: playlist.id) == 0)
+        #expect(try app.credentials.load(for: playlist.id) == nil)
+        #expect(removed == [playlist.id])
+    }
+
+    @Test
+    func `nothing changes when nothing was removed elsewhere`() async throws {
+        let app = try TestApp(transport: FakePanel(live: 4, movies: 2).transport())
+        defer { app.cleanUp() }
+        let playlist = try await addPlaylist(app)
+        var removed: [String] = []
+        app.services.library.onRemoved = { removed.append($0) }
+
+        await app.services.library.applyRemoteChanges()
+
+        #expect(app.services.library.playlists.map(\.id) == [playlist.id])
+        #expect(try await app.services.catalogStore.entryCount(kind: .live, playlist: playlist.id) == 4)
+        #expect(removed.isEmpty)
+    }
+
+    @Test
+    func `a playlist that arrives with its login is listed and fetched`() async throws {
+        let app = try TestApp(transport: FakePanel(live: 3, movies: 1).transport())
+        defer { app.cleanUp() }
+        // What the other device made: a record, and (as the login travels with it) the secret here too.
+        let other = ModelContext(app.cloud)
+        other.insert(PlaylistRecord(
+            id: "from-elsewhere",
+            name: "Elsewhere",
+            kind: .xtream,
+            displayHost: "panel.example"
+        ))
+        try other.save()
+        try app.credentials.save(
+            PlaylistSecret(url: panel, username: "alice", password: "s3cret", guideURL: nil), for: "from-elsewhere"
+        )
+
+        await app.services.library.applyRemoteChanges()
+        await app.services.sync.waitForCompletion("from-elsewhere")
+
+        #expect(app.services.library.playlists.map(\.id) == ["from-elsewhere"])
+        #expect(try await app.services.catalogStore.entryCount(kind: .live, playlist: "from-elsewhere") == 3)
+    }
+
+    @Test
+    func `a playlist that arrives without its login is listed and not fetched, rather than failing`() async throws {
+        let app = try TestApp(transport: FakePanel(live: 3, movies: 1).transport())
+        defer { app.cleanUp() }
+        let other = ModelContext(app.cloud)
+        other.insert(PlaylistRecord(id: "no-login", name: "No login", kind: .xtream, displayHost: "panel.example"))
+        try other.save()
+
+        await app.services.library.applyRemoteChanges()
+
+        #expect(app.services.library.playlists.map(\.id) == ["no-login"])
+        #expect(try await app.services.catalogStore.entryCount(kind: .live, playlist: "no-login") == 0)
+    }
+}

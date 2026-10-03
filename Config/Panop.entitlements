@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- The person's own iCloud: favourites, what they watched, hidden titles, category choices and their
+	     playlists are mirrored to a private CloudKit database that only they can read. The container is
+	     named after the bundle identifier. Whether mirroring is used at all is decided at launch from the
+	     Settings switch and the iCloud account (see CloudSync). -->
+	<key>com.apple.developer.icloud-container-identifiers</key>
+	<array>
+		<string>iCloud.com.panop.Panop</string>
+	</array>
+	<key>com.apple.developer.icloud-services</key>
+	<array>
+		<string>CloudKit</string>
+	</array>
+	<!-- CloudKit tells the app a change has arrived by a silent push. Xcode swaps this for the production
+	     value when it archives for distribution. -->
+	<key>com.apple.developer.aps-environment</key>
+	<string>development</string>
+</dict>
+</plist>

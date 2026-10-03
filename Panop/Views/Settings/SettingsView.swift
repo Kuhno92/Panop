@@ -124,6 +124,8 @@ struct SettingsView: View {
                 )
             }
 
+            CloudSyncSection()
+
             if SimklConfig.isConfigured {
                 SimklSettingsSection()
             }

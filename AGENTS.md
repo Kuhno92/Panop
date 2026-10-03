@@ -123,6 +123,10 @@ no network or stream. Three things learned the hard way:
   focused button covering its neighbour on Apple TV).
 
 ```bash
+# Signing: the app target carries iCloud entitlements (Config/Panop.entitlements). Ad hoc builds cannot, so
+# test-app.sh (macOS) sets CODE_SIGN_ENTITLEMENTS= and build-all-platforms.sh sets CODE_SIGNING_ALLOWED=NO.
+# A signed build needs the App ID and iCloud container registered once, in Xcode, with the team's account.
+
 # Strings: every text the user sees is a literal given to Text, Label, Button and the like, or goes
 # through String(localized:). A String variable given to Text is NOT localised. New strings are
 # added to Panop/Localizable.xcstrings with a German value; Scripts/check-localisation.sh --strict

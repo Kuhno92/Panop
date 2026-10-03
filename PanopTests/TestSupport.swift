@@ -139,6 +139,9 @@ struct TestApp {
             transport: transport,
             playlistsDirectory: directory
         )
+        // A test must not write to the real preferences, and starts with logins kept to the device.
+        services.library.loginMemory = InMemoryLoginMemory()
+        services.library.syncsLogins = { false }
     }
 
     /// The persisted playlist records, read through a context of their own, so

@@ -28,22 +28,35 @@ nonisolated enum PanopContainers {
         return try ModelContainer(for: catalogSchema, configurations: configuration)
     }
 
-    /// User state. Mirrors to CloudKit once the app has a team and an iCloud
-    /// container.
+    /// User state: favourites, what was watched, hidden titles, category choices and the playlists.
     ///
-    /// CloudKit is currently off. Turning it on requires a Developer Program
-    /// team, the iCloud capability, and a real container identifier; without
-    /// those the app fails to launch rather than degrading. Flip this to
-    /// `.private("iCloud.<bundle id>")` in the same change that adds the
-    /// entitlement.
-    static func makeCloud(inMemory: Bool = false) throws -> ModelContainer {
+    /// Mirrors to the person's own iCloud when `mirrored` is set, which `CloudSync.decide` does only for a
+    /// build that has the entitlement and an account that is signed in. Without those SwiftData would
+    /// refuse to open the store rather than degrade, so the default is local.
+    static func makeCloud(inMemory: Bool = false, mirrored: Bool = false) throws -> ModelContainer {
         let configuration = ModelConfiguration(
             "CloudUserData",
             schema: cloudSchema,
             isStoredInMemoryOnly: inMemory,
-            cloudKitDatabase: .none
+            cloudKitDatabase: mirrored && !inMemory ? .private(CloudSync.containerID) : .none
         )
         return try ModelContainer(for: cloudSchema, configurations: configuration)
+    }
+
+    /// The cloud container for what `CloudSync` decided, and what that came to: a mirrored container that
+    /// would not open is replaced by a local one, and the reason is kept so Settings can say so.
+    static func openCloud(
+        inMemory: Bool,
+        availability: CloudSync.Availability
+    ) throws -> (container: ModelContainer, availability: CloudSync.Availability) {
+        guard availability == .active, !inMemory else {
+            return try (makeCloud(inMemory: inMemory), availability)
+        }
+        do {
+            return try (makeCloud(mirrored: true), .active)
+        } catch {
+            return try (makeCloud(), .failed(String(describing: error)))
+        }
     }
 
     static let catalogSchema = Schema([

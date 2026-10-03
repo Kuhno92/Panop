@@ -37,6 +37,12 @@ final class PlaylistLibrary {
     /// Called with a playlist's id once it has been deleted, so what hangs off it can go too.
     var onRemoved: ((String) -> Void)?
 
+    /// Whether logins travel with the playlists: the person wants it and iCloud is on. A closure, so it is
+    /// read when it matters. Off until the app says otherwise, so nothing leaves a device by accident.
+    var syncsLogins: () -> Bool = { false }
+    /// What this device last wrote to or took from each record's login, by playlist id, as a digest.
+    var loginMemory: any LoginMemory = DefaultsLoginMemory()
+
     private let context: ModelContext
     private let credentials: any CredentialStore
     private let sync: SyncService
@@ -75,6 +81,66 @@ final class PlaylistLibrary {
         }
     }
 
+    /// Another device changed the playlists and it has arrived. New ones appear (and are fetched, if they
+    /// can be: their logins come with them or are asked for). One removed there is removed here: its
+    /// catalog rows, its login and what hangs off it. Called only after a successful CloudKit import, so a
+    /// store that is merely empty never reads as everything having been deleted.
+    func applyRemoteChanges() async {
+        let before = Set(playlists.map(\.id))
+        reload()
+        // Logins that arrived go into the Keychain first, so a new playlist can be fetched below.
+        reconcileLogins()
+        let after = Set(playlists.map(\.id))
+        for id in before.subtracting(after) {
+            guard !removing.contains(id) else { continue }
+            try? await sync.remove(id)
+            try? credentials.delete(for: id)
+            onRemoved?(id)
+        }
+        if !after.subtracting(before).isEmpty {
+            await refreshStale(maxAge: 12 * 3600)
+        }
+    }
+
+    /// Brings each playlist's login and its record into line, as the person's setting says: logins go to the
+    /// records so other devices can use them, a login that arrived is taken into the Keychain, and with the
+    /// setting off they are withdrawn from the records. Safe to run any number of times.
+    func reconcileLogins() {
+        let records = (try? context.fetch(FetchDescriptor<PlaylistRecord>())) ?? []
+        let uploading = syncsLogins()
+        var changed = false
+        for record in records where record.kind != .localM3U {
+            let local = try? credentials.load(for: record.id)
+            let action = PlaylistLogins.decide(
+                local: local,
+                blob: record.encryptedLogin,
+                remembered: loginMemory.digest(for: record.id),
+                uploading: uploading
+            )
+            switch action {
+            case .none:
+                if let blob = record.encryptedLogin {
+                    loginMemory.remember(PlaylistLogins.digest(blob), for: record.id)
+                }
+            case let .upload(blob):
+                record.encryptedLogin = blob
+                loginMemory.remember(PlaylistLogins.digest(blob), for: record.id)
+                changed = true
+            case let .adopt(secret):
+                if (try? credentials.save(secret, for: record.id)) != nil, let blob = record.encryptedLogin {
+                    loginMemory.remember(PlaylistLogins.digest(blob), for: record.id)
+                }
+            case .withdraw:
+                record.encryptedLogin = nil
+                loginMemory.forget(for: record.id)
+                changed = true
+            }
+        }
+        if changed {
+            try? context.save()
+        }
+    }
+
     /// Whether any source has movies and series to show. The Movies and Series screens are
     /// offered only then. With no source at all there is nothing to hide yet.
     var offersVOD: Bool {
@@ -110,6 +176,10 @@ final class PlaylistLibrary {
             sortOrder: playlists.count,
             includesVOD: includeVOD
         )
+        if syncsLogins(), prepared.kind != .localM3U, let blob = PlaylistLogins.encode(prepared.secret) {
+            record.encryptedLogin = blob
+            loginMemory.remember(PlaylistLogins.digest(blob), for: id)
+        }
         context.insert(record)
         do {
             try context.save()
@@ -399,5 +469,55 @@ private extension String {
 
     nonisolated var nilIfEmpty: String? {
         isEmpty ? nil : self
+    }
+}
+
+/// What a device remembers about the login on each playlist record (see `PlaylistLogins.decide`).
+@MainActor
+protocol LoginMemory {
+    func digest(for playlist: String) -> String?
+    func remember(_ digest: String, for playlist: String)
+    func forget(for playlist: String)
+}
+
+/// In the app's preferences: only a digest, never the login.
+@MainActor
+struct DefaultsLoginMemory: LoginMemory {
+    private var defaults: UserDefaults {
+        .standard
+    }
+
+    private func key(_ playlist: String) -> String {
+        "loginDigest.\(playlist)"
+    }
+
+    func digest(for playlist: String) -> String? {
+        defaults.string(forKey: key(playlist))
+    }
+
+    func remember(_ digest: String, for playlist: String) {
+        defaults.set(digest, forKey: key(playlist))
+    }
+
+    func forget(for playlist: String) {
+        defaults.removeObject(forKey: key(playlist))
+    }
+}
+
+/// For tests: nothing is written outside the process.
+@MainActor
+final class InMemoryLoginMemory: LoginMemory {
+    private var digests: [String: String] = [:]
+
+    func digest(for playlist: String) -> String? {
+        digests[playlist]
+    }
+
+    func remember(_ digest: String, for playlist: String) {
+        digests[playlist] = digest
+    }
+
+    func forget(for playlist: String) {
+        digests[playlist] = nil
     }
 }

@@ -6,6 +6,7 @@ import SwiftUI
 struct PanopApp: App {
     private let catalogContainer: ModelContainer
     private let cloudContainer: ModelContainer
+    private let cloudSync: CloudSyncStatus
     private let services: AppServices
     private let metricsStore: PlaybackMetricsStore?
 
@@ -16,7 +17,14 @@ struct PanopApp: App {
             || UITestMode.isActive
         do {
             let catalog = try PanopContainers.makeCatalog(inMemory: underTest)
-            let cloud = try PanopContainers.makeCloud(inMemory: underTest)
+            // Mirrored to the person's iCloud only when it is switched on, this build may, and an account is
+            // signed in; a store that will not open that way is opened locally instead.
+            let opened = try PanopContainers.openCloud(
+                inMemory: underTest,
+                availability: CloudSync.current(underTest: underTest)
+            )
+            let cloud = opened.container
+            cloudSync = CloudSyncStatus(opened.availability)
             catalogContainer = catalog
             cloudContainer = cloud
             // The real file only for the real app: a test run must not write to it.
@@ -58,6 +66,7 @@ struct PanopApp: App {
                 .environment(services.library)
                 .environment(services.userState)
                 .environment(services.syncStatus)
+                .environment(cloudSync)
                 .environment(\.playbackMetrics, metricsStore)
         }
         .modelContainer(catalogContainer)

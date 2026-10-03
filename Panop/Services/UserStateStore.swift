@@ -239,6 +239,13 @@ final class UserStateStore {
         commit()
     }
 
+    /// Another device changed something and it has arrived: read it, and tell whatever is built from this
+    /// state (the suggestions) that it has changed.
+    func reloadAfterRemoteChange() {
+        revision += 1
+        reload()
+    }
+
     func reload() {
         let rows = profileRows()
         favorites = Set(rows.filter(\.isFavorite).map(\.streamID))

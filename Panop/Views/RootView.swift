@@ -23,6 +23,8 @@ struct RootView: View {
     @AppStorage(SimklSync.enabledKey) private var sendsWatched = true
     @AppStorage(DiscoveryModel.enabledKey) private var showsSuggestions = true
     @State private var profiles = ProfileStore()
+    @Environment(CloudSyncStatus.self) private var cloudSync
+    @AppStorage(CloudSync.loginsKey) private var syncsLogins = true
     @Environment(SyncStatusCenter.self) private var status
     @AppStorage(DiscoveryModel.trendingKey) private var showsTrending = true
 
@@ -91,7 +93,21 @@ struct RootView: View {
         .task { await library.refreshStale(maxAge: 12 * 3600) }
         .environment(discovery)
         .environment(profiles)
-        // Another person's profile: their state replaces this one's, and what was suggested is dropped.
+        // Logins travel with the playlists only when the person wants it and iCloud is on. Run at launch and
+        // whenever either changes: it sends what is there, takes what has arrived, or withdraws it.
+        .task(id: [syncsLogins, cloudSync.availability == .active]) {
+            let allowed = syncsLogins && cloudSync.availability == .active
+            library.syncsLogins = { allowed }
+            library.reconcileLogins()
+        }
+        // What another device changes arrives as an import: read it, and drop what was removed there.
+        .task(id: cloudSync.availability == .active) {
+            guard cloudSync.availability == .active else { return }
+            for await _ in CloudChanges.imports() {
+                userState.reloadAfterRemoteChange()
+                await library.applyRemoteChanges()
+            }
+        } // Another person's profile: their state replaces this one's, and what was suggested is dropped.
         .onChange(of: profiles.currentID, initial: true) {
             if userState.profile != profiles.currentID {
                 userState.switchProfile(profiles.currentID)
@@ -170,6 +186,7 @@ private extension RootView {
         .environment(services.library)
         .environment(services.userState)
         .environment(services.syncStatus)
+        .environment(CloudSyncStatus())
 }
 
 #if os(macOS)

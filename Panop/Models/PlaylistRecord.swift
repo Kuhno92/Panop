@@ -23,6 +23,10 @@ final class PlaylistRecord {
     /// False for a source added to carry live TV only. Defaulted, so a store made before this
     /// existed still opens, with every source as it was: movies and series included.
     var includesVOD: Bool = true
+    /// The login (see `PlaylistLogins`), encrypted by CloudKit end to end, so a playlist that reaches
+    /// another device can be used there. Empty when the person keeps logins to this device. Defaulted, so
+    /// a store made before this existed still opens.
+    @Attribute(.allowsCloudEncryption) var encryptedLogin: Data?
 
     init(
         id: String,

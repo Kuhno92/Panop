@@ -575,16 +575,29 @@ The brief called performance a key concept. For IPTV this concentrates in one nu
 
 ## M5 — Sync
 
-- [ ] **Enable CloudKit mirroring** *(asked for, as "iCloud sync")*. Needs a Developer Program
-      team and a real container identifier first; without them the app fails to launch rather
-      than degrading.
-- [ ] **Favourites** across devices. They exist on one device now (see M4, *Favourites and
-      recently watched*) and live in the cloud container, so turning CloudKit on is what carries
-      them across: no change to the model should be needed beyond the entitlement.
-- [ ] **Watch progress and resume points** across devices. They exist on one device now (see M2, *Resume playback*), in the cloud container, so CloudKit carries them once it is on.
-- [ ] **App settings**, including the selected playback engine
-- [ ] **Encrypted provider credentials** via `@Attribute(.allowsCloudEncryption)`
-- [ ] **Reconcile guard**: never let an empty local catalog push mass deletions to CloudKit.
+- [ ] **Enable CloudKit mirroring** *(asked for, as "iCloud sync")* (ADR 0009). **Built, not yet run against
+      iCloud.** The entitlements (`Config/Panop.entitlements`: CloudKit and the container
+      `iCloud.com.panop.Panop`, push) are in the project, mirroring is chosen at launch from facts
+      (`CloudSync.decide`: the switch, the entitlement, an account, not a test) and falls back to a local
+      store with the reason shown, and **Settings has an iCloud section** (a switch, a switch for logins, a
+      plain status). **Blocked on one step that needs Xcode's own account:** build once in Xcode so it
+      registers the App ID `com.panop.Panop` and the container on team 4HUJUM5AUG (a command-line build
+      reports "No Accounts"). Then `TEST_RUNNER_PANOP_TEST_CLOUDKIT=1` runs a test that opens the real
+      mirrored store, and two devices are needed to see data travel.
+- [x] **Playlists across devices**: they sync with the state, so a favourite names a playlist both devices
+      have. A playlist removed on another device is removed here (channels, login, state), on a finished
+      CloudKit import only. One that arrives is fetched if its login is there. Tested against the stores.
+- [ ] **Favourites** across devices. They live in the cloud container, so turning CloudKit on carries them;
+      verified against the stores, **not against two devices**.
+- [ ] **Watch progress and resume points** across devices. Same: in the cloud container, not seen travelling.
+- [ ] **App settings**, including the selected playback engine. Not done: they are in the device's
+      preferences, which do not sync; the cloud container would need a settings record.
+- [x] **Encrypted provider credentials** via `@Attribute(.allowsCloudEncryption)`: a playlist's login travels
+      on its record, encrypted by CloudKit, as a switch that is on by default. The decision logic (upload,
+      adopt on a second device, withdraw, a conflict) is tested. **Not seen across two devices.**
+- [x] **Reconcile guard**: other devices' changes are applied on a finished, successful CloudKit import
+      only, never because a record is missing from the local store, so an empty or reset store cannot
+      remove anything.
 
 ---
 

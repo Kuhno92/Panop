@@ -910,6 +910,16 @@
         }
       }
     },
+    "Favourites, what you watched, hidden titles and your playlists are kept in your own iCloud, where only you can read them. Logins are encrypted before they leave this device. A change here takes effect the next time Panop opens.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Favoriten, Gesehenes, ausgeblendete Titel und deine Playlists werden in deinem eigenen iCloud gespeichert, wo nur du sie lesen kannst. Anmeldedaten werden verschlüsselt, bevor sie dieses Gerät verlassen. Eine Änderung hier gilt, sobald Panop das nächste Mal geöffnet wird."
+          }
+        }
+      }
+    },
     "Forget": {
       "localizations": {
         "de": {
@@ -1106,6 +1116,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Filme und Serien einbeziehen"
+          }
+        }
+      }
+    },
+    "Include provider logins": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anmeldedaten der Anbieter einbeziehen"
           }
         }
       }
@@ -1656,6 +1676,16 @@
         }
       }
     },
+    "Off. Everything stays on this device.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aus. Alles bleibt auf diesem Gerät."
+          }
+        }
+      }
+    },
     "On your Simkl list": {
       "localizations": {
         "de": {
@@ -1672,6 +1702,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Öffne auf deinem Handy oder Computer"
+          }
+        }
+      }
+    },
+    "On. Your data is syncing with iCloud.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "An. Deine Daten werden mit iCloud abgeglichen."
           }
         }
       }
@@ -2296,6 +2336,16 @@
         }
       }
     },
+    "Sign in to iCloud in the system settings to sync.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Melde dich in den Systemeinstellungen bei iCloud an, um abzugleichen."
+          }
+        }
+      }
+    },
     "Simkl": {
       "localizations": {
         "de": {
@@ -2462,6 +2512,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Vorschläge werden auf diesem Gerät aus deiner eigenen Mediathek und dem, was du schaust, ausgewählt. Was beliebt ist, kommt aus der öffentlichen Liste von Simkl, die für alle gleich abgerufen wird. Über dich oder das, was du schaust, wird nichts gesendet."
+          }
+        }
+      }
+    },
+    "Sync with iCloud": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mit iCloud abgleichen"
           }
         }
       }
@@ -2816,6 +2876,16 @@
         }
       }
     },
+    "This build of Panop cannot use iCloud.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diese Version von Panop kann iCloud nicht nutzen."
+          }
+        }
+      }
+    },
     "This item has no stream address. Refresh the playlist and try again.": {
       "localizations": {
         "de": {
@@ -3012,6 +3082,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Erneut versuchen"
+          }
+        }
+      }
+    },
+    "Turns on the next time Panop opens.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wird beim nächsten Öffnen von Panop aktiv."
           }
         }
       }
@@ -3282,6 +3362,26 @@
           "stringUnit": {
             "state": "translated",
             "value": "https://provider.example/playlist.m3u"
+          }
+        }
+      }
+    },
+    "iCloud": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud"
+          }
+        }
+      }
+    },
+    "iCloud could not be opened, so this device's own copy is in use.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud konnte nicht geöffnet werden, daher wird die Kopie dieses Geräts verwendet."
           }
         }
       }

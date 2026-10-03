@@ -18,6 +18,8 @@
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>audio</string>
+		<!-- CloudKit wakes the app with a silent push when another device changes something. -->
+		<string>remote-notification</string>
 	</array>
 </dict>
 </plist>
