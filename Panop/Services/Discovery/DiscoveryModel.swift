@@ -125,6 +125,22 @@ final class DiscoveryModel {
         }
     }
 
+    /// Forgets everything shown, for when another person's profile takes over: their rails are not these.
+    func reset() {
+        buildTask?.cancel()
+        buildTask = nil
+        if let observer {
+            NotificationCenter.default.removeObserver(observer)
+        }
+        observer = nil
+        store = nil
+        lastContext = nil
+        generation += 1
+        built = []
+        rows = [:]
+        phase = .loading
+    }
+
     /// Starts reading: the cached rails now, and the catalog's changes from here on.
     func start(container: ModelContainer, cacheURL: URL? = DiscoveryModel.defaultCacheURL) {
         guard store == nil else { return }
@@ -188,9 +204,14 @@ final class DiscoveryModel {
 
     /// Where the last result is kept, so Home has something to draw before the first build finishes.
     nonisolated static var defaultCacheURL: URL? {
+        cacheURL(profile: "")
+    }
+
+    /// One file per profile: what is suggested depends on what that person has watched.
+    nonisolated static func cacheURL(profile: String) -> URL? {
         FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first?
             .appendingPathComponent("Discovery", isDirectory: true)
-            .appendingPathComponent("rails.json")
+            .appendingPathComponent(profile.isEmpty ? "rails.json" : "rails-\(profile).json")
     }
 }
 

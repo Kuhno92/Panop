@@ -611,7 +611,14 @@ Features real users expect that the brief did not name. All *(surfaced)*.
       scrubber), M3U catch-up (`catchup-source` templates differ per provider), and timeshift
       (pausing and rewinding live).
 - [x] **Multiple playlists** and switching between them. Several sources can be added, and Live TV shows all of them or one chosen source (M2); each can be refreshed or deleted from Playlists.
-- [ ] **Profiles**. Shared family devices, especially Apple TV.
+- [x] **Profiles** *(first part)*: up to eight, each with its own favourites, history, hidden titles,
+      category choices, suggestions and adult filter. Added, renamed and deleted in Settings → Profiles,
+      switched there or from a menu on Home (iOS, macOS; Apple TV through Settings). A new profile starts
+      with adult content hidden; with a PIN set, switching to a profile that shows it, and deleting one,
+      ask for the PIN. The first profile owns everything saved before. Tested on iOS by a UI test.
+      **Not done:** a "who is watching" screen at launch, avatars, syncing profiles between devices (the
+      list lives in this device's defaults, the rows in the cloud container), and per-profile Simkl
+      accounts (one Simkl account is shared by all profiles on a device).
 - [x] **Hide adult content** *(surfaced)*: a Settings switch, on by default, leaves categories a provider names as adult out of the lists, search and suggestions. A category the person hid themselves stays their own choice. **Not done:** a PIN to turn it off, which is the parental-controls item below.
 - [x] **Parental controls** *(first part)*: a 4 to 6 digit PIN, stored as a salted hash in this
       device's Keychain, that guards turning the adult filter off and changing or removing the PIN.

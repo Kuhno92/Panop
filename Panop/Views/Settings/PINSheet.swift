@@ -7,6 +7,8 @@ enum PINPurpose: String, Identifiable {
     case create
     case change
     case remove
+    /// Just proof that the PIN is known, for something the caller then does.
+    case confirm
 
     var id: String {
         rawValue
@@ -86,6 +88,7 @@ struct PINSheet: View {
         case .create: "Set a PIN"
         case .change: "Change PIN"
         case .remove: "Remove PIN"
+        case .confirm: "Enter PIN"
         }
     }
 

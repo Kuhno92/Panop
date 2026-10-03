@@ -7,14 +7,14 @@ struct SettingsView: View {
     /// Turning the filter off asks for the PIN when there is one; turning it on never does.
     private var hidesAdultGuarded: Binding<Bool> {
         Binding(
-            get: { hidesAdult },
+            get: { profiles.current.hidesAdult },
             set: { newValue in
                 if newValue {
-                    hidesAdult = true
+                    profiles.setHidesAdult(true)
                 } else if parental.hasPIN {
                     pinPurpose = .unlock
                 } else {
-                    hidesAdult = false
+                    profiles.setHidesAdult(false)
                 }
             }
         )
@@ -31,7 +31,7 @@ struct SettingsView: View {
     @Environment(UserStateStore.self) private var userState
     @AppStorage(DiscoveryModel.enabledKey) private var showsSuggestions = true
     @AppStorage(DiscoveryModel.trendingKey) private var showsTrending = true
-    @AppStorage(UserStateStore.hideAdultKey) private var hidesAdult = true
+    @Environment(ProfileStore.self) private var profiles
     @Environment(ParentalControls.self) private var parental
     @State private var pinPurpose: PINPurpose?
     @State private var confirmingForget = false
@@ -43,6 +43,11 @@ struct SettingsView: View {
                     PlaylistsView()
                 } label: {
                     LabeledContent("Playlists", value: library.playlists.count.formatted())
+                }
+                NavigationLink {
+                    ProfilesView()
+                } label: {
+                    LabeledContent("Profiles", value: profiles.current.name)
                 }
                 if !userState.hidden.isEmpty {
                     NavigationLink {
@@ -137,10 +142,10 @@ struct SettingsView: View {
             PINSheet(purpose: purpose) {
                 // A PIN is for keeping the filter on: setting one turns it on.
                 if purpose == .create {
-                    hidesAdult = true
+                    profiles.setHidesAdult(true)
                 }
                 if purpose == .unlock {
-                    hidesAdult = false
+                    profiles.setHidesAdult(false)
                 }
             }
         }

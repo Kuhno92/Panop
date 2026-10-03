@@ -66,8 +66,7 @@ extension UserStateStore {
     /// Forgets what was watched: the recently watched list, the watched marks and the play counts,
     /// and so what recommendations are drawn from. Favourites, hidden titles and resume points stay.
     func forgetViewingHistory() {
-        let rows = (try? context.fetch(FetchDescriptor<UserContentState>())) ?? []
-        for row in rows where row.lastPlayedAt > .distantPast || row.isWatched || row.playCount > 0 {
+        for row in profileRows() where row.lastPlayedAt > .distantPast || row.isWatched || row.playCount > 0 {
             row.lastPlayedAt = .distantPast
             row.playCount = 0
             row.parentKey = ""

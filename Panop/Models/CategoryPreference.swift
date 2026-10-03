@@ -15,6 +15,8 @@ final class CategoryPreference {
     /// Where the person put it, from 0. -1 for a category they have not placed, which then
     /// follows the placed ones in the order the provider lists it.
     var position: Int = -1
+    /// Which person chose this: empty is the first profile (see `UserContentState.profile`).
+    var profile: String = ""
 
     init(kindRaw: String = "", name: String = "", isHidden: Bool = false, position: Int = -1) {
         self.kindRaw = kindRaw

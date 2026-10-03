@@ -37,6 +37,9 @@ final class UserContentState {
     /// For an episode, the key of the series it belongs to, so what is watched can be told by show
     /// and not by episode. Empty for everything else.
     var parentKey: String = ""
+    /// Which person's this is (see `ProfileStore`). Empty is the first profile, which is also what a
+    /// store made before profiles existed holds, so nothing needs moving. Defaulted, so an older store opens.
+    var profile: String = ""
 
     init(
         streamID: String = "",

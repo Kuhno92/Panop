@@ -30,7 +30,7 @@ final class AppServices {
         catalogContainer = catalog
         syncStatus = status
         self.sync = sync
-        let userState = UserStateStore(context: ModelContext(cloud))
+        let userState = UserStateStore(context: ModelContext(cloud), profile: ProfileStore.savedCurrentID())
         self.userState = userState
         library = PlaylistLibrary(
             context: ModelContext(cloud),

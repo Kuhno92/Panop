@@ -72,7 +72,9 @@ extension UserStateStore {
     // MARK: - Rows
 
     func loadCategoryPreferences() {
-        let rows = (try? context.fetch(FetchDescriptor<CategoryPreference>())) ?? []
+        let current = profile
+        let rows = (try? context
+            .fetch(FetchDescriptor<CategoryPreference>(predicate: #Predicate { $0.profile == current }))) ?? []
         hiddenCategoryNames = Dictionary(grouping: rows.filter(\.isHidden), by: \.kindRaw)
             .mapValues { Set($0.map(\.name)) }
         categoryPositions = Dictionary(grouping: rows.filter { $0.position >= 0 }, by: \.kindRaw)
@@ -81,20 +83,25 @@ extension UserStateStore {
 
     private func preferences(kind: MediaKind) -> [CategoryPreference] {
         let raw = kind.rawValue
-        return (try? context.fetch(FetchDescriptor<CategoryPreference>(predicate: #Predicate { $0.kindRaw == raw }))) ??
-            []
+        let current = profile
+        return (try? context.fetch(FetchDescriptor<CategoryPreference>(
+            predicate: #Predicate { $0.kindRaw == raw && $0.profile == current }
+        ))) ?? []
     }
 
     private func preference(name: String, kind: MediaKind) -> CategoryPreference? {
         let raw = kind.rawValue
-        var descriptor =
-            FetchDescriptor<CategoryPreference>(predicate: #Predicate { $0.kindRaw == raw && $0.name == name })
+        let current = profile
+        var descriptor = FetchDescriptor<CategoryPreference>(
+            predicate: #Predicate { $0.kindRaw == raw && $0.name == name && $0.profile == current }
+        )
         descriptor.fetchLimit = 1
         return try? context.fetch(descriptor).first
     }
 
     private func insertPreference(name: String, kind: MediaKind) -> CategoryPreference {
         let row = CategoryPreference(kindRaw: kind.rawValue, name: name)
+        row.profile = profile
         context.insert(row)
         return row
     }

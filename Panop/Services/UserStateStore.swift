@@ -61,10 +61,47 @@ final class UserStateStore {
     static let retainedPlays = 200
 
     let context: ModelContext
+    /// Whose state this is: every read and write is limited to the rows of this profile. Empty is the
+    /// first profile, and where everything made before profiles existed lives.
+    private(set) var profile: String
 
-    init(context: ModelContext) {
+    init(context: ModelContext, profile: String = "") {
         self.context = context
+        self.profile = profile
         reload()
+    }
+
+    /// Makes another person's state the one the screens show.
+    func switchProfile(_ id: String) {
+        guard id != profile else { return }
+        profile = id
+        revision += 1
+        reload()
+    }
+
+    /// Drops everything one profile has chosen and watched, for when it is deleted.
+    func deleteProfileData(_ id: String) {
+        let target = id
+        for row in (try? context
+            .fetch(FetchDescriptor<UserContentState>(predicate: #Predicate { $0.profile == target }))) ?? []
+        {
+            context.delete(row)
+        }
+        for row in (try? context
+            .fetch(FetchDescriptor<CategoryPreference>(predicate: #Predicate { $0.profile == target }))) ?? []
+        {
+            context.delete(row)
+        }
+        commit()
+    }
+
+    /// The rows of the current profile.
+    func profileRows() -> [UserContentState] {
+        let current = profile
+        return (
+            try? context.fetch(FetchDescriptor<UserContentState>(predicate: #Predicate { $0.profile == current }))
+        ) ??
+            []
     }
 
     /// The playlist and the entry together, which is what identifies a channel.
@@ -203,7 +240,7 @@ final class UserStateStore {
     }
 
     func reload() {
-        let rows = (try? context.fetch(FetchDescriptor<UserContentState>())) ?? []
+        let rows = profileRows()
         favorites = Set(rows.filter(\.isFavorite).map(\.streamID))
         progress = Dictionary(
             rows.filter { $0.positionSeconds > 0 }.map {
@@ -234,13 +271,17 @@ final class UserStateStore {
     // MARK: - Rows
 
     private func state(for key: String) -> UserContentState? {
-        var descriptor = FetchDescriptor<UserContentState>(predicate: #Predicate { $0.streamID == key })
+        let current = profile
+        var descriptor = FetchDescriptor<UserContentState>(
+            predicate: #Predicate { $0.streamID == key && $0.profile == current }
+        )
         descriptor.fetchLimit = 1
         return try? context.fetch(descriptor).first
     }
 
     private func insert(_ key: String) -> UserContentState {
         let row = UserContentState(streamID: key)
+        row.profile = profile
         context.insert(row)
         return row
     }
@@ -255,8 +296,7 @@ final class UserStateStore {
 
     /// Keeps the played-only rows to a bounded number, oldest out first. Favourites stay.
     private func trimPlays() {
-        let rows = (try? context.fetch(FetchDescriptor<UserContentState>())) ?? []
-        let plays = rows
+        let plays = profileRows()
             .filter { !$0.isFavorite && !$0.isHidden && !$0.isWatched && $0.lastPlayedAt > .distantPast }
             .sorted { $0.lastPlayedAt > $1.lastPlayedAt }
         for row in plays.dropFirst(Self.retainedPlays) {

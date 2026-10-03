@@ -22,7 +22,7 @@ struct RootView: View {
     @State private var simklLibrary: SimklLibrary
     @AppStorage(SimklSync.enabledKey) private var sendsWatched = true
     @AppStorage(DiscoveryModel.enabledKey) private var showsSuggestions = true
-    @AppStorage(UserStateStore.hideAdultKey) private var hidesAdult = true
+    @State private var profiles = ProfileStore()
     @Environment(SyncStatusCenter.self) private var status
     @AppStorage(DiscoveryModel.trendingKey) private var showsTrending = true
 
@@ -75,6 +75,8 @@ struct RootView: View {
                 }
             }
         }
+        // Everything under it starts again, so no screen shows the last person's lists.
+        .id(profiles.currentID)
         .onChange(of: library.offersVOD) { _, offered in
             // A screen that went away cannot stay selected.
             if !offered, selection == .movies || selection == .series {
@@ -88,7 +90,16 @@ struct RootView: View {
         // The work runs on the sync service's actor, not here.
         .task { await library.refreshStale(maxAge: 12 * 3600) }
         .environment(discovery)
-        .onChange(of: hidesAdult, initial: true) { userState.hidesAdult = hidesAdult }
+        .environment(profiles)
+        // Another person's profile: their state replaces this one's, and what was suggested is dropped.
+        .onChange(of: profiles.currentID, initial: true) {
+            if userState.profile != profiles.currentID {
+                userState.switchProfile(profiles.currentID)
+                discovery.reset()
+            }
+            userState.hidesAdult = profiles.current.hidesAdult
+        }
+        .onChange(of: profiles.current.hidesAdult, initial: true) { userState.hidesAdult = profiles.current.hidesAdult }
         // Which categories a provider calls adult is read from the catalog, again after each sync.
         .task(id: [library.playlists.count, status.isAnySyncing ? 1 : 0]) {
             let reader = CatalogReader(container: catalog.container)
@@ -122,7 +133,10 @@ struct RootView: View {
         // playlists are part of the key: they may load after the first pass, and nothing else would rerun it.
         .task(id: [userState.revision, library.playlists.count]) {
             guard !library.playlists.isEmpty else { return }
-            discovery.start(container: catalog.container)
+            discovery.start(
+                container: catalog.container,
+                cacheURL: DiscoveryModel.cacheURL(profile: userState.profile)
+            )
             discovery.update(DiscoveryContext.current(userState))
         }
         .modifier(PlayerPresentation(target: $autoplay))

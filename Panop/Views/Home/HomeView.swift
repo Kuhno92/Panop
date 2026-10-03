@@ -33,13 +33,16 @@ struct HomeView: View {
             }
         }
         .navigationTitle("Home")
-        .navigationDestination(item: $openMovie) { MovieDetailView(movie: $0) }
-        .navigationDestination(item: $openSeries) { SeriesDetailView(series: $0) }
-        .modifier(HomeSearch(text: $search, isOffered: !library.playlists.isEmpty))
-        .sheet(isPresented: $showingAdd) {
-            NavigationStack { AddPlaylistView() }
-        }
-        .modifier(PlayerPresentation(target: $playing))
+        #if !os(tvOS)
+            .toolbar { ToolbarItem { ProfileMenu() } }
+        #endif
+            .navigationDestination(item: $openMovie) { MovieDetailView(movie: $0) }
+            .navigationDestination(item: $openSeries) { SeriesDetailView(series: $0) }
+            .modifier(HomeSearch(text: $search, isOffered: !library.playlists.isEmpty))
+            .sheet(isPresented: $showingAdd) {
+                NavigationStack { AddPlaylistView() }
+            }
+            .modifier(PlayerPresentation(target: $playing))
     }
 
     private var rails: some View {
