@@ -73,10 +73,10 @@ struct SettingsView: View {
             } header: {
                 Text("Parental controls")
             } footer: {
-                Text(
-                    "With a PIN, adult content cannot be shown again, and the PIN cannot be changed, without it. "
-                        + "The PIN stays on this device."
-                )
+                Text("""
+                With a PIN, adult content cannot be shown again, and the PIN cannot be changed, without it. \
+                The PIN stays on this device.
+                """)
             }
 
             StartupSection()
@@ -108,11 +108,11 @@ struct SettingsView: View {
             } header: {
                 Text("Suggestions")
             } footer: {
-                Text(
-                    "Suggestions are chosen on this device from your own library and what you watch. "
-                        + "What is trending is Simkl's public list, fetched the same way for everyone. "
-                        + "Nothing about you or what you watch is sent."
-                )
+                Text("""
+                Suggestions are chosen on this device from your own library and what you watch. \
+                What is trending is Simkl's public list, fetched the same way for everyone. \
+                Nothing about you or what you watch is sent.
+                """)
             }
             .confirmationDialog(
                 "Forget what you watched?", isPresented: $confirmingForget, titleVisibility: .visible

@@ -114,7 +114,9 @@ nonisolated enum PlaybackRequestBuilder {
                   parsed.isFileURL || parsed.host?.isEmpty == false || url.contains("://@")
             else {
                 throw PlaybackTargetError
-                    .notPlayable("This item's address is incomplete. Refresh the playlist and try again.")
+                    .notPlayable(
+                        String(localized: "This item's address is incomplete. Refresh the playlist and try again.")
+                    )
             }
             let item = PlaybackItem(
                 url: url,
@@ -127,7 +129,7 @@ nonisolated enum PlaybackRequestBuilder {
 
         guard case let .xtream(credentials)? = source else {
             throw PlaybackTargetError
-                .notPlayable("This item has no stream address. Refresh the playlist and try again.")
+                .notPlayable(String(localized: "This item has no stream address. Refresh the playlist and try again."))
         }
         // An episode is not a catalog row: its address is built from the playlist's login and the
         // episode's own id, which is a string on some panels and so is not parsed as a number.
@@ -140,7 +142,7 @@ nonisolated enum PlaybackRequestBuilder {
             do {
                 client = try XtreamClient(credentials: credentials, transport: transport)
             } catch {
-                throw PlaybackTargetError.notPlayable("The provider's server address is not valid.")
+                throw PlaybackTargetError.notPlayable(String(localized: "The provider's server address is not valid."))
             }
             let ext = target.containerExtension
             let resume = target.resumeAt
@@ -155,13 +157,15 @@ nonisolated enum PlaybackRequestBuilder {
         }
         guard let remote = target.remoteID.flatMap(Int.init) else {
             throw PlaybackTargetError
-                .notPlayable("This item is missing its provider id. Refresh the playlist and try again.")
+                .notPlayable(
+                    String(localized: "This item is missing its provider id. Refresh the playlist and try again.")
+                )
         }
         let client: XtreamClient
         do {
             client = try XtreamClient(credentials: credentials, transport: transport)
         } catch {
-            throw PlaybackTargetError.notPlayable("The provider's server address is not valid.")
+            throw PlaybackTargetError.notPlayable(String(localized: "The provider's server address is not valid."))
         }
 
         switch target.kind {
@@ -179,7 +183,7 @@ nonisolated enum PlaybackRequestBuilder {
                 )
             }
         case .series, .unknown:
-            throw PlaybackTargetError.notPlayable("Open the series to pick an episode.")
+            throw PlaybackTargetError.notPlayable(String(localized: "Open the series to pick an episode."))
         }
     }
 

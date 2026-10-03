@@ -59,10 +59,10 @@ nonisolated struct SyncSummary: Equatable, Sendable {
 
     private static func name(of kind: MediaKind) -> String {
         switch kind {
-        case .live: "Live TV"
-        case .movie: "Movies"
-        case .series: "Series"
-        case .unknown: "Other"
+        case .live: String(localized: "Live TV")
+        case .movie: String(localized: "Movies")
+        case .series: String(localized: "Series")
+        case .unknown: String(localized: "Other")
         }
     }
 }
@@ -114,17 +114,17 @@ nonisolated enum SyncErrorMessage {
         case let error as XtreamError: text(for: error)
         case let error as CatalogError: text(for: error)
         case let error as EPGError: text(for: error)
-        default: "Something went wrong while updating this playlist."
+        default: String(localized: "Something went wrong while updating this playlist.")
         }
     }
 
     private static func text(for error: XtreamError) -> String {
         switch error {
-        case .authenticationFailed: "The provider rejected the username or password."
-        case .invalidBaseURL: "That server address is not valid."
+        case .authenticationFailed: String(localized: "The provider rejected the username or password.")
+        case .invalidBaseURL: String(localized: "That server address is not valid.")
         case let .http(status): httpText(status)
-        case .unexpectedResponse: "The provider's reply was not in the expected format."
-        case .truncatedResponse: "The download was cut off, so nothing was changed."
+        case .unexpectedResponse: String(localized: "The provider's reply was not in the expected format.")
+        case .truncatedResponse: String(localized: "The download was cut off, so nothing was changed.")
         case .transport: unreachable
         }
     }
@@ -133,29 +133,31 @@ nonisolated enum SyncErrorMessage {
         switch error {
         case let .http(status): httpText(status)
         case .download: unreachable
-        case .cannotReadFile: "The playlist file could not be read."
-        case .invalidSource: "That is not a valid web address."
-        case .everySectionFailed: "The provider did not return any channels, movies or series."
-        case .staleConfirmation: "That playlist was updated in the meantime. Review it again."
+        case .cannotReadFile: String(localized: "The playlist file could not be read.")
+        case .invalidSource: String(localized: "That is not a valid web address.")
+        case .everySectionFailed: String(localized: "The provider did not return any channels, movies or series.")
+        case .staleConfirmation: String(localized: "That playlist was updated in the meantime. Review it again.")
         }
     }
 
     private static func text(for error: EPGError) -> String {
         switch error {
-        case .http, .transport: "The TV guide could not be downloaded."
-        case .notXMLTV, .malformed: "The TV guide is not in a format Panop understands."
-        case .truncated, .corruptGzip: "The TV guide download was damaged, so it was not used."
+        case .http, .transport: String(localized: "The TV guide could not be downloaded.")
+        case .notXMLTV, .malformed: String(localized: "The TV guide is not in a format Panop understands.")
+        case .truncated, .corruptGzip: String(localized: "The TV guide download was damaged, so it was not used.")
         }
     }
 
-    private static let unreachable = "Could not reach the provider. Check the address and your connection."
+    private static var unreachable: String {
+        String(localized: "Could not reach the provider. Check the address and your connection.")
+    }
 
     private static func httpText(_ status: Int) -> String {
         switch status {
-        case 401, 403: "The provider refused access (\(status)). Check the username and password."
-        case 404: "The provider has nothing at that address (404)."
-        case 500...: "The provider is having problems (\(status)). Try again later."
-        default: "The provider answered with an error (\(status))."
+        case 401, 403: String(localized: "The provider refused access (\(status)). Check the username and password.")
+        case 404: String(localized: "The provider has nothing at that address (404).")
+        case 500...: String(localized: "The provider is having problems (\(status)). Try again later.")
+        default: String(localized: "The provider answered with an error (\(status)).")
         }
     }
 }

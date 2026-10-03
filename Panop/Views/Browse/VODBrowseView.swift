@@ -38,7 +38,7 @@ struct VODBrowseView: View {
     @State private var showingAdd = false
 
     private var title: String {
-        kind == .movie ? "Movies" : "Series"
+        kind == .movie ? String(localized: "Movies") : String(localized: "Series")
     }
 
     private var isSearching: Bool {

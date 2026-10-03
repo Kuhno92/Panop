@@ -639,7 +639,7 @@ Features real users expect that the brief did not name. All *(surfaced)*.
 ## M7 — Release readiness
 
 - [ ] App icon and marketing assets
-- [ ] Localisation via String Catalogs
+- [x] Localisation via String Catalogs: `Panop/Localizable.xcstrings` with English and German (322 strings), covering the screens, the player and the messages built in code. A UI test launches the app in German and checks the tabs, Settings and a name built in code. `Scripts/check-localisation.sh --strict` lists strings with no entry or no German. **Not done:** other languages, the app's name and permission texts (`InfoPlist.strings`), plural forms beyond one entry, and VLC's own on-screen texts.
 - [x] `PrivacyInfo.xcprivacy` privacy manifest: no tracking, no collected data, and the two
       required-reason APIs the app uses (UserDefaults `CA92.1`, file timestamps `C617.1`, for the
       image cache). Checked to ship in the built app. **Not checked:** the manifests of the

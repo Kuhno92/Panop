@@ -54,10 +54,10 @@ struct AddPlaylistView: View {
             Section {
                 Toggle("Live TV only", isOn: $liveOnly)
             } footer: {
-                Text(
-                    "Skips the movies and series: they are not downloaded or stored, and the Movies and "
-                        + "Series tabs are hidden unless another source has them."
-                )
+                Text("""
+                Skips the movies and series: they are not downloaded or stored, and the Movies and \
+                Series tabs are hidden unless another source has them.
+                """)
             }
 
             if let errorMessage {
@@ -132,10 +132,10 @@ struct AddPlaylistView: View {
                 .keyboardType(.URL)
             #endif
         } footer: {
-            Text(
-                "The address is kept in the Keychain, because it often contains your login. "
-                    + "If the playlist names its own TV guide, you do not need to fill this in."
-            )
+            Text("""
+            The address is kept in the Keychain, because it often contains your login. \
+            If the playlist names its own TV guide, you do not need to fill this in.
+            """)
         }
     }
 

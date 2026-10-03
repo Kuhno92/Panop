@@ -321,10 +321,10 @@ nonisolated enum LiveOrder: String, CaseIterable, Identifiable {
 
     var title: String {
         switch self {
-        case .name: "By name"
-        case .provider: "Provider's order"
-        case .recentlyAdded: "Recently added"
-        case .rating: "Top rated"
+        case .name: String(localized: "By name")
+        case .provider: String(localized: "Provider's order")
+        case .recentlyAdded: String(localized: "Recently added")
+        case .rating: String(localized: "Top rated")
         }
     }
 }
@@ -339,9 +339,9 @@ enum LiveListMode: String, CaseIterable, Identifiable {
 
     var title: String {
         switch self {
-        case .all: "All channels"
-        case .favourites: "Favourites"
-        case .recents: "Recently watched"
+        case .all: String(localized: "All channels")
+        case .favourites: String(localized: "Favourites")
+        case .recents: String(localized: "Recently watched")
         }
     }
 

@@ -89,7 +89,12 @@ nonisolated enum MovieMeta {
 
     static func length(_ seconds: Int) -> String {
         let minutes = (seconds + 30) / 60
-        return minutes >= 60 ? "\(minutes / 60) h \(minutes % 60) min" : "\(minutes) min"
+        if minutes >= 60 {
+            let hours = minutes / 60
+            let rest = minutes % 60
+            return String(localized: "\(hours) h \(rest) min")
+        }
+        return String(localized: "\(minutes) min")
     }
 }
 

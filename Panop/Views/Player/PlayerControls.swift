@@ -145,10 +145,10 @@ struct PlayerControls: View {
         if model.audioTracks.count > 1 {
             trackChoice(Choice(
                 symbol: "speaker.wave.2",
-                label: "Audio",
+                label: String(localized: "Audio"),
                 reason: "audio",
                 focus: .audio,
-                noneTitle: "Default",
+                noneTitle: String(localized: "Default"),
                 tracks: model.audioTracks,
                 selected: model.selectedAudioID,
                 select: model.selectAudio(id:)
@@ -157,10 +157,10 @@ struct PlayerControls: View {
         if !model.subtitleTracks.isEmpty {
             trackChoice(Choice(
                 symbol: "captions.bubble",
-                label: "Subtitles",
+                label: String(localized: "Subtitles"),
                 reason: "subtitles",
                 focus: .subtitles,
-                noneTitle: "Off",
+                noneTitle: String(localized: "Off"),
                 tracks: model.subtitleTracks,
                 selected: model.selectedSubtitleID,
                 select: model.selectSubtitle(id:)

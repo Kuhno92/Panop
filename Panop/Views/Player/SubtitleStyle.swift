@@ -19,10 +19,10 @@ nonisolated struct SubtitleStyle: Equatable, Sendable, RawRepresentable {
 
         var title: String {
             switch self {
-            case .small: "Small"
-            case .medium: "Medium"
-            case .large: "Large"
-            case .extraLarge: "Extra large"
+            case .small: String(localized: "Small")
+            case .medium: String(localized: "Medium")
+            case .large: String(localized: "Large")
+            case .extraLarge: String(localized: "Extra large")
             }
         }
 
@@ -45,7 +45,12 @@ nonisolated struct SubtitleStyle: Equatable, Sendable, RawRepresentable {
         }
 
         var title: String {
-            rawValue.capitalized
+            switch self {
+            case .white: String(localized: "White")
+            case .yellow: String(localized: "Yellow")
+            case .cyan: String(localized: "Cyan")
+            case .green: String(localized: "Green")
+            }
         }
 
         /// Red, green and blue, 0 to 1.
@@ -68,9 +73,9 @@ nonisolated struct SubtitleStyle: Equatable, Sendable, RawRepresentable {
 
         var title: String {
             switch self {
-            case .none: "None"
-            case .translucent: "Translucent"
-            case .solid: "Solid"
+            case .none: String(localized: "None")
+            case .translucent: String(localized: "Translucent")
+            case .solid: String(localized: "Solid")
             }
         }
 
@@ -118,7 +123,10 @@ nonisolated struct SubtitleStyle: Equatable, Sendable, RawRepresentable {
 
     var rawValue: String {
         let stored = StoredSubtitleStyle(size: size, tint: tint, backdrop: backdrop, raised: raised)
-        guard let data = try? JSONEncoder().encode(stored) else { return "" }
+        // Sorted, so the same style is always the same text: that text is what `@AppStorage` compares.
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = .sortedKeys
+        guard let data = try? encoder.encode(stored) else { return "" }
         return String(bytes: data, encoding: .utf8) ?? ""
     }
 }

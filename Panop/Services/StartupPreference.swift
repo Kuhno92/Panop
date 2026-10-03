@@ -13,11 +13,11 @@ nonisolated enum StartupAction: String, CaseIterable, Identifiable, Sendable {
 
     var title: String {
         switch self {
-        case .home: "Home"
-        case .live: "Live TV"
-        case .movies: "Movies"
-        case .series: "Series"
-        case .channel: "Play a channel"
+        case .home: String(localized: "Home")
+        case .live: String(localized: "Live TV")
+        case .movies: String(localized: "Movies")
+        case .series: String(localized: "Series")
+        case .channel: String(localized: "Play a channel")
         }
     }
 

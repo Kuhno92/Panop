@@ -18,6 +18,11 @@ class PanopUITestCase: XCTestCase {
         "live"
     }
 
+    /// A language code to run the app in, such as `de`, or nil for the simulator's own.
+    var launchLanguage: String? {
+        nil
+    }
+
     /// Seed the playlist as a live-only source, which hides the Movies and Series tabs.
     var liveOnly: Bool {
         false
@@ -33,6 +38,9 @@ class PanopUITestCase: XCTestCase {
         // The app clears its remembered filters when it starts in this mode. They are not set
         // here as launch arguments: those pin a value, and the app could then never change it.
         app.launchArguments = ["-panop-uitest"]
+        if let language = launchLanguage {
+            app.launchArguments += ["-AppleLanguages", "(\(language))", "-AppleLocale", language]
+        }
         app.launchEnvironment["PANOP_CONTROLS_TIMEOUT"] = String(controlsTimeout)
         app.launchEnvironment["PANOP_START_TAB"] = startTab
         if liveOnly {

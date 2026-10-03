@@ -42,7 +42,7 @@ struct SeriesDetailView: View {
         }
 
         var title: String {
-            number == 0 ? "Specials" : "Season \(number)"
+            number == 0 ? String(localized: "Specials") : String(localized: "Season \(number)")
         }
     }
 

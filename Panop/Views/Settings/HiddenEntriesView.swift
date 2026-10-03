@@ -44,9 +44,9 @@ struct HiddenEntriesView: View {
 
     private static func kind(_ kind: MediaKind) -> String {
         switch kind {
-        case .live: "Channel"
-        case .movie: "Movie"
-        case .series: "Series"
+        case .live: String(localized: "Channel")
+        case .movie: String(localized: "Movie")
+        case .series: String(localized: "Series")
         case .unknown: ""
         }
     }

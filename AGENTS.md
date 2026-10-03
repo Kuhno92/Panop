@@ -123,6 +123,11 @@ no network or stream. Three things learned the hard way:
   focused button covering its neighbour on Apple TV).
 
 ```bash
+# Strings: every text the user sees is a literal given to Text, Label, Button and the like, or goes
+# through String(localized:). A String variable given to Text is NOT localised. New strings are
+# added to Panop/Localizable.xcstrings with a German value; Scripts/check-localisation.sh --strict
+# lists what is missing (the command-line build does not write the catalog, only Xcode does).
+
 # Reclaim disk from build caches and leftover simulator clones. Dry run by default; keeps the hook tooling
 # (test-app.sh and test-ui.sh already remove their clones on exit; after an xcodebuild test of
 # your own run Scripts/clean-test-clones.sh)

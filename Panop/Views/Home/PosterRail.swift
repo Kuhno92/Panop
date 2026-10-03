@@ -5,32 +5,49 @@ import SwiftUI
 
 /// The heading of a rail, in words.
 nonisolated enum RailHeading {
+    /// The wording for a series or for a film.
+    private static func forKind(_ kind: MediaKind, series: String, movies: String) -> String {
+        kind == .series ? series : movies
+    }
+
     static func title(for rail: Rail) -> String {
         switch rail.kind {
         case .nextUp:
-            "Next up on Simkl"
+            String(localized: "Next up on Simkl")
         case .onYourList:
-            "On your Simkl list"
+            String(localized: "On your Simkl list")
         case let .trending(kind):
-            kind == .series ? "Trending series on Simkl" : "Trending movies on Simkl"
+            forKind(
+                kind,
+                series: String(localized: "Trending series on Simkl"),
+                movies: String(localized: "Trending movies on Simkl")
+            )
         case .becauseYouWatched:
-            "Because you watched \(display(rail.subject))"
+            String(localized: "Because you watched \(display(rail.subject))")
         case let .newReleases(kind):
-            kind == .series ? "New series" : "New movies"
+            forKind(kind, series: String(localized: "New series"), movies: String(localized: "New movies"))
         case .mostWatched:
-            "Watch again"
+            String(localized: "Watch again")
         case let .topRated(kind):
-            kind == .series ? "Top rated series" : "Top rated movies"
+            forKind(kind, series: String(localized: "Top rated series"), movies: String(localized: "Top rated movies"))
         case let .genre(kind, _):
-            "\(rail.subject?.capitalized ?? "More") \(kind == .series ? "series" : "movies")"
+            forKind(
+                kind,
+                series: String(localized: "\(rail.subject?.capitalized ?? "More") series"),
+                movies: String(localized: "\(rail.subject?.capitalized ?? "More") movies")
+            )
         case .franchise:
-            "More from \(rail.subject?.capitalized ?? "this series")"
+            String(localized: "More from \(rail.subject?.capitalized ?? "this series")")
         case .classics:
-            "Classics"
+            String(localized: "Classics")
         case let .decade(_, decade):
-            "Movies of the \(decade)s"
+            String(localized: "Movies of the \(String(decade))s")
         case let .pickOfTheDay(kind):
-            kind == .series ? "Series pick of the day" : "Movie pick of the day"
+            forKind(
+                kind,
+                series: String(localized: "Series pick of the day"),
+                movies: String(localized: "Movie pick of the day")
+            )
         }
     }
 

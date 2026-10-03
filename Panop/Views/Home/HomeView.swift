@@ -189,7 +189,7 @@ struct ChannelRail: View {
     @Query private var channels: [CatalogEntryRecord]
     @Environment(UserStateStore.self) private var userState
 
-    let title: String
+    let title: LocalizedStringKey
     let keys: [String]
     /// Recents are shown in the order they were watched; favourites by name.
     let keepsOrder: Bool
@@ -198,7 +198,7 @@ struct ChannelRail: View {
     let onPlay: (CatalogEntryRecord) -> Void
 
     init(
-        title: String,
+        title: LocalizedStringKey,
         keys: [String],
         keepsOrder: Bool,
         showsProgress: Bool = false,

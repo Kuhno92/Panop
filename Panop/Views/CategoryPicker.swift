@@ -23,7 +23,7 @@ struct CategoryPickerList: View {
     var body: some View {
         List {
             if search.isEmpty {
-                row("All categories", value: nil)
+                row(String(localized: "All categories"), value: nil)
             }
             ForEach(shown, id: \.self) { row($0, value: $0) }
         }
@@ -121,7 +121,7 @@ struct CategoryChips: View {
                 HStack(spacing: Self.spacing) {
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: Self.spacing) {
-                            chip("All", value: nil)
+                            chip(String(localized: "All"), value: nil)
                             ForEach(shown, id: \.self) { chip($0, value: $0) }
                         }
                         .padding(.leading)
@@ -254,10 +254,10 @@ struct CategoryEditor: View {
                     .buttonStyle(.borderless)
                 }
             } footer: {
-                Text(
-                    "A hidden category is left out of the lists and of search, along with what is in it. "
-                        + "Adult categories stay hidden while Hide adult content is on in Settings."
-                )
+                Text("""
+                A hidden category is left out of the lists and of search, along with what is in it. \
+                Adult categories stay hidden while Hide adult content is on in Settings.
+                """)
             }
             Section {
                 Button("Reset to the provider's order", role: .destructive) {

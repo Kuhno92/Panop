@@ -98,7 +98,7 @@ final class PlaylistLibrary {
         do {
             try credentials.save(prepared.secret, for: id)
         } catch {
-            throw PlaylistAddError(message: "The login details could not be saved to the Keychain.")
+            throw PlaylistAddError(message: String(localized: "The login details could not be saved to the Keychain."))
         }
 
         let record = PlaylistRecord(
@@ -122,7 +122,7 @@ final class PlaylistLibrary {
             {
                 try? FileManager.default.removeItem(at: directory.appendingPathComponent(file))
             }
-            throw PlaylistAddError(message: "The playlist could not be saved.")
+            throw PlaylistAddError(message: String(localized: "The playlist could not be saved."))
         }
 
         reload()
@@ -153,12 +153,14 @@ final class PlaylistLibrary {
             let trimmed = url.trimmingCharacters(in: .whitespacesAndNewlines)
             guard let host = Self.webHost(trimmed) else {
                 throw PlaylistAddError(
-                    message: "That is not a valid web address. It should start with http:// or https://."
+                    message: String(
+                        localized: "That is not a valid web address. It should start with http:// or https://."
+                    )
                 )
             }
             let guide = guideURL?.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty
             if let guide, Self.webHost(guide) == nil {
-                throw PlaylistAddError(message: "The TV guide address is not a valid web address.")
+                throw PlaylistAddError(message: String(localized: "The TV guide address is not a valid web address."))
             }
             return Prepared(
                 name: name.nilIfBlank ?? host,
@@ -221,7 +223,7 @@ final class PlaylistLibrary {
             try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
             try FileManager.default.copyItem(at: source, to: directory.appendingPathComponent(name))
         } catch {
-            throw PlaylistAddError(message: "That file could not be read.")
+            throw PlaylistAddError(message: String(localized: "That file could not be read."))
         }
         return name
     }

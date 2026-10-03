@@ -38,6 +38,14 @@ struct SubtitleStyleTests {
     }
 
     @Test
+    func `the same style is always the same saved text`() {
+        let first = SubtitleStyle().rawValue
+        for _ in 0 ..< 50 {
+            #expect(SubtitleStyle().rawValue == first)
+        }
+    }
+
+    @Test
     func `any change counts as customised`() {
         var style = SubtitleStyle()
         style.raised = true

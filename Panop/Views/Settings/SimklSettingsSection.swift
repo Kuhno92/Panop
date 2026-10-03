@@ -28,10 +28,10 @@ struct SimklSettingsSection: View {
         } header: {
             Text("Simkl")
         } footer: {
-            Text(
-                "Once connected, films and episodes you finish are recorded on your Simkl account. "
-                    + "Nothing is sent while you are disconnected, and live TV is never sent."
-            )
+            Text("""
+            Once connected, films and episodes you finish are recorded on your Simkl account. \
+            Nothing is sent while you are disconnected, and live TV is never sent.
+            """)
         }
     }
 

@@ -94,14 +94,14 @@ struct SearchView: View {
 /// not drawn, rather than shown empty.
 private struct SearchSection: View {
     @Query private var matches: [CatalogEntryRecord]
-    let title: String
+    let title: LocalizedStringKey
     let hidden: Set<String>
     let hiddenGroups: Set<String>
     let onSelect: (CatalogEntryRecord) -> Void
 
     init(
         kind: MediaKind,
-        title: String,
+        title: LocalizedStringKey,
         term: String,
         limit: Int,
         hidden: Set<String>,

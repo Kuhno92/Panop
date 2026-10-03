@@ -43,9 +43,9 @@ struct PINSheet: View {
 
     private var prompt: String {
         switch step {
-        case .current: "Enter your PIN"
-        case .new: "Choose a PIN of 4 to 6 digits"
-        case .confirm: "Enter it again"
+        case .current: String(localized: "Enter your PIN")
+        case .new: String(localized: "Choose a PIN of 4 to 6 digits")
+        case .confirm: String(localized: "Enter it again")
         }
     }
 
@@ -84,11 +84,11 @@ struct PINSheet: View {
 
     private var title: String {
         switch purpose {
-        case .unlock: "Show adult content"
-        case .create: "Set a PIN"
-        case .change: "Change PIN"
-        case .remove: "Remove PIN"
-        case .confirm: "Enter PIN"
+        case .unlock: String(localized: "Show adult content")
+        case .create: String(localized: "Set a PIN")
+        case .change: String(localized: "Change PIN")
+        case .remove: String(localized: "Remove PIN")
+        case .confirm: String(localized: "Enter PIN")
         }
     }
 
@@ -101,14 +101,14 @@ struct PINSheet: View {
             check(current: text)
         case .new:
             guard ParentalControls.isValid(text) else {
-                message = "A PIN is 4 to 6 digits."
+                message = String(localized: "A PIN is 4 to 6 digits.")
                 return
             }
             chosen = text
             step = .confirm
         case .confirm:
             guard text == chosen else {
-                message = "The two did not match. Choose a PIN again."
+                message = String(localized: "The two did not match. Choose a PIN again.")
                 chosen = ""
                 step = .new
                 return
@@ -128,9 +128,12 @@ struct PINSheet: View {
             default: finish()
             }
         case let .wrong(left):
-            message = left == 1 ? "Wrong PIN. One try left before it locks." : "Wrong PIN. \(left) tries left."
+            message = left == 1
+                ? String(localized: "Wrong PIN. One try left before it locks.")
+                : String(localized: "Wrong PIN. \(left) tries left.")
         case let .locked(until):
-            message = "Too many tries. Try again at \(until.formatted(date: .omitted, time: .shortened))."
+            let time = until.formatted(date: .omitted, time: .shortened)
+            message = String(localized: "Too many tries. Try again at \(time).")
         }
     }
 

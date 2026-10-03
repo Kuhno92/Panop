@@ -47,9 +47,9 @@ struct StartupSection: View {
     private var footer: String {
         switch action.wrappedValue {
         case .channel:
-            "The channel starts playing as soon as Panop opens, from what is already on this device."
+            String(localized: "The channel starts playing as soon as Panop opens, from what is already on this device.")
         default:
-            "The screen Panop opens on."
+            String(localized: "The screen Panop opens on.")
         }
     }
 }

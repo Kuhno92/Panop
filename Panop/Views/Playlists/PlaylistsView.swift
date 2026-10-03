@@ -137,11 +137,11 @@ struct PlaylistRow: View {
                 }
                 Button("Keep them", role: .cancel) {}
             } message: { removal in
-                Text(
-                    "The provider's latest list is missing \(removal.ids.count) items. "
-                        + "That can mean the download was cut off. "
-                        + "Removing them also removes any favourites and watch progress on them."
-                )
+                Text("""
+                The provider's latest list is missing \(removal.ids.count) items. \
+                That can mean the download was cut off. \
+                Removing them also removes any favourites and watch progress on them.
+                """)
             }
     }
 
@@ -203,11 +203,11 @@ struct PlaylistRow: View {
 
     private var subtitle: String {
         let source = switch playlist.kind {
-        case .xtream: "Xtream · \(playlist.displayHost)"
-        case .remoteM3U: "M3U · \(playlist.displayHost)"
-        case .localM3U: "M3U file"
+        case .xtream: String(localized: "Xtream · \(playlist.displayHost)")
+        case .remoteM3U: String(localized: "M3U · \(playlist.displayHost)")
+        case .localM3U: String(localized: "M3U file")
         }
-        return playlist.includesVOD ? source : source + " · Live TV only"
+        return playlist.includesVOD ? source : source + String(localized: " · Live TV only")
     }
 
     @ViewBuilder
@@ -237,7 +237,9 @@ struct PlaylistRow: View {
             // Not an error: the rest imported. But a person whose channel count is lower than
             // the file's should be told why.
             Label(
-                "\(summary.skipped.formatted()) \(summary.skipped == 1 ? "entry was" : "entries were") left out: no address to play.",
+                summary.skipped == 1
+                    ? "One entry was left out: no address to play."
+                    : "\(summary.skipped.formatted()) entries were left out: no address to play.",
                 systemImage: "info.circle"
             )
             .font(.caption).foregroundStyle(.secondary)
@@ -263,7 +265,7 @@ struct PlaylistRow: View {
     private func finishedText(_ summary: SyncSummary) -> String {
         let when = summary.finishedAt.formatted(.relative(presentation: .named))
         return summary.unchanged
-            ? "Up to date · checked \(when)"
-            : "\(summary.entries.formatted()) items · updated \(when)"
+            ? String(localized: "Up to date · checked \(when)")
+            : String(localized: "\(summary.entries.formatted()) items · updated \(when)")
     }
 }
