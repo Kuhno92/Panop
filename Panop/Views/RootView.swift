@@ -17,6 +17,7 @@ struct RootView: View {
     /// One set of rails for Home, Movies and Series, built off the main thread (see `DiscoveryModel`).
     @State private var discovery = DiscoveryModel()
     @State private var simkl: SimklAccount
+    @State private var parental = ParentalControls.live()
     @State private var simklSync: SimklSync
     @State private var simklLibrary: SimklLibrary
     @AppStorage(SimklSync.enabledKey) private var sendsWatched = true
@@ -97,6 +98,7 @@ struct RootView: View {
             }
         }
         .environment(simkl)
+        .environment(parental)
         .environment(simklSync)
         // What is finished goes to Simkl only while connected and switched on; the queue belongs to the
         // account it was made for, so signing out drops it.

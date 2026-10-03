@@ -32,6 +32,46 @@ final class SettingsTests: PanopUITestCase {
             add(shot)
         }
 
+        /// Types into the PIN field the sheet has focused and presses Continue.
+        private func enterPIN(_ digits: String) {
+            let field = app.secureTextFields.firstMatch
+            XCTAssertTrue(field.waitForExistence(timeout: 10), "no PIN field. Screen:\n\(app.debugDescription)")
+            field.tap()
+            field.typeText(digits)
+            app.buttons["Continue"].tap()
+        }
+
+        private func scrollTo(_ element: XCUIElement) {
+            for _ in 0 ..< 6 where !element.exists {
+                app.swipeUp()
+            }
+        }
+
+        func testAPINGuardsTurningTheAdultFilterOff() {
+            waitForChannels()
+            app.tabBars.buttons["Settings"].tap()
+            let setPIN = app.buttons["Set a PIN…"]
+            scrollTo(setPIN)
+            setPIN.tap()
+            enterPIN("4821")
+            enterPIN("4821")
+            XCTAssertTrue(app.buttons["Change PIN…"].waitForExistence(timeout: 10), "the PIN was not set")
+
+            let toggle = app.switches["Hide adult content"]
+            scrollTo(toggle)
+            XCTAssertEqual(toggle.value as? String, "1", "the filter should be on")
+            // The row is wide, but only the switch at its right edge responds.
+            toggle.coordinate(withNormalizedOffset: CGVector(dx: 0.92, dy: 0.5)).tap()
+
+            // Asked for the PIN: a wrong one is refused and the filter stays on.
+            enterPIN("1111")
+            XCTAssertTrue(app.staticTexts["Wrong PIN. 4 tries left."].waitForExistence(timeout: 10))
+            enterPIN("4821")
+            XCTAssertTrue(app.buttons["Change PIN…"].waitForExistence(timeout: 10), "the sheet did not close")
+            scrollTo(toggle)
+            XCTAssertEqual(toggle.value as? String, "0", "the right PIN did not turn the filter off")
+        }
+
         func testAStartupChannelCanBeChosen() {
             waitForChannels()
             app.tabBars.buttons["Settings"].tap()

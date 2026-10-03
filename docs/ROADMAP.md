@@ -613,8 +613,12 @@ Features real users expect that the brief did not name. All *(surfaced)*.
 - [x] **Multiple playlists** and switching between them. Several sources can be added, and Live TV shows all of them or one chosen source (M2); each can be refreshed or deleted from Playlists.
 - [ ] **Profiles**. Shared family devices, especially Apple TV.
 - [x] **Hide adult content** *(surfaced)*: a Settings switch, on by default, leaves categories a provider names as adult out of the lists, search and suggestions. A category the person hid themselves stays their own choice. **Not done:** a PIN to turn it off, which is the parental-controls item below.
-- [ ] **Parental controls**. A PIN cannot ride iCloud Keychain to tvOS, so it goes through the
-      CloudKit container.
+- [x] **Parental controls** *(first part)*: a 4 to 6 digit PIN, stored as a salted hash in this
+      device's Keychain, that guards turning the adult filter off and changing or removing the PIN.
+      Five wrong tries lock it for a minute, doubling to a quarter of an hour, and the count survives
+      quitting. Tested on iOS by a UI test. **Not done:** syncing the PIN to other devices (it cannot
+      ride iCloud Keychain to tvOS, so it goes through the CloudKit container, which is not enabled),
+      per-profile PINs, and locking other things behind it (a rating limit, specific categories).
 - [ ] **Subtitles**. Plain text from LumeEngine is drawn now (M2); what is left is styling, positioning and bitmap subtitles. LumeEngine returns plain text only, with no positioning or styling and no
       bitmap subtitle support, so rendering is Panop's job.
 - [x] **Audio and subtitle track selection** per engine. The player's controls list the tracks any engine reports and pass a choice to it (M2, *Player overlay*). Not yet checked against a real stream with several tracks.

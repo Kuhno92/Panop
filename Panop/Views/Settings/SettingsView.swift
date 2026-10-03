@@ -4,6 +4,22 @@ import SwiftUI
 struct SettingsView: View {
     @AppStorage("playbackEngine") private var engineRaw = PlaybackEngineKind.avPlayer.rawValue
 
+    /// Turning the filter off asks for the PIN when there is one; turning it on never does.
+    private var hidesAdultGuarded: Binding<Bool> {
+        Binding(
+            get: { hidesAdult },
+            set: { newValue in
+                if newValue {
+                    hidesAdult = true
+                } else if parental.hasPIN {
+                    pinPurpose = .unlock
+                } else {
+                    hidesAdult = false
+                }
+            }
+        )
+    }
+
     private var selectedEngine: Binding<PlaybackEngineKind> {
         Binding(
             get: { PlaybackEngineKind(rawValue: engineRaw) ?? .avPlayer },
@@ -16,6 +32,8 @@ struct SettingsView: View {
     @AppStorage(DiscoveryModel.enabledKey) private var showsSuggestions = true
     @AppStorage(DiscoveryModel.trendingKey) private var showsTrending = true
     @AppStorage(UserStateStore.hideAdultKey) private var hidesAdult = true
+    @Environment(ParentalControls.self) private var parental
+    @State private var pinPurpose: PINPurpose?
     @State private var confirmingForget = false
 
     var body: some View {
@@ -33,11 +51,27 @@ struct SettingsView: View {
                         LabeledContent("Hidden", value: userState.hidden.count.formatted())
                     }
                 }
-                Toggle("Hide adult content", isOn: $hidesAdult)
+                Toggle("Hide adult content", isOn: hidesAdultGuarded)
             } header: {
                 Text("Library")
             } footer: {
                 Text("Leaves out categories a provider names as adult, from the lists, search and suggestions.")
+            }
+
+            Section {
+                if parental.hasPIN {
+                    Button("Change PIN…") { pinPurpose = .change }
+                    Button("Remove PIN…", role: .destructive) { pinPurpose = .remove }
+                } else {
+                    Button("Set a PIN…") { pinPurpose = .create }
+                }
+            } header: {
+                Text("Parental controls")
+            } footer: {
+                Text(
+                    "With a PIN, adult content cannot be shown again, and the PIN cannot be changed, without it. "
+                        + "The PIN stays on this device."
+                )
             }
 
             StartupSection()
@@ -99,6 +133,17 @@ struct SettingsView: View {
             }
         }
         .navigationTitle("Settings")
+        .sheet(item: $pinPurpose) { purpose in
+            PINSheet(purpose: purpose) {
+                // A PIN is for keeping the filter on: setting one turns it on.
+                if purpose == .create {
+                    hidesAdult = true
+                }
+                if purpose == .unlock {
+                    hidesAdult = false
+                }
+            }
+        }
     }
 }
 
