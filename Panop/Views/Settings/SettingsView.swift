@@ -89,6 +89,7 @@ struct SettingsView: View {
                         Text(kind.displayName).tag(kind)
                     }
                 }
+                NavigationLink("Subtitles") { SubtitleSettingsView() }
             } header: {
                 Text("Playback")
             } footer: {

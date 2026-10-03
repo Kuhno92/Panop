@@ -72,6 +72,26 @@ final class SettingsTests: PanopUITestCase {
             XCTAssertEqual(toggle.value as? String, "0", "the right PIN did not turn the filter off")
         }
 
+        func testSubtitlesCanBeStyledAndResetToStandard() {
+            waitForChannels()
+            app.tabBars.buttons["Settings"].tap()
+            let link = app.buttons["Subtitles"]
+            scrollTo(link)
+            link.tap()
+
+            let raise = app.switches["Raise subtitles"]
+            XCTAssertTrue(raise.waitForExistence(timeout: 10), "no subtitle settings. Screen:\n\(app.debugDescription)")
+            XCTAssertEqual(raise.value as? String, "0")
+
+            raise.coordinate(withNormalizedOffset: CGVector(dx: 0.92, dy: 0.5)).tap()
+            XCTAssertEqual(raise.value as? String, "1", "the setting did not change")
+
+            let reset = app.buttons["Reset to standard"]
+            XCTAssertTrue(reset.waitForExistence(timeout: 10))
+            reset.tap()
+            XCTAssertEqual(raise.value as? String, "0", "reset did not restore the standard look")
+        }
+
         func testAStartupChannelCanBeChosen() {
             waitForChannels()
             app.tabBars.buttons["Settings"].tap()

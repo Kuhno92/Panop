@@ -626,7 +626,7 @@ Features real users expect that the brief did not name. All *(surfaced)*.
       quitting. Tested on iOS by a UI test. **Not done:** syncing the PIN to other devices (it cannot
       ride iCloud Keychain to tvOS, so it goes through the CloudKit container, which is not enabled),
       per-profile PINs, and locking other things behind it (a rating limit, specific categories).
-- [ ] **Subtitles**. Plain text from LumeEngine is drawn now (M2); what is left is styling, positioning and bitmap subtitles. LumeEngine returns plain text only, with no positioning or styling and no
+- [x] **Subtitles** *(styling done)*. Settings → Playback → Subtitles sets size, colour, background and a raised position, with a preview. Panop's own overlay (Lume) uses it at once, and AVPlayer gets it as text style rules once the style is changed, so the system caption setting stays in charge until then. **Not done:** VLC, which draws its own subtitles and has no hook for this, and bitmap subtitles. Plain text from LumeEngine is drawn now (M2); what is left is positioning and bitmap subtitles. LumeEngine returns plain text only, with no positioning or styling and no
       bitmap subtitle support, so rendering is Panop's job.
 - [x] **Audio and subtitle track selection** per engine. The player's controls list the tracks any engine reports and pass a choice to it (M2, *Player overlay*). Not yet checked against a real stream with several tracks.
 - [ ] **Large-catalog hardening**. Indexes on every predicate and sort column, batched writes

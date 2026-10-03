@@ -209,22 +209,17 @@ private struct PlayerProblem: View {
 private struct SubtitleOverlay: View {
     let display: SubtitleDisplay
     let controlsUp: Bool
+    @AppStorage(SubtitleStyle.key) private var style = SubtitleStyle.standard
 
     var body: some View {
         VStack {
             Spacer()
             if let text = display.text {
-                Text(text)
-                    .font(.title3.weight(.semibold))
-                    .multilineTextAlignment(.center)
-                    .foregroundStyle(.white)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 6)
-                    .background(.black.opacity(0.6), in: RoundedRectangle(cornerRadius: 6))
+                SubtitleText(text: text, style: style)
                     .padding(.horizontal, 40)
             }
         }
-        .padding(.bottom, controlsUp ? 110 : 36)
+        .padding(.bottom, (controlsUp ? 110 : 36) + (style.raised ? 90 : 0))
         .allowsHitTesting(false)
         .animation(.easeOut(duration: 0.2), value: controlsUp)
     }

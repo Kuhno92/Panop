@@ -114,6 +114,9 @@ final class AVPlayerEngine: PlaybackEngine {
 
         let asset = AVURLAsset(url: url, options: options)
         let playerItem = AVPlayerItem(asset: asset)
+        if let rule = SubtitleStyle.current.textStyleRule {
+            playerItem.textStyleRules = [rule]
+        }
         player.replaceCurrentItem(with: playerItem)
 
         try await waitUntilReady(playerItem)
