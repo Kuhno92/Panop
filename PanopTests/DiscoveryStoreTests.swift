@@ -236,15 +236,29 @@ struct RailHeadingTests {
         #expect(title(.classics(.movie)) == "Classics")
         #expect(title(.decade(.movie, 1990)) == "Movies of the 1990s")
         #expect(title(.pickOfTheDay(.series)) == "Series pick of the day")
-        #expect(title(.curated(.movie, "boxOffice")) == "Top Box Office Movies on Simkl")
-        #expect(title(.curated(.series, "network.Netflix")) == "Best of Netflix on Simkl")
-        #expect(title(.curated(.series, "genre.Science Fiction")) == "Best Sci-Fi Series on Simkl")
-        #expect(title(.curated(.movie, "genre.Action")) == "Best Action Movies on Simkl")
-        #expect(title(.curated(.movie, "decade.1990")) == "Best Movies of the 1990s on Simkl", "no thousands separator")
-        #expect(title(.curated(.series, "topRated")) == "Top Rated Series on Simkl")
-        #expect(title(.curated(.movie, "justOnDVD")) == "Latest DVD Releases on Simkl")
-        #expect(title(.curated(.series, "airing")) == "Currently Airing Series on Simkl")
-        #expect(title(.curated(.movie, "custom.11"), "Best 90s sci-fi") == "Your Simkl list: Best 90s sci-fi")
+        #expect(title(.curated(.movie, "boxOffice")) == "Top Box Office Movies")
+        #expect(title(.curated(.series, "network.Netflix")) == "Best of Netflix")
+        #expect(title(.curated(.series, "genre.Science Fiction")) == "Best Sci-Fi Series")
+        #expect(title(.curated(.movie, "genre.Action")) == "Best Action Movies")
+        #expect(title(.curated(.movie, "decade.1990")) == "Best Movies of the 1990s", "no thousands separator")
+        #expect(title(.curated(.series, "topRated")) == "Top Rated Series")
+        #expect(title(.curated(.movie, "justOnDVD")) == "Latest DVD Releases")
+        #expect(title(.curated(.series, "airing")) == "Currently Airing Series")
+        #expect(title(.curated(.movie, "custom.11"), "Best 90s sci-fi") == "Your list: Best 90s sci-fi")
+    }
+
+    @Test
+    func `the rails made from Simkl's data are the ones that carry its mark`() {
+        func fromSimkl(_ kind: RailKind) -> Bool {
+            RailHeading.isFromSimkl(Rail(kind: kind, keys: [], subject: nil))
+        }
+
+        #expect(fromSimkl(.trending(.movie)))
+        #expect(fromSimkl(.curated(.movie, "boxOffice")))
+        #expect(fromSimkl(.nextUp))
+        #expect(fromSimkl(.onYourList))
+        #expect(!fromSimkl(.mostWatched))
+        #expect(!fromSimkl(.topRated(.movie)))
     }
 
     @Test

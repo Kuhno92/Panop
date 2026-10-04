@@ -18,10 +18,13 @@ struct MainTabLabel: View {
     @Environment(\.horizontalSizeClass) private var sizeClass
 
     var body: some View {
-        // Icons alone in a bar on a phone or a TV, where room and distance ask for it. In the sidebar of an
-        // iPad or a Mac there is room, and an icon with no name is a puzzle.
+        // Icons alone in a bar on a phone, a Mac or a TV. In the sidebar of an iPad there is room, and an icon
+        // with no name is a puzzle.
         #if os(macOS)
+            // With room either side, so each is a wide, easy target in the bar.
             Label(title, systemImage: systemImage)
+                .labelStyle(.iconOnly)
+                .padding(.horizontal, 18)
         #elseif os(tvOS)
             // Icons alone, with room either side so each is a wide, easy target in the bar.
             Label(title, systemImage: systemImage)
@@ -143,8 +146,9 @@ struct RootView: View {
                 MainTabLabel("Settings", systemImage: "gearshape")
             }
         }
-        #if !os(tvOS)
-        // A tab bar on a phone, and a sidebar the person can open on an iPad or a Mac.
+        #if os(iOS)
+        // A tab bar on a phone, and a sidebar the person can open on an iPad. The Mac keeps its bar along the
+        // top, as does Apple TV.
         .tabViewStyle(.sidebarAdaptable)
         #endif
         // Everything under it starts again, so no screen shows the last person's lists.

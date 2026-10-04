@@ -409,42 +409,42 @@
         }
       }
     },
-    "Best %@ Movies on Simkl": {
+    "Best %@ Movies": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Beste %@-Filme auf Simkl"
+            "value": "Beste %@-Filme"
           }
         }
       }
     },
-    "Best %@ Series on Simkl": {
+    "Best %@ Series": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Beste %@-Serien auf Simkl"
+            "value": "Beste %@-Serien"
           }
         }
       }
     },
-    "Best Movies of the %@s on Simkl": {
+    "Best Movies of the %@s": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Beste Filme der %@er auf Simkl"
+            "value": "Beste Filme der %@er"
           }
         }
       }
     },
-    "Best of %@ on Simkl": {
+    "Best of %@": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Das Beste von %@ auf Simkl"
+            "value": "Das Beste von %@"
           }
         }
       }
@@ -821,12 +821,12 @@
         }
       }
     },
-    "Currently Airing Series on Simkl": {
+    "Currently Airing Series": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Aktuell laufende Serien auf Simkl"
+            "value": "Aktuell laufende Serien"
           }
         }
       }
@@ -1171,22 +1171,22 @@
         }
       }
     },
-    "Hidden Gem Movies on Simkl": {
+    "Hidden Gem Movies": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Geheimtipp-Filme auf Simkl"
+            "value": "Geheimtipp-Filme"
           }
         }
       }
     },
-    "Hidden Gem Series on Simkl": {
+    "Hidden Gem Series": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Geheimtipp-Serien auf Simkl"
+            "value": "Geheimtipp-Serien"
           }
         }
       }
@@ -1281,12 +1281,12 @@
         }
       }
     },
-    "In Theatres Now on Simkl": {
+    "In Theatres Now": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Jetzt im Kino, auf Simkl"
+            "value": "Jetzt im Kino"
           }
         }
       }
@@ -1391,12 +1391,12 @@
         }
       }
     },
-    "Latest DVD Releases on Simkl": {
+    "Latest DVD Releases": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Neueste DVD-Veröffentlichungen auf Simkl"
+            "value": "Neueste DVD-Veröffentlichungen"
           }
         }
       }
@@ -1542,22 +1542,22 @@
         }
       }
     },
-    "Most Watchlisted Movies on Simkl": {
+    "Most Watchlisted Movies": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Meistgemerkte Filme auf Simkl"
+            "value": "Meistgemerkte Filme"
           }
         }
       }
     },
-    "Most Watchlisted Series on Simkl": {
+    "Most Watchlisted Series": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Meistgemerkte Serien auf Simkl"
+            "value": "Meistgemerkte Serien"
           }
         }
       }
@@ -1598,6 +1598,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "Filmtipp des Tages"
+          }
+        }
+      }
+    },
+    "Movie, TV and anime data from Simkl": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Film-, Serien- und Anime-Daten von Simkl"
           }
         }
       }
@@ -1712,12 +1723,12 @@
         }
       }
     },
-    "Next up on Simkl": {
+    "Next up": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Als Nächstes auf Simkl"
+            "value": "Als Nächstes"
           }
         }
       }
@@ -1958,12 +1969,12 @@
         }
       }
     },
-    "On your Simkl list": {
+    "On your list": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Auf deiner Simkl-Liste"
+            "value": "Auf deiner Liste"
           }
         }
       }
@@ -2248,12 +2259,12 @@
         }
       }
     },
-    "Quick Watches on Simkl (90 min or less)": {
+    "Quick Watches (90 min or less)": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Kurz und gut auf Simkl (bis 90 Min.)"
+            "value": "Kurz und gut (bis 90 Min.)"
           }
         }
       }
@@ -3328,32 +3339,32 @@
         }
       }
     },
-    "Top Box Office Movies on Simkl": {
+    "Top Box Office Movies": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Kassenschlager auf Simkl"
+            "value": "Kassenschlager"
           }
         }
       }
     },
-    "Top Rated Movies on Simkl": {
+    "Top Rated Movies": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Bestbewertete Filme auf Simkl"
+            "value": "Bestbewertete Filme"
           }
         }
       }
     },
-    "Top Rated Series on Simkl": {
+    "Top Rated Series": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Bestbewertete Serien auf Simkl"
+            "value": "Bestbewertete Serien"
           }
         }
       }
@@ -3408,22 +3419,22 @@
         }
       }
     },
-    "Trending Movie Premieres on Simkl": {
+    "Trending Movie Premieres": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Beliebte Film-Premieren auf Simkl"
+            "value": "Beliebte Film-Premieren"
           }
         }
       }
     },
-    "Trending Series Premieres on Simkl": {
+    "Trending Series Premieres": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Beliebte Serien-Premieren auf Simkl"
+            "value": "Beliebte Serien-Premieren"
           }
         }
       }
@@ -3688,12 +3699,12 @@
         }
       }
     },
-    "Your Simkl list: %@": {
+    "Your list: %@": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Deine Simkl-Liste: %@"
+            "value": "Deine Liste: %@"
           }
         }
       }

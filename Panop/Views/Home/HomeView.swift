@@ -103,6 +103,9 @@ struct HomeView: View {
                     } else {
                         browseButton
                     }
+                    if discovery.rails.filter(showsOnHome).contains(where: RailHeading.isFromSimkl) {
+                        SimklCredit()
+                    }
                 }
             }
             .padding(.vertical)

@@ -8,62 +8,62 @@ nonisolated enum RailHeading {
     /// The name of one of the person's own lists, or nil for a list that is not one.
     private static func customTitle(_ rail: Rail, _ id: String) -> String? {
         guard id.hasPrefix("custom.") else { return nil }
-        return String(localized: "Your Simkl list: \(rail.subject ?? "")")
+        return String(localized: "Your list: \(rail.subject ?? "")")
     }
 
     /// A list made from Simkl's. Each names Simkl, as its terms ask of anything shown from its data.
     private static func curatedTitle(_ kind: MediaKind, _ id: String) -> String {
         switch id {
         case "boxOffice":
-            return String(localized: "Top Box Office Movies on Simkl")
+            return String(localized: "Top Box Office Movies")
         case "inTheatres":
-            return String(localized: "In Theatres Now on Simkl")
+            return String(localized: "In Theatres Now")
         case "justOnDVD":
-            return String(localized: "Latest DVD Releases on Simkl")
+            return String(localized: "Latest DVD Releases")
         case "quickWatches":
-            return String(localized: "Quick Watches on Simkl (90 min or less)")
+            return String(localized: "Quick Watches (90 min or less)")
         case "airing":
-            return String(localized: "Currently Airing Series on Simkl")
+            return String(localized: "Currently Airing Series")
         case "premieres":
             return forKind(
                 kind,
-                series: String(localized: "Trending Series Premieres on Simkl"),
-                movies: String(localized: "Trending Movie Premieres on Simkl")
+                series: String(localized: "Trending Series Premieres"),
+                movies: String(localized: "Trending Movie Premieres")
             )
         case "hiddenGems":
             return forKind(
                 kind,
-                series: String(localized: "Hidden Gem Series on Simkl"),
-                movies: String(localized: "Hidden Gem Movies on Simkl")
+                series: String(localized: "Hidden Gem Series"),
+                movies: String(localized: "Hidden Gem Movies")
             )
         case "topRated":
             return forKind(
                 kind,
-                series: String(localized: "Top Rated Series on Simkl"),
-                movies: String(localized: "Top Rated Movies on Simkl")
+                series: String(localized: "Top Rated Series"),
+                movies: String(localized: "Top Rated Movies")
             )
         case "mostWatchlisted":
             return forKind(
                 kind,
-                series: String(localized: "Most Watchlisted Series on Simkl"),
-                movies: String(localized: "Most Watchlisted Movies on Simkl")
+                series: String(localized: "Most Watchlisted Series"),
+                movies: String(localized: "Most Watchlisted Movies")
             )
         default:
             if id.hasPrefix("genre.") {
                 let genre = genreName(String(id.dropFirst("genre.".count)))
                 return forKind(
                     kind,
-                    series: String(localized: "Best \(genre) Series on Simkl"),
-                    movies: String(localized: "Best \(genre) Movies on Simkl")
+                    series: String(localized: "Best \(genre) Series"),
+                    movies: String(localized: "Best \(genre) Movies")
                 )
             }
             if id.hasPrefix("decade.") {
                 let decade = String(id.dropFirst("decade.".count))
-                return String(localized: "Best Movies of the \(decade)s on Simkl")
+                return String(localized: "Best Movies of the \(decade)s")
             }
             if id.hasPrefix("network.") {
                 let network = String(id.dropFirst("network.".count))
-                return String(localized: "Best of \(network) on Simkl")
+                return String(localized: "Best of \(network)")
             }
             return id
         }
@@ -87,12 +87,20 @@ nonisolated enum RailHeading {
         kind == .series ? series : movies
     }
 
+    /// Whether the rail is made from Simkl's data, and so carries its mark.
+    static func isFromSimkl(_ rail: Rail) -> Bool {
+        switch rail.kind {
+        case .nextUp, .onYourList, .curated, .trending: true
+        default: false
+        }
+    }
+
     static func title(for rail: Rail) -> String {
         switch rail.kind {
         case .nextUp:
-            String(localized: "Next up on Simkl")
+            String(localized: "Next up")
         case .onYourList:
-            String(localized: "On your Simkl list")
+            String(localized: "On your list")
         case let .curated(kind, id):
             // A list the person named themselves is called what they called it.
             customTitle(rail, id) ?? curatedTitle(kind, id)
@@ -139,6 +147,36 @@ nonisolated enum RailHeading {
     }
 }
 
+/// Simkl's own mark, the colored icon it provides for apps that show its data, at the start of a heading.
+struct SimklMark: View {
+    var body: some View {
+        Image("SimklLogo")
+            .resizable()
+            .scaledToFit()
+            .frame(width: Self.size, height: Self.size)
+            .clipShape(RoundedRectangle(cornerRadius: Self.size * 0.22))
+            .accessibilityLabel("Simkl")
+    }
+
+    private static var size: CGFloat {
+        #if os(tvOS)
+            40
+        #else
+            24
+        #endif
+    }
+}
+
+/// The one line of credit for Simkl's data that Simkl's rules ask for where it is shown.
+struct SimklCredit: View {
+    var body: some View {
+        Text("Movie, TV and anime data from Simkl")
+            .font(.caption)
+            .foregroundStyle(.secondary)
+            .padding(.horizontal)
+    }
+}
+
 /// A row of posters under a heading. Draws what it is given; the titles were chosen off the main thread.
 struct PosterRail: View {
     let rail: Rail
@@ -153,10 +191,16 @@ struct PosterRail: View {
         let items = rail.keys.compactMap { rows[$0] }
         if !items.isEmpty {
             VStack(alignment: .leading, spacing: 12) {
-                Text(RailHeading.title(for: rail))
-                    .font(.title2.bold())
-                    .padding(.horizontal)
-                    .accessibilityAddTraits(.isHeader)
+                HStack(spacing: 10) {
+                    if RailHeading.isFromSimkl(rail) {
+                        SimklMark()
+                    }
+                    Text(RailHeading.title(for: rail))
+                        .font(.title2.bold())
+                }
+                .padding(.horizontal)
+                .accessibilityElement(children: .combine)
+                .accessibilityAddTraits(.isHeader)
                 ScrollView(.horizontal, showsIndicators: false) {
                     LazyHStack(alignment: .top, spacing: RailMetrics.spacing) {
                         ForEach(items) { row in

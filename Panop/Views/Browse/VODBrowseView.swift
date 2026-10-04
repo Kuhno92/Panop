@@ -296,6 +296,9 @@ private struct VODGrid: View {
                         onSelect: onSelect
                     )
                 }
+                if rails.contains(where: RailHeading.isFromSimkl) {
+                    SimklCredit()
+                }
                 ForEach(model.sections) { section in
                     Section {
                         LazyVGrid(

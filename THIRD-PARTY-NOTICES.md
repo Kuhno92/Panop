@@ -98,7 +98,7 @@ Not code in the build, but data the app fetches.
 
 | Service | Use | Terms |
 |---|---|---|
-| Simkl (https://simkl.com) | Public trending and disc-release lists, and rows made from them (Top Box Office, Best of Netflix and the like), shown under Simkl's name with a link to each title's Simkl page | https://api.simkl.org/api-rules: free for non-commercial apps and for commercial apps earning under $150 a month; above that a commercial licence is required. All Simkl code is in `PanopSimkl`, which can be dropped. |
+| Simkl (https://simkl.com) | Public trending and disc-release lists, and rows made from them (Top Box Office, Best of Netflix and the like), shown with Simkl's own colored icon (the brand asset it provides at us.simkl.in/img_favicon/v2/favicon-192x192.png, in `Panop/Assets.xcassets/SimklLogo.imageset`) at the start of each heading, the word Simkl kept in the trending rails' titles, a one-line credit under the rails, and a link to each title's Simkl page | https://api.simkl.org/api-rules: free for non-commercial apps and for commercial apps earning under $150 a month; above that a commercial licence is required. All Simkl code is in `PanopSimkl`, which can be dropped. |
 
 ---
 
