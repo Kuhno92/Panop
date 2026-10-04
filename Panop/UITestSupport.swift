@@ -1,4 +1,5 @@
 import Foundation
+import PanopCatalog
 import PanopCore
 import PanopEPG
 import PanopPlayback
@@ -38,6 +39,21 @@ enum UITestMode {
         static let opensPlayerWindow = isActive && ProcessInfo.processInfo.arguments
             .contains("-panop-open-player-window")
 
+        /// A title for Home's hero, from the environment `PANOP_HERO`: the seeded library has no suggestion rails
+        /// (they need ratings, years and a trending list), so a test that is about the hero gives it one.
+        static var heroTitle: CatalogRow? {
+            guard isActive, ProcessInfo.processInfo.environment["PANOP_HERO"] == "1" else { return nil }
+            return CatalogRow(CatalogEntryRecord(playlist: "uitest", entry: CatalogEntry(
+                id: "hero",
+                kind: .movie,
+                name: "Dune",
+                streamURL: "http://127.0.0.1:9/movie/u/p/3.mp4",
+                rating: 8.1,
+                year: 2021,
+                genre: "Science Fiction, Drama"
+            )))
+        }
+
         /// The tab to open on, from the environment `PANOP_START_TAB` (`home`, `live`). Most UI
         /// tests are about Live TV and ask for it; the home screen tests ask for `home`.
         static var startTab: AppTab? {
@@ -59,6 +75,10 @@ enum UITestMode {
         }
 
         static var startTab: AppTab? {
+            nil
+        }
+
+        static var heroTitle: CatalogRow? {
             nil
         }
     #endif

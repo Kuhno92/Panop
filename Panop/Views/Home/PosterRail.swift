@@ -158,14 +158,14 @@ struct PosterRail: View {
                     .padding(.horizontal)
                     .accessibilityAddTraits(.isHeader)
                 ScrollView(.horizontal, showsIndicators: false) {
-                    LazyHStack(alignment: .top, spacing: Self.spacing) {
+                    LazyHStack(alignment: .top, spacing: RailMetrics.spacing) {
                         ForEach(items) { row in
                             RailPoster(row: row, link: link(for: row), caption: caption(for: row)) { onSelect(row) }
                         }
                     }
                     .padding(.horizontal)
                     // A focused poster on Apple TV grows, and the row would clip it.
-                    .padding(.vertical, Self.verticalRoom)
+                    .padding(.vertical, RailMetrics.verticalRoom)
                 }
             }
         }
@@ -184,22 +184,6 @@ struct PosterRail: View {
     private func caption(for row: CatalogRow) -> String? {
         guard case .nextUp = rail.kind, let id = row.tmdbID else { return nil }
         return nextEpisodes[DiscoveryModel.linkKey(kind: row.kind, tmdbID: id)]?.label
-    }
-
-    private static var spacing: CGFloat {
-        #if os(tvOS)
-            40
-        #else
-            14
-        #endif
-    }
-
-    private static var verticalRoom: CGFloat {
-        #if os(tvOS)
-            24
-        #else
-            0
-        #endif
     }
 }
 
@@ -241,11 +225,7 @@ private struct RailPoster: View {
     }
 
     private static var width: CGFloat {
-        #if os(tvOS)
-            200
-        #else
-            110
-        #endif
+        RailMetrics.posterWidth
     }
 }
 

@@ -14,6 +14,11 @@ class PanopUITestCase: XCTestCase {
     }
 
     /// The tab the app opens on: Live TV, since most tests are about it.
+    /// Gives Home a hero title, which the seeded library has no suggestions to choose from.
+    var showsHero: Bool {
+        false
+    }
+
     var startTab: String {
         "live"
     }
@@ -43,6 +48,9 @@ class PanopUITestCase: XCTestCase {
         }
         app.launchEnvironment["PANOP_CONTROLS_TIMEOUT"] = String(controlsTimeout)
         app.launchEnvironment["PANOP_START_TAB"] = startTab
+        if showsHero {
+            app.launchEnvironment["PANOP_HERO"] = "1"
+        }
         if liveOnly {
             app.launchEnvironment["PANOP_LIVE_ONLY"] = "1"
         }

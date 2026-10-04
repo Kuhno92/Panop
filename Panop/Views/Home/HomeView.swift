@@ -48,11 +48,18 @@ struct HomeView: View {
 
     private var rails: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 32) {
+            VStack(alignment: .leading, spacing: RailMetrics.rowSpacing) {
                 if library.playlists.isEmpty {
                     noPlaylist
                 } else {
                     let hasHistory = !userState.recents.isEmpty || !userState.favorites.isEmpty
+                    if let hero = heroRow {
+                        HeroView(
+                            row: hero,
+                            onPlay: { hero.kind == .movie ? playNow(hero) : open(hero) },
+                            onInfo: { open(hero) }
+                        )
+                    }
                     if hasHistory {
                         if let last = userState.recents.first {
                             ContinueBanner(key: last, onPlay: play)
@@ -101,6 +108,20 @@ struct HomeView: View {
         }
     }
 
+    /// The title Home leads with: the first of the first suggestion row that has one. Chosen from what the
+    /// rails already hold, so nothing is read or fetched for it.
+    private var heroRow: CatalogRow? {
+        if let seeded = UITestMode.heroTitle {
+            return seeded
+        }
+        for rail in discovery.rails.filter(showsOnHome) {
+            if let row = rail.keys.lazy.compactMap({ discovery.rows[$0] }).first(where: { $0.iconURL != nil }) {
+                return row
+            }
+        }
+        return nil
+    }
+
     /// Unfinished films and episodes, without the one the banner already offers.
     private var continueKeys: [String] {
         userState.continueWatching.filter { $0 != userState.recents.first }
@@ -134,6 +155,11 @@ struct HomeView: View {
             userState.markPlayed(row.id)
             playing = PlaybackTarget(row: row)
         }
+    }
+
+    private func playNow(_ row: CatalogRow) {
+        userState.markPlayed(row.id)
+        playing = PlaybackTarget(row: row)
     }
 
     private func play(_ channel: CatalogEntryRecord) {
@@ -247,39 +273,30 @@ struct ChannelRail: View {
                     .padding(.horizontal)
                     .accessibilityAddTraits(.isHeader)
                 ScrollView(.horizontal, showsIndicators: false) {
-                    LazyHStack(spacing: Self.spacing) {
+                    LazyHStack(alignment: .top, spacing: RailMetrics.spacing) {
                         ForEach(shown) { channel in
-                            ChannelCard(
-                                channel: channel,
-                                isFavorite: userState.isFavorite(key(of: channel)),
-                                progress: showsProgress ? userState.progress[key(of: channel)]?.fraction : nil
-                            ) {
-                                onPlay(channel)
-                            }
+                            card(channel)
                         }
                     }
                     .padding(.horizontal)
-                    // A focused card on Apple TV grows, and the row would clip it.
-                    .padding(.vertical, Self.verticalRoom)
+                    .padding(.vertical, RailMetrics.verticalRoom)
                 }
             }
         }
     }
 
-    private static var spacing: CGFloat {
-        #if os(tvOS)
-            40
-        #else
-            14
-        #endif
-    }
-
-    private static var verticalRoom: CGFloat {
-        #if os(tvOS)
-            24
-        #else
-            0
-        #endif
+    /// A film or an episode is a poster with its progress; a channel is its logo.
+    @ViewBuilder
+    private func card(_ channel: CatalogEntryRecord) -> some View {
+        let key = key(of: channel)
+        let progress = showsProgress ? userState.progress[key]?.fraction : nil
+        if channel.kind == .live {
+            ChannelCard(channel: channel, isFavorite: userState.isFavorite(key), progress: progress) { onPlay(channel) }
+        } else {
+            ProgressPoster(channel: channel, isFavorite: userState.isFavorite(key), progress: progress) {
+                onPlay(channel)
+            }
+        }
     }
 }
 

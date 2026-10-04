@@ -1531,6 +1531,17 @@
         }
       }
     },
+    "More info": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mehr Infos"
+          }
+        }
+      }
+    },
     "Most Watchlisted Movies on Simkl": {
       "localizations": {
         "de": {
