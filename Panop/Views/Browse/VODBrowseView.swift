@@ -282,11 +282,11 @@ private struct VODGrid: View {
     var body: some View {
         ScrollView {
             LazyVStack(alignment: .leading, spacing: Self.spacing, pinnedViews: Self.pinnedHeadings) {
-                if let lead = rails.lazy.compactMap({ rail in
-                    rail.keys.lazy.compactMap { railRows[$0] }.first { $0.iconURL != nil }
-                }).first {
-                    HeroView(row: lead, backdrop: backdrop(lead), onInfo: { onSelect(lead) })
-                }
+                HeroCarousel(
+                    rows: HeroSelection.rows(rails: rails, rows: railRows, backdrop: backdrop),
+                    backdrop: backdrop,
+                    onInfo: onSelect
+                )
                 ForEach(rails) { rail in
                     PosterRail(
                         rail: rail,

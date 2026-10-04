@@ -39,19 +39,21 @@ enum UITestMode {
         static let opensPlayerWindow = isActive && ProcessInfo.processInfo.arguments
             .contains("-panop-open-player-window")
 
-        /// A title for Home's hero, from the environment `PANOP_HERO`: the seeded library has no suggestion rails
-        /// (they need ratings, years and a trending list), so a test that is about the hero gives it one.
-        static var heroTitle: CatalogRow? {
-            guard isActive, ProcessInfo.processInfo.environment["PANOP_HERO"] == "1" else { return nil }
-            return CatalogRow(CatalogEntryRecord(playlist: "uitest", entry: CatalogEntry(
-                id: "hero",
-                kind: .movie,
-                name: "Dune",
-                streamURL: "http://127.0.0.1:9/movie/u/p/3.mp4",
-                rating: 8.1,
-                year: 2021,
-                genre: "Science Fiction, Drama"
-            )))
+        /// Titles for Home's hero, from the environment `PANOP_HERO`: the seeded library has no suggestion rails
+        /// (they need ratings, years and a trending list), so a test that is about the hero gives it some.
+        static var heroTitles: [CatalogRow] {
+            guard isActive, ProcessInfo.processInfo.environment["PANOP_HERO"] == "1" else { return [] }
+            return [("Dune", 2021, 8.1), ("Arrival", 2016, 7.9), ("Tenet", 2020, 7.3)].enumerated().map { index, film in
+                CatalogRow(CatalogEntryRecord(playlist: "uitest", entry: CatalogEntry(
+                    id: "hero\(index)",
+                    kind: .movie,
+                    name: film.0,
+                    streamURL: "http://127.0.0.1:9/movie/u/p/\(index).mp4",
+                    rating: film.2,
+                    year: film.1,
+                    genre: "Science Fiction, Drama"
+                )))
+            }
         }
 
         /// The tab to open on, from the environment `PANOP_START_TAB` (`home`, `live`). Most UI
@@ -79,8 +81,8 @@ enum UITestMode {
             nil
         }
 
-        static var heroTitle: CatalogRow? {
-            nil
+        static var heroTitles: [CatalogRow] {
+            []
         }
     #endif
 }

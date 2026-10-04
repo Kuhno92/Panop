@@ -4,7 +4,7 @@ final class SearchTests: PanopUITestCase {
     #if !os(tvOS)
         private func search(_ text: String) {
             waitForChannels()
-            app.tabBars.buttons["Home"].tap()
+            app.tabBars.buttons["Search"].tap()
             let field = app.searchFields.firstMatch
             XCTAssertTrue(field.waitForExistence(timeout: 10), "no search field. Screen:\n\(app.debugDescription)")
             field.tap()
@@ -41,7 +41,7 @@ final class SearchTests: PanopUITestCase {
             "search"
         }
 
-        /// Search is a tab of its own on Apple TV, and opens on its field.
+        /// Search is a tab of its own, and opens on its field.
         func testSearchIsATabWithAField() {
             XCTAssertTrue(app.tabBars.buttons["Search"].waitForExistence(timeout: 30), "no Search in the tab bar")
             XCTAssertTrue(

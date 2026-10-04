@@ -235,7 +235,6 @@ struct RailHeadingTests {
         #expect(title(.franchise("toy story"), "toy story") == "More from Toy Story")
         #expect(title(.classics(.movie)) == "Classics")
         #expect(title(.decade(.movie, 1990)) == "Movies of the 1990s")
-        #expect(title(.pickOfTheDay(.series)) == "Series pick of the day")
         #expect(title(.curated(.movie, "boxOffice")) == "Top Box Office Movies")
         #expect(title(.curated(.series, "network.Netflix")) == "Best of Netflix")
         #expect(title(.curated(.series, "genre.Science Fiction")) == "Best Sci-Fi Series")

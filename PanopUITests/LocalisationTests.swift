@@ -17,7 +17,7 @@ final class LocalisationTests: PanopUITestCase {
             "Home is not in German. Screen:\n\(app.debugDescription)"
         )
         #if !os(tvOS)
-            XCTAssertTrue(app.tabBars.buttons["Einstellungen"].exists, "the Settings tab is not in German")
+            XCTAssertTrue(app.buttons["Einstellungen"].exists, "Settings is not in German")
             XCTAssertTrue(app.tabBars.buttons["Live-TV"].exists)
             XCTAssertTrue(app.tabBars.buttons["Filme"].exists)
             XCTAssertTrue(app.tabBars.buttons["Serien"].exists)
@@ -27,7 +27,7 @@ final class LocalisationTests: PanopUITestCase {
     #if !os(tvOS)
         func testSettingsAndWhatIsBuiltInCodeAreInGerman() {
             XCTAssertTrue(app.staticTexts["Noch nichts hier"].waitForExistence(timeout: 30))
-            app.tabBars.buttons["Einstellungen"].tap()
+            openSettings(named: "Einstellungen")
 
             XCTAssertTrue(
                 app.staticTexts["Mediathek"].waitForExistence(timeout: 10),

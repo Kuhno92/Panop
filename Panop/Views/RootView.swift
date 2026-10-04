@@ -40,17 +40,16 @@ struct MainTabLabel: View {
     }
 }
 
-#if os(tvOS)
-    /// Apple TV's search: the field and the results, as a tab of their own.
-    private struct TVSearchView: View {
-        @State private var text = ""
+/// Search over channels, movies and series, as a tab of its own: an icon at the end of the bar that opens the field.
+private struct SearchTabView: View {
+    @State private var text = ""
 
-        var body: some View {
-            SearchView(query: text)
-                .searchable(text: $text, prompt: "Channels, movies, series")
-        }
+    var body: some View {
+        SearchView(query: text)
+            .navigationTitle("Search")
+            .searchable(text: $text, prompt: "Channels, movies, series")
     }
-#endif
+}
 
 nonisolated enum AppTab: Hashable {
     case home, live, movies, series, settings, search
@@ -59,6 +58,7 @@ nonisolated enum AppTab: Hashable {
 struct RootView: View {
     @Environment(PlaylistLibrary.self) private var library
     @Environment(UserStateStore.self) private var userState
+    @Environment(\.horizontalSizeClass) private var sizeClass
     @Environment(\.modelContext) private var catalog
     @State private var selection: AppTab
     @State private var autoplay: PlaybackTarget?
@@ -97,6 +97,15 @@ struct RootView: View {
         ))
     }
 
+    /// Whether Settings has a tab. A phone's bar holds five, so there it is a button on Home.
+    private var settingsInBar: Bool {
+        #if os(iOS)
+            sizeClass != .compact
+        #else
+            true
+        #endif
+    }
+
     var body: some View {
         TabView(selection: $selection) {
             Tab(value: AppTab.home) {
@@ -130,20 +139,21 @@ struct RootView: View {
                     MainTabLabel("Series", systemImage: "rectangle.stack")
                 }
             }
-            #if os(tvOS)
-                // A search icon at the end of the bar; choosing it shows the search field.
-                Tab(value: AppTab.search, role: .search) {
-                    NavigationStack { TVSearchView() }
-                } label: {
-                    MainTabLabel("Search", systemImage: "magnifyingglass")
-                }
-            #endif
-            Tab(value: AppTab.settings) {
-                NavigationStack {
-                    SettingsView()
-                }
+            // A search icon at the end of the bar; choosing it shows the search field.
+            Tab(value: AppTab.search, role: .search) {
+                NavigationStack { SearchTabView() }
             } label: {
-                MainTabLabel("Settings", systemImage: "gearshape")
+                MainTabLabel("Search", systemImage: "magnifyingglass")
+            }
+            // Not on a phone: the bar holds five, and Search takes the last. Settings is a button on Home there.
+            if settingsInBar {
+                Tab(value: AppTab.settings) {
+                    NavigationStack {
+                        SettingsView()
+                    }
+                } label: {
+                    MainTabLabel("Settings", systemImage: "gearshape")
+                }
             }
         }
         #if os(iOS)
@@ -153,6 +163,11 @@ struct RootView: View {
         #endif
         // Everything under it starts again, so no screen shows the last person's lists.
         .id(profiles.currentID)
+        .onChange(of: settingsInBar, initial: true) { _, inBar in
+            if !inBar, selection == .settings {
+                selection = .home
+            }
+        }
         .onChange(of: library.offersVOD) { _, offered in
             // A screen that went away cannot stay selected.
             if !offered, selection == .movies || selection == .series {

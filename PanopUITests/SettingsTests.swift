@@ -18,7 +18,7 @@ final class SettingsTests: PanopUITestCase {
             Thread.sleep(forTimeInterval: 3)
             app.buttons["Close"].tap()
 
-            app.tabBars.buttons["Settings"].tap()
+            openSettings()
             openPlaybackStatistics()
 
             XCTAssertTrue(
@@ -49,7 +49,7 @@ final class SettingsTests: PanopUITestCase {
 
         func testAPINGuardsTurningTheAdultFilterOff() {
             waitForChannels()
-            app.tabBars.buttons["Settings"].tap()
+            openSettings()
             let setPIN = app.buttons["Set a PIN…"]
             scrollTo(setPIN)
             setPIN.tap()
@@ -74,7 +74,7 @@ final class SettingsTests: PanopUITestCase {
 
         func testSubtitlesCanBeStyledAndResetToStandard() {
             waitForChannels()
-            app.tabBars.buttons["Settings"].tap()
+            openSettings()
             let link = app.buttons["Subtitles"]
             scrollTo(link)
             link.tap()
@@ -94,7 +94,7 @@ final class SettingsTests: PanopUITestCase {
 
         func testAStartupChannelCanBeChosen() {
             waitForChannels()
-            app.tabBars.buttons["Settings"].tap()
+            openSettings()
 
             let picker = app.buttons.matching(NSPredicate(format: "label CONTAINS 'When Panop opens'")).firstMatch
             XCTAssertTrue(picker.waitForExistence(timeout: 10), "no startup setting. Screen:\n\(app.debugDescription)")
@@ -114,7 +114,7 @@ final class SettingsTests: PanopUITestCase {
         func testWithNothingPlayedTheStatisticsSaySo() {
             waitForChannels()
 
-            app.tabBars.buttons["Settings"].tap()
+            openSettings()
             openPlaybackStatistics()
 
             XCTAssertTrue(app.staticTexts["Nothing yet"].waitForExistence(timeout: 10))

@@ -1592,16 +1592,6 @@
         }
       }
     },
-    "Movie pick of the day": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Filmtipp des Tages"
-          }
-        }
-      }
-    },
     "Movie, TV and anime data from Simkl": {
       "extractionState": "manual",
       "localizations": {
@@ -2525,16 +2515,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Serien"
-          }
-        }
-      }
-    },
-    "Series pick of the day": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Serientipp des Tages"
           }
         }
       }

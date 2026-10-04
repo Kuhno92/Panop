@@ -65,6 +65,17 @@ class PanopUITestCase: XCTestCase {
         app.buttons.matching(NSPredicate(format: "label CONTAINS %@", name)).firstMatch
     }
 
+    /// Opens Settings: its tab where there is one, and on a phone the button on Home, which has no room for the tab.
+    func openSettings(named name: String = "Settings") {
+        let tab = app.tabBars.buttons[name]
+        if tab.exists {
+            tab.tap()
+        } else {
+            app.tabBars.buttons.element(boundBy: 0).tap()
+            app.buttons[name].tap()
+        }
+    }
+
     func waitForChannels(file: StaticString = #filePath, line: UInt = #line) {
         let found = channel("3sat").waitForExistence(timeout: 30)
         // On a miss, what the screen held is the only clue to why.

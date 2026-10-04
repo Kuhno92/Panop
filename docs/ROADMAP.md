@@ -556,7 +556,7 @@ The brief called performance a key concept. For IPTV this concentrates in one nu
 
 - [x] **Discovery rails** *(asked for)*: Netflix-style rails built only from the person's own
       library. Trending, because you watched, new releases, top rated, genre, franchise, classics,
-      decades, a pick of the day and what was watched most; on Home, and at the top of Movies and
+      decades and what was watched most; on Home, and at the top of Movies and
       Series. The provider's own year, rating, genre, cast, TMDB id and adult flag feed them; adult
       titles are never suggested. Computed off the main thread, cached on disk, rebuilt after a
       change. A Settings switch turns them off and "Forget what I watched" clears the history they
@@ -641,7 +641,7 @@ Features real users expect that the brief did not name. All *(surfaced)*.
       **Not done:** a day picker (the grid shows from an hour ago to ten hours ahead), jumping to
       a time, a filter for channels that have a guide, and a reminder or record action. **Not seen on a
       real Apple TV or with a real provider's guide.**
-- [ ] **Netflix-style layout** *(asked for)*. Done: Home leads with a hero title (poster enlarged and softened as
+- [ ] **Netflix-style layout** *(asked for)*. Done: Home leads with a hero carousel (up to six titles, one from each of the first suggestion rows, those with wide artwork first; it slides every seven seconds, pauses while a button has focus, moves by swipe or the dots, and stays still with Reduce Motion; the Movies and Series screens have one too); the pick-of-the-day rails are gone; Search is an icon of its own in the tab bar on every platform (on an iPhone the bar holds five, so Settings is a button on Home there); Home has a hero title (poster enlarged and softened as
       the backdrop, since the catalog holds no wide artwork) with Play and More info; Continue Watching shows
       films and episodes as posters with a progress bar; one set of rail measures (`RailMetrics`); Movies and
       Series lead with a hero; film and series pages open on full-width artwork with the poster, name and

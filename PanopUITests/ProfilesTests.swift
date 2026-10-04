@@ -14,7 +14,7 @@ final class ProfilesTests: PanopUITestCase {
             app.buttons["Add to Favourites"].tap()
             XCTAssertTrue(app.images["Favourite"].waitForExistence(timeout: 10))
 
-            app.tabBars.buttons["Settings"].tap()
+            openSettings()
             app.buttons["Profiles, Main"].tap()
             app.buttons["Add profile…"].tap()
             let field = app.alerts.textFields.firstMatch

@@ -17,8 +17,9 @@ struct HomeView: View {
 
     @Environment(DiscoveryModel.self) private var discovery
     @State private var showingAdd = false
+    @State private var showingSettings = false
+    @Environment(\.horizontalSizeClass) private var sizeClass
     @State private var playing: PlaybackTarget?
-    @State private var search = ""
     @State private var openMovie: MovieReference?
     @State private var openSeries: SeriesReference?
 
@@ -26,20 +27,24 @@ struct HomeView: View {
     private let railLimit = 20
 
     var body: some View {
-        Group {
-            if search.trimmingCharacters(in: .whitespaces).isEmpty {
-                rails
-            } else {
-                SearchView(query: search)
-            }
-        }
-        .navigationTitle("Home")
+        rails
+            .navigationTitle("Home")
         #if !os(tvOS)
-            .toolbar { ToolbarItem { ProfileMenu() } }
+            .toolbar {
+                ToolbarItemGroup {
+                    #if os(iOS)
+                        // On a phone Settings has no tab (the bar is full), so it is here.
+                        if sizeClass == .compact {
+                            Button("Settings", systemImage: "gearshape") { showingSettings = true }
+                        }
+                    #endif
+                    ProfileMenu()
+                }
+            }
         #endif
+            .navigationDestination(isPresented: $showingSettings) { SettingsView() }
             .navigationDestination(item: $openMovie) { MovieDetailView(movie: $0) }
             .navigationDestination(item: $openSeries) { SeriesDetailView(series: $0) }
-            .modifier(HomeSearch(text: $search, isOffered: !library.playlists.isEmpty))
             .sheet(isPresented: $showingAdd) {
                 NavigationStack { AddPlaylistView() }
             }
@@ -53,14 +58,12 @@ struct HomeView: View {
                     noPlaylist
                 } else {
                     let hasHistory = !userState.recents.isEmpty || !userState.favorites.isEmpty
-                    if let hero = heroRow {
-                        HeroView(
-                            row: hero,
-                            backdrop: discovery.backdrop(for: hero),
-                            onPlay: { hero.kind == .movie ? playNow(hero) : open(hero) },
-                            onInfo: { open(hero) }
-                        )
-                    }
+                    HeroCarousel(
+                        rows: heroRows,
+                        backdrop: { discovery.backdrop(for: $0) },
+                        onPlay: { $0.kind == .movie ? playNow($0) : open($0) },
+                        onInfo: open
+                    )
                     if hasHistory {
                         if let last = userState.recents.first {
                             ContinueBanner(key: last, onPlay: play)
@@ -112,18 +115,18 @@ struct HomeView: View {
         }
     }
 
-    /// The title Home leads with: the first of the first suggestion row that has one. Chosen from what the
-    /// rails already hold, so nothing is read or fetched for it.
-    private var heroRow: CatalogRow? {
-        if let seeded = UITestMode.heroTitle {
+    /// The titles Home leads with, one from each of the first suggestion rows. Chosen from what the rails already
+    /// hold, so nothing is read or fetched for them.
+    private var heroRows: [CatalogRow] {
+        let seeded = UITestMode.heroTitles
+        if !seeded.isEmpty {
             return seeded
         }
-        for rail in discovery.rails.filter(showsOnHome) {
-            if let row = rail.keys.lazy.compactMap({ discovery.rows[$0] }).first(where: { $0.iconURL != nil }) {
-                return row
-            }
-        }
-        return nil
+        return HeroSelection.rows(
+            rails: discovery.rails.filter(showsOnHome),
+            rows: discovery.rows,
+            backdrop: { discovery.backdrop(for: $0) }
+        )
     }
 
     /// Unfinished films and episodes, without the one the banner already offers.
@@ -203,22 +206,6 @@ struct HomeView: View {
     private var browseButton: some View {
         Button("Browse all channels", systemImage: "tv", action: onBrowse)
             .padding(.horizontal)
-    }
-}
-
-/// Search across everything, once there is something to search: before the first source there is
-/// nothing to find, and on Apple TV the keyboard would sit above the welcome message.
-private struct HomeSearch: ViewModifier {
-    @Binding var text: String
-    let isOffered: Bool
-
-    func body(content: Content) -> some View {
-        #if os(tvOS)
-            // Apple TV has Search as a tab of its own.
-            content
-        #else
-            content.searchable(text: $text, prompt: "Channels, movies, series")
-        #endif
     }
 }
 

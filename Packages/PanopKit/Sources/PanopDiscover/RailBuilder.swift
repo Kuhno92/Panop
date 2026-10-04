@@ -67,12 +67,6 @@ public enum RailBuilder {
         for (decade, titles) in decades(in: pool, year: year, rules: rules).prefix(rules.maxDecadeRails) {
             add(.decade(.movie, decade), titles)
         }
-        for kind in kinds {
-            let day = Int(input.now.timeIntervalSince1970 / 86400)
-            if let pick = pickOfTheDay(of: kind, in: pool, day: day, used: used, rules: rules) {
-                add(.pickOfTheDay(kind), [pick], minimum: 1)
-            }
-        }
         input.curated.filter { !$0.isHighlight }.forEach(addCurated)
         return rails
     }
@@ -274,26 +268,6 @@ public enum RailBuilder {
                 (decade, titles.sorted { ($0.rating ?? 0, $1.key) > ($1.rating ?? 0, $0.key) })
             }
             .sorted { ($0.1.count, $1.0) > ($1.1.count, $0.0) }
-    }
-
-    /// One well-liked title, the same all day and a different one tomorrow.
-    private static func pickOfTheDay(
-        of kind: MediaKind,
-        in pool: [DiscoveryTitle],
-        day: Int,
-        used: Set<String>,
-        rules: RailRules
-    ) -> DiscoveryTitle? {
-        let candidates = pool
-            .filter { title in
-                guard title.kind == kind, !used.contains(title.key),
-                      let rating = trusted(title.rating, rules) else { return false }
-                return rating >= rules.topRatedMinimum
-            }
-            .sorted { $0.key < $1.key }
-        guard !candidates.isEmpty else { return nil }
-        let offset = kind == .series ? 7919 : 0
-        return candidates[(day + offset) % candidates.count]
     }
 
     /// A rating worth ranking by: present, above zero (providers send 0 for "none") and under the ceiling.

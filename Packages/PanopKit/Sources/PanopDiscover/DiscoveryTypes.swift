@@ -194,7 +194,6 @@ public enum RailKind: Sendable, Hashable, Codable {
     case franchise(String)
     case classics(MediaKind)
     case decade(MediaKind, Int)
-    case pickOfTheDay(MediaKind)
 }
 
 /// A row of titles under one heading. It holds keys, in the order to show them; the app looks the
@@ -219,7 +218,6 @@ public struct Rail: Sendable, Equatable, Identifiable, Codable {
         case let .franchise(stem): "franchise.\(stem)"
         case let .classics(kind): "classics.\(kind.rawValue)"
         case let .decade(kind, decade): "decade.\(kind.rawValue).\(decade)"
-        case let .pickOfTheDay(kind): "pick.\(kind.rawValue)"
         }
     }
 

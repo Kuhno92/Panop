@@ -130,12 +130,6 @@ nonisolated enum RailHeading {
             String(localized: "Classics")
         case let .decade(_, decade):
             String(localized: "Movies of the \(String(decade))s")
-        case let .pickOfTheDay(kind):
-            forKind(
-                kind,
-                series: String(localized: "Series pick of the day"),
-                movies: String(localized: "Movie pick of the day")
-            )
         }
     }
 
@@ -282,7 +276,7 @@ extension Rail {
             kind,
             _
         ),
-        let .classics(kind), let .decade(kind, _), let .pickOfTheDay(kind):
+        let .classics(kind), let .decade(kind, _):
             kind
         case .franchise:
             .movie

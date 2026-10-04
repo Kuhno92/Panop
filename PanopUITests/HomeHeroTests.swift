@@ -18,4 +18,19 @@ final class HomeHeroTests: PanopUITestCase {
         shot.lifetime = .keepAlways
         add(shot)
     }
+
+    #if !os(tvOS)
+        func testASwipeMovesToTheNextTitleAndBack() {
+            XCTAssertTrue(app.staticTexts["Dune"].waitForExistence(timeout: 30))
+
+            app.staticTexts["Dune"].swipeLeft()
+            XCTAssertTrue(
+                app.staticTexts["Arrival"].waitForExistence(timeout: 5),
+                "a swipe did not show the next title"
+            )
+
+            app.staticTexts["Arrival"].swipeRight()
+            XCTAssertTrue(app.staticTexts["Dune"].waitForExistence(timeout: 5), "a swipe back did not return")
+        }
+    #endif
 }

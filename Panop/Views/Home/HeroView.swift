@@ -11,14 +11,20 @@ struct HeroView: View {
     var onPlay: (() -> Void)?
     let onInfo: () -> Void
 
+    /// Set while a button in the hero has focus, so a carousel around it does not slide away from under the person.
+    var engaged: Binding<Bool> = .constant(false)
+
     @Environment(\.horizontalSizeClass) private var sizeClass
+    @FocusState private var focus: Control?
+
+    private enum Control { case play, info }
 
     var body: some View {
         content
             .padding(.horizontal, Self.inset)
             .padding(.top, Self.inset)
             .padding(.bottom, 20)
-            .frame(maxWidth: .infinity)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             .background {
                 BackdropView(address: backdrop ?? row.iconURL, blurred: backdrop == nil)
                     .opacity(0.55)
@@ -92,18 +98,22 @@ struct HeroView: View {
                     Label("Play", systemImage: "play.fill").frame(minWidth: 90)
                 }
                 .buttonStyle(.borderedProminent)
+                .focused($focus, equals: .play)
                 Button(action: onInfo) {
                     Label("More info", systemImage: "info.circle").frame(minWidth: 90)
                 }
                 .buttonStyle(.bordered)
+                .focused($focus, equals: .info)
             } else {
                 Button(action: onInfo) {
                     Label("More info", systemImage: "info.circle").frame(minWidth: 90)
                 }
                 .buttonStyle(.borderedProminent)
+                .focused($focus, equals: .info)
             }
         }
         .controlSize(Self.controlSize)
+        .onChange(of: focus) { _, now in engaged.wrappedValue = now != nil }
     }
 
     private static var inset: CGFloat {

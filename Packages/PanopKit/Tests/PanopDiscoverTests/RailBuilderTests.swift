@@ -434,22 +434,6 @@ struct RailBuilderTests {
     }
 
     @Test
-    func `the pick of the day is the same all day and changes with the day`() throws {
-        // No year, so no decade or classics rail takes the titles first.
-        let titles = (1 ... 30).map { title($0, year: nil, rating: 8.0, tmdb: $0) }
-        func pick(on date: Date) -> String? {
-            rail(.pickOfTheDay(.movie), in: build(DiscoveryInput(titles: titles, now: date)))?.keys.first
-        }
-
-        let morning = Date(timeIntervalSince1970: 1_790_899_200 + 3600)
-        let evening = Date(timeIntervalSince1970: 1_790_899_200 + 20 * 3600)
-        let tomorrow = Date(timeIntervalSince1970: 1_790_899_200 + 86400 + 3600)
-
-        #expect(try #require(pick(on: morning)) == pick(on: evening))
-        #expect(pick(on: morning) != pick(on: tomorrow))
-    }
-
-    @Test
     func `the same input gives the same rails`() {
         let titles = (1 ... 90).map { title(
             $0,
