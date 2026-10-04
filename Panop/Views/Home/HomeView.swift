@@ -285,7 +285,9 @@ struct ChannelRail: View {
                     .padding(.horizontal)
                     .padding(.vertical, RailMetrics.verticalRoom)
                 }
+                .scrollClipDisabled()
             }
+            .hoverZoom(1.03, anchor: .leading, lifts: false)
         }
     }
 
@@ -352,6 +354,7 @@ struct ChannelCard: View {
         .buttonStyle(.plain)
         .background(.quaternary.opacity(0.5), in: RoundedRectangle(cornerRadius: 14))
         #endif
+        .hoverZoom(1.08)
         .contextMenu {
             let key = UserStateStore.key(playlist: channel.playlist, entry: channel.id)
             Button {

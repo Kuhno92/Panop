@@ -6,8 +6,12 @@ final class SearchTests: PanopUITestCase {
         private func search(_ text: String, on tab: String = "Home") {
             waitForChannels()
             app.tabBars.buttons[tab].tap()
+            XCTAssertFalse(
+                app.textFields["searchField"].exists,
+                "the search field was open before the magnifier was chosen"
+            )
             app.tabBars.buttons["Search"].tap()
-            let field = app.searchFields.firstMatch
+            let field = app.textFields["searchField"]
             XCTAssertTrue(field.waitForExistence(timeout: 10), "no search field. Screen:\n\(app.debugDescription)")
             field.typeText(text)
             XCTAssertEqual(field.value as? String, text, "the field did not keep what was typed")

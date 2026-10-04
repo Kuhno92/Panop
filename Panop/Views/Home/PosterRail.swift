@@ -205,7 +205,9 @@ struct PosterRail: View {
                     // A focused poster on Apple TV grows, and the row would clip it.
                     .padding(.vertical, RailMetrics.verticalRoom)
                 }
+                .scrollClipDisabled()
             }
+            .hoverZoom(1.03, anchor: .leading, lifts: false)
         }
     }
 
@@ -255,6 +257,7 @@ private struct RailPoster: View {
         .buttonStyle(.plain)
         #endif
         .accessibilityLabel(RailHeading.display(row.name))
+        .hoverZoom(1.08)
         .contextMenu {
             if let link {
                 Link("View on Simkl", destination: link)

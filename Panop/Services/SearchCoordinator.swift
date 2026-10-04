@@ -27,33 +27,73 @@ struct ScreenSearch: ViewModifier {
     let isOffered: Bool
 
     @Environment(SearchCoordinator.self) private var coordinator
-    @State private var presented = false
+    @State private var open = false
+    @FocusState private var focused: Bool
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     func body(content: Content) -> some View {
         #if os(tvOS)
+            // The field is always on the screen there, and cannot be opened from outside: Search is a screen of its
+            // own.
             if isOffered {
-                searchable(content)
+                content.searchable(text: $text, prompt: prompt)
             } else {
                 content
             }
         #else
-            searchable(content)
-        #endif
-    }
-
-    private func searchable(_ content: Content) -> some View {
-        #if os(tvOS)
-            // The field is always on the screen there, and cannot be opened from outside: Search is a screen of its
-            // own.
-            content.searchable(text: $text, prompt: prompt)
-        #else
+            // The field floats over the top of the screen instead of taking room from it, and the screen under it is
+            // never rebuilt or moved: putting the system's field in and out reshuffled the page and the hero started
+            // over.
             content
-                .searchable(text: $text, isPresented: $presented, prompt: prompt)
+                .overlay(alignment: .top) {
+                    if open {
+                        field
+                            .transition(.move(edge: .top).combined(with: .opacity))
+                    }
+                }
                 .onChange(of: coordinator.tick) {
                     if coordinator.target == tab {
-                        presented = true
+                        show()
                     }
                 }
         #endif
     }
+
+    #if !os(tvOS)
+        private var field: some View {
+            HStack(spacing: 8) {
+                Image(systemName: "magnifyingglass").foregroundStyle(.secondary)
+                TextField(prompt, text: $text)
+                    .textFieldStyle(.plain)
+                    .focused($focused)
+                    .submitLabel(.search)
+                    .accessibilityIdentifier("searchField")
+                Button(action: close) {
+                    Image(systemName: "xmark.circle.fill").foregroundStyle(.secondary)
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Close search")
+            }
+            .padding(.horizontal, 14)
+            .padding(.vertical, 10)
+            .background(.regularMaterial, in: Capsule())
+            .shadow(color: .black.opacity(0.18), radius: 10, y: 4)
+            .padding(.horizontal, 16)
+            .padding(.top, 8)
+            #if os(macOS)
+                .onExitCommand(perform: close)
+            #endif
+        }
+
+        private func show() {
+            withAnimation(reduceMotion ? nil : .snappy(duration: 0.3)) { open = true }
+            focused = true
+        }
+
+        private func close() {
+            focused = false
+            withAnimation(reduceMotion ? nil : .snappy(duration: 0.25)) { open = false }
+            text = ""
+        }
+    #endif
 }

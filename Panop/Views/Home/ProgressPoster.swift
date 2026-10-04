@@ -46,6 +46,7 @@ struct ProgressPoster: View {
         #else
         .buttonStyle(.plain)
         #endif
+        .hoverZoom(1.08)
         .contextMenu {
             let key = UserStateStore.key(playlist: channel.playlist, entry: channel.id)
             Button {

@@ -460,6 +460,7 @@ private struct VODCard: View {
         .buttonStyle(.plain)
         #endif
         .accessibilityLabel(item.name)
+        .hoverZoom(1.07)
         .contextMenu {
             Button {
                 userState.toggleFavorite(key)
