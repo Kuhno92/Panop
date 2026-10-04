@@ -102,6 +102,7 @@ struct VODBrowseView: View {
             backdrop: { discovery.backdrop(for: $0) },
             onAdd: { showingAdd = true }
         )
+        .background { PageBackground() }
         .navigationTitle(title)
         .modifier(VODSearch(
             text: $search,

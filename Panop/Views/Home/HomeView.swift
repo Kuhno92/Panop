@@ -31,6 +31,7 @@ struct HomeView: View {
         // The results go over the rails rather than in place of them: swapping the screen's content under the
         // search field as the first letter is typed made the field lose focus, and the rest of the word with it.
         rails
+            .background { PageBackground() }
             .overlay {
                 if !search.trimmingCharacters(in: .whitespaces).isEmpty {
                     SearchView(query: search)
