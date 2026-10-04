@@ -124,6 +124,18 @@ possible on Apple platforms), and non-Apple UIs.
 See [CONTRIBUTING.md](CONTRIBUTING.md). If you are using an AI coding agent, point it at
 [AGENTS.md](AGENTS.md) first; it documents the invariants that are expensive to rediscover.
 
+## Acknowledgements and credits
+
+Panop was shaped by looking at other apps in this space. Thank you to:
+
+- **[Nuvio](https://nuvio.tv)**, for what a modern, rail-based home screen can feel like.
+- **[Lume](https://github.com/bilipp/Lume)**, the IPTV player whose approach to long-running live
+  streams led to LumeEngine, which Panop uses as a playback engine. Panop copies no code from Lume,
+  which is AGPL-3.0 (see [AGENTS.md](AGENTS.md)).
+- **IPTV Deck**, for showing how much a guide-first live TV app can do.
+
+Their names belong to their authors. Panop is not affiliated with or endorsed by any of them.
+
 ## License
 
 MIT, see [LICENSE](LICENSE). Third-party components and their licenses are listed in
