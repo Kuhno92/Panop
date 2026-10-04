@@ -2,12 +2,6 @@ import XCTest
 
 final class ProfilesTests: PanopUITestCase {
     #if !os(tvOS)
-        private func scrollTo(_ element: XCUIElement) {
-            for _ in 0 ..< 6 where !element.exists {
-                app.swipeUp()
-            }
-        }
-
         func testEachProfileHasItsOwnFavourites() {
             waitForChannels()
             channel("3sat").press(forDuration: 1.2)
@@ -15,6 +9,7 @@ final class ProfilesTests: PanopUITestCase {
             XCTAssertTrue(app.images["Favourite"].waitForExistence(timeout: 10))
 
             openSettings()
+            scrollTo(app.buttons["Profiles, Main"])
             app.buttons["Profiles, Main"].tap()
             app.buttons["Add profile…"].tap()
             let field = app.alerts.textFields.firstMatch

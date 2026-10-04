@@ -79,7 +79,9 @@ final class FavouritesTests: PanopUITestCase {
             XCTAssertTrue(channel("3sat").waitForNonExistence(timeout: 10), "a hidden channel is still listed")
 
             openSettings()
-            app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Hidden'")).firstMatch.tap()
+            let hidden = app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Hidden'")).firstMatch
+            scrollTo(hidden)
+            hidden.tap()
             XCTAssertTrue(
                 app.staticTexts["3sat"].waitForExistence(timeout: 10),
                 "the hidden channel is not listed in Settings"

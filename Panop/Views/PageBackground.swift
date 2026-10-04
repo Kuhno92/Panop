@@ -37,3 +37,15 @@ struct PageBackground: View {
         color.opacity(scheme == .dark ? strength : strength * 0.55)
     }
 }
+
+extension View {
+    /// The gradient page behind a list or form: the list's own background is hidden so it shows through (Apple TV
+    /// has no way to hide it, and keeps its own).
+    func pageBackdrop() -> some View {
+        #if os(tvOS)
+            background { PageBackground() }
+        #else
+            scrollContentBackground(.hidden).background { PageBackground() }
+        #endif
+    }
+}

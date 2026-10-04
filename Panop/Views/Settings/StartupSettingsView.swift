@@ -2,8 +2,8 @@ import PanopCore
 import SwiftData
 import SwiftUI
 
-/// Settings for what the app does when it opens.
-struct StartupSection: View {
+/// What the app does when it opens: the rows of the choice, for the Playing section of Settings.
+struct StartupPicker: View {
     @AppStorage(StartupPreference.actionKey) private var actionRaw = StartupAction.home.rawValue
     @AppStorage(StartupPreference.channelKey) private var channelKey = ""
     @AppStorage(StartupPreference.channelNameKey) private var channelName = ""
@@ -23,33 +23,25 @@ struct StartupSection: View {
     }
 
     var body: some View {
-        Section {
-            Picker("When Panop opens", selection: action) {
-                ForEach(choices) { Text($0.title).tag($0) }
-            }
-            if action.wrappedValue == .channel {
-                NavigationLink {
-                    StartupChannelPicker { channel in
-                        channelKey = UserStateStore.key(playlist: channel.playlist, entry: channel.id)
-                        channelName = channel.name
-                    }
-                } label: {
-                    LabeledContent("Channel", value: channelName.isEmpty ? "Choose…" : channelName)
-                }
-            }
-        } header: {
-            Text("Startup")
-        } footer: {
-            Text(footer)
+        Picker(selection: action) {
+            ForEach(choices) { Text($0.title).tag($0) }
+        } label: {
+            SettingsRow("When Panop opens", symbol: "power", tint: .mint)
         }
-    }
-
-    private var footer: String {
-        switch action.wrappedValue {
-        case .channel:
-            String(localized: "The channel starts playing as soon as Panop opens, from what is already on this device.")
-        default:
-            String(localized: "The screen Panop opens on.")
+        if action.wrappedValue == .channel {
+            NavigationLink {
+                StartupChannelPicker { channel in
+                    channelKey = UserStateStore.key(playlist: channel.playlist, entry: channel.id)
+                    channelName = channel.name
+                }
+            } label: {
+                SettingsRow(
+                    "Channel",
+                    symbol: "tv",
+                    tint: .mint,
+                    value: channelName.isEmpty ? String(localized: "Choose…") : channelName
+                )
+            }
         }
     }
 }

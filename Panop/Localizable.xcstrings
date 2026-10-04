@@ -219,12 +219,32 @@
         }
       }
     },
+    "A player for your own TV, movies and series.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ein Player für dein eigenes Fernsehen, deine Filme und Serien."
+          }
+        }
+      }
+    },
     "A secure connection to this stream could not be made.": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
             "value": "Zu diesem Stream konnte keine sichere Verbindung hergestellt werden."
+          }
+        }
+      }
+    },
+    "About Panop": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Über Panop"
           }
         }
       }
@@ -621,6 +641,16 @@
         }
       }
     },
+    "Choose…": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Auswählen…"
+          }
+        }
+      }
+    },
     "Classics": {
       "localizations": {
         "de": {
@@ -862,6 +892,16 @@
         }
       }
     },
+    "Data": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Daten"
+          }
+        }
+      }
+    },
     "Default": {
       "localizations": {
         "de": {
@@ -1038,6 +1078,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Sehr groß"
+          }
+        }
+      }
+    },
+    "Family and safety": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Familie und Sicherheit"
           }
         }
       }
@@ -1263,12 +1313,32 @@
         }
       }
     },
+    "Hiding adult content leaves out what a provider files as adult, from lists, search and suggestions. With a PIN it cannot be turned off, or the PIN changed, without the PIN. It stays on this device.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Das Ausblenden lässt aus Listen, Suche und Vorschlägen weg, was ein Anbieter als Inhalt für Erwachsene führt. Mit einer PIN lässt es sich nicht ohne die PIN ausschalten oder die PIN ändern. Sie bleibt auf diesem Gerät."
+          }
+        }
+      }
+    },
     "Home": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
             "value": "Start"
+          }
+        }
+      }
+    },
+    "Home screen": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Startbildschirm"
           }
         }
       }
@@ -1284,11 +1354,22 @@
       }
     },
     "How fast channels start and how often they stall. Kept on this device only.": {
+      "extractionState": "stale",
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
             "value": "Wie schnell Sender starten und wie oft sie stocken. Nur auf diesem Gerät gespeichert."
+          }
+        }
+      }
+    },
+    "If a video will not start, change the engine. Panop tries your choice first and then the others by itself.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Startet ein Video nicht, wechsle den Player. Panop versucht zuerst deine Wahl und dann von selbst die anderen."
           }
         }
       }
@@ -1424,6 +1505,7 @@
       }
     },
     "Leaves out categories a provider names as adult, from the lists, search and suggestions.": {
+      "extractionState": "stale",
       "localizations": {
         "de": {
           "stringUnit": {
@@ -1444,6 +1526,7 @@
       }
     },
     "Library": {
+      "extractionState": "stale",
       "localizations": {
         "de": {
           "stringUnit": {
@@ -1539,6 +1622,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Mittel"
+          }
+        }
+      }
+    },
+    "More": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mehr"
           }
         }
       }
@@ -1882,6 +1975,16 @@
         }
       }
     },
+    "None yet": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Noch keine"
+          }
+        }
+      }
+    },
     "Not updated yet": {
       "localizations": {
         "de": {
@@ -2072,12 +2175,32 @@
         }
       }
     },
+    "Panop": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Panop"
+          }
+        }
+      }
+    },
     "Panop draws subtitles itself with the Lume player. The system player follows this once you change it.": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
             "value": "Panop zeichnet Untertitel beim Lume-Player selbst. Der System-Player folgt dem, sobald du etwas änderst."
+          }
+        }
+      }
+    },
+    "Panop is free software under the MIT licence. The parts it is built from are listed in THIRD-PARTY-NOTICES.md.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Panop ist freie Software unter der MIT-Lizenz. Die Teile, aus denen es besteht, stehen in THIRD-PARTY-NOTICES.md."
           }
         }
       }
@@ -2093,6 +2216,7 @@
       }
     },
     "Panop tries your choice first, and falls back through the other players when a stream will not start.": {
+      "extractionState": "stale",
       "localizations": {
         "de": {
           "stringUnit": {
@@ -2103,6 +2227,7 @@
       }
     },
     "Parental controls": {
+      "extractionState": "stale",
       "localizations": {
         "de": {
           "stringUnit": {
@@ -2163,6 +2288,7 @@
       }
     },
     "Playback": {
+      "extractionState": "stale",
       "localizations": {
         "de": {
           "stringUnit": {
@@ -2192,12 +2318,32 @@
         }
       }
     },
+    "Playback statistics show how fast channels start and how often they stall. They stay on this device.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Wiedergabestatistik zeigt, wie schnell Sender starten und wie oft sie stocken. Sie bleibt auf diesem Gerät."
+          }
+        }
+      }
+    },
     "Player": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
             "value": "Player"
+          }
+        }
+      }
+    },
+    "Playing": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wiedergabe"
           }
         }
       }
@@ -2804,6 +2950,7 @@
       }
     },
     "Startup": {
+      "extractionState": "stale",
       "localizations": {
         "de": {
           "stringUnit": {
@@ -2844,6 +2991,7 @@
       }
     },
     "Suggestions": {
+      "extractionState": "stale",
       "localizations": {
         "de": {
           "stringUnit": {
@@ -2854,11 +3002,22 @@
       }
     },
     "Suggestions are chosen on this device from your own library and what you watch. What is trending is Simkl's public list, fetched the same way for everyone. Nothing about you or what you watch is sent.": {
+      "extractionState": "stale",
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
             "value": "Vorschläge werden auf diesem Gerät aus deiner eigenen Mediathek und dem, was du schaust, ausgewählt. Was beliebt ist, kommt aus der öffentlichen Liste von Simkl, die für alle gleich abgerufen wird. Über dich oder das, was du schaust, wird nichts gesendet."
+          }
+        }
+      }
+    },
+    "Suggestions are picked on this device from your own library and what you watch. Nothing about you or what you watch is sent anywhere.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vorschläge werden auf diesem Gerät aus deiner Mediathek und dem, was du schaust, ausgewählt. Nichts über dich oder das, was du schaust, wird irgendwohin gesendet."
           }
         }
       }
@@ -2899,6 +3058,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Tippe auf eine Sendung, um sie von Anfang an zu sehen."
+          }
+        }
+      }
+    },
+    "Thanks to": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Danke an"
           }
         }
       }
@@ -3024,6 +3193,7 @@
       }
     },
     "The channel starts playing as soon as Panop opens, from what is already on this device.": {
+      "extractionState": "stale",
       "localizations": {
         "de": {
           "stringUnit": {
@@ -3194,6 +3364,7 @@
       }
     },
     "The screen Panop opens on.": {
+      "extractionState": "stale",
       "localizations": {
         "de": {
           "stringUnit": {
@@ -3219,6 +3390,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Die beiden stimmten nicht überein. Wähle die PIN erneut."
+          }
+        }
+      }
+    },
+    "Their names belong to their authors. Panop is not affiliated with or endorsed by any of them.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Namen gehören ihren Urhebern. Panop ist weder mit ihnen verbunden noch von ihnen empfohlen."
           }
         }
       }
@@ -3543,6 +3724,16 @@
         }
       }
     },
+    "Version %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Version %@"
+          }
+        }
+      }
+    },
     "View on Simkl": {
       "localizations": {
         "de": {
@@ -3663,6 +3854,16 @@
         }
       }
     },
+    "Where your channels, movies and series come from. Add or update your provider here.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Woher deine Sender, Filme und Serien kommen. Hier fügst du deinen Anbieter hinzu oder aktualisierst ihn."
+          }
+        }
+      }
+    },
     "White": {
       "localizations": {
         "de": {
@@ -3674,6 +3875,7 @@
       }
     },
     "With a PIN, adult content cannot be shown again, and the PIN cannot be changed, without it. The PIN stays on this device.": {
+      "extractionState": "stale",
       "localizations": {
         "de": {
           "stringUnit": {
@@ -3723,6 +3925,16 @@
         }
       }
     },
+    "Your content": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deine Inhalte"
+          }
+        }
+      }
+    },
     "Your list: %@": {
       "localizations": {
         "de": {
@@ -3763,6 +3975,26 @@
         }
       }
     },
+    "for showing how much a guide-first live TV app can do.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "dafür, wie viel eine Live-TV-App mit dem Programm im Mittelpunkt kann."
+          }
+        }
+      }
+    },
+    "for what a modern, rail-based home screen can feel like.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "dafür, wie sich ein moderner Startbildschirm aus Reihen anfühlen kann."
+          }
+        }
+      }
+    },
     "http://provider.example:8080": {
       "localizations": {
         "de": {
@@ -3799,6 +4031,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "iCloud konnte nicht geöffnet werden, daher wird die Kopie dieses Geräts verwendet."
+          }
+        }
+      }
+    },
+    "whose approach to long-running live streams led to Panop's LumeEngine player.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "deren Ansatz für lange laufende Live-Streams zu Panops Player LumeEngine geführt hat."
           }
         }
       }

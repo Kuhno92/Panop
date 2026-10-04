@@ -66,6 +66,15 @@ class PanopUITestCase: XCTestCase {
     }
 
     #if !os(tvOS)
+        /// Scrolls until `element` is in the accessibility tree: Settings is a long list, and a row below the fold is
+        /// not
+        /// there yet.
+        func scrollTo(_ element: XCUIElement) {
+            for _ in 0 ..< 6 where !element.exists {
+                app.swipeUp()
+            }
+        }
+
         /// Opens Settings: its tab where there is one, and on a phone the button on Home, which has no room for the
         /// tab.
         func openSettings(named name: String = "Settings") {

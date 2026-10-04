@@ -30,10 +30,15 @@ final class LocalisationTests: PanopUITestCase {
             openSettings(named: "Einstellungen")
 
             XCTAssertTrue(
-                app.staticTexts["Mediathek"].waitForExistence(timeout: 10),
+                app.staticTexts["Deine Inhalte"].waitForExistence(timeout: 10),
                 "a section header is not in German"
             )
-            XCTAssertTrue(app.switches["Inhalte für Erwachsene ausblenden"].exists, "a toggle is not in German")
+            // Settings is a long list, and a row below the fold is not in the accessibility tree yet.
+            let toggle = app.switches["Inhalte für Erwachsene ausblenden"]
+            for _ in 0 ..< 6 where !toggle.exists {
+                app.swipeUp()
+            }
+            XCTAssertTrue(toggle.exists, "a toggle is not in German")
 
             // Sorting names come from code, not from a literal in a view.
             app.tabBars.buttons["Live-TV"].tap()

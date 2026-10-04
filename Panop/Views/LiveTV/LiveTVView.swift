@@ -340,6 +340,7 @@ private struct LiveChannelList: View {
                     .foregroundStyle(.secondary)
             }
         }
+        .pageBackdrop()
         .overlay {
             // Not while the first page is still being read: an empty list is not a list with
             // nothing in it until the catalog has answered.

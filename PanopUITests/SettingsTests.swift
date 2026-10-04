@@ -41,12 +41,6 @@ final class SettingsTests: PanopUITestCase {
             app.buttons["Continue"].tap()
         }
 
-        private func scrollTo(_ element: XCUIElement) {
-            for _ in 0 ..< 6 where !element.exists {
-                app.swipeUp()
-            }
-        }
-
         func testAPINGuardsTurningTheAdultFilterOff() {
             waitForChannels()
             openSettings()
@@ -109,6 +103,28 @@ final class SettingsTests: PanopUITestCase {
 
             let chosen = app.buttons.matching(NSPredicate(format: "label CONTAINS '3sat'")).firstMatch
             XCTAssertTrue(chosen.waitForExistence(timeout: 10), "the chosen channel is not shown in Settings")
+        }
+
+        /// Settings is in groups a person can follow, in the order they go through them.
+        func testSettingsIsInGroupsWithHeadings() {
+            waitForChannels()
+            openSettings()
+
+            for heading in ["Your content", "Playing", "Home screen"] {
+                XCTAssertTrue(app.staticTexts[heading].waitForExistence(timeout: 10), "no \(heading) group")
+            }
+            let shot = XCTAttachment(screenshot: app.screenshot())
+            shot.name = "settings-top"
+            shot.lifetime = .keepAlways
+            add(shot)
+
+            let family = app.staticTexts["Family and safety"]
+            scrollTo(family)
+            XCTAssertTrue(family.exists, "no Family and safety group")
+            let more = XCTAttachment(screenshot: app.screenshot())
+            more.name = "settings-family"
+            more.lifetime = .keepAlways
+            add(more)
         }
 
         func testWithNothingPlayedTheStatisticsSaySo() {
