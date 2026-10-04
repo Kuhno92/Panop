@@ -18,7 +18,8 @@ struct HomeView: View {
     @Environment(DiscoveryModel.self) private var discovery
     @State private var showingAdd = false
     @State private var search = ""
-    @State private var searchOpen = false
+    @State private var showingSettings = false
+    @Environment(\.horizontalSizeClass) private var sizeClass
     @State private var playing: PlaybackTarget?
     @State private var openMovie: MovieReference?
     @State private var openSeries: SeriesReference?
@@ -38,14 +39,25 @@ struct HomeView: View {
             }
             .navigationTitle("Home")
         #if !os(tvOS)
-            .toolbar { ToolbarItem { ProfileMenu() } }
+            .toolbar {
+                ToolbarItemGroup {
+                    #if os(iOS)
+                        // On a phone Settings has no tab (the bar is full), so it is here.
+                        if sizeClass == .compact {
+                            Button("Settings", systemImage: "gearshape") { showingSettings = true }
+                        }
+                    #endif
+                    ProfileMenu()
+                }
+            }
         #endif
-            .modifier(ExpandingSearch(
+            .modifier(ScreenSearch(
                 text: $search,
-                isOpen: $searchOpen,
+                tab: .home,
                 prompt: "Channels, movies, series",
                 isOffered: !library.playlists.isEmpty
             ))
+            .navigationDestination(isPresented: $showingSettings) { SettingsView() }
             .navigationDestination(item: $openMovie) { MovieDetailView(movie: $0) }
             .navigationDestination(item: $openSeries) { SeriesDetailView(series: $0) }
             .sheet(isPresented: $showingAdd) {

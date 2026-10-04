@@ -27,7 +27,6 @@ struct VODBrowseView: View {
     @AppStorage("vodSortOrder") private var storedOrder = LiveOrder.provider.rawValue
 
     @State private var search = ""
-    @State private var searchOpen = false
     @State private var group: String?
     /// Every category of this kind and source, in the provider's order, once known.
     @State private var providerCategories: [String] = []
@@ -104,7 +103,11 @@ struct VODBrowseView: View {
             onAdd: { showingAdd = true }
         )
         .navigationTitle(title)
-        .modifier(VODSearch(text: $search, isOpen: $searchOpen, isOffered: !library.playlists.isEmpty))
+        .modifier(VODSearch(
+            text: $search,
+            tab: kind == .movie ? .movies : .series,
+            isOffered: !library.playlists.isEmpty
+        ))
         .safeAreaInset(edge: .top, spacing: 0) {
             if !library.playlists.isEmpty {
                 VStack(spacing: 0) {
@@ -486,13 +489,13 @@ private struct VODCard: View {
     }
 }
 
-/// Search for films or series: a magnifier under the section bar that opens a field (see `ExpandingSearch`).
+/// Search for films or series, in the system's field (see `ScreenSearch`).
 private struct VODSearch: ViewModifier {
     @Binding var text: String
-    @Binding var isOpen: Bool
+    let tab: AppTab
     let isOffered: Bool
 
     func body(content: Content) -> some View {
-        content.modifier(ExpandingSearch(text: $text, isOpen: $isOpen, prompt: "Search", isOffered: isOffered))
+        content.modifier(ScreenSearch(text: $text, tab: tab, prompt: "Search", isOffered: isOffered))
     }
 }

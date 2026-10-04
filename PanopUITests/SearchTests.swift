@@ -2,11 +2,12 @@ import XCTest
 
 final class SearchTests: PanopUITestCase {
     #if !os(tvOS)
-        private func search(_ text: String) {
+        /// The tab bar's magnifier opens the search field of the screen on show.
+        private func search(_ text: String, on tab: String = "Home") {
             waitForChannels()
-            app.tabBars.buttons["Home"].tap()
-            app.buttons["Search"].tap()
-            let field = app.textFields["searchField"]
+            app.tabBars.buttons[tab].tap()
+            app.tabBars.buttons["Search"].tap()
+            let field = app.searchFields.firstMatch
             XCTAssertTrue(field.waitForExistence(timeout: 10), "no search field. Screen:\n\(app.debugDescription)")
             field.typeText(text)
             XCTAssertEqual(field.value as? String, text, "the field did not keep what was typed")
@@ -31,6 +32,16 @@ final class SearchTests: PanopUITestCase {
             XCTAssertTrue(app.buttons.matching(NSPredicate(format: "label CONTAINS 'Alien'")).firstMatch.exists)
         }
 
+        /// On the Series screen the search is of series: the tab bar's magnifier does not leave for a screen of its
+        /// own.
+        func testSearchOnSeriesSearchesSeries() {
+            search("Sev", on: "Series")
+
+            XCTAssertTrue(app.buttons["Severance"].waitForExistence(timeout: 10), "the show was not found")
+            XCTAssertFalse(app.buttons["Dark"].exists, "a show that does not match stayed")
+            XCTAssertFalse(app.staticTexts["Channels"].exists, "the search left Series for the all-round one")
+        }
+
         func testAFilmFoundBySearchOpensItsPage() {
             search("Dune")
 
@@ -45,20 +56,11 @@ final class SearchTests: PanopUITestCase {
             "home"
         }
 
-        /// The magnifier is the first thing under the tab bar, and opens a field.
-        func testTheMagnifierOpensAField() {
+        /// The magnifier is the last icon of the tab bar, and the field is on the screen.
+        func testTheTabBarOffersSearch() {
+            XCTAssertTrue(app.tabBars.buttons["Search"].waitForExistence(timeout: 30), "no Search in the tab bar")
             XCTAssertTrue(
-                app.buttons["Search"].waitForExistence(timeout: 30),
-                "no search button. Screen:\n\(app.debugDescription)"
-            )
-            // Focus starts on the tab bar or, once the screen has settled, already in the content: go down until
-            // it is on the magnifier, rather than count presses.
-            for _ in 0 ..< 3 where !app.buttons["Search"].hasFocus {
-                XCUIRemote.shared.press(.down)
-            }
-            XCUIRemote.shared.press(.select)
-            XCTAssertTrue(
-                app.textFields["searchField"].waitForExistence(timeout: 10),
+                app.searchFields.firstMatch.waitForExistence(timeout: 10),
                 "no search field. Screen:\n\(app.debugDescription)"
             )
         }

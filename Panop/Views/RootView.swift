@@ -40,13 +40,28 @@ struct MainTabLabel: View {
     }
 }
 
+#if os(tvOS)
+    /// Search over channels, movies and series, as a tab of its own: Apple TV cannot open a screen's search field from
+    /// outside, so the icon is a screen there.
+    private struct SearchTabView: View {
+        @State private var text = ""
+
+        var body: some View {
+            SearchView(query: text)
+                .searchable(text: $text, prompt: "Channels, movies, series")
+        }
+    }
+#endif
+
 nonisolated enum AppTab: Hashable {
-    case home, live, movies, series, settings
+    case home, live, movies, series, settings, search
 }
 
 struct RootView: View {
     @Environment(PlaylistLibrary.self) private var library
     @Environment(UserStateStore.self) private var userState
+    @Environment(\.horizontalSizeClass) private var sizeClass
+    @State private var searchRequests = SearchCoordinator()
     @Environment(\.modelContext) private var catalog
     @State private var selection: AppTab
     @State private var autoplay: PlaybackTarget?
@@ -85,6 +100,15 @@ struct RootView: View {
         ))
     }
 
+    /// Whether Settings has a tab. A phone's bar holds five and Search takes the last, so there it is a button on Home.
+    private var settingsInBar: Bool {
+        #if os(iOS)
+            sizeClass != .compact
+        #else
+            true
+        #endif
+    }
+
     var body: some View {
         TabView(selection: $selection) {
             Tab(value: AppTab.home) {
@@ -118,12 +142,24 @@ struct RootView: View {
                     MainTabLabel("Series", systemImage: "rectangle.stack")
                 }
             }
-            Tab(value: AppTab.settings) {
-                NavigationStack {
-                    SettingsView()
+            if settingsInBar {
+                Tab(value: AppTab.settings) {
+                    NavigationStack {
+                        SettingsView()
+                    }
+                } label: {
+                    MainTabLabel("Settings", systemImage: "gearshape")
                 }
+            }
+            // A magnifier at the end of the bar. It is never a screen of its own: see `tabSelection`.
+            Tab(value: AppTab.search, role: .search) {
+                #if os(tvOS)
+                    NavigationStack { SearchTabView() }
+                #else
+                    Color.clear
+                #endif
             } label: {
-                MainTabLabel("Settings", systemImage: "gearshape")
+                MainTabLabel("Search", systemImage: "magnifyingglass")
             }
         }
         #if os(iOS)
@@ -132,7 +168,25 @@ struct RootView: View {
         .tabViewStyle(.sidebarAdaptable)
         #endif
         // Everything under it starts again, so no screen shows the last person's lists.
+        .environment(searchRequests)
         .id(profiles.currentID)
+        // Choosing Search does not move to a screen: the selection goes straight back to where it was, and the
+        // screen that was on show is asked to open its search field.
+        .onChange(of: selection) { old, new in
+            #if !os(tvOS)
+                if new == .search {
+                    var transaction = Transaction()
+                    transaction.disablesAnimations = true
+                    withTransaction(transaction) { selection = old }
+                    searchRequests.request(for: old)
+                }
+            #endif
+        }
+        .onChange(of: settingsInBar, initial: true) { _, inBar in
+            if !inBar, selection == .settings {
+                selection = .home
+            }
+        }
         .onChange(of: library.offersVOD) { _, offered in
             // A screen that went away cannot stay selected.
             if !offered, selection == .movies || selection == .series {

@@ -53,10 +53,13 @@ struct HeroCarousel: View {
             }
             // The artwork is its own layer behind the slides, crossfading while they stay put. As a background it
             // reaches up under the bar without moving the slides, and it is not clipped, so it fades into the rows.
-            .background(alignment: .top) {
+            // Anchored at the bottom, so what it gains by reaching under the bars goes upward, to the top of the
+            // screen as on a film's page, and never down over the rows (where it would block them).
+            .background(alignment: .bottom) {
                 HeroArtwork(address: backdrop(row) ?? row.iconURL, blurred: backdrop(row) == nil)
                     .id("art-" + row.id)
                     .transition(.opacity)
+                    .allowsHitTesting(false)
             }
             // One height for every slide, so the page below does not move as titles change.
             .frame(height: Self.height(compact: sizeClass == .compact))

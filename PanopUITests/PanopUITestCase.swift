@@ -100,8 +100,14 @@ class PanopUITestCase: XCTestCase {
 
         /// Moves down until one of the buttons with this label has focus, for a label the tree holds more than once.
         func focusButton(labelled label: String) {
-            let buttons = app.buttons.matching(NSPredicate(format: "label == %@", label))
-            for _ in 0 ..< 12 where !buttons.allElementsBoundByIndex.contains(where: \.hasFocus) {
+            // In a list the focused thing can be the row (a cell) that holds the button, not the button.
+            let matches = app.descendants(matching: .any).matching(NSPredicate(
+                format: "label == %@ AND (elementType == %d OR elementType == %d)",
+                label,
+                XCUIElement.ElementType.button.rawValue,
+                XCUIElement.ElementType.cell.rawValue
+            ))
+            for _ in 0 ..< 12 where !matches.allElementsBoundByIndex.contains(where: \.hasFocus) {
                 XCUIRemote.shared.press(.down)
             }
         }

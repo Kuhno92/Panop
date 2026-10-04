@@ -14,7 +14,6 @@ struct LiveTVView: View {
     @AppStorage("liveListMode") private var storedMode = LiveListMode.all.rawValue
     @AppStorage("liveSortOrder") private var storedOrder = LiveOrder.provider.rawValue
     @State private var search = ""
-    @State private var searchOpen = false
     @State private var group: String?
     @State private var showingAdd = false
     @State private var playing: PlaybackTarget?
@@ -124,7 +123,7 @@ struct LiveTVView: View {
             #endif
         }
         .navigationTitle(selectedSource?.name ?? "Live TV")
-        .modifier(ChannelSearch(text: $search, isOpen: $searchOpen, isOffered: !library.playlists.isEmpty))
+        .modifier(ChannelSearch(text: $search, isOffered: !library.playlists.isEmpty))
         .toolbar {
             if !library.playlists.isEmpty {
                 ToolbarItem {
@@ -528,15 +527,13 @@ struct PlayerPresentation: ViewModifier {
     }
 }
 
-/// Search for channels: a magnifier under the section bar that opens a field (see `ExpandingSearch`). Offered once
-/// there is a playlist, so it does not sit above a message about adding one.
+/// Search for channels, in the system's field (see `ScreenSearch`).
 private struct ChannelSearch: ViewModifier {
     @Binding var text: String
-    @Binding var isOpen: Bool
     let isOffered: Bool
 
     func body(content: Content) -> some View {
-        content.modifier(ExpandingSearch(text: $text, isOpen: $isOpen, prompt: "Search channels", isOffered: isOffered))
+        content.modifier(ScreenSearch(text: $text, tab: .live, prompt: "Search channels", isOffered: isOffered))
     }
 }
 

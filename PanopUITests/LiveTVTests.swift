@@ -9,8 +9,8 @@ final class LiveTVTests: PanopUITestCase {
     #if !os(tvOS)
         func testSearchNarrowsTheList() {
             waitForChannels()
-            app.buttons["Search"].tap()
-            let search = app.textFields["searchField"]
+            app.tabBars.buttons["Search"].tap()
+            let search = app.searchFields.firstMatch
             XCTAssertTrue(search.waitForExistence(timeout: 10), "no search field once a playlist exists")
 
             search.typeText("zdf")
