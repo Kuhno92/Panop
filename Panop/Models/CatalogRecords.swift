@@ -70,6 +70,7 @@ final class CatalogEntryRecord {
     var groupID: String?
     var groupName: String?
     var iconURL: String?
+    var backdropURL: String?
     var epgKey: String?
     var streamURL: String?
     var remoteID: String?
@@ -105,6 +106,7 @@ final class CatalogEntryRecord {
         groupID = entry.groupID
         groupName = entry.groupName
         iconURL = entry.iconURL
+        backdropURL = entry.backdropURL
         epgKey = entry.epgKey
         streamURL = entry.streamURL
         remoteID = entry.remoteID
@@ -151,6 +153,7 @@ final class CatalogEntryRecord {
         assign(\.groupID, entry.groupID)
         assign(\.groupName, entry.groupName)
         assign(\.iconURL, entry.iconURL)
+        assign(\.backdropURL, entry.backdropURL)
         assign(\.epgKey, entry.epgKey)
         assign(\.streamURL, entry.streamURL)
         assign(\.remoteID, entry.remoteID)

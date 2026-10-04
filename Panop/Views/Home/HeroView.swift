@@ -5,6 +5,8 @@ import SwiftUI
 /// poster is enlarged and softened as the backdrop, since the catalog holds no wide artwork.
 struct HeroView: View {
     let row: CatalogRow
+    /// Wide artwork for it, when there is some; otherwise the poster, enlarged and softened.
+    var backdrop: String?
     /// Nil where playing straight away is not on offer, and the one button is for the title's page.
     var onPlay: (() -> Void)?
     let onInfo: () -> Void
@@ -18,7 +20,7 @@ struct HeroView: View {
             .padding(.bottom, 20)
             .frame(maxWidth: .infinity)
             .background {
-                BackdropView(address: row.iconURL, blurred: true)
+                BackdropView(address: backdrop ?? row.iconURL, blurred: backdrop == nil)
                     .opacity(0.55)
                     // Fades into the page, so the hero has no hard lower edge.
                     .mask(LinearGradient(colors: [.black, .black, .clear], startPoint: .top, endPoint: .bottom))

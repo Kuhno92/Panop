@@ -99,6 +99,7 @@ struct VODBrowseView: View {
             railLinks: discovery.trendingLinks,
             nextEpisodes: discovery.nextEpisodes,
             onSelect: select,
+            backdrop: { discovery.backdrop(for: $0) },
             onAdd: { showingAdd = true }
         )
         .navigationTitle(title)
@@ -185,7 +186,8 @@ struct VODBrowseView: View {
                 name: item.name,
                 posterURL: item.iconURL,
                 plot: item.plot,
-                tmdbID: item.tmdbID
+                tmdbID: item.tmdbID,
+                backdropURL: item.backdropURL
             )
             return
         }
@@ -221,6 +223,7 @@ struct SeriesReference: Hashable, Identifiable {
     var posterURL: String?
     var plot: String?
     var tmdbID: Int?
+    var backdropURL: String?
 
     var id: String {
         "\(playlist)|\(entryID)"
@@ -244,6 +247,8 @@ private struct VODGrid: View {
     let railLinks: [String: URL]
     let nextEpisodes: [String: SimklNextEpisode]
     let onSelect: (CatalogRow) -> Void
+    /// Wide artwork for a title, if any is known.
+    let backdrop: (CatalogRow) -> String?
     let onAdd: () -> Void
 
     init(
@@ -257,6 +262,7 @@ private struct VODGrid: View {
         railLinks: [String: URL],
         nextEpisodes: [String: SimklNextEpisode],
         onSelect: @escaping (CatalogRow) -> Void,
+        backdrop: @escaping (CatalogRow) -> String?,
         onAdd: @escaping () -> Void
     ) {
         self.plan = plan
@@ -269,6 +275,7 @@ private struct VODGrid: View {
         self.railLinks = railLinks
         self.nextEpisodes = nextEpisodes
         self.onSelect = onSelect
+        self.backdrop = backdrop
         self.onAdd = onAdd
     }
 
@@ -278,7 +285,7 @@ private struct VODGrid: View {
                 if let lead = rails.lazy.compactMap({ rail in
                     rail.keys.lazy.compactMap { railRows[$0] }.first { $0.iconURL != nil }
                 }).first {
-                    HeroView(row: lead, onInfo: { onSelect(lead) })
+                    HeroView(row: lead, backdrop: backdrop(lead), onInfo: { onSelect(lead) })
                 }
                 ForEach(rails) { rail in
                     PosterRail(

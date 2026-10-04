@@ -81,23 +81,30 @@ public struct SimklTrendingSource: Sendable {
         guard let items = try? JSONDecoder().decode([Item].self, from: response.body) else {
             throw Failure.undecodable
         }
-        let usable = items.compactMap { item -> (Int, String?)? in
-            guard let id = item.tmdbID else { return nil }
-            return (id, item.url.map { Self.site + $0 })
-        }
+        let usable = items.filter { $0.tmdbID != nil }
         // Simkl lists them best first; the score only has to keep that order.
-        return usable.enumerated().map { index, found in
-            TrendingEntry(kind: kind, tmdbID: found.0, score: Double(usable.count - index), link: found.1)
+        return usable.enumerated().compactMap { index, item in
+            item.tmdbID.map {
+                TrendingEntry(
+                    kind: kind,
+                    tmdbID: $0,
+                    score: Double(usable.count - index),
+                    link: item.url.map { Self.site + $0 },
+                    fanart: item.fanart
+                )
+            }
         }
     }
 
     private struct Item: Decodable {
         var url: String?
+        var fanart: String?
         var tmdbID: Int?
 
         init(from decoder: any Decoder) throws {
             let container = try decoder.container(keyedBy: ItemKeys.self)
             url = try? container.decodeIfPresent(String.self, forKey: .url)
+            fanart = try? container.decodeIfPresent(String.self, forKey: .fanart)
             // The id is a string in one file and a number in another.
             if let ids = try? container.nestedContainer(keyedBy: IDKeys.self, forKey: .ids) {
                 if let number = try? ids.decodeIfPresent(Int.self, forKey: .tmdb) {
@@ -110,5 +117,5 @@ public struct SimklTrendingSource: Sendable {
     }
 }
 
-private enum ItemKeys: String, CodingKey { case url, ids }
+private enum ItemKeys: String, CodingKey { case url, fanart, ids }
 private enum IDKeys: String, CodingKey { case tmdb }

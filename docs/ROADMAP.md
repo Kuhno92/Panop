@@ -646,7 +646,10 @@ Features real users expect that the brief did not name. All *(surfaced)*.
       films and episodes as posters with a progress bar; one set of rail measures (`RailMetrics`); Movies and
       Series lead with a hero; film and series pages open on full-width artwork with the poster, name and
       details over it; on iPad and Mac a sidebar opens from the tab bar (names shown there), iPhone and Apple TV
-      keep icons alone. **Not done:** a season picker and episode thumbnails, tvOS focus sections and a default
+      keep icons alone. **Wide artwork, provider first:** a series' backdrop is saved at import (the panel's list has
+      one for 1,286 of 1,394 series on the test provider), and Simkl's `fanart` stands in for a title that is on one of its
+      lists (films get it this way: 0 of 40 sampled films had a backdrop from the panel). Used by the hero and the
+      film and series pages. A title with neither keeps the softened poster. **Not done:** a season picker and episode thumbnails, tvOS focus sections and a default
       focus on the hero, real wide artwork (provider backdrops saved at import, or Simkl/TMDB), and a look at
       iPad, Mac and a real Apple TV, none of which has been seen.
 - [ ] **Aspect ratio of the stream** *(asked for)*. Let the person change how the picture fills the screen

@@ -24,6 +24,8 @@ final class DiscoveryModel {
 
     /// Where Simkl lists a title, by `linkKey`, for the lists whose terms ask for a link back.
     private(set) var trendingLinks: [String: URL] = [:]
+    /// Simkl's wide artwork for the titles on its lists, by `linkKey`: the stand-in where the provider has none.
+    private(set) var fanart: [String: String] = [:]
     @ObservationIgnored private var trending: [TrendingEntry] = []
     /// The lists made from Simkl's public files, and what a connected account adds to them.
     @ObservationIgnored private var baseCurated: [CuratedList] = []
@@ -118,6 +120,14 @@ final class DiscoveryModel {
             },
             uniquingKeysWith: { first, _ in first }
         )
+        fanart = Dictionary(
+            (trending + lists.flatMap(\.entries)).compactMap { entry in
+                entry.fanart.flatMap(SimklArtwork.fanartURL).map {
+                    (Self.linkKey(kind: entry.kind, tmdbID: entry.tmdbID), $0.absoluteString)
+                }
+            },
+            uniquingKeysWith: { first, _ in first }
+        )
         highlighted = Set(lists.filter(\.isHighlight).map { "curated.\($0.kind.rawValue).\($0.id)" })
         if var context = lastContext {
             context.trending = trending
@@ -157,6 +167,20 @@ final class DiscoveryModel {
     }
 
     private(set) var rows: [String: CatalogRow] = [:]
+
+    /// Wide artwork for a title: the provider's own where its list gave one (series), otherwise Simkl's for a
+    /// title on one of its lists, otherwise nil and the screen softens the poster instead.
+    func backdrop(for row: CatalogRow) -> String? {
+        backdrop(kind: row.kind, tmdbID: row.tmdbID, provider: row.backdropURL)
+    }
+
+    func backdrop(kind: MediaKind, tmdbID: Int?, provider: String?) -> String? {
+        if let provider, !provider.isEmpty {
+            return provider
+        }
+        return tmdbID.flatMap { fanart[Self.linkKey(kind: kind, tmdbID: $0)] }
+    }
+
     /// `loading` until the first result, cached or built, has arrived.
     private(set) var phase = CatalogListModel.Phase.loading
 

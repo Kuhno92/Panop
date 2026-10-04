@@ -19,6 +19,8 @@ public struct CatalogEntry: Sendable, Equatable, Hashable {
     public var groupID: String?
     public var groupName: String?
     public var iconURL: String?
+    /// Wide artwork, where the provider's list gives it (a series' backdrop).
+    public var backdropURL: String?
     /// Lower-cased EPG channel id, ready to match against guide channels.
     public var epgKey: String?
     /// A complete URL when the source supplies one (M3U, or an Xtream
@@ -57,6 +59,7 @@ public struct CatalogEntry: Sendable, Equatable, Hashable {
         groupID: String? = nil,
         groupName: String? = nil,
         iconURL: String? = nil,
+        backdropURL: String? = nil,
         epgKey: String? = nil,
         streamURL: String? = nil,
         remoteID: String? = nil,
@@ -82,6 +85,7 @@ public struct CatalogEntry: Sendable, Equatable, Hashable {
         self.groupID = groupID
         self.groupName = groupName
         self.iconURL = iconURL
+        self.backdropURL = backdropURL
         self.epgKey = epgKey
         self.streamURL = streamURL
         self.remoteID = remoteID

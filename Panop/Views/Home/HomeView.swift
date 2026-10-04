@@ -56,6 +56,7 @@ struct HomeView: View {
                     if let hero = heroRow {
                         HeroView(
                             row: hero,
+                            backdrop: discovery.backdrop(for: hero),
                             onPlay: { hero.kind == .movie ? playNow(hero) : open(hero) },
                             onInfo: { open(hero) }
                         )
@@ -149,7 +150,8 @@ struct HomeView: View {
                 name: row.name,
                 posterURL: row.iconURL,
                 plot: row.plot,
-                tmdbID: row.tmdbID
+                tmdbID: row.tmdbID,
+                backdropURL: row.backdropURL
             )
         default:
             userState.markPlayed(row.id)

@@ -9,6 +9,8 @@ public struct SimklTitle: Sendable, Equatable {
     public var tmdbID: Int
     /// Simkl's own page for it, which anything shown from Simkl's data links back to.
     public var link: String?
+    /// Simkl's wide artwork for it, as the path its files give (see `SimklArtwork`).
+    public var fanart: String?
     /// Where it comes in the list it was read from, 0 being first.
     public var position: Int
     public var genres: [String]
@@ -30,7 +32,8 @@ public struct SimklTitle: Sendable, Equatable {
     public var watched: Int
 
     public init(
-        kind: MediaKind, tmdbID: Int, link: String? = nil, position: Int = 0, genres: [String] = [],
+        kind: MediaKind, tmdbID: Int, link: String? = nil, fanart: String? = nil, position: Int = 0,
+        genres: [String] = [],
         network: String? = nil, simklRating: Double? = nil, simklVotes: Int = 0, imdbRating: Double? = nil,
         imdbVotes: Int = 0, releaseDate: Date? = nil, theatricalDate: Date? = nil, dvdDate: Date? = nil,
         runtimeMinutes: Int? = nil, boxOffice: Double? = nil, status: String? = nil, watchlisted: Int = 0,
@@ -39,6 +42,7 @@ public struct SimklTitle: Sendable, Equatable {
         self.kind = kind
         self.tmdbID = tmdbID
         self.link = link
+        self.fanart = fanart
         self.position = position
         self.genres = genres
         self.network = network
@@ -112,6 +116,7 @@ public enum SimklFile {
             kind: kind,
             tmdbID: tmdb,
             link: (item["url"] as? String).map { "https://simkl.com" + $0 },
+            fanart: (item["fanart"] as? String).flatMap { $0.isEmpty ? nil : $0 },
             position: position,
             genres: unique((item["genres"] as? [String]) ?? []),
             network: item["network"] as? String,

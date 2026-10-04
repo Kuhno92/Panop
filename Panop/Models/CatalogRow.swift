@@ -17,6 +17,8 @@ nonisolated struct CatalogRow: Identifiable, Hashable, Sendable, Codable {
     var nameKey: String
     var groupName: String?
     var iconURL: String?
+    /// Wide artwork from the provider, for a series; Simkl's stands in for the rest (see `DiscoveryModel.backdrop`).
+    var backdropURL: String?
     var epgKey: String?
     var streamURL: String?
     var remoteID: String?
@@ -44,6 +46,7 @@ nonisolated struct CatalogRow: Identifiable, Hashable, Sendable, Codable {
         nameKey = record.nameKey
         groupName = record.groupName
         iconURL = record.iconURL
+        backdropURL = record.backdropURL
         epgKey = record.epgKey
         streamURL = record.streamURL
         remoteID = record.remoteID

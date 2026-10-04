@@ -74,7 +74,8 @@ struct SearchView: View {
                 name: item.name,
                 posterURL: item.iconURL,
                 plot: item.plot,
-                tmdbID: item.tmdbID == 0 ? nil : item.tmdbID
+                tmdbID: item.tmdbID == 0 ? nil : item.tmdbID,
+                backdropURL: item.backdropURL
             )
         default:
             userState.markPlayed(UserStateStore.key(playlist: item.playlist, entry: item.id))

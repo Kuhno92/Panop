@@ -95,7 +95,11 @@ struct SeriesDetailView: View {
                     List {
                         Section {
                             DetailHeader(
-                                backdrop: nil,
+                                backdrop: discovery.backdrop(
+                                    kind: .series,
+                                    tmdbID: series.tmdbID,
+                                    provider: series.backdropURL
+                                ),
                                 poster: series.posterURL,
                                 title: series.name,
                                 meta: "",

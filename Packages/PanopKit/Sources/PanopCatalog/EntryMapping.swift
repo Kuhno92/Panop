@@ -110,6 +110,7 @@ enum EntryMapping {
             groupID: series.categoryID,
             groupName: group,
             iconURL: series.coverURL,
+            backdropURL: series.backdropURLs.first(where: { !$0.isEmpty }),
             remoteID: String(series.seriesID),
             sortNumber: series.number,
             addedAt: series.lastModified,

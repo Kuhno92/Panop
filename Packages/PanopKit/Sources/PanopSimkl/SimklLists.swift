@@ -134,7 +134,13 @@ public enum SimklLists {
         var seen = Set<Int>()
         let unique = titles.filter { seen.insert($0.tmdbID).inserted }.prefix(listSize)
         return unique.enumerated().map {
-            TrendingEntry(kind: $1.kind, tmdbID: $1.tmdbID, score: Double(unique.count - $0), link: $1.link)
+            TrendingEntry(
+                kind: $1.kind,
+                tmdbID: $1.tmdbID,
+                score: Double(unique.count - $0),
+                link: $1.link,
+                fanart: $1.fanart
+            )
         }
     }
 }

@@ -17,6 +17,7 @@ struct MovieReference: Hashable, Identifiable {
     var streamURL: String?
     var containerExtension: String?
     var tmdbID: Int?
+    var backdropURL: String?
 
     var id: String {
         "\(playlist)|\(entryID)"
@@ -34,6 +35,7 @@ struct MovieReference: Hashable, Identifiable {
         streamURL = row.streamURL
         containerExtension = row.containerExtension
         tmdbID = row.tmdbID
+        backdropURL = row.backdropURL
     }
 
     init(_ item: CatalogEntryRecord) {
@@ -109,6 +111,7 @@ struct MovieDetailView: View {
     @Environment(PlaylistLibrary.self) private var library
     @Environment(UserStateStore.self) private var userState
     @Environment(SimklSync.self) private var simkl
+    @Environment(DiscoveryModel.self) private var discovery
 
     @State private var info: XtreamMovieInfo?
     @State private var playing: PlaybackTarget?
@@ -145,7 +148,7 @@ struct MovieDetailView: View {
 
     private var header: some View {
         DetailHeader(
-            backdrop: info?.backdropURLs.first,
+            backdrop: discovery.backdrop(kind: .movie, tmdbID: movie.tmdbID, provider: info?.backdropURLs.first),
             poster: info?.coverURL ?? movie.posterURL,
             title: movie.name,
             meta: MovieMeta.line(
