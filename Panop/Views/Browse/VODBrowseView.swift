@@ -275,6 +275,11 @@ private struct VODGrid: View {
     var body: some View {
         ScrollView {
             LazyVStack(alignment: .leading, spacing: Self.spacing, pinnedViews: Self.pinnedHeadings) {
+                if let lead = rails.lazy.compactMap({ rail in
+                    rail.keys.lazy.compactMap { railRows[$0] }.first { $0.iconURL != nil }
+                }).first {
+                    HeroView(row: lead, onInfo: { onSelect(lead) })
+                }
                 ForEach(rails) { rail in
                     PosterRail(
                         rail: rail,

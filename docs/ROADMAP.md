@@ -641,6 +641,14 @@ Features real users expect that the brief did not name. All *(surfaced)*.
       **Not done:** a day picker (the grid shows from an hour ago to ten hours ahead), jumping to
       a time, a filter for channels that have a guide, and a reminder or record action. **Not seen on a
       real Apple TV or with a real provider's guide.**
+- [ ] **Netflix-style layout** *(asked for)*. Done: Home leads with a hero title (poster enlarged and softened as
+      the backdrop, since the catalog holds no wide artwork) with Play and More info; Continue Watching shows
+      films and episodes as posters with a progress bar; one set of rail measures (`RailMetrics`); Movies and
+      Series lead with a hero; film and series pages open on full-width artwork with the poster, name and
+      details over it; on iPad and Mac a sidebar opens from the tab bar (names shown there), iPhone and Apple TV
+      keep icons alone. **Not done:** a season picker and episode thumbnails, tvOS focus sections and a default
+      focus on the hero, real wide artwork (provider backdrops saved at import, or Simkl/TMDB), and a look at
+      iPad, Mac and a real Apple TV, none of which has been seen.
 - [ ] **Aspect ratio of the stream** *(asked for)*. Let the person change how the picture fills the screen
       while watching (fit, fill, stretch, 16:9, 4:3), per playback and optionally remembered per channel
       or source. Each engine does it differently (AVPlayer `videoGravity`; libVLC's aspect and crop

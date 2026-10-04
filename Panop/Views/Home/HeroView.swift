@@ -5,7 +5,8 @@ import SwiftUI
 /// poster is enlarged and softened as the backdrop, since the catalog holds no wide artwork.
 struct HeroView: View {
     let row: CatalogRow
-    let onPlay: () -> Void
+    /// Nil where playing straight away is not on offer, and the one button is for the title's page.
+    var onPlay: (() -> Void)?
     let onInfo: () -> Void
 
     @Environment(\.horizontalSizeClass) private var sizeClass
@@ -84,14 +85,21 @@ struct HeroView: View {
 
     private var buttons: some View {
         HStack(spacing: 12) {
-            Button(action: onPlay) {
-                Label("Play", systemImage: "play.fill").frame(minWidth: 90)
+            if let onPlay {
+                Button(action: onPlay) {
+                    Label("Play", systemImage: "play.fill").frame(minWidth: 90)
+                }
+                .buttonStyle(.borderedProminent)
+                Button(action: onInfo) {
+                    Label("More info", systemImage: "info.circle").frame(minWidth: 90)
+                }
+                .buttonStyle(.bordered)
+            } else {
+                Button(action: onInfo) {
+                    Label("More info", systemImage: "info.circle").frame(minWidth: 90)
+                }
+                .buttonStyle(.borderedProminent)
             }
-            .buttonStyle(.borderedProminent)
-            Button(action: onInfo) {
-                Label("More info", systemImage: "info.circle").frame(minWidth: 90)
-            }
-            .buttonStyle(.bordered)
         }
         .controlSize(Self.controlSize)
     }
