@@ -59,6 +59,9 @@ struct SeriesDetailView: View {
     var body: some View {
         content
             .navigationTitle(series.name)
+        #if os(iOS)
+            .navigationBarTitleDisplayMode(.inline)
+        #endif
             .task { await fetch() }
             .resumeDialog($resume)
             .modifier(PlayerPresentation(target: $playing))
@@ -90,6 +93,20 @@ struct SeriesDetailView: View {
             } else {
                 ScrollViewReader { proxy in
                     List {
+                        Section {
+                            DetailHeader(
+                                backdrop: nil,
+                                poster: series.posterURL,
+                                title: series.name,
+                                meta: "",
+                                symbol: "rectangle.stack"
+                            ) { EmptyView() }
+                                .listRowInsets(EdgeInsets())
+                                .listRowBackground(Color.clear)
+                            #if !os(tvOS)
+                                .listRowSeparator(.hidden)
+                            #endif
+                        }
                         if let plot = series.plot ?? plot, !plot.isEmpty {
                             Section { Text(plot).font(.callout).foregroundStyle(.secondary) }
                         }
@@ -102,6 +119,8 @@ struct SeriesDetailView: View {
                             }
                         }
                     }
+                    // Flat rows, so the header's artwork runs to the edges instead of sitting in a rounded card.
+                    .listStyle(.plain)
                     // Straight to where the person left off, when their Simkl account says where that is.
                     .task(id: seasons.count) {
                         if let next = upNext {
