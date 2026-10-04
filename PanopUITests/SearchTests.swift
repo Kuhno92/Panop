@@ -36,5 +36,18 @@ final class SearchTests: PanopUITestCase {
 
             XCTAssertTrue(app.buttons["Play"].waitForExistence(timeout: 10), "the film's page did not open")
         }
+    #else
+        override var startTab: String {
+            "search"
+        }
+
+        /// Search is a tab of its own on Apple TV, and opens on its field.
+        func testSearchIsATabWithAField() {
+            XCTAssertTrue(app.tabBars.buttons["Search"].waitForExistence(timeout: 30), "no Search in the tab bar")
+            XCTAssertTrue(
+                app.searchFields.firstMatch.waitForExistence(timeout: 10),
+                "no search field. Screen:\n\(app.debugDescription)"
+            )
+        }
     #endif
 }

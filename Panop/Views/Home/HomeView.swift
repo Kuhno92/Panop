@@ -209,11 +209,8 @@ private struct HomeSearch: ViewModifier {
 
     func body(content: Content) -> some View {
         #if os(tvOS)
-            if isOffered {
-                content.searchable(text: $text, prompt: "Channels, movies, series")
-            } else {
-                content
-            }
+            // Apple TV has Search as a tab of its own.
+            content
         #else
             content.searchable(text: $text, prompt: "Channels, movies, series")
         #endif

@@ -18,8 +18,7 @@ final class HomeTests: PanopUITestCase {
         attach("home-empty")
 
         #if os(tvOS)
-            // Down from the tab bar reaches the search field first, then the button.
-            XCUIRemote.shared.press(.down)
+            // Down from the tab bar reaches the button.
             XCUIRemote.shared.press(.down)
             XCUIRemote.shared.press(.select)
         #else

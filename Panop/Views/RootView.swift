@@ -23,7 +23,10 @@ struct MainTabLabel: View {
         #if os(macOS)
             Label(title, systemImage: systemImage)
         #elseif os(tvOS)
-            Label(title, systemImage: systemImage).labelStyle(.iconOnly)
+            // Icons alone, with room either side so each is a wide, easy target in the bar.
+            Label(title, systemImage: systemImage)
+                .labelStyle(.iconOnly)
+                .padding(.horizontal, 28)
         #else
             if sizeClass == .compact {
                 Label(title, systemImage: systemImage).labelStyle(.iconOnly)
@@ -34,8 +37,20 @@ struct MainTabLabel: View {
     }
 }
 
+#if os(tvOS)
+    /// Apple TV's search: the field and the results, as a tab of their own.
+    private struct TVSearchView: View {
+        @State private var text = ""
+
+        var body: some View {
+            SearchView(query: text)
+                .searchable(text: $text, prompt: "Channels, movies, series")
+        }
+    }
+#endif
+
 nonisolated enum AppTab: Hashable {
-    case home, live, movies, series, settings
+    case home, live, movies, series, settings, search
 }
 
 struct RootView: View {
@@ -112,6 +127,14 @@ struct RootView: View {
                     MainTabLabel("Series", systemImage: "rectangle.stack")
                 }
             }
+            #if os(tvOS)
+                // A search icon at the end of the bar; choosing it shows the search field.
+                Tab(value: AppTab.search, role: .search) {
+                    NavigationStack { TVSearchView() }
+                } label: {
+                    MainTabLabel("Search", systemImage: "magnifyingglass")
+                }
+            #endif
             Tab(value: AppTab.settings) {
                 NavigationStack {
                     SettingsView()
