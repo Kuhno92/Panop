@@ -15,9 +15,22 @@ struct MainTabLabel: View {
         self.systemImage = systemImage
     }
 
+    @Environment(\.horizontalSizeClass) private var sizeClass
+
     var body: some View {
-        Label(title, systemImage: systemImage)
-            .labelStyle(.iconOnly)
+        // Icons alone in a bar on a phone or a TV, where room and distance ask for it. In the sidebar of an
+        // iPad or a Mac there is room, and an icon with no name is a puzzle.
+        #if os(macOS)
+            Label(title, systemImage: systemImage)
+        #elseif os(tvOS)
+            Label(title, systemImage: systemImage).labelStyle(.iconOnly)
+        #else
+            if sizeClass == .compact {
+                Label(title, systemImage: systemImage).labelStyle(.iconOnly)
+            } else {
+                Label(title, systemImage: systemImage)
+            }
+        #endif
     }
 }
 
@@ -107,6 +120,10 @@ struct RootView: View {
                 MainTabLabel("Settings", systemImage: "gearshape")
             }
         }
+        #if !os(tvOS)
+        // A tab bar on a phone, and a sidebar the person can open on an iPad or a Mac.
+        .tabViewStyle(.sidebarAdaptable)
+        #endif
         // Everything under it starts again, so no screen shows the last person's lists.
         .id(profiles.currentID)
         .onChange(of: library.offersVOD) { _, offered in
