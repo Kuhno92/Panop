@@ -623,16 +623,60 @@ Features real users expect that the brief did not name. All *(surfaced)*.
       Live TV toolbar, the first row on Apple TV) opens a **time grid for the channels of the current
       list**: the same source, category, search and favourites as the list, a channel down the side that
       stays in view, time along the top that stays in view, each programme as wide as it is long, a red
-      line for now, what is on highlighted with its progress, and what is coming up beside it for the next
+      line for now (drawn across the programmes, under the channel column), what is on highlighted with its progress, and what is coming up beside it for the next
       ten hours. Tapping a programme opens it in full with a way to watch the channel; tapping a channel
       plays it. Channels are read as they scroll into view, in batches, off the main thread, one bounded read
       each on the (source, channel, start) index. A programme's title stays clear of the channel column
       while its start is scrolled under it. On Apple TV the grid takes the whole screen and Menu closes it.
       Tested: the layout arithmetic, the batching model, the lookups, UI tests on iOS and tvOS (the grid,
       a programme's details, playing from it, the next line, and the channel schedule from the row menu on
-      Apple TV). **Not done:** a day picker (the grid shows from an hour ago to ten hours ahead), jumping to
+      Apple TV). **Made easier to read:** what is on now is a strongly coloured, ringed cell with a NOW tag
+      and a progress bar, with a red NOW tag on the time bar; each programme is coloured by its kind (news,
+      sport, films, series, kids, documentaries, music, entertainment), read from the guide's own
+      categories in English or German and drawn as a stripe and a wash of that colour; rows are striped,
+      there are hour lines, and the first mark after midnight names the day; a colour key explains it all
+      (not on Apple TV). **The channel list has a lite version**: under each name the programme on now
+      with a colour dot, minutes left and a progress bar, and what follows in a pill of its kind's colour,
+      with nothing to scroll. A guide that gives no categories is drawn in grey, not guessed at.
+      **Not done:** a day picker (the grid shows from an hour ago to ten hours ahead), jumping to
       a time, a filter for channels that have a guide, and a reminder or record action. **Not seen on a
       real Apple TV or with a real provider's guide.**
+- [ ] **Aspect ratio of the stream** *(asked for)*. Let the person change how the picture fills the screen
+      while watching (fit, fill, stretch, 16:9, 4:3), per playback and optionally remembered per channel
+      or source. Each engine does it differently (AVPlayer `videoGravity`; libVLC's aspect and crop
+      ratios; LumeEngine's renderer), so the choice lives in the shared player model and each adapter
+      applies it. Not started.
+- [ ] **User agent per source** *(asked for)*. Some providers only serve clients that look like a known
+      player, so a source gets a setting for the `User-Agent` it sends (a few presets, such as VLC and
+      Chrome, and a custom text), used for its playlist and guide downloads, the Xtream API and the
+      stream itself in every engine (AVPlayer needs the `AVURLAssetHTTPUserAgentKey` option; libVLC
+      `:http-user-agent`). Stored with the source, not the login. Not started.
+- [ ] **Live rewind: always keep the last 30 minutes** *(asked for)*. While a live channel plays, record
+      it into a rolling 30-minute buffer on disk, so the person can go back in time, pause and carry on
+      later, or jump back to live. Distinct from provider catch-up (above), which needs the panel to
+      archive the channel; this works for any stream. The buffer is the stream's own bytes (a transport
+      stream or HLS segments), written off the main thread, bounded in size and deleted when the channel
+      changes or the app quits, with a limit for Apple TV's storage. Needs a design note first: one
+      download feeding both the engine and the file (a local loopback server or a custom loader), and how
+      each engine plays a growing file. Not started.
+- [ ] **Preview image while seeking** *(asked for)*. Scrubbing the timeline shows a thumbnail of that
+      moment. For VOD: frames sampled from the file (AVAssetImageGenerator for AVPlayer, the engine's own
+      snapshot for the others), generated lazily around the scrub position and cached. For live rewind:
+      frames taken from the buffer above. Not started.
+- [ ] **Download VOD for offline viewing** *(asked for)*. Save a movie or an episode to the device and play
+      it without a connection: a download queue with progress, pause and resume, background transfer
+      (`URLSession` background configuration), a storage limit and a Downloads screen to delete from.
+      Plays from the local file through the same engines. Not available on tvOS, which has no persistent
+      storage for it. Open question: whether providers' terms allow it, so it should be off unless the
+      person turns it on. Not started.
+- [ ] **Add AetherEngine as an engine** *(asked for)*. A fourth playback engine behind `PlaybackEngine`,
+      next to AVPlayer, VLCKit and LumeEngine, chosen in Settings. Before adding: read its licence and
+      record it in `THIRD-PARTY-NOTICES.md` in the same commit, and keep it out if it is GPL (see
+      Licensing). Not started.
+- [ ] **Add MPVKit as an engine** *(asked for)*. libmpv through MPVKit, as another `PlaybackEngine`. The
+      licence needs care: mpv itself is GPL-2.0-or-later unless built as LGPL, and MPVKit's builds differ by
+      configuration (and bundle FFmpeg), so confirm that the variant used is LGPL and dynamically linked
+      before it goes in; if only a GPL build exists it cannot ship, like KSPlayer. Not started.
 - [ ] **Catch-up and timeshift**. Xtream supports it; the M3U attributes are already parsed.
       **Catch-up for Xtream is built**: a channel the panel archives (`tv_archive`) lists the
       programmes that aired within its window under "Earlier" in its guide, and tapping one plays

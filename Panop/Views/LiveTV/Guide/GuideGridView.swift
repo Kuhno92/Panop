@@ -29,11 +29,12 @@ struct GuideGridView: View {
         ScrollView([.horizontal, .vertical]) {
             LazyVStack(alignment: .leading, spacing: 0, pinnedViews: [.sectionHeaders]) {
                 Section {
-                    ForEach(rows) { channel in
+                    ForEach(Array(rows.enumerated()), id: \.element.id) { index, channel in
                         GuideGridRow(
                             channel: channel,
                             timeline: timeline,
                             grid: grid,
+                            isAlternate: index.isMultiple(of: 2),
                             focus: $focusedChannel,
                             onPlay: play,
                             onSelect: { selected = GuideSelection(channel: channel, programme: $0) }
@@ -45,8 +46,10 @@ struct GuideGridView: View {
                 }
             }
             .frame(width: GuideMetrics.channelWidth + timeline.width, alignment: .leading)
-            // Behind the rows, so the line shows through the gaps and the light cells but never over a title.
-            .background(alignment: .topLeading) { GuideNowMarker(timeline: timeline) }
+            // Behind the rows, so the lines show through the gaps and the light cells but never over a title.
+            .background(alignment: .topLeading) {
+                GuideHourLines(timeline: timeline)
+            }
         }
         .scrollPosition($position)
         .coordinateSpace(.named(GuideMetrics.space))
@@ -166,6 +169,15 @@ private struct GuideBarBackground: View {
 private struct GuideTimeHeader: View {
     let timeline: GuideTimeline
 
+    /// The time, and the day too at the first mark after midnight, so a guide that runs into tomorrow says so.
+    static func label(for tick: Date) -> String {
+        let time = tick.formatted(date: .omitted, time: .shortened)
+        let calendar = Calendar.current
+        let startOfDay = calendar.startOfDay(for: tick)
+        guard tick.timeIntervalSince(startOfDay) < 1800 else { return time }
+        return tick.formatted(.dateTime.weekday(.abbreviated)) + " " + time
+    }
+
     var body: some View {
         HStack(spacing: 0) {
             GuideBarBackground()
@@ -187,16 +199,56 @@ private struct GuideTimeHeader: View {
                         .fill(.secondary.opacity(whole ? 0.5 : 0.25))
                         .frame(width: 1, height: whole ? GuideMetrics.headerHeight : GuideMetrics.headerHeight / 2)
                         .offset(x: timeline.x(for: tick))
-                    Text(tick.formatted(date: .omitted, time: .shortened))
-                        .font(.caption.monospacedDigit())
+                    Text(Self.label(for: tick))
+                        .font(.caption.monospacedDigit().weight(whole ? .semibold : .regular))
                         .foregroundStyle(whole ? .primary : .secondary)
                         .padding(.leading, 6)
                         .offset(x: timeline.x(for: tick))
                 }
+                GuideNowChip(timeline: timeline)
             }
             .frame(width: timeline.width, height: GuideMetrics.headerHeight)
         }
         .frame(height: GuideMetrics.headerHeight)
+    }
+}
+
+/// Faint vertical lines at every half hour, stronger at the hour, running the height of the grid.
+private struct GuideHourLines: View {
+    let timeline: GuideTimeline
+
+    var body: some View {
+        Canvas { context, size in
+            for tick in timeline.ticks {
+                let x = GuideMetrics.channelWidth + timeline.x(for: tick)
+                let whole = GuideTimeline.isWholeHour(tick)
+                var line = Path()
+                line.move(to: CGPoint(x: x, y: 0))
+                line.addLine(to: CGPoint(x: x, y: size.height))
+                context.stroke(line, with: .color(.primary.opacity(whole ? 0.14 : 0.06)), lineWidth: 1)
+            }
+        }
+        .allowsHitTesting(false)
+        .accessibilityHidden(true)
+    }
+}
+
+/// A small "NOW" label on the time bar, where the red line meets it.
+private struct GuideNowChip: View {
+    let timeline: GuideTimeline
+
+    var body: some View {
+        TimelineView(.everyMinute) { context in
+            Text("NOW")
+                .font(.caption2.weight(.heavy))
+                .foregroundStyle(.white)
+                .padding(.horizontal, 6)
+                .padding(.vertical, 2)
+                .background(Capsule().fill(.red))
+                .offset(x: timeline.x(for: context.date) - 18, y: GuideMetrics.headerHeight - 18)
+        }
+        .allowsHitTesting(false)
+        .accessibilityHidden(true)
     }
 }
 
@@ -208,8 +260,9 @@ private struct GuideNowMarker: View {
         TimelineView(.everyMinute) { context in
             Rectangle()
                 .fill(.red)
-                .frame(width: 2)
-                .offset(x: GuideMetrics.channelWidth + timeline.x(for: context.date) - 1)
+                .frame(width: 2, height: GuideMetrics.rowHeight)
+                .shadow(color: .black.opacity(0.35), radius: 1)
+                .offset(x: timeline.x(for: context.date) - 1)
         }
         .allowsHitTesting(false)
         .accessibilityHidden(true)
@@ -222,6 +275,8 @@ private struct GuideGridRow: View {
     let channel: CatalogRow
     let timeline: GuideTimeline
     let grid: GuideGridModel
+    /// Every other row is shaded a little, so a row can be followed across the grid.
+    let isAlternate: Bool
     var focus: FocusState<String?>.Binding
     let onPlay: (CatalogRow) -> Void
     let onSelect: (ProgrammeSnapshot) -> Void
@@ -257,10 +312,14 @@ private struct GuideGridRow: View {
             ZStack(alignment: .topLeading) {
                 Color.clear
                 programmes
+                // Over the cells, so the line is seen across a programme, and under the channel column
+                // (which is above this area), so it never crosses a channel name.
+                GuideNowMarker(timeline: timeline)
             }
             .frame(width: timeline.width, height: GuideMetrics.rowHeight)
         }
         .frame(height: GuideMetrics.rowHeight)
+        .background(isAlternate ? Color.primary.opacity(0.045) : Color.clear)
         .overlay(alignment: .bottom) { Divider() }
         .task(id: key) {
             if let key {
@@ -300,6 +359,7 @@ private struct GuideGridRow: View {
 }
 
 private struct GuideProgrammeCell: View {
+    @Environment(\.colorScheme) private var scheme
     let channel: CatalogRow
     let programme: ProgrammeSnapshot
     let width: Double
@@ -311,33 +371,55 @@ private struct GuideProgrammeCell: View {
         let now = Date.now
         let onAir = programme.isOn(at: now)
         let over = programme.stop <= now
+        let kind = programme.kind
+        let tint = kind.color
+        let shape = RoundedRectangle(cornerRadius: 8)
         Button(action: action) {
-            VStack(alignment: .leading, spacing: 2) {
-                Text(programme.title)
-                    .font(.footnote.weight(.semibold))
-                    .lineLimit(2)
-                Text(Self.range(programme))
-                    .font(.caption2.monospacedDigit())
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
+            HStack(spacing: 0) {
+                // The colour of the kind, down the left edge.
+                Rectangle().fill(onAir ? Color.white.opacity(0.9) : tint.opacity(over ? 0.45 : 1)).frame(width: 4)
+                VStack(alignment: .leading, spacing: 2) {
+                    HStack(spacing: 5) {
+                        if onAir, width > 130 {
+                            Text("NOW")
+                                .font(.caption2.weight(.heavy))
+                                .padding(.horizontal, 5)
+                                .padding(.vertical, 1)
+                                .background(Capsule().fill(.white.opacity(0.28)))
+                        }
+                        Text(programme.title)
+                            .font(.footnote.weight(onAir ? .bold : .semibold))
+                            .lineLimit(2)
+                    }
+                    Text(Self.range(programme))
+                        .font(.caption2.monospacedDigit())
+                        .foregroundStyle(onAir ? Color.white.opacity(0.85) : Color.secondary)
+                        .lineLimit(1)
+                }
+                // The title stays in view while the programme's start is scrolled under the channel column.
+                .stayingClearOfChannelColumn(limit: max(width - 110, 0))
+                .padding(.horizontal, 8)
             }
-            // The title stays in view while the programme's start is scrolled under the channel column.
-            .stayingClearOfChannelColumn(limit: max(width - 110, 0))
-            .padding(.horizontal, 8)
+            .foregroundStyle(onAir ? Color.white : Color.primary)
             .frame(width: width - 3, height: GuideMetrics.rowHeight - 6, alignment: .leading)
-            .background(
-                RoundedRectangle(cornerRadius: 8)
-                    .fill(onAir ? Color.blue.opacity(0.32) : Color.gray.opacity(over ? 0.10 : 0.22))
-            )
+            .background(shape.fill(Self.fill(tint: tint, onAir: onAir, over: over, dark: scheme == .dark)))
+            .clipShape(shape)
+            // What is on now is ringed, so it stands out from everything round it.
+            .overlay(shape.strokeBorder(
+                onAir ? Color.white.opacity(0.9) : tint.opacity(over ? 0.10 : 0.30), lineWidth: onAir ? 2 : 1
+            ))
             .overlay(alignment: .bottomLeading) {
                 if onAir {
-                    Capsule()
-                        .fill(Color.blue)
-                        .frame(width: max((width - 3) * programme.fraction(at: now), 0), height: 3)
-                        .padding(.horizontal, 4)
-                        .padding(.bottom, 3)
+                    ZStack(alignment: .leading) {
+                        Capsule().fill(.white.opacity(0.3))
+                        Capsule().fill(.white).frame(width: max((width - 3 - 16) * programme.fraction(at: now), 4))
+                    }
+                    .frame(height: 4)
+                    .padding(.horizontal, 8)
+                    .padding(.bottom, 4)
                 }
             }
+            .shadow(color: onAir ? tint.opacity(0.45) : .clear, radius: 5, y: 1)
             .opacity(over ? 0.7 : 1)
             .contentShape(Rectangle())
         }
@@ -345,6 +427,20 @@ private struct GuideProgrammeCell: View {
         .padding(.leading, 1.5)
         .padding(.top, 3)
         .accessibilityLabel("\(programme.title), \(Self.range(programme)), \(channel.name)")
+        .accessibilityValue(onAir ? Text("NOW") : Text(kind.title))
+    }
+
+    /// Strong for what is on, a light wash of the kind's colour for what is coming, fainter for what is over.
+    private static func fill(tint: Color, onAir: Bool, over: Bool, dark: Bool) -> AnyShapeStyle {
+        if onAir {
+            return AnyShapeStyle(LinearGradient(
+                colors: [tint, tint.opacity(0.78)],
+                startPoint: .top,
+                endPoint: .bottom
+            ))
+        }
+        // A wash that is enough to tell the kind on a dark screen, where the same tint is muddier.
+        return AnyShapeStyle(tint.opacity(over ? (dark ? 0.12 : 0.07) : (dark ? 0.30 : 0.17)))
     }
 
     private static func range(_ programme: ProgrammeSnapshot) -> String {
@@ -409,3 +505,42 @@ private struct GuideProgrammeSheet: View {
         }
     }
 }
+
+#if !os(tvOS)
+    /// A button that explains the colours: what each kind of programme is drawn in, and how what is on now is shown.
+    private struct GuideColourKeyButton: View {
+        @State private var showing = false
+
+        var body: some View {
+            Button("Colour key", systemImage: "paintpalette") { showing = true }
+                .popover(isPresented: $showing) {
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text("Colour key").font(.headline)
+                        HStack(spacing: 10) {
+                            RoundedRectangle(cornerRadius: 4)
+                                .fill(LinearGradient(
+                                    colors: [.blue, .blue.opacity(0.78)],
+                                    startPoint: .top,
+                                    endPoint: .bottom
+                                ))
+                                .overlay(RoundedRectangle(cornerRadius: 4).strokeBorder(.white, lineWidth: 2))
+                                .frame(width: 26, height: 18)
+                            Text("On now")
+                        }
+                        ForEach(ProgrammeCategory.allCases, id: \.self) { kind in
+                            HStack(spacing: 10) {
+                                RoundedRectangle(cornerRadius: 4)
+                                    .fill(kind.color.opacity(0.17))
+                                    .overlay(alignment: .leading) { Rectangle().fill(kind.color).frame(width: 4) }
+                                    .clipShape(RoundedRectangle(cornerRadius: 4))
+                                    .frame(width: 26, height: 18)
+                                Text(kind.title)
+                            }
+                        }
+                    }
+                    .padding()
+                    .presentationCompactAdaptation(.popover)
+                }
+        }
+    }
+#endif

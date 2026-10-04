@@ -33,13 +33,46 @@ struct NowOnAirLine: View {
     private func lines(at moment: Date) -> some View {
         let current = store.current(playlist: channel.playlist, epgKey: channel.epgKey, now: moment)
         let next = store.next(playlist: channel.playlist, epgKey: channel.epgKey, now: moment)
-        return VStack(alignment: .leading, spacing: 1) {
-            Text(current.map { "Now: \($0.title)" } ?? " ")
+        let tint = current?.kind.color ?? .clear
+        // The guide's grid in miniature, with nothing to scroll: what is on and how far through it is, then
+        // what follows in the colour of its kind. Every part holds its height when empty, so a row does not
+        // move as the guide fills in.
+        return VStack(alignment: .leading, spacing: 3) {
+            HStack(spacing: 6) {
+                Circle().fill(tint).frame(width: 7, height: 7)
+                Text(current.map { "Now: \($0.title)" } ?? " ")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.primary)
+                    .lineLimit(1)
+                Spacer(minLength: 4)
+                if let current {
+                    Text("\(String(Self.minutesLeft(current, at: moment))) min left")
+                        .font(.caption2.monospacedDigit())
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                        .fixedSize()
+                }
+            }
+            Capsule()
+                .fill(tint.opacity(current == nil ? 0 : 0.2))
+                .frame(height: 3)
+                .overlay(alignment: .leading) {
+                    GeometryReader { proxy in
+                        Capsule().fill(tint).frame(width: proxy.size.width * (current?.fraction(at: moment) ?? 0))
+                    }
+                }
             Text(next.map { "Next: \($0.start.formatted(date: .omitted, time: .shortened)) · \($0.title)" } ?? " ")
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+                .lineLimit(1)
+                .padding(.horizontal, 6)
+                .padding(.vertical, 1)
+                .background(Capsule().fill((next?.kind.color ?? .clear).opacity(next == nil ? 0 : 0.16)))
         }
-        .font(.caption)
-        .foregroundStyle(.secondary)
-        .lineLimit(1)
+    }
+
+    private static func minutesLeft(_ programme: ProgrammeSnapshot, at moment: Date) -> Int {
+        max(1, Int((programme.stop.timeIntervalSince(moment) / 60).rounded(.up)))
     }
 }
 
@@ -74,6 +107,8 @@ struct ChannelGuideView: View {
                 Section("Schedule") {
                     ForEach(programmes) { programme in
                         row(programme)
+                            // What is on now is tinted in its kind's colour, so it is found at a glance.
+                            .listRowBackground(programme.isOn(at: .now) ? programme.kind.color.opacity(0.16) : nil)
                     }
                 }
             }
@@ -164,6 +199,7 @@ struct ChannelGuideView: View {
                 Text(programme.start.formatted(date: .omitted, time: .shortened))
                     .font(.subheadline.monospacedDigit())
                     .foregroundStyle(.secondary)
+                Circle().fill(programme.kind.color).frame(width: 9, height: 9).accessibilityHidden(true)
                 Text(programme.title).font(.body.weight(onAir ? .semibold : .regular))
                 if onAir {
                     Text("NOW").font(.caption2.bold()).foregroundStyle(.red)

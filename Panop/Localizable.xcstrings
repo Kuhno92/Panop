@@ -92,6 +92,17 @@
         }
       }
     },
+    "%@ min left": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "noch %@ Min."
+          }
+        }
+      }
+    },
     "%@ movies": {
       "localizations": {
         "de": {
@@ -680,6 +691,16 @@
         }
       }
     },
+    "Colour key": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Farblegende"
+          }
+        }
+      }
+    },
     "Comedy": {
       "localizations": {
         "de": {
@@ -890,6 +911,16 @@
         }
       }
     },
+    "Documentaries": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dokumentationen"
+          }
+        }
+      }
+    },
     "Done": {
       "localizations": {
         "de": {
@@ -980,6 +1011,16 @@
         }
       }
     },
+    "Entertainment": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unterhaltung"
+          }
+        }
+      }
+    },
     "Extra large": {
       "localizations": {
         "de": {
@@ -1016,6 +1057,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Favoriten, Gesehenes, ausgeblendete Titel und deine Playlists werden in deinem eigenen iCloud gespeichert, wo nur du sie lesen kannst. Anmeldedaten werden verschlüsselt, bevor sie dieses Gerät verlassen. Eine Änderung hier gilt, sobald Panop das nächste Mal geöffnet wird."
+          }
+        }
+      }
+    },
+    "Films": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Filme"
           }
         }
       }
@@ -1310,6 +1361,16 @@
         }
       }
     },
+    "Kids": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kinder"
+          }
+        }
+      }
+    },
     "LIVE": {
       "localizations": {
         "de": {
@@ -1550,6 +1611,16 @@
         }
       }
     },
+    "Music": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Musik"
+          }
+        }
+      }
+    },
     "NOW": {
       "localizations": {
         "de": {
@@ -1616,6 +1687,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Neue Serien"
+          }
+        }
+      }
+    },
+    "News": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nachrichten"
           }
         }
       }
@@ -1852,6 +1933,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Aus. Alles bleibt auf diesem Gerät."
+          }
+        }
+      }
+    },
+    "On now": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Läuft gerade"
           }
         }
       }
@@ -2642,6 +2733,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Specials"
+          }
+        }
+      }
+    },
+    "Sport": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sport"
           }
         }
       }

@@ -136,6 +136,7 @@ enum UITestMode {
                 func programme(
                     _ channel: String,
                     _ title: String,
+                    _ categories: [String],
                     from start: Double,
                     to stop: Double
                 ) -> EPGProgramme {
@@ -143,19 +144,24 @@ enum UITestMode {
                         channelID: channel,
                         start: now.addingTimeInterval(start * 60),
                         stop: now.addingTimeInterval(stop * 60),
-                        title: title
+                        title: title,
+                        categories: categories
                     )
                 }
                 _ = try await services.catalogStore.upsertProgrammes([
-                    programme("c2", "Seeded News", from: -30, to: 30),
-                    programme("c2", "Seeded Film", from: 30, to: 120),
-                    programme("c2", "Seeded Late Show", from: 120, to: 180),
-                    programme("c0", "Morning Magazine", from: -60, to: 30),
-                    programme("c0", "Quiz Night", from: 30, to: 90),
-                    programme("c1", "Sunrise Talk", from: -15, to: 45),
-                    programme("c1", "Crime Series", from: 45, to: 135),
-                    programme("c3", "Art Documentary", from: -90, to: 60),
-                    programme("c3", "Opera Evening", from: 60, to: 210)
+                    programme("c2", "Seeded News", ["News"], from: -30, to: 30),
+                    programme("c2", "Seeded Film", ["Movie"], from: 30, to: 120),
+                    programme("c2", "Seeded Late Show", ["Talk-Show"], from: 120, to: 180),
+                    programme("c0", "Morning Magazine", ["Magazine"], from: -60, to: 30),
+                    programme("c0", "Quiz Night", ["Quiz"], from: 30, to: 90),
+                    programme("c1", "Sunrise Talk", ["Talk"], from: -15, to: 45),
+                    programme("c1", "Crime Series", ["Krimi"], from: 45, to: 135),
+                    programme("c3", "Art Documentary", ["Documentary"], from: -90, to: 60),
+                    programme("c3", "Opera Evening", ["Opera"], from: 60, to: 210),
+                    programme("c4", "Match of the Day", ["Sport"], from: -20, to: 70),
+                    programme("c4", "Kids Cartoon Hour", ["Kids"], from: 70, to: 130),
+                    programme("c5", "Headlines", ["Nachrichten"], from: -5, to: 25),
+                    programme("c5", "Mystery Hour", [], from: 25, to: 85)
                 ], playlist: playlist.id)
             } catch {
                 assertionFailure("UI test seed failed: \(error)")

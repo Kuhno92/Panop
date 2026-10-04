@@ -88,6 +88,30 @@ struct GuideLookupTests {
     }
 
     @Test
+    func `a programme carries the guide's categories, and from them its kind`() async throws {
+        let catalog = try OnDiskCatalog()
+        defer { catalog.cleanUp() }
+        _ = try await catalog.store.upsertProgrammes([
+            EPGProgramme(
+                channelID: "sport", start: now.addingTimeInterval(-600), stop: now.addingTimeInterval(600),
+                title: "Derby", categories: ["Sport", "Fußball"]
+            ),
+            EPGProgramme(
+                channelID: "sport", start: now.addingTimeInterval(600), stop: now.addingTimeInterval(1200),
+                title: "Plain"
+            )
+        ], playlist: "p")
+        let context = ModelContext(catalog.container)
+
+        let both = GuideLookup.nowAndNext(playlist: "p", epgKey: "sport", at: now, in: context)
+
+        #expect(both.now?.categories == ["Sport", "Fußball"])
+        #expect(both.now?.kind == .sport)
+        #expect(both.next?.categories.isEmpty == true)
+        #expect(both.next?.kind == .other)
+    }
+
+    @Test
     func `now and next are the one on air and the one after it`() async throws {
         let catalog = try OnDiskCatalog()
         defer { catalog.cleanUp() }

@@ -8,6 +8,13 @@ nonisolated struct ProgrammeSnapshot: Identifiable, Hashable, Sendable {
     var title: String
     var subtitle: String?
     var details: String?
+    /// The guide's own words for what kind of programme it is ("News", "Spielfilm"), as it wrote them.
+    var categories: [String] = []
+
+    /// What kind of programme it is, for colouring it.
+    var kind: ProgrammeCategory {
+        ProgrammeCategory.classify(categories: categories, title: title)
+    }
 
     var id: Date {
         start
@@ -63,15 +70,7 @@ enum GuideLookup {
         later.fetchLimit = Swift.max(limit - onNow.count, 0)
         let following = later.fetchLimit == 0 ? [] : ((try? context.fetch(later)) ?? [])
 
-        return (onNow + following).prefix(limit).map {
-            ProgrammeSnapshot(
-                start: $0.start,
-                stop: $0.stop,
-                title: $0.title,
-                subtitle: $0.subtitle,
-                details: $0.details
-            )
-        }
+        return (onNow + following).prefix(limit).map { snapshot($0) }
     }
 
     /// What is on at `now` on one channel: begun at or before it and not yet ended, soonest first.
@@ -140,7 +139,8 @@ enum GuideLookup {
             stop: record.stop,
             title: record.title,
             subtitle: record.subtitle,
-            details: record.details
+            details: record.details,
+            categories: record.categoriesRaw.split(separator: "\u{1F}").map(String.init)
         )
     }
 
@@ -151,15 +151,7 @@ enum GuideLookup {
         at now: Date,
         in context: ModelContext
     ) -> ProgrammeSnapshot? {
-        onNowAll(playlist: playlist, key: epgKey, at: now, in: context).first.map {
-            ProgrammeSnapshot(
-                start: $0.start,
-                stop: $0.stop,
-                title: $0.title,
-                subtitle: $0.subtitle,
-                details: $0.details
-            )
-        }
+        onNowAll(playlist: playlist, key: epgKey, at: now, in: context).first.map { snapshot($0) }
     }
 
     /// Programmes that have ended within the last `days`, newest first, for a channel whose
@@ -181,14 +173,6 @@ enum GuideLookup {
             sortBy: [SortDescriptor(\.start, order: .reverse)]
         )
         descriptor.fetchLimit = limit
-        return ((try? context.fetch(descriptor)) ?? []).map {
-            ProgrammeSnapshot(
-                start: $0.start,
-                stop: $0.stop,
-                title: $0.title,
-                subtitle: $0.subtitle,
-                details: $0.details
-            )
-        }
+        return ((try? context.fetch(descriptor)) ?? []).map { snapshot($0) }
     }
 }
