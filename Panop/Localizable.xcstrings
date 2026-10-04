@@ -671,6 +671,17 @@
         }
       }
     },
+    "Close search": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Suche schließen"
+          }
+        }
+      }
+    },
     "Code %@": {
       "localizations": {
         "de": {
@@ -1057,6 +1068,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "Favoriten, Gesehenes, ausgeblendete Titel und deine Playlists werden in deinem eigenen iCloud gespeichert, wo nur du sie lesen kannst. Anmeldedaten werden verschlüsselt, bevor sie dieses Gerät verlassen. Eine Änderung hier gilt, sobald Panop das nächste Mal geöffnet wird."
+          }
+        }
+      }
+    },
+    "Featured title %lld of %lld": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Empfohlener Titel %1$lld von %2$lld"
           }
         }
       }
@@ -1713,6 +1735,17 @@
         }
       }
     },
+    "Next title": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nächster Titel"
+          }
+        }
+      }
+    },
     "Next up": {
       "localizations": {
         "de": {
@@ -2195,6 +2228,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "Vorschau des Untertitelstils"
+          }
+        }
+      }
+    },
+    "Previous title": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vorheriger Titel"
           }
         }
       }

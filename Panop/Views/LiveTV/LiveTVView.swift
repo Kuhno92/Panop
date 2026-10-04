@@ -14,6 +14,7 @@ struct LiveTVView: View {
     @AppStorage("liveListMode") private var storedMode = LiveListMode.all.rawValue
     @AppStorage("liveSortOrder") private var storedOrder = LiveOrder.provider.rawValue
     @State private var search = ""
+    @State private var searchOpen = false
     @State private var group: String?
     @State private var showingAdd = false
     @State private var playing: PlaybackTarget?
@@ -123,7 +124,7 @@ struct LiveTVView: View {
             #endif
         }
         .navigationTitle(selectedSource?.name ?? "Live TV")
-        .modifier(ChannelSearch(text: $search, isOffered: !library.playlists.isEmpty))
+        .modifier(ChannelSearch(text: $search, isOpen: $searchOpen, isOffered: !library.playlists.isEmpty))
         .toolbar {
             if !library.playlists.isEmpty {
                 ToolbarItem {
@@ -527,26 +528,15 @@ struct PlayerPresentation: ViewModifier {
     }
 }
 
-/// Search. On Apple TV only once there is something to search: before the first playlist its
-/// keyboard, half the screen, would sit above a message about adding one.
-///
-/// Elsewhere it is always there. Switching it on and off changes the view's structure, which
-/// rebuilt the screen when the first playlist loaded, and a UI test sometimes found the search
-/// field missing afterwards.
+/// Search for channels: a magnifier under the section bar that opens a field (see `ExpandingSearch`). Offered once
+/// there is a playlist, so it does not sit above a message about adding one.
 private struct ChannelSearch: ViewModifier {
     @Binding var text: String
+    @Binding var isOpen: Bool
     let isOffered: Bool
 
     func body(content: Content) -> some View {
-        #if os(tvOS)
-            if isOffered {
-                content.searchable(text: $text, prompt: "Search channels")
-            } else {
-                content
-            }
-        #else
-            content.searchable(text: $text, prompt: "Search channels")
-        #endif
+        content.modifier(ExpandingSearch(text: $text, isOpen: $isOpen, prompt: "Search channels", isOffered: isOffered))
     }
 }
 

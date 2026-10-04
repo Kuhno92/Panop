@@ -18,14 +18,17 @@ final class HomeTests: PanopUITestCase {
         attach("home-empty")
 
         #if os(tvOS)
-            // Down from the tab bar reaches the button.
-            XCUIRemote.shared.press(.down)
+            // Down from the tab bar reaches the search magnifier first, then the button.
+            focus(app.buttons["Browse Live TV"])
             XCUIRemote.shared.press(.select)
         #else
             app.buttons["Browse Live TV"].tap()
         #endif
 
-        XCTAssertTrue(channel("3sat").waitForExistence(timeout: 20), "Browse Live TV did not open the channel list")
+        XCTAssertTrue(
+            channel("3sat").waitForExistence(timeout: 20),
+            "Browse Live TV did not open the channel list. Screen:\n\(app.debugDescription)"
+        )
     }
 
     #if !os(tvOS)

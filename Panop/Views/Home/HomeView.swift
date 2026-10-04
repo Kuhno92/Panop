@@ -17,8 +17,8 @@ struct HomeView: View {
 
     @Environment(DiscoveryModel.self) private var discovery
     @State private var showingAdd = false
-    @State private var showingSettings = false
-    @Environment(\.horizontalSizeClass) private var sizeClass
+    @State private var search = ""
+    @State private var searchOpen = false
     @State private var playing: PlaybackTarget?
     @State private var openMovie: MovieReference?
     @State private var openSeries: SeriesReference?
@@ -27,22 +27,25 @@ struct HomeView: View {
     private let railLimit = 20
 
     var body: some View {
+        // The results go over the rails rather than in place of them: swapping the screen's content under the
+        // search field as the first letter is typed made the field lose focus, and the rest of the word with it.
         rails
-            .navigationTitle("Home")
-        #if !os(tvOS)
-            .toolbar {
-                ToolbarItemGroup {
-                    #if os(iOS)
-                        // On a phone Settings has no tab (the bar is full), so it is here.
-                        if sizeClass == .compact {
-                            Button("Settings", systemImage: "gearshape") { showingSettings = true }
-                        }
-                    #endif
-                    ProfileMenu()
+            .overlay {
+                if !search.trimmingCharacters(in: .whitespaces).isEmpty {
+                    SearchView(query: search)
+                        .background(.background)
                 }
             }
+            .navigationTitle("Home")
+        #if !os(tvOS)
+            .toolbar { ToolbarItem { ProfileMenu() } }
         #endif
-            .navigationDestination(isPresented: $showingSettings) { SettingsView() }
+            .modifier(ExpandingSearch(
+                text: $search,
+                isOpen: $searchOpen,
+                prompt: "Channels, movies, series",
+                isOffered: !library.playlists.isEmpty
+            ))
             .navigationDestination(item: $openMovie) { MovieDetailView(movie: $0) }
             .navigationDestination(item: $openSeries) { SeriesDetailView(series: $0) }
             .sheet(isPresented: $showingAdd) {

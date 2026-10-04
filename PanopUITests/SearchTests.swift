@@ -4,11 +4,12 @@ final class SearchTests: PanopUITestCase {
     #if !os(tvOS)
         private func search(_ text: String) {
             waitForChannels()
-            app.tabBars.buttons["Search"].tap()
-            let field = app.searchFields.firstMatch
+            app.tabBars.buttons["Home"].tap()
+            app.buttons["Search"].tap()
+            let field = app.textFields["searchField"]
             XCTAssertTrue(field.waitForExistence(timeout: 10), "no search field. Screen:\n\(app.debugDescription)")
-            field.tap()
             field.typeText(text)
+            XCTAssertEqual(field.value as? String, text, "the field did not keep what was typed")
         }
 
         /// The list is lazy, so a query is specific enough for each section to be on screen.
@@ -23,7 +24,10 @@ final class SearchTests: PanopUITestCase {
         func testASearchFindsAFilm() {
             search("Alien")
 
-            XCTAssertTrue(app.staticTexts["Movies"].waitForExistence(timeout: 10), "no movie results")
+            XCTAssertTrue(
+                app.staticTexts["Movies"].waitForExistence(timeout: 10),
+                "no movie results. Screen:\n\(app.debugDescription)"
+            )
             XCTAssertTrue(app.buttons.matching(NSPredicate(format: "label CONTAINS 'Alien'")).firstMatch.exists)
         }
 
@@ -38,14 +42,23 @@ final class SearchTests: PanopUITestCase {
         }
     #else
         override var startTab: String {
-            "search"
+            "home"
         }
 
-        /// Search is a tab of its own, and opens on its field.
-        func testSearchIsATabWithAField() {
-            XCTAssertTrue(app.tabBars.buttons["Search"].waitForExistence(timeout: 30), "no Search in the tab bar")
+        /// The magnifier is the first thing under the tab bar, and opens a field.
+        func testTheMagnifierOpensAField() {
             XCTAssertTrue(
-                app.searchFields.firstMatch.waitForExistence(timeout: 10),
+                app.buttons["Search"].waitForExistence(timeout: 30),
+                "no search button. Screen:\n\(app.debugDescription)"
+            )
+            // Focus starts on the tab bar or, once the screen has settled, already in the content: go down until
+            // it is on the magnifier, rather than count presses.
+            for _ in 0 ..< 3 where !app.buttons["Search"].hasFocus {
+                XCUIRemote.shared.press(.down)
+            }
+            XCUIRemote.shared.press(.select)
+            XCTAssertTrue(
+                app.textFields["searchField"].waitForExistence(timeout: 10),
                 "no search field. Screen:\n\(app.debugDescription)"
             )
         }

@@ -35,7 +35,10 @@ final class MoviesTests: PanopUITestCase {
 
         // A heading for each category, as well as the chip that narrows to it.
         XCTAssertTrue(app.staticTexts["Films"].waitForExistence(timeout: 10), "no heading for the first category")
-        XCTAssertTrue(app.staticTexts["Classics"].exists, "no heading for the second category")
+        #if !os(tvOS)
+            // On Apple TV the second category starts below the first screenful, and a lazy list has not drawn it.
+            XCTAssertTrue(app.staticTexts["Classics"].exists, "no heading for the second category")
+        #endif
     }
 
     #if !os(tvOS)

@@ -31,22 +31,33 @@ struct HeroCarousel: View {
         if !rows.isEmpty {
             let row = rows[current]
             ZStack(alignment: .bottom) {
+                // The artwork is its own layer, crossfading under slides that stay put, and not clipped, so it
+                // fades into the rows below as the single hero did.
+                HeroArtwork(address: backdrop(row) ?? row.iconURL, blurred: backdrop(row) == nil)
+                    .id("art-" + row.id)
+                    .transition(.opacity)
                 HeroView(
                     row: row,
                     backdrop: backdrop(row),
                     onPlay: onPlay.map { play in { play(row) } },
                     onInfo: { onInfo(row) },
-                    engaged: $engaged
+                    engaged: $engaged,
+                    showsBackdrop: false,
+                    onStep: { move(by: $0) }
                 )
                 .id(row.id)
                 .transition(.opacity)
                 if rows.count > 1 {
                     dots
                 }
+                #if !os(tvOS)
+                    if rows.count > 1, sizeClass != .compact {
+                        arrows
+                    }
+                #endif
             }
             // One height for every slide, so the page below does not move as titles change.
             .frame(height: Self.height(compact: sizeClass == .compact))
-            .clipped()
             #if !os(tvOS)
                 .simultaneousGesture(swipe)
             #endif
@@ -62,17 +73,62 @@ struct HeroCarousel: View {
         }
     }
 
+    /// Where on the carousel it stands, and a way to go to one: each dot is a button where there is a pointer or a
+    /// finger. Apple TV moves by the remote, and its dots only show.
     private var dots: some View {
-        HStack(spacing: 6) {
+        HStack(spacing: 4) {
             ForEach(rows.indices, id: \.self) { position in
-                Capsule()
-                    .fill(position == current ? Color.primary : Color.primary.opacity(0.3))
-                    .frame(width: position == current ? 18 : 6, height: 6)
+                #if os(tvOS)
+                    dot(position)
+                #else
+                    Button { go(to: position) } label: {
+                        dot(position)
+                            // A larger target than the dot itself.
+                            .padding(.vertical, 12)
+                            .padding(.horizontal, 3)
+                            .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("Featured title \(position + 1) of \(rows.count)")
+                #endif
             }
         }
-        .padding(.bottom, 4)
-        .allowsHitTesting(false)
-        .accessibilityHidden(true)
+        .padding(.bottom, 0)
+    }
+
+    private func dot(_ position: Int) -> some View {
+        Capsule()
+            .fill(position == current ? Color.primary : Color.primary.opacity(0.3))
+            .frame(width: position == current ? 18 : 6, height: 6)
+    }
+
+    #if !os(tvOS)
+        /// Previous and next, at the sides, where there is room for them: a pointer has no swipe.
+        private var arrows: some View {
+            HStack {
+                arrow("chevron.left", step: -1, label: "Previous title")
+                Spacer()
+                arrow("chevron.right", step: 1, label: "Next title")
+            }
+            .padding(.horizontal, 8)
+            .frame(maxHeight: .infinity)
+        }
+
+        private func arrow(_ symbol: String, step: Int, label: LocalizedStringKey) -> some View {
+            Button { move(by: step) } label: {
+                Image(systemName: symbol)
+                    .font(.title3.weight(.semibold))
+                    .padding(12)
+                    .background(.regularMaterial, in: Circle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(label)
+        }
+    #endif
+
+    private func go(to position: Int) {
+        engaged = false
+        withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.45)) { index = position }
     }
 
     #if !os(tvOS)
@@ -104,7 +160,7 @@ struct HeroCarousel: View {
         #if os(tvOS)
             500
         #else
-            compact ? 480 : 300
+            compact ? 450 : 300
         #endif
     }
 }

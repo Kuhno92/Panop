@@ -65,16 +65,19 @@ class PanopUITestCase: XCTestCase {
         app.buttons.matching(NSPredicate(format: "label CONTAINS %@", name)).firstMatch
     }
 
-    /// Opens Settings: its tab where there is one, and on a phone the button on Home, which has no room for the tab.
-    func openSettings(named name: String = "Settings") {
-        let tab = app.tabBars.buttons[name]
-        if tab.exists {
-            tab.tap()
-        } else {
-            app.tabBars.buttons.element(boundBy: 0).tap()
-            app.buttons[name].tap()
+    #if !os(tvOS)
+        /// Opens Settings: its tab where there is one, and on a phone the button on Home, which has no room for the
+        /// tab.
+        func openSettings(named name: String = "Settings") {
+            let tab = app.tabBars.buttons[name]
+            if tab.exists {
+                tab.tap()
+            } else {
+                app.tabBars.buttons.element(boundBy: 0).tap()
+                app.buttons[name].tap()
+            }
         }
-    }
+    #endif
 
     func waitForChannels(file: StaticString = #filePath, line: UInt = #line) {
         let found = channel("3sat").waitForExistence(timeout: 30)
@@ -88,10 +91,24 @@ class PanopUITestCase: XCTestCase {
     }
 
     #if os(tvOS)
-        /// Focus starts on the tab bar. Down from there reaches the search keyboard, then the TV Guide
-        /// button, the Show filter, the Sort row, the category chips, then the first channel.
+        /// Focus starts on the tab bar. Down from there reaches the search magnifier, then the TV Guide
+        /// button, the Show filter, the Sort row, the category chips, then the first channel. Pressed until the
+        /// channel has focus, not counted, so a row added above it does not break every test that follows.
         func focusFirstChannel() {
-            for _ in 0 ..< 6 {
+            focus(channel("Das Erste"))
+        }
+
+        /// Moves down until one of the buttons with this label has focus, for a label the tree holds more than once.
+        func focusButton(labelled label: String) {
+            let buttons = app.buttons.matching(NSPredicate(format: "label == %@", label))
+            for _ in 0 ..< 12 where !buttons.allElementsBoundByIndex.contains(where: \.hasFocus) {
+                XCUIRemote.shared.press(.down)
+            }
+        }
+
+        /// Moves down until `element` has focus, up to a dozen presses.
+        func focus(_ element: XCUIElement) {
+            for _ in 0 ..< 12 where !(element.exists && element.hasFocus) {
                 XCUIRemote.shared.press(.down)
             }
         }

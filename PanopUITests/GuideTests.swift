@@ -9,9 +9,8 @@ final class GuideTests: PanopUITestCase {
     private func openGuide() {
         waitForChannels()
         #if os(tvOS)
-            // Down from the tab bar reaches the search keyboard, then the TV Guide button.
-            XCUIRemote.shared.press(.down)
-            XCUIRemote.shared.press(.down)
+            // Down from the tab bar reaches the search magnifier, then the TV Guide button.
+            focusButton(labelled: "TV Guide")
             XCUIRemote.shared.press(.select)
         #else
             app.buttons["TV Guide"].tap()
