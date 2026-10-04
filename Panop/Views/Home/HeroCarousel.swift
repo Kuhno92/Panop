@@ -31,11 +31,6 @@ struct HeroCarousel: View {
         if !rows.isEmpty {
             let row = rows[current]
             ZStack(alignment: .bottom) {
-                // The artwork is its own layer, crossfading under slides that stay put, and not clipped, so it
-                // fades into the rows below as the single hero did.
-                HeroArtwork(address: backdrop(row) ?? row.iconURL, blurred: backdrop(row) == nil)
-                    .id("art-" + row.id)
-                    .transition(.opacity)
                 HeroView(
                     row: row,
                     backdrop: backdrop(row),
@@ -56,8 +51,17 @@ struct HeroCarousel: View {
                     }
                 #endif
             }
+            // The artwork is its own layer behind the slides, crossfading while they stay put. As a background it
+            // reaches up under the bar without moving the slides, and it is not clipped, so it fades into the rows.
+            .background(alignment: .top) {
+                HeroArtwork(address: backdrop(row) ?? row.iconURL, blurred: backdrop(row) == nil)
+                    .id("art-" + row.id)
+                    .transition(.opacity)
+            }
             // One height for every slide, so the page below does not move as titles change.
             .frame(height: Self.height(compact: sizeClass == .compact))
+            // Above the rows that follow it, so the dots are never behind them.
+            .zIndex(1)
             #if !os(tvOS)
                 .simultaneousGesture(swipe)
             #endif
@@ -93,7 +97,7 @@ struct HeroCarousel: View {
                 #endif
             }
         }
-        .padding(.bottom, 0)
+        .padding(.bottom, 8)
     }
 
     private func dot(_ position: Int) -> some View {
@@ -158,9 +162,9 @@ struct HeroCarousel: View {
 
     private static func height(compact: Bool) -> CGFloat {
         #if os(tvOS)
-            500
+            540
         #else
-            compact ? 450 : 300
+            compact ? 480 : 320
         #endif
     }
 }
