@@ -681,13 +681,26 @@ Features real users expect that the brief did not name. All *(surfaced)*.
       storage for it. Open question: whether providers' terms allow it, so it should be off unless the
       person turns it on. Not started.
 - [ ] **Add AetherEngine as an engine** *(asked for)*. A fourth playback engine behind `PlaybackEngine`,
-      next to AVPlayer, VLCKit and LumeEngine, chosen in Settings. Before adding: read its licence and
-      record it in `THIRD-PARTY-NOTICES.md` in the same commit, and keep it out if it is GPL (see
-      Licensing). Not started.
-- [ ] **Add MPVKit as an engine** *(asked for)*. libmpv through MPVKit, as another `PlaybackEngine`. The
-      licence needs care: mpv itself is GPL-2.0-or-later unless built as LGPL, and MPVKit's builds differ by
-      configuration (and bundle FFmpeg), so confirm that the variant used is LGPL and dynamically linked
-      before it goes in; if only a GPL build exists it cannot ship, like KSPlayer. Not started.
+      next to AVPlayer, VLCKit and LumeEngine, chosen in Settings. **Licence checked (2026-10-05,
+      github.com/superuser404notfound/AetherEngine, v7.27.2):** LGPL-3.0 **with an Apple Store / DRM exception**
+      that allows App Store and TestFlight distribution where LGPL sections 4 to 6 would otherwise conflict. Its
+      FFmpeg comes as dynamic frameworks (FFmpegBuild), LGPL-2.1-or-later with no GPL parts. Obligations are
+      the same kind as VLCKit's: ship the licence texts, tell users they hold LGPL rights, keep the source
+      public (and publish any change made to the engine), and keep the FFmpeg frameworks dynamic and
+      replaceable. An MIT app can link it that way (as it does VLCKit); this is a reading of the licence, not
+      legal advice. **Fit:** iOS 18, tvOS 18, macOS 15 (matches Panop), needs Swift 6.4 / Xcode 27 (the installed
+      toolchain). Offers live TV with DVR timeshift, which overlaps the "live rewind" item below. Not started:
+      adapter, a `THIRD-PARTY-NOTICES.md` entry in the same commit, a check that it does not collide with
+      Lume's and VLC's FFmpeg (see `docs/engines.md`).
+- [ ] **Add MPVKit as an engine** *(asked for)*. libmpv through MPVKit as another `PlaybackEngine`. **Licence
+      checked (2026-10-05, github.com/mpvkit/MPVKit):** the **`MPVKit` product is LGPL-3.0** (libmpv, FFmpeg and the
+      libraries around them); the **`MPVKit-GPL` product (or a build with `enable-gpl`) is GPL-3.0** and must never
+      be added, like KSPlayer. Same obligations as any LGPL library, and the xcframeworks' static or dynamic
+      form is not stated, so it has to be checked (as for VLCKit: dynamic and replaceable). It bundles OpenSSL,
+      GnuTLS, libass, libplacebo, dav1d and MoltenVK, whose notices belong in `THIRD-PARTY-NOTICES.md`.
+      **Cautions:** the project says it is "only suitable for learning" and will not be maintained often;
+      Metal support is experimental; it brings a third copy of FFmpeg (n9.0.1), with the same collision risk as
+      Lume's. Floors are macOS 12, iOS 15, tvOS 15, below Panop's. Not started.
 - [ ] **Catch-up and timeshift**. Xtream supports it; the M3U attributes are already parsed.
       **Catch-up for Xtream is built**: a channel the panel archives (`tv_archive`) lists the
       programmes that aired within its window under "Earlier" in its guide, and tapping one plays
