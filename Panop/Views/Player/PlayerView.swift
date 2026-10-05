@@ -84,6 +84,8 @@ struct PlayerView: View {
             .onReceive(NotificationCenter.default.publisher(for: .playerWindowWillClose)) { _ in
                 Task { await model.stop() }
             }
+            // Escape goes back to the app where the stream is in the main window.
+            .onExitCommand { onBrowse?() }
         #endif
         #if os(tvOS)
         .onPlayPauseCommand { model.togglePause() }
@@ -184,24 +186,31 @@ struct PlayerView: View {
     private var header: some View {
         HStack(alignment: .top) {
             #if !os(tvOS)
-                Button {
-                    if let onClose {
-                        onClose()
-                    } else {
-                        dismiss()
-                    }
-                } label: {
-                    Image(systemName: "xmark.circle.fill").font(.title)
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel("Close")
                 if let onBrowse {
+                    // In the main window of a Mac there is no Close here, only the way back to the app: the stream is
+                    // stopped from the bar over the app, so it is never stopped by a stray click on the picture.
                     Button(action: onBrowse) {
-                        Image(systemName: "rectangle.grid.2x2.fill").font(.title2)
+                        Label("Menu", systemImage: "rectangle.grid.2x2.fill")
+                            .font(.headline)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 6)
+                            .background(.black.opacity(0.45), in: Capsule())
                     }
                     .buttonStyle(.plain)
-                    .accessibilityLabel("Back to Panop")
+                    .accessibilityLabel("Menu")
                     .help("Back to Panop. The stream keeps playing behind it.")
+                } else {
+                    Button {
+                        if let onClose {
+                            onClose()
+                        } else {
+                            dismiss()
+                        }
+                    } label: {
+                        Image(systemName: "xmark.circle.fill").font(.title)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("Close")
                 }
             #endif
             VStack(alignment: .leading, spacing: 2) {

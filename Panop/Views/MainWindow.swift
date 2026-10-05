@@ -32,6 +32,9 @@
                         }
                     }
             }
+            // The window's toolbar (the tabs, the filter and sort) is for the app: out of the way while the stream is
+            // in front, back when it goes behind.
+            .toolbar(playback.isFront ? .hidden : .automatic, for: .windowToolbar)
             .animation(.snappy(duration: 0.25), value: playback.isFront)
             .animation(.snappy(duration: 0.25), value: playback.isPlaying)
         }

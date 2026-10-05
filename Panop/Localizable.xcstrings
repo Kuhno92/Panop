@@ -409,17 +409,6 @@
         }
       }
     },
-    "Back to Panop": {
-      "extractionState": "manual",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Zurück zu Panop"
-          }
-        }
-      }
-    },
     "Back to Panop. The stream keeps playing behind it.": {
       "extractionState": "manual",
       "localizations": {
@@ -1644,6 +1633,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "Mittel"
+          }
+        }
+      }
+    },
+    "Menu": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Menü"
           }
         }
       }
