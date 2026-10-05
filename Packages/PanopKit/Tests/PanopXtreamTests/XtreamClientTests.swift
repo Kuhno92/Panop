@@ -288,6 +288,38 @@ struct XtreamClientTests {
         #expect(info.episodes.last?.imageURL == "e.jpg")
     }
 
+    @Test
+    func `decodes the series' rating, people, dates, trailer and each episode's picture and file details`(
+    ) async throws {
+        let body = """
+        {"info":{"name":"Lost","plot":"Island.","cover":"c.jpg","genre":"Drama, Mystery","cast":"A, B","director":"C",
+                 "release_date":"2004-09-22","rating":"8.4","episode_run_time":"43","backdrop_path":["b1.jpg","b2.jpg"],
+                 "youtube_trailer":"abc123"},
+         "episodes":{"1":[{"id":"11","season":1,"episode_num":1,"title":"Pilot","container_extension":"mkv",
+            "info":{"air_date":"2004-09-22","rating":7.5,"duration_secs":2700,
+                    "video":{"height":1080,"codec_name":"hevc"},"audio":{"codec_name":"ac3"}}},
+           {"id":"12","season":1,"episode_num":2,"title":"Two","container_extension":"mkv",
+            "info":{"video":[],"audio":[]}}]}}
+        """
+        let info = try await client(StubTransport(body: body)).seriesInfo(seriesID: 40)
+        #expect(info.cast == "A, B")
+        #expect(info.director == "C")
+        #expect(info.releaseDate == "2004-09-22")
+        #expect(info.rating == 8.4)
+        #expect(info.episodeRunTime == 43)
+        #expect(info.backdropURLs == ["b1.jpg", "b2.jpg"])
+        #expect(info.trailer == "abc123")
+        let pilot = try #require(info.episodes.first)
+        #expect(pilot.airDate == "2004-09-22")
+        #expect(pilot.rating == 7.5)
+        #expect(pilot.videoHeight == 1080)
+        #expect(pilot.videoCodec == "hevc")
+        #expect(pilot.audioCodec == "ac3")
+        let two = try #require(info.episodes.last)
+        #expect(two.videoHeight == nil, "a panel that has not probed the file sends [] for it")
+        #expect(two.audioCodec == nil)
+    }
+
     /// A show with no episodes yet has `"episodes": []`, not `{}`.
     @Test
     func `series info tolerates an empty episode array and info`() async throws {

@@ -213,7 +213,11 @@ struct VODBrowseView: View {
                 posterURL: item.iconURL,
                 plot: item.plot,
                 tmdbID: item.tmdbID,
-                backdropURL: item.backdropURL
+                backdropURL: item.backdropURL,
+                rating: item.rating,
+                year: item.year,
+                genre: item.genre,
+                cast: item.cast
             )
             return
         }
@@ -250,6 +254,11 @@ struct SeriesReference: Hashable, Identifiable {
     var plot: String?
     var tmdbID: Int?
     var backdropURL: String?
+    /// What the catalog already knows, so the page has it before the panel answers.
+    var rating: Double?
+    var year: Int?
+    var genre: String?
+    var cast: String?
 
     var id: String {
         "\(playlist)|\(entryID)"

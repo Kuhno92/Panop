@@ -275,6 +275,14 @@ public struct XtreamEpisode: Sendable, Equatable, Hashable, Decodable {
     public var durationSeconds: Int?
     public var plot: String?
     public var imageURL: String?
+    /// As the panel writes it, usually `2023-04-01`.
+    public var airDate: String?
+    /// Out of ten.
+    public var rating: Double?
+    /// What the file holds, for a line like "1080p · HEVC · AC3": the video's height and codec, the audio's codec.
+    public var videoHeight: Int?
+    public var videoCodec: String?
+    public var audioCodec: String?
 
     public init(
         id: String,
@@ -284,7 +292,12 @@ public struct XtreamEpisode: Sendable, Equatable, Hashable, Decodable {
         containerExtension: String? = nil,
         durationSeconds: Int? = nil,
         plot: String? = nil,
-        imageURL: String? = nil
+        imageURL: String? = nil,
+        airDate: String? = nil,
+        rating: Double? = nil,
+        videoHeight: Int? = nil,
+        videoCodec: String? = nil,
+        audioCodec: String? = nil
     ) {
         self.id = id
         self.seasonNumber = seasonNumber
@@ -294,6 +307,11 @@ public struct XtreamEpisode: Sendable, Equatable, Hashable, Decodable {
         self.durationSeconds = durationSeconds
         self.plot = plot
         self.imageURL = imageURL
+        self.airDate = airDate
+        self.rating = rating
+        self.videoHeight = videoHeight
+        self.videoCodec = videoCodec
+        self.audioCodec = audioCodec
     }
 
     private enum CodingKeys: String, CodingKey {
@@ -303,6 +321,11 @@ public struct XtreamEpisode: Sendable, Equatable, Hashable, Decodable {
 
     private enum InfoKeys: String, CodingKey {
         case durationSeconds = "duration_secs", plot, image = "movie_image"
+        case airDate = "air_date", releaseDate = "release_date", rating, video, audio
+    }
+
+    private enum StreamKeys: String, CodingKey {
+        case height, codecName = "codec_name"
     }
 
     public init(from decoder: any Decoder) throws {
@@ -321,6 +344,16 @@ public struct XtreamEpisode: Sendable, Equatable, Hashable, Decodable {
             durationSeconds = info.lenientInt(.durationSeconds)
             plot = info.lenientString(.plot)
             imageURL = info.lenientString(.image)
+            airDate = info.lenientString(.airDate) ?? info.lenientString(.releaseDate)
+            rating = info.lenientDouble(.rating)
+            // `video` and `audio` are objects, or `[]` when the panel has not probed the file.
+            if let video = try? info.nestedContainer(keyedBy: StreamKeys.self, forKey: .video) {
+                videoHeight = video.lenientInt(.height)
+                videoCodec = video.lenientString(.codecName)
+            }
+            if let audio = try? info.nestedContainer(keyedBy: StreamKeys.self, forKey: .audio) {
+                audioCodec = audio.lenientString(.codecName)
+            }
         }
     }
 }
@@ -330,6 +363,17 @@ public struct XtreamSeriesInfo: Sendable, Equatable {
     public var plot: String?
     public var coverURL: String?
     public var genre: String?
+    public var cast: String?
+    public var director: String?
+    /// As the panel writes it: a date, or just a year.
+    public var releaseDate: String?
+    /// Out of ten.
+    public var rating: Double?
+    /// Minutes per episode, as the panel gives it.
+    public var episodeRunTime: Int?
+    public var backdropURLs: [String]
+    /// A YouTube video id or address, when the panel has one.
+    public var trailer: String?
     public var episodes: [XtreamEpisode]
 
     public init(
@@ -337,19 +381,37 @@ public struct XtreamSeriesInfo: Sendable, Equatable {
         plot: String? = nil,
         coverURL: String? = nil,
         genre: String? = nil,
+        cast: String? = nil,
+        director: String? = nil,
+        releaseDate: String? = nil,
+        rating: Double? = nil,
+        episodeRunTime: Int? = nil,
+        backdropURLs: [String] = [],
+        trailer: String? = nil,
         episodes: [XtreamEpisode]
     ) {
         self.name = name
         self.plot = plot
         self.coverURL = coverURL
         self.genre = genre
+        self.cast = cast
+        self.director = director
+        self.releaseDate = releaseDate
+        self.rating = rating
+        self.episodeRunTime = episodeRunTime
+        self.backdropURLs = backdropURLs
+        self.trailer = trailer
         self.episodes = episodes
     }
 }
 
 extension XtreamSeriesInfo: Decodable {
     private enum CodingKeys: String, CodingKey { case info, episodes }
-    private enum InfoKeys: String, CodingKey { case name, plot, cover, genre }
+    private enum InfoKeys: String, CodingKey {
+        case name, plot, cover, genre, cast, director, rating
+        case releaseDate, releaseDateSnake = "release_date"
+        case episodeRunTime = "episode_run_time", backdrop = "backdrop_path", trailer = "youtube_trailer"
+    }
 
     public init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -359,8 +421,16 @@ extension XtreamSeriesInfo: Decodable {
             plot = info.lenientString(.plot)
             coverURL = info.lenientString(.cover)
             genre = info.lenientString(.genre)
+            cast = info.lenientString(.cast)
+            director = info.lenientString(.director)
+            releaseDate = info.lenientString(.releaseDate) ?? info.lenientString(.releaseDateSnake)
+            rating = info.lenientDouble(.rating)
+            episodeRunTime = info.lenientInt(.episodeRunTime)
+            backdropURLs = info.lenientStrings(.backdrop)
+            trailer = info.lenientString(.trailer)
         } else {
             name = ""
+            backdropURLs = []
         }
 
         // Episodes are an object keyed by season number, or `[]` when empty.

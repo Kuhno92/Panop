@@ -173,7 +173,11 @@ struct HomeView: View {
                 posterURL: row.iconURL,
                 plot: row.plot,
                 tmdbID: row.tmdbID,
-                backdropURL: row.backdropURL
+                backdropURL: row.backdropURL,
+                rating: row.rating,
+                year: row.year,
+                genre: row.genre,
+                cast: row.cast
             )
         default:
             userState.markPlayed(row.id)

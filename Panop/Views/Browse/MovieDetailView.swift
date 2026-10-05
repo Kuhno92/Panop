@@ -112,6 +112,7 @@ struct MovieDetailView: View {
     @Environment(UserStateStore.self) private var userState
     @Environment(SimklSync.self) private var simkl
     @Environment(DiscoveryModel.self) private var discovery
+    @Environment(\.openURL) private var openURL
 
     @State private var info: XtreamMovieInfo?
     @State private var playing: PlaybackTarget?
@@ -159,12 +160,30 @@ struct MovieDetailView: View {
                 rating: info?.rating ?? movie.rating
             )
         ) {
-            if userState.isWatched(key) {
-                Label("Watched", systemImage: "checkmark.circle.fill")
-                    .font(.subheadline)
-                    .foregroundStyle(.green)
+            VStack(alignment: .leading, spacing: 8) {
+                DetailChips(chips: chips)
+                if userState.isWatched(key) {
+                    Label("Watched", systemImage: "checkmark.circle.fill")
+                        .font(.subheadline)
+                        .foregroundStyle(.green)
+                }
             }
         }
+    }
+
+    /// The rating, then up to three genres. The category the film is filed under stands in for a genre.
+    private var chips: [DetailChip] {
+        var result: [DetailChip] = []
+        if let rating = info?.rating ?? movie.rating, rating > 0 {
+            result.append(DetailChip(text: DetailFormat.rating(rating), symbol: "star.fill", tint: .yellow))
+        }
+        result += DetailFormat.genres(info?.genre ?? movie.groupName).map { DetailChip(text: $0) }
+        return result
+    }
+
+    private var trailerURL: URL? {
+        guard let text = info?.trailer, !text.isEmpty else { return nil }
+        return text.hasPrefix("http") ? URL(string: text) : URL(string: "https://www.youtube.com/watch?v=\(text)")
     }
 
     private var actions: some View {
@@ -180,6 +199,9 @@ struct MovieDetailView: View {
                     .buttonStyle(.borderedProminent)
             }
             HStack {
+                if let trailerURL {
+                    Button("Trailer", systemImage: "play.rectangle") { openURL(trailerURL) }
+                }
                 let isFavorite = userState.isFavorite(key)
                 Button(
                     isFavorite ? "Remove from Favourites" : "Add to Favourites",
@@ -199,6 +221,7 @@ struct MovieDetailView: View {
             credit("Director", info?.director)
             credit("Cast", info?.cast)
             credit("Country", info?.country)
+            credit("Released", DetailFormat.date(info?.releaseDate))
         }
     }
 

@@ -11,6 +11,10 @@ import SwiftUI
 /// the episodes are fetched here, when someone opens one, rather than for every series in the
 /// catalog. A series built from an M3U file already has its episodes in the catalog, linked to
 /// it when the playlist was imported, so they are read from there and need no network.
+///
+/// The page opens on the artwork and the facts about the show (rating, year, genres, how many seasons and
+/// episodes, cast), a button for what to watch next, and then one season at a time with a picture, a date, a length,
+/// the file's quality and a line of plot for each episode.
 struct SeriesDetailView: View {
     let series: SeriesReference
 
@@ -19,6 +23,7 @@ struct SeriesDetailView: View {
     @Environment(SimklSync.self) private var simkl
     @Environment(DiscoveryModel.self) private var discovery
     @Environment(\.modelContext) private var catalog
+    @Environment(\.openURL) private var openURL
 
     /// An episode as the screen needs it, whichever playlist it came from.
     private struct Episode: Identifiable {
@@ -31,6 +36,11 @@ struct SeriesDetailView: View {
         var streamURL: String?
         var remoteID: String?
         var containerExtension: String?
+        var plot: String?
+        var imageURL: String?
+        var airDate: String?
+        var rating: Double?
+        var quality: String?
     }
 
     private struct Season: Identifiable {
@@ -46,15 +56,30 @@ struct SeriesDetailView: View {
         }
     }
 
+    /// What the panel says about the show itself.
+    private struct Details {
+        var plot: String?
+        var genre: String?
+        var cast: String?
+        var director: String?
+        var releaseDate: String?
+        var rating: Double?
+        var runtimeMinutes: Int?
+        var backdrop: String?
+        var trailer: String?
+    }
+
     private enum Load {
         case loading
         case failed(String)
-        case loaded(seasons: [Season], plot: String?)
+        case loaded(seasons: [Season], details: Details)
     }
 
     @State private var load = Load.loading
     @State private var playing: PlaybackTarget?
     @State private var resume: ResumeChoice?
+    @State private var selectedSeason: Int?
+    @State private var plotExpanded = false
 
     var body: some View {
         content
@@ -83,7 +108,7 @@ struct SeriesDetailView: View {
                     Task { await fetch() }
                 }
             }
-        case let .loaded(seasons, plot):
+        case let .loaded(seasons, details):
             if seasons.isEmpty {
                 ContentUnavailableView(
                     "No episodes",
@@ -91,50 +116,226 @@ struct SeriesDetailView: View {
                     description: Text("Nothing is listed for this series.")
                 )
             } else {
-                ScrollViewReader { proxy in
-                    List {
-                        Section {
-                            DetailHeader(
-                                backdrop: discovery.backdrop(
-                                    kind: .series,
-                                    tmdbID: series.tmdbID,
-                                    provider: series.backdropURL
-                                ),
-                                poster: series.posterURL,
-                                title: series.name,
-                                meta: "",
-                                symbol: "rectangle.stack"
-                            ) { EmptyView() }
-                                .listRowInsets(EdgeInsets())
-                                .listRowBackground(Color.clear)
-                            #if !os(tvOS)
-                                .listRowSeparator(.hidden)
-                            #endif
-                        }
-                        if let plot = series.plot ?? plot, !plot.isEmpty {
-                            Section { Text(plot).font(.callout).foregroundStyle(.secondary) }
-                        }
-                        ForEach(seasons) { season in
-                            Section(season.title) {
-                                ForEach(season.episodes) { episode in
-                                    episodeRow(episode, season: season)
-                                        .id(Self.rowID(season: season.number, episode: episode.number))
-                                }
-                            }
-                        }
-                    }
-                    .pageBackdrop()
-                    // Flat rows, so the header's artwork runs to the edges instead of sitting in a rounded card.
-                    .listStyle(.plain)
-                    // Straight to where the person left off, when their Simkl account says where that is.
-                    .task(id: seasons.count) {
-                        if let next = upNext {
-                            proxy.scrollTo(Self.rowID(season: next.season, episode: next.number), anchor: .top)
-                        }
+                page(seasons, details)
+            }
+        }
+    }
+
+    // MARK: - The page
+
+    private func page(_ seasons: [Season], _ details: Details) -> some View {
+        let shown = seasons.first { $0.number == selectedSeason } ?? seasons
+            .first(where: { $0.number == startSeason(seasons) })
+            ?? seasons[0]
+        return ScrollViewReader { proxy in
+            List {
+                Section {
+                    header(seasons, details)
+                        .listRowInsets(EdgeInsets())
+                        .listRowBackground(Color.clear)
+                    #if !os(tvOS)
+                        .listRowSeparator(.hidden)
+                    #endif
+                    actions(seasons, details)
+                    overview(details)
+                    facts(details)
+                    watchedSummary(seasons)
+                }
+                if seasons.count > 1 {
+                    Section { seasonPicker(seasons, shown) }
+                }
+                Section(shown.title) {
+                    ForEach(shown.episodes) { episode in
+                        episodeRow(episode, season: shown)
+                            .id(Self.rowID(season: shown.number, episode: episode.number))
                     }
                 }
             }
+            .pageBackdrop()
+            // Flat rows, so the header's artwork runs to the edges instead of sitting in a rounded card.
+            .listStyle(.plain)
+            // Straight to where the person left off, when their Simkl account says where that is.
+            .task(id: seasons.count) {
+                if let next = upNext {
+                    selectedSeason = next.season
+                    proxy.scrollTo(Self.rowID(season: next.season, episode: next.number), anchor: .top)
+                }
+            }
         }
+    }
+
+    private func header(_ seasons: [Season], _ details: Details) -> some View {
+        DetailHeader(
+            backdrop: discovery.backdrop(
+                kind: .series,
+                tmdbID: series.tmdbID,
+                provider: details.backdrop ?? series.backdropURL
+            ),
+            poster: series.posterURL,
+            title: series.name,
+            meta: stats(seasons, details),
+            symbol: "rectangle.stack"
+        ) {
+            DetailChips(chips: chips(details))
+        }
+    }
+
+    /// `2023 · 3 seasons · 28 episodes · 45 min`
+    private func stats(_ seasons: [Season], _ details: Details) -> String {
+        var parts: [String] = []
+        if let year = DetailFormat.year(from: details.releaseDate) ?? series.year {
+            parts.append(String(year))
+        }
+        let real = seasons.filter { $0.number > 0 }.count
+        if real > 0 {
+            parts.append(DetailFormat.seasons(real))
+        }
+        parts.append(DetailFormat.episodes(seasons.reduce(0) { $0 + $1.episodes.count }))
+        if let minutes = details.runtimeMinutes, minutes > 0 {
+            parts.append(DetailFormat.runtime(minutes: minutes))
+        }
+        return parts.joined(separator: " · ")
+    }
+
+    /// The rating, then up to three genres.
+    private func chips(_ details: Details) -> [DetailChip] {
+        var result: [DetailChip] = []
+        if let rating = details.rating ?? series.rating, rating > 0 {
+            result.append(DetailChip(text: DetailFormat.rating(rating), symbol: "star.fill", tint: .yellow))
+        }
+        result += DetailFormat.genres(details.genre ?? series.genre).map { DetailChip(text: $0) }
+        return result
+    }
+
+    /// What to watch next, and the trailer when the panel has one.
+    private func actions(_ seasons: [Season], _ details: Details) -> some View {
+        HStack(spacing: 12) {
+            if let next = nextToWatch(seasons) {
+                let key = UserStateStore.key(playlist: series.playlist, entry: next.episode.entryID)
+                Button {
+                    select(next.episode, season: next.season, key: key)
+                } label: {
+                    Label(nextLabel(next, key: key), systemImage: "play.fill")
+                }
+                .buttonStyle(.borderedProminent)
+            }
+            if let trailer = trailerURL(details.trailer) {
+                Button { openURL(trailer) } label: {
+                    Label("Trailer", systemImage: "play.rectangle")
+                }
+                .buttonStyle(.bordered)
+            }
+            Spacer(minLength: 0)
+        }
+        #if !os(tvOS)
+        .listRowSeparator(.hidden)
+        #endif
+    }
+
+    private func nextLabel(_ next: (season: Season, episode: Episode), key: String) -> String {
+        let code = "S\(next.season.number) E\(next.episode.number)"
+        let started = userState.progress[key] != nil
+        return started ? String(localized: "Continue \(code)") : String(localized: "Play \(code)")
+    }
+
+    @ViewBuilder
+    private func overview(_ details: Details) -> some View {
+        if let plot = series.plot ?? details.plot, !plot.isEmpty {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(plot)
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(plotExpanded ? nil : 4)
+                if plot.count > 220 {
+                    Button(plotExpanded ? "Less" : "More") { plotExpanded.toggle() }
+                        .font(.caption.weight(.semibold))
+                        .buttonStyle(.plain)
+                        .foregroundStyle(.tint)
+                }
+            }
+            #if !os(tvOS)
+            .listRowSeparator(.hidden)
+            #endif
+        }
+    }
+
+    @ViewBuilder
+    private func facts(_ details: Details) -> some View {
+        let cast = details.cast ?? series.cast
+        if [cast, details.director, details.releaseDate].contains(where: { $0?.isEmpty == false }) {
+            VStack(alignment: .leading, spacing: 10) {
+                DetailFact(title: "Cast", value: cast)
+                DetailFact(title: "Director", value: details.director)
+                DetailFact(title: "First aired", value: DetailFormat.date(details.releaseDate))
+            }
+            #if !os(tvOS)
+            .listRowSeparator(.hidden)
+            #endif
+        }
+    }
+
+    /// `12 of 28 watched`, with a bar.
+    @ViewBuilder
+    private func watchedSummary(_ seasons: [Season]) -> some View {
+        let all = seasons.flatMap(\.episodes)
+        let seen = all.filter { userState.isWatched(UserStateStore.key(playlist: series.playlist, entry: $0.entryID)) }
+            .count
+        if seen > 0, !all.isEmpty {
+            VStack(alignment: .leading, spacing: 4) {
+                Text("\(seen) of \(all.count) watched").font(.caption.weight(.semibold)).foregroundStyle(.secondary)
+                ProgressView(value: Double(seen), total: Double(all.count))
+            }
+            #if !os(tvOS)
+            .listRowSeparator(.hidden)
+            #endif
+        }
+    }
+
+    private func seasonPicker(_ seasons: [Season], _ shown: Season) -> some View {
+        Picker(selection: Binding(get: { shown.number }, set: { selectedSeason = $0 })) {
+            ForEach(seasons) { season in
+                Text(season.title).tag(season.number)
+            }
+        } label: {
+            Label("Season", systemImage: "list.number")
+        }
+        #if os(macOS)
+        .pickerStyle(.menu)
+        #endif
+    }
+
+    /// The season the page opens on: the one with the episode to watch next.
+    private func startSeason(_ seasons: [Season]) -> Int {
+        if let next = upNext {
+            return next.season
+        }
+        return nextToWatch(seasons)?.season.number ?? seasons[0].number
+    }
+
+    /// The episode left part-way if there is one, else the first not yet watched, else the first of the show.
+    private func nextToWatch(_ seasons: [Season]) -> (season: Season, episode: Episode)? {
+        let all = seasons.flatMap { season in season.episodes.map { (season: season, episode: $0) } }
+        func key(_ item: (season: Season, episode: Episode)) -> String {
+            UserStateStore.key(playlist: series.playlist, entry: item.episode.entryID)
+        }
+        if let next = upNext,
+           let found = all.first(where: { $0.season.number == next.season && $0.episode.number == next.number })
+        {
+            return found
+        }
+        if let partway = all.first(where: { userState.progress[key($0)] != nil && !userState.isWatched(key($0)) }) {
+            return partway
+        }
+        return all.first { !userState.isWatched(key($0)) } ?? all.first
+    }
+
+    /// A YouTube id or address, as the panel writes it.
+    private func trailerURL(_ text: String?) -> URL? {
+        guard let text, !text.isEmpty else { return nil }
+        if text.hasPrefix("http") {
+            return URL(string: text)
+        }
+        return URL(string: "https://www.youtube.com/watch?v=\(text)")
     }
 
     private static func rowID(season: Int, episode: Int) -> String {
@@ -145,6 +346,11 @@ struct SeriesDetailView: View {
     private var upNext: SimklNextEpisode? {
         series.tmdbID.flatMap { discovery.nextEpisodes[DiscoveryModel.linkKey(kind: .series, tmdbID: $0)] }
     }
+}
+
+/// The episode rows, and what is said under each.
+extension SeriesDetailView {
+    // MARK: - An episode
 
     private func episodeRow(_ episode: Episode, season: Season) -> some View {
         let key = UserStateStore.key(playlist: series.playlist, entry: episode.entryID)
@@ -152,29 +358,31 @@ struct SeriesDetailView: View {
         return Button {
             select(episode, season: season, key: key)
         } label: {
-            VStack(alignment: .leading, spacing: 6) {
-                HStack {
-                    Text("\(episode.number). \(episode.title)")
-                    if let next = upNext, next.season == season.number, next.number == episode.number {
-                        Text("Up next")
-                            .font(.caption2.bold())
-                            .padding(.horizontal, 6)
-                            .padding(.vertical, 2)
-                            .background(.tint.opacity(0.2), in: Capsule())
+            HStack(alignment: .top, spacing: 12) {
+                thumbnail(episode, progress: progress?.fraction)
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack {
+                        Text("\(episode.number). \(episode.title)").font(.subheadline.weight(.semibold))
+                        if let next = upNext, next.season == season.number, next.number == episode.number {
+                            Text("Up next")
+                                .font(.caption2.bold())
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 2)
+                                .background(.tint.opacity(0.2), in: Capsule())
+                        }
+                        Spacer(minLength: 4)
+                        if userState.isWatched(key) {
+                            Image(systemName: "checkmark.circle.fill")
+                                .foregroundStyle(.green)
+                                .accessibilityLabel("Watched")
+                        }
                     }
-                    Spacer()
-                    if userState.isWatched(key) {
-                        Image(systemName: "checkmark.circle.fill")
-                            .foregroundStyle(.green)
-                            .accessibilityLabel("Watched")
+                    if let line = detailLine(episode) {
+                        Text(line).font(.caption).foregroundStyle(.secondary).lineLimit(1)
                     }
-                    if let seconds = episode.seconds, seconds > 0 {
-                        Text(PlayerTime.text(Double(seconds))).font(.caption).foregroundStyle(.secondary)
+                    if let plot = episode.plot, !plot.isEmpty {
+                        Text(plot).font(.caption).foregroundStyle(.secondary).lineLimit(2)
                     }
-                }
-                if let fraction = progress?.fraction {
-                    ProgressView(value: fraction)
-                        .accessibilityLabel("Watched \(Int(fraction * 100)) percent")
                 }
             }
             .contentShape(Rectangle())
@@ -189,6 +397,46 @@ struct SeriesDetailView: View {
                 Label(seen ? "Mark as Not Watched" : "Mark as Watched", systemImage: seen ? "eye.slash" : "eye")
             }
         }
+    }
+
+    /// `22 September 2004 · 45 min · ★ 7.5 · 1080p · HEVC · AC3`
+    private func detailLine(_ episode: Episode) -> String? {
+        var parts: [String] = []
+        if let date = DetailFormat.date(episode.airDate) {
+            parts.append(date)
+        }
+        if let seconds = episode.seconds, seconds > 0 {
+            parts.append(PlayerTime.text(Double(seconds)))
+        }
+        if let rating = episode.rating, rating > 0 {
+            parts.append("★ " + DetailFormat.rating(rating))
+        }
+        if let quality = episode.quality {
+            parts.append(quality)
+        }
+        return parts.isEmpty ? nil : parts.joined(separator: " · ")
+    }
+
+    /// The episode's picture, with how far through it the person is as a bar along the bottom. Without a picture, a
+    /// tile of the same size so the rows line up.
+    private func thumbnail(_ episode: Episode, progress: Double?) -> some View {
+        BackdropView(address: episode.imageURL)
+            .frame(width: Self.thumbnailWidth, height: Self.thumbnailWidth * 9 / 16)
+            .clipShape(RoundedRectangle(cornerRadius: 8))
+            .overlay(alignment: .bottom) {
+                if let progress {
+                    ProgressBar(fraction: progress).padding(6)
+                }
+            }
+            .accessibilityHidden(true)
+    }
+
+    private static var thumbnailWidth: CGFloat {
+        #if os(tvOS)
+            280
+        #else
+            120
+        #endif
     }
 
     private func select(_ episode: Episode, season: Season, key: String) {
@@ -251,11 +499,16 @@ struct SeriesDetailView: View {
                     entryID: row.id,
                     streamURL: row.streamURL,
                     remoteID: nil,
-                    containerExtension: row.containerExtension
+                    containerExtension: row.containerExtension,
+                    plot: nil,
+                    imageURL: nil,
+                    airDate: nil,
+                    rating: nil,
+                    quality: nil
                 )
             )
         }
-        load = .loaded(seasons: Self.seasons(from: episodes), plot: nil)
+        load = .loaded(seasons: Self.seasons(from: episodes), details: Details())
     }
 
     /// A panel's series: the episodes are fetched now.
@@ -285,11 +538,31 @@ struct SeriesDetailView: View {
                             containerExtension: episode.containerExtension
                         )?.absoluteString,
                         remoteID: episode.id,
-                        containerExtension: episode.containerExtension
+                        containerExtension: episode.containerExtension,
+                        plot: episode.plot,
+                        imageURL: episode.imageURL,
+                        airDate: episode.airDate,
+                        rating: episode.rating,
+                        quality: DetailFormat.quality(
+                            height: episode.videoHeight,
+                            video: episode.videoCodec,
+                            audio: episode.audioCodec
+                        )
                     )
                 )
             }
-            load = .loaded(seasons: Self.seasons(from: episodes), plot: info.plot)
+            let details = Details(
+                plot: info.plot,
+                genre: info.genre,
+                cast: info.cast,
+                director: info.director,
+                releaseDate: info.releaseDate,
+                rating: info.rating,
+                runtimeMinutes: info.episodeRunTime,
+                backdrop: info.backdropURLs.first,
+                trailer: info.trailer
+            )
+            load = .loaded(seasons: Self.seasons(from: episodes), details: details)
         } catch {
             load = .failed(SyncErrorMessage.text(for: error))
         }
