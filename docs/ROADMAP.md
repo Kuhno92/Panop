@@ -690,9 +690,17 @@ Features real users expect that the brief did not name. All *(surfaced)*.
       unreachable source and on bytes that are not media). **Two costs:** (1) `libdovi`, which it needs, collides with
       LumeEngine's FFmpeg in the build (two static xcframeworks with a module map), so `Packages/LibDovi` stands in for
       it with no-op functions: Dolby Vision profile 7 plays as its HDR10 base layer. (2) It reconnects a dead live
-      source by itself for about fifteen seconds before the load fails. **Not done:** the rewind controls in the player
-      (the engine has the window; there is no UI for going back yet), the engine's picture-in-picture, a real provider
-      stream, and a look on a device.
+      source by itself for about fifteen seconds before the load fails. **Measured on a real provider (2026-10-05, `docs/engine-matrix.md`):** plays every MP4 and MKV film and episode (10 of 10
+      and more), but **crashed the process twice on live TV**, inside its own deinterlace filter teardown, with both of its
+      deinterlacers. So live TV never offers it automatically (a person can still choose it, labelled experimental).
+      **Not done:** report the crash upstream with the crash log, retry with a newer version, the rewind controls in the
+      player (the engine has the window; there is no UI for going back yet), the engine's picture-in-picture, and a look on
+      a device.
+- [x] **Default engine by kind of stream** *(asked for)*. `PlaybackEngineKind.defaultPriority(for:)`: MKV and raw TS try
+      LumeEngine, AetherEngine, VLC and only then AVPlayer (which refuses them); MP4 and HLS keep AVPlayer first; live TV
+      leaves AetherEngine out. Built from a measured table (`docs/engine-matrix.md`) and tested. A setting for the default
+      per kind, and per-source memory that a source's `.m3u8` is not really HLS, are **not done**: the engine that last
+      played a title is already remembered and tried first.
 - [ ] **Add MPVKit as an engine** *(asked for)*. libmpv through MPVKit as another `PlaybackEngine`. **Licence
       checked (2026-10-05, github.com/mpvkit/MPVKit):** the **`MPVKit` product is LGPL-3.0** (libmpv, FFmpeg and the
       libraries around them); the **`MPVKit-GPL` product (or a build with `enable-gpl`) is GPL-3.0** and must never

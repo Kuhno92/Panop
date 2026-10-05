@@ -64,6 +64,9 @@ final class AetherPlaybackEngine: PlaybackEngine {
             headers["User-Agent"] = agent
         }
         var options = LoadOptions(httpHeaders: headers, isLive: isLive)
+        // Interlaced live TV is deinterlaced on the CPU. The engine's hardware (Metal) deinterlacer crashed the whole
+        // process inside FFmpeg's filter teardown on a real provider's live channels.
+        options.deinterlaceMode = .software
         // A live channel can be paused and gone back in for half an hour. The engine keeps the window on disk.
         if isLive {
             options.dvrWindowSeconds = 1800

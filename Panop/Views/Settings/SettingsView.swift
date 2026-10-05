@@ -100,7 +100,8 @@ struct SettingsView: View {
                 // `selectable`: only engines with a working adapter. KSPlayer is
                 // GPL-3.0 and not linked (docs/adr/0002), so it is never offered.
                 ForEach(EngineRegistry.selectable) { kind in
-                    Text(kind.displayName).tag(kind)
+                    Text(kind == .aetherEngine ? String(localized: "AetherEngine (experimental)") : kind.displayName)
+                        .tag(kind)
                 }
             } label: {
                 SettingsRow("Engine", symbol: "play.rectangle.fill", tint: .indigo)

@@ -78,13 +78,13 @@ final class PlayerModel {
         self.memoryKey = memoryKey
         self.metrics = metrics
         session = PlaybackSessionRecorder(startedAt: .now, mediaKind: request.mediaKind)
-        let settingOrder = PlaybackEngineKind.order(preferred: preferred)
+        let settingOrder = PlaybackEngineKind.order(preferred: preferred, for: request)
         settingsFirst = settingOrder.first
         // The engine that played this last time, when it was not the person's own pick, goes
         // first: a channel one engine cannot read should not fail there again every time.
         let learned = memoryKey.flatMap { memory?.remembered(for: $0) }
         coordinator = PlaybackCoordinator(
-            priority: learned.map { PlaybackEngineKind.order(preferred: $0) } ?? settingOrder,
+            priority: learned.map { PlaybackEngineKind.order(preferred: $0, for: request) } ?? settingOrder,
             makeEngine: makeEngine
         )
     }

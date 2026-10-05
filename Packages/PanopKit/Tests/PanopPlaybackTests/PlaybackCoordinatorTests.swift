@@ -456,7 +456,7 @@ struct PlaybackCoordinatorTests {
     @Test
     func `the preferred engine leads and the rest keep their default order`() {
         #expect(PlaybackEngineKind.order(preferred: nil) == PlaybackEngineKind.defaultPriority)
-        #expect(PlaybackEngineKind.order(preferred: .vlcKit) == [.vlcKit, .avPlayer, .lumeEngine])
+        #expect(PlaybackEngineKind.order(preferred: .vlcKit) == [.vlcKit, .avPlayer, .lumeEngine, .aetherEngine])
         #expect(PlaybackEngineKind.order(preferred: .avPlayer) == PlaybackEngineKind.defaultPriority)
         // An engine that is not linked cannot be preferred.
         #expect(!PlaybackEngineKind.order(preferred: .ksPlayer).contains(.ksPlayer))

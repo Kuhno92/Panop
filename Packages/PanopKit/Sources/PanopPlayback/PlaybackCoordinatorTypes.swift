@@ -1,3 +1,4 @@
+import Foundation
 import PanopCore
 
 /// How patient the coordinator is, and how hard it tries before moving on.
@@ -127,6 +128,41 @@ public extension PlaybackEngineKind {
     static func order(preferred: PlaybackEngineKind?) -> [PlaybackEngineKind] {
         let rest = defaultPriority
         guard let preferred, rest.contains(preferred) else { return rest }
+        return [preferred] + rest.filter { $0 != preferred }
+    }
+
+    /// Containers and playlists Apple's player reads. Anything else (Matroska above all, and raw transport streams) it
+    /// refuses outright, which a real provider's films and live channels confirmed: AVPlayer failed every MKV and every
+    /// raw MPEG-TS channel, and played every MP4.
+    private static let appleContainers: Set<String> = ["mp4", "m4v", "mov", "m3u8", "m3u", "mp3", "m4a", "aac"]
+
+    /// The default order for one request, from what each engine was measured to play on a real provider
+    /// (docs/engine-matrix.md).
+    ///
+    /// - **Not an Apple container** (MKV films and episodes, raw MPEG-TS live): AVPlayer would refuse it, so it goes
+    /// last
+    ///   rather than first.
+    /// - **Live TV never offers AetherEngine on its own.** Version 7.27.2 crashed the whole process, inside its own
+    ///   deinterlacing filter, on a real provider's live channels, with both of its deinterlacers. A person can still
+    ///   choose it.
+    /// - **Everything else**: the general order, system integration first.
+    static func defaultPriority(for request: PlaybackRequest) -> [PlaybackEngineKind] {
+        let address = request.item(.vlcKit).url
+        let container = URL(string: address)?.pathExtension.lowercased() ?? ""
+        let readByApple = container.isEmpty || appleContainers.contains(container)
+        var order: [PlaybackEngineKind] = readByApple
+            ? [.avPlayer, .lumeEngine, .aetherEngine, .vlcKit]
+            : [.lumeEngine, .aetherEngine, .vlcKit, .avPlayer]
+        if request.mediaKind == .live {
+            order.removeAll { $0 == .aetherEngine }
+        }
+        return order.filter { available.contains($0) }
+    }
+
+    /// The user's choice first, then the default order for this request.
+    static func order(preferred: PlaybackEngineKind?, for request: PlaybackRequest) -> [PlaybackEngineKind] {
+        let rest = defaultPriority(for: request)
+        guard let preferred, available.contains(preferred) else { return rest }
         return [preferred] + rest.filter { $0 != preferred }
     }
 }

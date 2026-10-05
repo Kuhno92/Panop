@@ -127,6 +127,11 @@ same C functions that AetherEngine calls and bodies that do nothing. Cost: Dolby
 If either engine ever stops shipping a static module-mapped xcframework, the real `LibDovi` can come back by removing the
 local package reference from the project.
 
+**It crashed on live TV.** On a real provider's interlaced H.264 live channels AetherEngine 7.27.2 raised SIGSEGV inside
+FFmpeg's `avfilter_free`, called from its `DeinterlaceFilter.ensureGraph`, with the hardware and the software
+deinterlacer alike. Films and episodes play. The default order therefore leaves it out of live TV (see
+[engine-matrix.md](engine-matrix.md)).
+
 **It reconnects by itself.** A live source that cannot be reached is retried inside the engine (five attempts over about
 fifteen seconds were seen), and there is no public option to turn that off, so a failed load takes that long to be
 reported. The coordinator's load timeout still applies. It is the one adapter that does not report a failure at once.
