@@ -697,8 +697,8 @@ Features real users expect that the brief did not name. All *(surfaced)*.
       player (the engine has the window; there is no UI for going back yet), the engine's picture-in-picture, and a look on
       a device.
 - [x] **Default engine by kind of stream** *(asked for)*. `PlaybackEngineKind.defaultPriority(for:)`: MKV and raw TS try
-      LumeEngine, AetherEngine, VLC and only then AVPlayer (which refuses them); MP4 and HLS keep AVPlayer first; live TV
-      leaves AetherEngine out. Built from a measured table (`docs/engine-matrix.md`) and tested. A setting for the default
+      LumeEngine, VLC, AetherEngine and only then AVPlayer (which refuses them); MP4 and HLS keep AVPlayer first, then
+      LumeEngine, VLC, AetherEngine; live TV leaves AetherEngine out. Built from a measured table (`docs/engine-matrix.md`) and tested. A setting for the default
       per kind, and per-source memory that a source's `.m3u8` is not really HLS, are **not done**: the engine that last
       played a title is already remembered and tried first.
 - [ ] **Add MPVKit as an engine** *(asked for)*. libmpv through MPVKit as another `PlaybackEngine`. **Licence

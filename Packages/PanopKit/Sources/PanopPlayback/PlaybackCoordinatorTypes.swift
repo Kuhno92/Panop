@@ -142,6 +142,9 @@ public extension PlaybackEngineKind {
     /// - **Not an Apple container** (MKV films and episodes, raw MPEG-TS live): AVPlayer would refuse it, so it goes
     /// last
     ///   rather than first.
+    /// - **AetherEngine comes after VLC.** It was only about half a second faster to a moving picture on films, and the
+    /// same
+    ///   deinterlacing code that crashed it on live channels runs for any interlaced source.
     /// - **Live TV never offers AetherEngine on its own.** Version 7.27.2 crashed the whole process, inside its own
     ///   deinterlacing filter, on a real provider's live channels, with both of its deinterlacers. A person can still
     ///   choose it.
@@ -151,8 +154,8 @@ public extension PlaybackEngineKind {
         let container = URL(string: address)?.pathExtension.lowercased() ?? ""
         let readByApple = container.isEmpty || appleContainers.contains(container)
         var order: [PlaybackEngineKind] = readByApple
-            ? [.avPlayer, .lumeEngine, .aetherEngine, .vlcKit]
-            : [.lumeEngine, .aetherEngine, .vlcKit, .avPlayer]
+            ? [.avPlayer, .lumeEngine, .vlcKit, .aetherEngine]
+            : [.lumeEngine, .vlcKit, .aetherEngine, .avPlayer]
         if request.mediaKind == .live {
             order.removeAll { $0 == .aetherEngine }
         }

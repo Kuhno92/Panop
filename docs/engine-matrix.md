@@ -30,8 +30,9 @@ Times are "opened" plus "moving after" from a debug build, so they compare engin
 
 `PlaybackEngineKind.defaultPriority(for:)` (`PanopPlayback`, tested in `EnginePriorityTests`):
 
-- **Not an Apple container** (MKV, raw TS): `LumeEngine, AetherEngine, VLC, AVPlayer`. AVPlayer is last, not first, since it refuses these outright.
-- **Apple container** (MP4, HLS, or no extension): `AVPlayer, LumeEngine, AetherEngine, VLC`. AVPlayer first keeps picture in picture, AirPlay and battery life where it works.
+- **Not an Apple container** (MKV, raw TS): `LumeEngine, VLC, AetherEngine, AVPlayer`. AVPlayer is last, not first, since it refuses these outright.
+- **Apple container** (MP4, HLS, or no extension): `AVPlayer, LumeEngine, VLC, AetherEngine`.
+- **AetherEngine after VLC**: it was only about half a second faster on films (MKV about 5.3 s against VLC's 5.7 s to a moving picture on average), and the deinterlacing code that crashed it runs for any interlaced source, not only live TV. AVPlayer first keeps picture in picture, AirPlay and battery life where it works.
 - **Live TV never includes AetherEngine** in the automatic order, because it crashed. A person can still choose it in Settings, where it is labelled experimental.
 - The person's own choice, when set, always goes first. The engine that last played a given title is remembered and tried first next time.
 
