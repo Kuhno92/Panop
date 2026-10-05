@@ -136,6 +136,10 @@ no network or stream. Three things learned the hard way:
 # (test-app.sh and test-ui.sh already remove their clones on exit; after an xcodebuild test of
 # your own run Scripts/clean-test-clones.sh)
 Scripts/clean-caches.sh [--apply]
+
+# Xcode's File > Packages > Reset Package Caches deletes the binary packages (LumeEngine's FFmpeg, VLCKit) and does not
+# download them again: "There is no XCFramework found at .../SourcePackages/artifacts/...". This puts them back.
+Scripts/restore-package-artifacts.sh
 ```
 
 `build-all-platforms.sh` builds for a tvOS simulator when a runtime is present, and falls back
