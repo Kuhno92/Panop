@@ -16,6 +16,7 @@ struct PlaylistsView: View {
                 PlaylistRow(playlist: playlist, onDelete: { pendingDelete = playlist })
             }
         }
+        .pageBackdrop()
         .overlay { emptyState }
         .navigationTitle("Playlists")
         .toolbar {

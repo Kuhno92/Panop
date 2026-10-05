@@ -54,6 +54,7 @@ struct ProfilesView: View {
                     .disabled(!profiles.canAdd)
             }
         }
+        .pageBackdrop()
         .navigationTitle("Profiles")
         .alert("New profile", isPresented: $adding) {
             TextField("Name", text: $newName)

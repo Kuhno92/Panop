@@ -49,6 +49,7 @@ struct SearchView: View {
                 }
             }
         }
+        .pageBackdrop()
         .task(id: query) {
             // Typing again cancels this task, so only the pause counts.
             try? await Task.sleep(for: .milliseconds(250))

@@ -27,6 +27,7 @@ struct CategoryPickerList: View {
             }
             ForEach(shown, id: \.self) { row($0, value: $0) }
         }
+        .pageBackdrop()
         .navigationTitle("Category")
         #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
@@ -265,6 +266,7 @@ struct CategoryEditor: View {
                 }
             }
         }
+        .pageBackdrop()
         .navigationTitle("Categories")
         #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)

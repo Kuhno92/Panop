@@ -135,6 +135,7 @@ struct MovieDetailView: View {
                 .padding(.bottom)
             }
         }
+        .background { PageBackground() }
         .navigationTitle(movie.name)
         #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)

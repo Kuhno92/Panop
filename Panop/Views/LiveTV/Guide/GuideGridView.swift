@@ -493,6 +493,7 @@ private struct GuideProgrammeSheet: View {
                     })
                 }
             }
+            .pageBackdrop()
             .navigationTitle(channel.name)
             #if os(iOS)
                 .navigationBarTitleDisplayMode(.inline)

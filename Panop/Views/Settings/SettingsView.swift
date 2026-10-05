@@ -48,19 +48,25 @@ struct SettingsView: View {
             accounts
             about
         }
-        .pageBackdrop()
-        .navigationTitle("Settings")
-        .sheet(item: $pinPurpose) { purpose in
-            PINSheet(purpose: purpose) {
-                // A PIN is for keeping the filter on: setting one turns it on.
-                if purpose == .create {
-                    profiles.setHidesAdult(true)
-                }
-                if purpose == .unlock {
-                    profiles.setHidesAdult(false)
+        // Grouped, so each group is its own card with room around it, and the whole form scrolls: on a Mac the
+        // plain form style neither separates the groups nor scrolls when the window is shorter than the list.
+        .formStyle(.grouped)
+        #if !os(tvOS)
+            .headerProminence(.increased)
+        #endif
+            .pageBackdrop()
+            .navigationTitle("Settings")
+            .sheet(item: $pinPurpose) { purpose in
+                PINSheet(purpose: purpose) {
+                    // A PIN is for keeping the filter on: setting one turns it on.
+                    if purpose == .create {
+                        profiles.setHidesAdult(true)
+                    }
+                    if purpose == .unlock {
+                        profiles.setHidesAdult(false)
+                    }
                 }
             }
-        }
     }
 
     // MARK: - Where the content comes from

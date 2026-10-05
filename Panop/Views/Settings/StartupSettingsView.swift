@@ -81,6 +81,7 @@ private struct StartupChannelList: View {
         List(channels) { channel in
             Button(channel.name) { onPick(channel) }
         }
+        .pageBackdrop()
         .overlay {
             if channels.isEmpty {
                 ContentUnavailableView("No channels", systemImage: "tv")

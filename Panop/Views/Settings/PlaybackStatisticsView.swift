@@ -27,6 +27,7 @@ struct PlaybackStatisticsView: View {
                 )
             }
         }
+        .pageBackdrop()
         .navigationTitle("Playback Statistics")
         .task { statistics = await store?.statistics() }
         .confirmationDialog("Clear the statistics?", isPresented: $confirmingClear, titleVisibility: .visible) {

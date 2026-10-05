@@ -29,6 +29,7 @@ struct HiddenEntriesView: View {
                 Button("Show") { userState.setHidden(false, for: row.id) }
             }
         }
+        .pageBackdrop()
         .overlay {
             if shown.isEmpty, model.phase == .loaded {
                 ContentUnavailableView(

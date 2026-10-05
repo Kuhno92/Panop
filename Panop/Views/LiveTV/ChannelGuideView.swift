@@ -132,6 +132,7 @@ struct ChannelGuideView: View {
                 }
             }
         }
+        .pageBackdrop()
         .overlay {
             if loaded, programmes.isEmpty, aired.isEmpty {
                 ContentUnavailableView(

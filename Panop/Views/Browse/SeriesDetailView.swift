@@ -123,6 +123,7 @@ struct SeriesDetailView: View {
                             }
                         }
                     }
+                    .pageBackdrop()
                     // Flat rows, so the header's artwork runs to the edges instead of sitting in a rounded card.
                     .listStyle(.plain)
                     // Straight to where the person left off, when their Simkl account says where that is.

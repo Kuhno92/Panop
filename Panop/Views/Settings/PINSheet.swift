@@ -72,6 +72,7 @@ struct PINSheet: View {
                         .disabled(entry.isEmpty)
                 }
             }
+            .pageBackdrop()
             .navigationTitle(title)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {

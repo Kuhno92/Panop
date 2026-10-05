@@ -26,6 +26,10 @@ struct VODBrowseView: View {
     @AppStorage("vodSourceFilter") private var storedSource = LiveSourceFilter.allID
     @AppStorage("vodSortOrder") private var storedOrder = LiveOrder.provider.rawValue
 
+    /// Whether this screen leads with suggestions (the carousel and the rails). Kept for Movies and Series apart, so
+    /// someone who wants only the list on one of them can have it so.
+    @AppStorage("showsSuggestionsOnMovies") private var suggestionsOnMovies = true
+    @AppStorage("showsSuggestionsOnSeries") private var suggestionsOnSeries = true
     @State private var search = ""
     @State private var group: String?
     /// Every category of this kind and source, in the provider's order, once known.
@@ -39,6 +43,10 @@ struct VODBrowseView: View {
 
     private var title: String {
         kind == .movie ? String(localized: "Movies") : String(localized: "Series")
+    }
+
+    private var showsSuggestions: Binding<Bool> {
+        kind == .movie ? $suggestionsOnMovies : $suggestionsOnSeries
     }
 
     private var isSearching: Bool {
@@ -93,7 +101,7 @@ struct VODBrowseView: View {
             hasPlaylists: !library.playlists.isEmpty,
             isSyncing: status.isAnySyncing,
             // Suggestions are for browsing: a search or a chosen category wants its own titles.
-            rails: isSearching || group != nil ? [] : discovery.rails
+            rails: isSearching || group != nil || !showsSuggestions.wrappedValue ? [] : discovery.rails
                 .filter { ($0.mediaKind ?? discovery.rows[$0.keys.first ?? ""]?.kind) == kind },
             railRows: discovery.rows,
             railLinks: discovery.trendingLinks,
@@ -119,6 +127,7 @@ struct VODBrowseView: View {
                             if sources.count > 1 {
                                 sourceMenu
                             }
+                            suggestionsToggle
                             Spacer()
                         }
                         .padding(.horizontal)
@@ -130,6 +139,7 @@ struct VODBrowseView: View {
         .toolbar {
             #if !os(tvOS)
                 if !library.playlists.isEmpty {
+                    ToolbarItem { suggestionsToggle }
                     ToolbarItem { sortMenu }
                     if sources.count > 1 {
                         ToolbarItem { sourceMenu }
@@ -151,6 +161,17 @@ struct VODBrowseView: View {
         }
         .resumeDialog($resume)
         .modifier(PlayerPresentation(target: $playing))
+    }
+
+    /// Shows or hides the carousel and the rails above the list.
+    private var suggestionsToggle: some View {
+        Toggle(isOn: showsSuggestions) {
+            Label("Suggestions", systemImage: "sparkles")
+        }
+        #if !os(tvOS)
+        .toggleStyle(.button)
+        #endif
+        .help("Show or hide the suggestions above the list")
     }
 
     private var sortMenu: some View {

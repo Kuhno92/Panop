@@ -66,6 +66,7 @@ struct AddPlaylistView: View {
                 }
             }
         }
+        .pageBackdrop()
         .navigationTitle("Add playlist")
         #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)

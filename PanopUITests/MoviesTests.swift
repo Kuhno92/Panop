@@ -42,6 +42,20 @@ final class MoviesTests: PanopUITestCase {
     }
 
     #if !os(tvOS)
+        /// Movies and Series can each be set to lead with the list alone, without the suggestions above it.
+        func testSuggestionsCanBeSwitchedOffOnTheScreen() {
+            XCTAssertTrue(poster("Alien").waitForExistence(timeout: 30))
+
+            let toggle = app.descendants(matching: .any)["Suggestions"].firstMatch
+            XCTAssertTrue(
+                toggle.waitForExistence(timeout: 10),
+                "no suggestions switch. Screen:\n\(app.debugDescription)"
+            )
+            XCTAssertEqual(toggle.value as? String, "1", "suggestions should start on")
+            toggle.tap()
+            XCTAssertEqual(toggle.value as? String, "0", "the switch did not turn the suggestions off")
+        }
+
         func testTheSortOffersWhatFilmsCanBeSortedBy() {
             XCTAssertTrue(poster("Alien").waitForExistence(timeout: 30))
 
