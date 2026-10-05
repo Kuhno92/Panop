@@ -1,32 +1,30 @@
 #!/usr/bin/env bash
 #
-# Puts back the binary packages (LumeEngine's FFmpeg, VLCKit) that Xcode's "Reset Package Caches" deletes and does not
-# download again, so a build stops with "There is no XCFramework found at .../SourcePackages/artifacts/...".
+# Fixes "There is no XCFramework found at .../SourcePackages/artifacts/..." in Xcode, which follows File > Packages >
+# Reset Package Caches: the binary packages (LumeEngine's FFmpeg, VLCKit) are gone and Xcode does not fetch them again.
 #
-#   Scripts/restore-package-artifacts.sh
+#   Scripts/restore-package-artifacts.sh      (quit Xcode first)
 #
-# They are copied from the shared package folder the scripts build with (see AGENTS.md) into the SourcePackages
-# folder of every Xcode DerivedData folder for this project. Nothing already there is replaced. Quit and reopen
-# Xcode afterwards, so it reads the packages again.
+# Copying the files back by hand is not enough: Xcode keeps its own record of where each one was downloaded from and
+# with which checksum, and does not accept files it did not download. So the downloaded packages and that record are
+# removed, and the package tool downloads them again into the folder Xcode uses.
 
 set -euo pipefail
 
-SHARED="${PANOP_SPM:-$HOME/Library/Developer/Panop-SharedSPM}/artifacts"
-if [[ ! -d "$SHARED/lumeengine" || ! -d "$SHARED/vlckit" ]]; then
-    echo "No saved packages in $SHARED. Run Scripts/build-all-platforms.sh once to download them." >&2
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$ROOT"
+
+if pgrep -x Xcode >/dev/null; then
+    echo "Quit Xcode first (Cmd-Q), then run this again." >&2
     exit 1
 fi
 
-restored=0
-for derived in "$HOME"/Library/Developer/Xcode/DerivedData/Panop-*; do
-    [[ -d "$derived/SourcePackages" ]] || continue
-    mkdir -p "$derived/SourcePackages/artifacts"
-    for name in lumeengine vlckit; do
-        if [[ ! -d "$derived/SourcePackages/artifacts/$name" ]]; then
-            cp -R "$SHARED/$name" "$derived/SourcePackages/artifacts/"
-            echo "restored $name into ${derived##*/}"
-            restored=$((restored + 1))
-        fi
-    done
+for packages in "$HOME"/Library/Developer/Xcode/DerivedData/Panop-*/SourcePackages; do
+    [[ -d "$packages" ]] || continue
+    rm -rf "$packages/artifacts" "$packages/workspace-state.json"
+    echo "cleared ${packages%/SourcePackages}"
 done
-echo "$restored restored"
+
+# Into the default location, which is the one Xcode reads.
+xcodebuild -resolvePackageDependencies -project Panop.xcodeproj -scheme Panop | tail -3
+echo "Done. Open the project in Xcode and build."

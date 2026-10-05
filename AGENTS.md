@@ -138,7 +138,8 @@ no network or stream. Three things learned the hard way:
 Scripts/clean-caches.sh [--apply]
 
 # Xcode's File > Packages > Reset Package Caches deletes the binary packages (LumeEngine's FFmpeg, VLCKit) and does not
-# download them again: "There is no XCFramework found at .../SourcePackages/artifacts/...". This puts them back.
+# download them again: "There is no XCFramework found at .../SourcePackages/artifacts/...". With Xcode quit, this has
+# them downloaded again properly (copying the files back is not enough: Xcode only accepts what it downloaded).
 Scripts/restore-package-artifacts.sh
 ```
 
