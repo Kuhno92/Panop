@@ -1,3 +1,4 @@
+import AetherEngine
 import PanopCore
 import PanopPlayback
 import SwiftUI
@@ -166,6 +167,8 @@ struct PlayerView: View {
         // Each engine draws its own way; a new adapter adds its own case here.
         if let engine = model.engine as? AVPlayerEngine {
             AVPlayerSurface(player: engine.player, onLayer: { engine.attach(layer: $0) }).ignoresSafeArea()
+        } else if let engine = model.engine as? AetherPlaybackEngine {
+            AetherPlayerSurface(engine: engine.player).ignoresSafeArea()
         } else if let engine = model.engine as? VLCEngine {
             VLCSurface(view: engine.surface).ignoresSafeArea()
         } else if let engine = model.engine as? LumePlaybackEngine {
@@ -179,6 +182,8 @@ struct PlayerView: View {
     @ViewBuilder
     private var subtitles: some View {
         if let engine = model.engine as? LumePlaybackEngine {
+            SubtitleOverlay(display: engine.subtitles, controlsUp: model.showsControls)
+        } else if let engine = model.engine as? AetherPlaybackEngine {
             SubtitleOverlay(display: engine.subtitles, controlsUp: model.showsControls)
         }
     }

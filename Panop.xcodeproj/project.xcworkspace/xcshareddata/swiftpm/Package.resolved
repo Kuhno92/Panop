@@ -1,6 +1,33 @@
 {
-  "originHash" : "13f39857d463f34b4c359cf121673051283838a023ee3fe76fb94f6dac495394",
+  "originHash" : "418191cd6a1b658dcd85d341b47b58818648462514223e0f6918e4361203ac6d",
   "pins" : [
+    {
+      "identity" : "aetherengine",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/superuser404notfound/AetherEngine",
+      "state" : {
+        "revision" : "ffbd54a778937f3c9c4587a51b24a58f4c1ba5d3",
+        "version" : "7.27.2"
+      }
+    },
+    {
+      "identity" : "ffmpegbuild",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/superuser404notfound/FFmpegBuild",
+      "state" : {
+        "revision" : "fda08325455bc12c112b5b82d014b98fa0fee0be",
+        "version" : "3.6.0"
+      }
+    },
+    {
+      "identity" : "smbclient",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/kishikawakatsumi/SMBClient",
+      "state" : {
+        "revision" : "e636c2b2458930770932a36d311ec9d478575b90",
+        "version" : "0.3.1"
+      }
+    },
     {
       "identity" : "vlckit",
       "kind" : "remoteSourceControl",

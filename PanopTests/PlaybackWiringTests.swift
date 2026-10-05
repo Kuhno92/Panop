@@ -147,7 +147,7 @@ struct PlaybackMessagesTests {
 struct EngineRegistryTests {
     @Test
     func `only engines with an adapter are offered`() {
-        #expect(EngineRegistry.selectable == [.avPlayer, .vlcKit, .lumeEngine])
+        #expect(EngineRegistry.selectable == [.avPlayer, .vlcKit, .lumeEngine, .aetherEngine])
         #expect(!EngineRegistry.selectable.contains(.ksPlayer), "KSPlayer is GPL-3.0 and must never be offered")
     }
 

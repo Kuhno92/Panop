@@ -24,6 +24,7 @@
 		AAAA000000000000000000F8 /* LumeEngine in Frameworks */ = {isa = PBXBuildFile; productRef = AAAA000000000000000000CC /* LumeEngine */; };
 		AAAA000000000000000000F9 /* PanopDiscover in Frameworks */ = {isa = PBXBuildFile; productRef = AAAA000000000000000000CD /* PanopDiscover */; };
 		AAAA000000000000000000FA /* LumeEngine in Embed Frameworks */ = {isa = PBXBuildFile; productRef = AAAA000000000000000000CB /* LumeEngine */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		AAAA00000000000000000120 /* AetherEngine in Frameworks */ = {isa = PBXBuildFile; productRef = AAAA00000000000000000122 /* AetherEngine */; };
 		BBBB000000000000000000A1 /* PanopSimkl in Frameworks */ = {isa = PBXBuildFile; productRef = BBBB000000000000000000A2 /* PanopSimkl */; };
 /* End PBXBuildFile section */
 
@@ -97,6 +98,7 @@
 				BBBB000000000000000000A1 /* PanopSimkl in Frameworks */,
 				AAAA000000000000000000F6 /* VLCKit in Frameworks */,
 				AAAA000000000000000000F7 /* LumeEngine in Frameworks */,
+				AAAA00000000000000000120 /* AetherEngine in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -175,6 +177,7 @@
 				BBBB000000000000000000A2 /* PanopSimkl */,
 				AAAA000000000000000000C8 /* VLCKit */,
 				AAAA000000000000000000CB /* LumeEngine */,
+				AAAA00000000000000000122 /* AetherEngine */,
 			);
 			productName = Panop;
 			productReference = AAAA000000000000000000A5 /* Panop.app */;
@@ -268,6 +271,8 @@
 				AAAA000000000000000000C1 /* XCLocalSwiftPackageReference "Packages/PanopKit" */,
 				AAAA000000000000000000C9 /* XCRemoteSwiftPackageReference "VLCKit" */,
 				AAAA000000000000000000CA /* XCLocalSwiftPackageReference "vendor/LumeEngine" */,
+				AAAA00000000000000000121 /* XCRemoteSwiftPackageReference "AetherEngine" */,
+				AAAA00000000000000000123 /* XCLocalSwiftPackageReference "Packages/LibDovi" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = AAAA000000000000000000A3 /* Products */;
@@ -582,6 +587,10 @@
 			isa = XCLocalSwiftPackageReference;
 			relativePath = vendor/LumeEngine;
 		};
+		AAAA00000000000000000123 /* XCLocalSwiftPackageReference "Packages/LibDovi" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Packages/LibDovi;
+		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCRemoteSwiftPackageReference section */
@@ -591,6 +600,14 @@
 			requirement = {
 				kind = exactVersion;
 				version = "4.0.0-a24";
+			};
+		};
+		AAAA00000000000000000121 /* XCRemoteSwiftPackageReference "AetherEngine" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/superuser404notfound/AetherEngine";
+			requirement = {
+				kind = exactVersion;
+				version = 7.27.2;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
@@ -638,6 +655,11 @@
 		AAAA000000000000000000CD /* PanopDiscover */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = PanopDiscover;
+		};
+		AAAA00000000000000000122 /* AetherEngine */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AAAA00000000000000000121 /* XCRemoteSwiftPackageReference "AetherEngine" */;
+			productName = AetherEngine;
 		};
 		BBBB000000000000000000A2 /* PanopSimkl */ = {
 			isa = XCSwiftPackageProductDependency;

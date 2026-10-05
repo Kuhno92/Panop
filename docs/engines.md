@@ -113,6 +113,24 @@ LumeEngine isolates its FFmpeg 9 through three mechanisms, **all of which are lo
 Header nesting prevents *path* collisions but cannot prevent C-namespace type redefinition.
 That is what mechanism 2 is for.
 
+### AetherEngine: dynamic frameworks, and a stand-in for libdovi
+
+AetherEngine's FFmpeg is **FFmpegBuild**: dynamic frameworks with their own names (`AetherLibavcodec.framework` and the rest), embedded in the app's
+Frameworks folder. The names differ from Lume's and VLC's, so nothing collides at load time, and the app target
+imports only AetherEngine, so no FFmpeg module reaches its compile.
+
+It also depends on `libdovi`, a *static* xcframework with a module map. LumeEngine's FFmpeg is one too. Xcode copies
+each static xcframework's module map to `Build/Products/<configuration>/include/module.modulemap`, and two of them
+there stop the build: `Multiple commands produce '.../include/module.modulemap'`. The way out that keeps AetherEngine
+unmodified is `Packages/LibDovi`, a local package named like the real one so that it overrides it in the graph, with the
+same C functions that AetherEngine calls and bodies that do nothing. Cost: Dolby Vision profile 7 is not converted to 8.1.
+If either engine ever stops shipping a static module-mapped xcframework, the real `LibDovi` can come back by removing the
+local package reference from the project.
+
+**It reconnects by itself.** A live source that cannot be reached is retried inside the engine (five attempts over about
+fifteen seconds were seen), and there is no public option to turn that off, so a failed load takes that long to be
+reported. The coordinator's load timeout still applies. It is the one adapter that does not report a failure at once.
+
 ---
 
 ## The trap

@@ -145,13 +145,14 @@ See `docs/adr/0003-two-model-containers.md`.
 
 ## 5. Playback
 
-Three engines ship, selected by the user in Settings, with an ordered fallback list:
+Four engines ship, selected by the user in Settings, with an ordered fallback list:
 
 | Engine | Strength | Cost |
 |---|---|---|
 | **AVPlayer / AVKit** | Native PiP, AirPlay, Now Playing, best battery | Cannot play raw MPEG-TS over HTTP, limited container support |
 | **VLCKit** | Widest codec and container coverage | Large binary, no native PiP integration |
 | **LumeEngine** | FFmpeg 9, purpose-built for long-running IPTV streams | Pre-1.0, unfrozen API |
+| **AetherEngine** | FFmpeg with VideoToolbox decoding, HDR, and a rewindable live window | Brings its own FFmpeg frameworks; retries a dead live source by itself before it fails |
 
 A fourth adapter for **KSPlayer** exists in source behind the `PANOP_ENABLE_KSPLAYER`
 compilation condition, with its dependency deliberately unlinked: KSPlayer is GPL-3.0, which

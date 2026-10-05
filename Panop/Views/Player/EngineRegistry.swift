@@ -18,13 +18,15 @@ enum EngineRegistry {
         case .avPlayer: AVPlayerEngine()
         case .vlcKit: VLCEngine()
         case .lumeEngine: LumePlaybackEngine()
+        // Nil if the engine cannot start (its FFmpeg could not be set up): the coordinator then skips it.
+        case .aetherEngine: AetherPlaybackEngine()
         case .ksPlayer: nil
         }
     }
 
     nonisolated static func isImplemented(_ kind: PlaybackEngineKind) -> Bool {
         switch kind {
-        case .avPlayer, .vlcKit, .lumeEngine: true
+        case .avPlayer, .vlcKit, .lumeEngine, .aetherEngine: true
         case .ksPlayer: false
         }
     }

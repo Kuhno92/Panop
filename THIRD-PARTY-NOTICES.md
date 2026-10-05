@@ -42,7 +42,7 @@ VLCKit bundles FFmpeg, statically linked inside `libvlccore` with hidden symbol 
 >
 > **Resolution:** Panop carries a KSPlayer adapter in source, guarded by the
 > `PANOP_ENABLE_KSPLAYER` compilation condition, but **does not link the dependency**. Official
-> builds ship three engines: AVPlayer, VLCKit, and LumeEngine. The adapter compiles only for
+> builds ship four engines: AVPlayer, VLCKit, LumeEngine and AetherEngine. The adapter compiles only for
 > someone who adds the dependency themselves and accepts GPL-3.0 for their own build.
 >
 > Do not add KSPlayer to the project's package dependencies. Doing so relicenses the shipped
@@ -75,6 +75,27 @@ relinkability, and that must remain true.
 - **Linking, verified:** the app links `@rpath/LumeEngine.framework` dynamically and embeds it in
   `Contents/Frameworks` through an explicit Embed Frameworks phase, code-signed on copy. Without
   that phase the build succeeds and the app cannot launch anywhere but the machine that built it.
+
+### AetherEngine
+- **License:** LGPL-3.0 **with an Apple Store / DRM exception** (permits distribution through the App Store and TestFlight where LGPL sections 4 to 6 would otherwise conflict)
+- **Source:** https://github.com/superuser404notfound/AetherEngine
+- **Use:** FFmpeg demuxing with VideoToolbox decoding; plays raw MPEG-TS and the containers AVPlayer refuses; keeps a rewindable window of a live stream
+
+Pinned to exactly **7.27.2** through SwiftPM. Its obligations are the same kind as VLCKit's: ship the licence
+texts, tell users they hold LGPL rights, keep the source public (and publish any change made to the engine; none is
+made), and keep its FFmpeg frameworks dynamic and replaceable. They are: **FFmpegBuild** 3.6.0
+(https://github.com/superuser404notfound/FFmpegBuild), dynamic frameworks under LGPL-2.1-or-later with no GPL
+components, embedded in `Contents/Frameworks` (and the iOS and tvOS equivalents) as `AetherLib*.framework`.
+AetherEngine's other dependency, **SMBClient** (MIT), is only used by its separate `AetherEngineSMB` product,
+which Panop does not link.
+
+**LibDovi is replaced by a stand-in.** AetherEngine depends on `libdovi` (MIT, Dolby Vision RPU parsing), a static
+xcframework with a module map, as LumeEngine's FFmpeg is. Xcode writes both module maps to the same path and the
+build stops with "Multiple commands produce .../include/module.modulemap". `Packages/LibDovi` is a package of the
+same name and product with the same C interface (the part AetherEngine calls) whose functions do nothing, so it takes
+the real one's place in the build. The effect: Dolby Vision profile 7 is not converted to profile 8.1 and plays as its
+HDR10 base layer, as it does in a player without libdovi. Profiles 5 and 8 are unaffected. The stand-in is Panop's own
+code under the MIT licence; no libdovi code is in it. See [docs/engines.md](docs/engines.md).
 
 ---
 

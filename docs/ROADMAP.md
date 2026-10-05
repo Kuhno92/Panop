@@ -680,18 +680,19 @@ Features real users expect that the brief did not name. All *(surfaced)*.
       Plays from the local file through the same engines. Not available on tvOS, which has no persistent
       storage for it. Open question: whether providers' terms allow it, so it should be off unless the
       person turns it on. Not started.
-- [ ] **Add AetherEngine as an engine** *(asked for)*. A fourth playback engine behind `PlaybackEngine`,
-      next to AVPlayer, VLCKit and LumeEngine, chosen in Settings. **Licence checked (2026-10-05,
-      github.com/superuser404notfound/AetherEngine, v7.27.2):** LGPL-3.0 **with an Apple Store / DRM exception**
-      that allows App Store and TestFlight distribution where LGPL sections 4 to 6 would otherwise conflict. Its
-      FFmpeg comes as dynamic frameworks (FFmpegBuild), LGPL-2.1-or-later with no GPL parts. Obligations are
-      the same kind as VLCKit's: ship the licence texts, tell users they hold LGPL rights, keep the source
-      public (and publish any change made to the engine), and keep the FFmpeg frameworks dynamic and
-      replaceable. An MIT app can link it that way (as it does VLCKit); this is a reading of the licence, not
-      legal advice. **Fit:** iOS 18, tvOS 18, macOS 15 (matches Panop), needs Swift 6.4 / Xcode 27 (the installed
-      toolchain). Offers live TV with DVR timeshift, which overlaps the "live rewind" item below. Not started:
-      adapter, a `THIRD-PARTY-NOTICES.md` entry in the same commit, a check that it does not collide with
-      Lume's and VLC's FFmpeg (see `docs/engines.md`).
+- [x] **AetherEngine as an engine** *(asked for)*. A fourth engine behind `PlaybackEngine`, chosen in Settings and
+      third in the fallback order (AVPlayer, LumeEngine, AetherEngine, VLC). Pinned to 7.27.2 through SwiftPM; licence
+      LGPL-3.0 with an Apple Store exception, checked 2026-10-05 and recorded in `THIRD-PARTY-NOTICES.md`. The adapter
+      (`AetherPlaybackEngine`) turns the engine's published state, position, tracks and errors into the coordinator's
+      events, draws its subtitle cues through the shared overlay, passes the User-Agent and headers, and asks for a
+      30-minute rewindable window on a live channel (the "live rewind" item below can use it). **Builds on macOS, iOS and
+      tvOS.** Tested on macOS with real MPEG-TS bytes over HTTP (plays, pauses, refuses a bad address, fails on an
+      unreachable source and on bytes that are not media). **Two costs:** (1) `libdovi`, which it needs, collides with
+      LumeEngine's FFmpeg in the build (two static xcframeworks with a module map), so `Packages/LibDovi` stands in for
+      it with no-op functions: Dolby Vision profile 7 plays as its HDR10 base layer. (2) It reconnects a dead live
+      source by itself for about fifteen seconds before the load fails. **Not done:** the rewind controls in the player
+      (the engine has the window; there is no UI for going back yet), the engine's picture-in-picture, a real provider
+      stream, and a look on a device.
 - [ ] **Add MPVKit as an engine** *(asked for)*. libmpv through MPVKit as another `PlaybackEngine`. **Licence
       checked (2026-10-05, github.com/mpvkit/MPVKit):** the **`MPVKit` product is LGPL-3.0** (libmpv, FFmpeg and the
       libraries around them); the **`MPVKit-GPL` product (or a build with `enable-gpl`) is GPL-3.0** and must never

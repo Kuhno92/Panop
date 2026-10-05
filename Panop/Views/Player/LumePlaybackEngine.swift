@@ -11,6 +11,13 @@ import PanopPlayback
 @Observable
 final class SubtitleDisplay {
     fileprivate(set) var text: String?
+
+    /// Set by an engine that publishes cues and leaves the drawing to the app.
+    func set(_ new: String?) {
+        if new != text {
+            text = new
+        }
+    }
 }
 
 /// The LumeEngine adapter, built on its `PlayerSession` rather than the `LumePlayer`

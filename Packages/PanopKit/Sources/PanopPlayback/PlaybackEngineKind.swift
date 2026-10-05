@@ -11,6 +11,11 @@ public enum PlaybackEngineKind: String, Sendable, Codable, CaseIterable, Identif
     /// FFmpeg 9 engine built for long-running live IPTV streams.
     case lumeEngine
 
+    /// An FFmpeg demuxer with VideoToolbox decoding and AVPlayer or sample-buffer display (LGPL-3.0 with an
+    /// Apple Store exception). Plays raw MPEG-TS and the containers AVPlayer refuses, with hardware decoding
+    /// and HDR, and keeps a rewindable window of a live stream.
+    case aetherEngine
+
     /// Not present in official builds.
     ///
     /// KSPlayer is GPL-3.0, which would relicense Panop and forfeit App Store
@@ -29,6 +34,7 @@ public enum PlaybackEngineKind: String, Sendable, Codable, CaseIterable, Identif
         case .avPlayer: "AVPlayer"
         case .vlcKit: "VLC"
         case .lumeEngine: "LumeEngine"
+        case .aetherEngine: "AetherEngine"
         case .ksPlayer: "KSPlayer"
         }
     }
@@ -52,7 +58,7 @@ public enum PlaybackEngineKind: String, Sendable, Codable, CaseIterable, Identif
     /// open, which on real provider playlists is a substantial share.
     public static var defaultPriority: [PlaybackEngineKind] {
         available.sorted { lhs, rhs in
-            let order: [PlaybackEngineKind] = [.avPlayer, .lumeEngine, .vlcKit, .ksPlayer]
+            let order: [PlaybackEngineKind] = [.avPlayer, .lumeEngine, .aetherEngine, .vlcKit, .ksPlayer]
             let lhsIndex = order.firstIndex(of: lhs) ?? order.count
             let rhsIndex = order.firstIndex(of: rhs) ?? order.count
             return lhsIndex < rhsIndex

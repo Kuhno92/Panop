@@ -1,8 +1,8 @@
 # Panop — AI Agent Guide
 
 Panop is a native IPTV player for Apple platforms (iOS 18+, iPadOS 18+, tvOS 18+, macOS 15+),
-written in Swift 6 and SwiftUI. Playback runs through three interchangeable engines the user
-picks in Settings: AVPlayer, VLCKit, and LumeEngine. A fourth adapter for KSPlayer exists in
+written in Swift 6 and SwiftUI. Playback runs through four interchangeable engines the user
+picks in Settings: AVPlayer, VLCKit, LumeEngine and AetherEngine. An adapter for KSPlayer exists in
 source but is **not linked**, because KSPlayer is GPL-3.0; see Licensing below.
 
 `CLAUDE.md` is a symlink to this file. One guide, every agent.

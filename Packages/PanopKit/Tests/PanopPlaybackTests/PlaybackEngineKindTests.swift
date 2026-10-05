@@ -12,7 +12,7 @@ struct PlaybackEngineKindTests {
             #expect(PlaybackEngineKind.available.contains(.ksPlayer))
         #else
             #expect(!PlaybackEngineKind.available.contains(.ksPlayer))
-            #expect(PlaybackEngineKind.available.count == 3)
+            #expect(PlaybackEngineKind.available.count == 4)
         #endif
     }
 
