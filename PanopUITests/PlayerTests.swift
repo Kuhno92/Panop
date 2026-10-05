@@ -30,6 +30,25 @@ final class PlayerTests: PanopUITestCase {
         XCTAssertTrue(app.buttons["Audio"].exists, "two audio tracks should offer a menu")
         XCTAssertTrue(app.buttons["Subtitles"].exists)
         XCTAssertTrue(app.staticTexts["playerClock"].exists, "the time of day is not shown with the controls")
+
+        // The seeded guide: what is on now, with its times, and what follows. Apple TV opens the first channel in the
+        // list and the other platforms open 3sat, each with a guide of its own.
+        let programme = app.descendants(matching: .any)["liveProgramme"].firstMatch
+        XCTAssertTrue(
+            programme.waitForExistence(timeout: 10),
+            "no programme in the controls. Screen:\n\(app.debugDescription)"
+        )
+        #if os(tvOS)
+            let (now, next) = ("Morning Magazine", "Quiz Night")
+        #else
+            let (now, next) = ("Seeded News", "Seeded Film")
+        #endif
+        XCTAssertTrue(programme.label.contains(now), "the programme on now is missing: \(programme.label)")
+        XCTAssertTrue(programme.label.contains(next), "the programme that follows is missing: \(programme.label)")
+        let shot = XCTAttachment(screenshot: app.screenshot())
+        shot.name = "player-programme"
+        shot.lifetime = .keepAlways
+        add(shot)
     }
 
     #if !os(tvOS)

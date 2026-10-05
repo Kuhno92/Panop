@@ -8,6 +8,8 @@ struct PlayerControls: View {
     let model: PlayerModel
     /// Opens the TV guide over the stream, to see what is on and switch to it. Nil for a film.
     var onShowGuide: (() -> Void)?
+    /// The live channel's place in the guide, for the programme timeline. Nil for a film or a channel with no guide.
+    var guide: GuideKey?
 
     /// The scrubber's own value while a finger is on it, so the coordinator is asked to
     /// seek once, on release, and not on every movement.
@@ -33,6 +35,25 @@ struct PlayerControls: View {
     }
 
     var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            // On its own line above the buttons, so the title and what follows have the bar's whole width: squeezed
+            // between the buttons on a phone the title did not show at all.
+            if let guide, !model.canSeek {
+                LiveProgrammeTimeline(guide: guide)
+            }
+            controlRow
+        }
+        .buttonStyle(.plain)
+        .foregroundStyle(.white)
+        .padding(.horizontal, 20)
+        .padding(.vertical, 14)
+        .background(.black.opacity(0.55), in: RoundedRectangle(cornerRadius: 16))
+        .padding()
+        // Focus anywhere in the bar holds it up; letting go starts the countdown again.
+        .onChange(of: focused) { model.holdControls(focused != nil) }
+    }
+
+    private var controlRow: some View {
         HStack(spacing: Self.spacing) {
             Button {
                 model.togglePause()
@@ -96,14 +117,6 @@ struct PlayerControls: View {
                 .accessibilityLabel("Picture in Picture")
             }
         }
-        .buttonStyle(.plain)
-        .foregroundStyle(.white)
-        .padding(.horizontal, 20)
-        .padding(.vertical, 14)
-        .background(.black.opacity(0.55), in: RoundedRectangle(cornerRadius: 16))
-        .padding()
-        // Focus anywhere in the bar holds it up; letting go starts the countdown again.
-        .onChange(of: focused) { model.holdControls(focused != nil) }
     }
 
     private var liveBadge: some View {

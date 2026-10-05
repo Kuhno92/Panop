@@ -38,7 +38,8 @@ struct PlayerScreen: View {
                     model: model,
                     onClose: onClose,
                     onBrowse: onBrowse,
-                    onShowGuide: playing.kind == .live ? (onShowGuideInApp ?? { showingGuide = true }) : nil
+                    onShowGuide: playing.kind == .live ? (onShowGuideInApp ?? { showingGuide = true }) : nil,
+                    guide: guideKey
                 )
             } else if let problem {
                 PlayerProblem(text: problem)
@@ -48,6 +49,13 @@ struct PlayerScreen: View {
         }
         .task { resolve() }
         .modifier(PlayerGuidePresentation(isPresented: $showingGuide) { switchTo($0) })
+    }
+
+    /// Where the live channel is in the guide, for its timeline. Not for an aired programme from the archive, which has
+    /// a scrubber of its own.
+    private var guideKey: GuideKey? {
+        guard playing.kind == .live, playing.catchup == nil, let key = playing.epgKey, !key.isEmpty else { return nil }
+        return GuideKey(playlist: playing.playlist, epgKey: key)
     }
 
     /// Plays another channel in place of this one, from the guide.
@@ -138,6 +146,7 @@ struct PlayerView: View {
     var onClose: (() -> Void)?
     var onBrowse: (() -> Void)?
     var onShowGuide: (() -> Void)?
+    var guide: GuideKey?
 
     @Environment(\.dismiss) private var dismiss
 
@@ -215,7 +224,7 @@ struct PlayerView: View {
             }
 
             if model.showsControls, model.failureText == nil {
-                PlayerControls(model: model, onShowGuide: onShowGuide)
+                PlayerControls(model: model, onShowGuide: onShowGuide, guide: guide)
                     .transition(.opacity)
             }
         }

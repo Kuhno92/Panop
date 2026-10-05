@@ -496,7 +496,8 @@ extension PlaybackTarget {
             name: row.name,
             streamURL: row.streamURL,
             remoteID: row.remoteID,
-            containerExtension: row.containerExtension
+            containerExtension: row.containerExtension,
+            epgKey: row.epgKey
         )
     }
 
@@ -509,7 +510,8 @@ extension PlaybackTarget {
             name: entry.name,
             streamURL: entry.streamURL,
             remoteID: entry.remoteID,
-            containerExtension: entry.containerExtension
+            containerExtension: entry.containerExtension,
+            epgKey: entry.epgKey
         )
     }
 }

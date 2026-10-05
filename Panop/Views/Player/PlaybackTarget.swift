@@ -33,6 +33,8 @@ nonisolated struct PlaybackTarget: Identifiable, Equatable, Hashable, Sendable {
     var resumeAt: Double?
     /// Set to play an aired programme of this channel from the archive.
     var catchup: CatchupWindow?
+    /// The channel's key in the guide, so the player can say what is on.
+    var epgKey: String?
 
     var id: String {
         "\(playlist)|\(entryID)"
@@ -55,6 +57,8 @@ nonisolated struct PlayerWindowRequest: Codable, Hashable {
     var containerExtension: String?
     var resumeAt: Double?
     var catchup: CatchupWindow?
+    /// Not a secret, so it may be saved with the window: the key the guide files the channel under.
+    var epgKey: String?
 
     init(_ target: PlaybackTarget) {
         playlist = target.playlist
@@ -65,6 +69,7 @@ nonisolated struct PlayerWindowRequest: Codable, Hashable {
         containerExtension = target.containerExtension
         resumeAt = target.resumeAt
         catchup = target.catchup
+        epgKey = target.epgKey
     }
 
     /// The target to play, given the address if the catalog has one for this item.
@@ -79,7 +84,8 @@ nonisolated struct PlayerWindowRequest: Codable, Hashable {
             remoteID: remoteID,
             containerExtension: containerExtension,
             resumeAt: resumeAt,
-            catchup: catchup
+            catchup: catchup,
+            epgKey: epgKey
         )
     }
 }
