@@ -66,6 +66,7 @@ struct AddPlaylistView: View {
                 }
             }
         }
+        .formStyle(.grouped)
         .pageBackdrop()
         .navigationTitle("Add playlist")
         #if os(iOS)

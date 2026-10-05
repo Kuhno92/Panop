@@ -29,6 +29,7 @@ final class PlayerTests: PanopUITestCase {
         XCTAssertTrue(app.staticTexts["Live"].exists, "a channel is live, so there is no scrubber")
         XCTAssertTrue(app.buttons["Audio"].exists, "two audio tracks should offer a menu")
         XCTAssertTrue(app.buttons["Subtitles"].exists)
+        XCTAssertTrue(app.staticTexts["playerClock"].exists, "the time of day is not shown with the controls")
     }
 
     func testPausingChangesTheButtonToPlay() {

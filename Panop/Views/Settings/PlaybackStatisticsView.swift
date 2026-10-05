@@ -27,6 +27,7 @@ struct PlaybackStatisticsView: View {
                 )
             }
         }
+        .formStyle(.grouped)
         .pageBackdrop()
         .navigationTitle("Playback Statistics")
         .task { statistics = await store?.statistics() }

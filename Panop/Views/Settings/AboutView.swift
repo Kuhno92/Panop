@@ -13,7 +13,8 @@ struct AboutView: View {
     var body: some View {
         Form {
             Section {
-                VStack(spacing: 6) {
+                VStack(spacing: 8) {
+                    AppLogo(size: 96)
                     Text("Panop").font(.largeTitle.bold())
                     Text("Version \(Self.version)").foregroundStyle(.secondary)
                     Text("A player for your own TV, movies and series.")

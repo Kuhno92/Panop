@@ -6,6 +6,10 @@ import SwiftUI
 /// channel or movie.
 struct PlayerScreen: View {
     let target: PlaybackTarget
+    /// Set where the player is not a presentation of its own (a Mac's main window): what Close does, and a way back to
+    /// the app that leaves the stream playing.
+    var onClose: (() -> Void)?
+    var onBrowse: (() -> Void)?
 
     @Environment(PlaylistLibrary.self) private var library
     @Environment(UserStateStore.self) private var userState
@@ -19,7 +23,7 @@ struct PlayerScreen: View {
         ZStack {
             Color.black.ignoresSafeArea()
             if let model {
-                PlayerView(model: model)
+                PlayerView(model: model, onClose: onClose, onBrowse: onBrowse)
             } else if let problem {
                 PlayerProblem(text: problem)
             } else {
@@ -62,6 +66,8 @@ struct PlayerScreen: View {
 
 struct PlayerView: View {
     let model: PlayerModel
+    var onClose: (() -> Void)?
+    var onBrowse: (() -> Void)?
 
     @Environment(\.dismiss) private var dismiss
 
@@ -165,16 +171,38 @@ struct PlayerView: View {
         #endif
     }
 
+    /// The time of day, at the top right with the controls, so a person watching can tell it without leaving the
+    /// picture.
+    private var clock: some View {
+        TimelineView(.everyMinute) { context in
+            Text(context.date, format: .dateTime.hour().minute())
+                .font(.headline.monospacedDigit())
+        }
+        .accessibilityIdentifier("playerClock")
+    }
+
     private var header: some View {
         HStack(alignment: .top) {
             #if !os(tvOS)
                 Button {
-                    dismiss()
+                    if let onClose {
+                        onClose()
+                    } else {
+                        dismiss()
+                    }
                 } label: {
                     Image(systemName: "xmark.circle.fill").font(.title)
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel("Close")
+                if let onBrowse {
+                    Button(action: onBrowse) {
+                        Image(systemName: "rectangle.grid.2x2.fill").font(.title2)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("Back to Panop")
+                    .help("Back to Panop. The stream keeps playing behind it.")
+                }
             #endif
             VStack(alignment: .leading, spacing: 2) {
                 Text(model.title).font(.headline)
@@ -183,6 +211,7 @@ struct PlayerView: View {
                 }
             }
             Spacer()
+            clock
         }
         .padding()
         .foregroundStyle(.white)

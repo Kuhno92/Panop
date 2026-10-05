@@ -38,6 +38,9 @@ struct SettingsView: View {
     @Environment(ParentalControls.self) private var parental
     @State private var pinPurpose: PINPurpose?
     @State private var confirmingForget = false
+    #if os(macOS)
+        @AppStorage("playsInSeparateWindow") private var separateWindow = false
+    #endif
 
     var body: some View {
         Form {
@@ -102,6 +105,11 @@ struct SettingsView: View {
             } label: {
                 SettingsRow("Engine", symbol: "play.rectangle.fill", tint: .indigo)
             }
+            #if os(macOS)
+                Toggle(isOn: $separateWindow) {
+                    SettingsRow("Play in a separate window", symbol: "macwindow.on.rectangle", tint: .cyan)
+                }
+            #endif
             NavigationLink {
                 SubtitleSettingsView()
             } label: {
@@ -111,9 +119,10 @@ struct SettingsView: View {
         } header: {
             Text("Playing")
         } footer: {
-            Text(
-                "If a video will not start, change the engine. Panop tries your choice first and then the others by itself."
-            )
+            Text("""
+            If a video will not start, change the engine. Panop tries your choice first and then the others by itself. \
+            On a Mac a stream plays in the main window, and you can still use the rest of the app over it.
+            """)
         }
     }
 

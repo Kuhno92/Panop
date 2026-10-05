@@ -199,7 +199,10 @@ struct HomeView: View {
 
     private var noPlaylist: some View {
         ContentUnavailableView {
-            Label("Welcome to Panop", systemImage: "antenna.radiowaves.left.and.right")
+            VStack(spacing: 16) {
+                AppLogo(size: 110)
+                Text("Welcome to Panop").font(.title.bold())
+            }
         } description: {
             Text("Add an M3U playlist or Xtream provider to get started.")
         } actions: {

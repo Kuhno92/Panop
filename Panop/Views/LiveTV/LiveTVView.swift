@@ -507,16 +507,25 @@ struct PlayerPresentation: ViewModifier {
 
     #if os(macOS)
         @Environment(\.openWindow) private var openWindow
+        @Environment(EmbeddedPlayback.self) private var embedded
+        /// Off by default: a stream plays in the main window, with the rest of the app usable over it. On, it opens in
+        /// a
+        /// window of its own that can be moved, resized and put on another display.
+        @AppStorage("playsInSeparateWindow") private var separateWindow = false
     #endif
 
     func body(content: Content) -> some View {
         #if os(macOS)
-            // A film belongs in a window that can be moved, resized, put on another display and
-            // taken full screen, not a sheet that sits on the list. Opening the same item again
-            // brings its window forward instead of making a second one.
+            // In the main window unless the person asked for a window of its own (a window that can be moved,
+            // resized, put on another display and taken full screen). Opening the same item again in its own
+            // window brings that window forward instead of making a second one.
             content.onChange(of: target) {
                 if let target {
-                    openWindow(id: PlayerWindow.id, value: PlayerWindowRequest(target))
+                    if separateWindow {
+                        openWindow(id: PlayerWindow.id, value: PlayerWindowRequest(target))
+                    } else {
+                        embedded.play(target)
+                    }
                     self.target = nil
                 }
             }

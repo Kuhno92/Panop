@@ -43,6 +43,7 @@ struct SubtitleSettingsView: View {
                     .disabled(!style.isCustomised)
             }
         }
+        .formStyle(.grouped)
         .pageBackdrop()
         .navigationTitle("Subtitles")
     }

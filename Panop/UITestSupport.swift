@@ -93,6 +93,8 @@ enum UITestMode {
         static func resetPreferences() {
             for key in [
                 "liveListMode", "liveSourceFilter", "liveSortOrder", "playbackEngine",
+                "vodSourceFilter", "vodSortOrder", "showsSuggestionsOnMovies", "showsSuggestionsOnSeries",
+                "playsInSeparateWindow",
                 StartupPreference.actionKey, StartupPreference.channelKey, StartupPreference.channelNameKey
             ] {
                 UserDefaults.standard.removeObject(forKey: key)

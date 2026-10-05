@@ -1,4060 +1,4126 @@
 {
-  "sourceLanguage" : "en",
-  "strings" : {
-    " " : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : " "
+  "sourceLanguage": "en",
+  "strings": {
+    " ": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": " "
           }
         }
       }
     },
-    " · Live TV only" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : " · Nur Live-TV"
+    " Not available yet: %@.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": " Noch nicht verfügbar: %@."
           }
         }
       }
     },
-    " Not available yet: %@." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : " Noch nicht verfügbar: %@."
+    " Tried: %@.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": " Versucht: %@."
           }
         }
       }
     },
-    " Tried: %@." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : " Versucht: %@."
+    " · Live TV only": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": " · Nur Live-TV"
           }
         }
       }
     },
-    "%@ · %@" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@ · %2$@"
+    "%@ %@ left out: no address to play.": {
+      "extractionState": "stale",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ %2$@ ausgelassen: keine Adresse zum Abspielen."
           }
         }
       }
     },
-    "%@ %@ left out: no address to play." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@ %2$@ ausgelassen: keine Adresse zum Abspielen."
+    "%@ couldn't be updated": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ konnte nicht aktualisiert werden"
           }
         }
       }
     },
-    "%@ couldn't be updated" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ konnte nicht aktualisiert werden"
+    "%@ couldn't open this stream, so Panop is using %@.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ konnte diesen Stream nicht öffnen, daher verwendet Panop %2$@."
           }
         }
       }
     },
-    "%@ couldn't open this stream, so Panop is using %@." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@ konnte diesen Stream nicht öffnen, daher verwendet Panop %2$@."
+    "%@ entries were left out: no address to play.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ Einträge wurden ausgelassen: keine Adresse zum Abspielen."
           }
         }
       }
     },
-    "%@ entries were left out: no address to play." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ Einträge wurden ausgelassen: keine Adresse zum Abspielen."
+    "%@ items · updated %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ Einträge · aktualisiert %2$@"
           }
         }
       }
     },
-    "%@ items · updated %@" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@ Einträge · aktualisiert %2$@"
+    "%@ min left": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "noch %@ Min."
           }
         }
       }
     },
-    "%@ min left" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "noch %@ Min."
+    "%@ movies": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@-Filme"
           }
         }
       }
     },
-    "%@ movies" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@-Filme"
+    "%@ series": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@-Serien"
           }
         }
       }
     },
-    "%@ series" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@-Serien"
+    "%@ · %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ · %2$@"
           }
         }
       }
     },
-    "%@, %@, %@" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@, %2$@, %3$@"
+    "%@, %@, %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@, %2$@, %3$@"
           }
         },
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$@, %2$@, %3$@"
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "%1$@, %2$@, %3$@"
           }
         }
       }
     },
-    "%lld h %lld min" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$lld Std. %2$lld Min."
+    "%lld h %lld min": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld Std. %2$lld Min."
           }
         }
       }
     },
-    "%lld items are missing from the provider. Review" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld Einträge fehlen beim Anbieter. Prüfen"
+    "%lld items are missing from the provider. Review": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld Einträge fehlen beim Anbieter. Prüfen"
           }
         }
       }
     },
-    "%lld min" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld Min."
+    "%lld min": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld Min."
           }
         }
       }
     },
-    "%lld sources couldn't be updated" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld Quellen konnten nicht aktualisiert werden"
+    "%lld sources couldn't be updated": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld Quellen konnten nicht aktualisiert werden"
           }
         }
       }
     },
-    "%lld. %@" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$lld. %2$@"
+    "%lld. %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld. %2$@"
           }
         }
       }
     },
-    "A hidden category is left out of the lists and of search, along with what is in it. Adult categories stay hidden while Hide adult content is on in Settings." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Eine ausgeblendete Kategorie wird samt Inhalt in Listen und Suche weggelassen. Kategorien für Erwachsene bleiben ausgeblendet, solange „Inhalte für Erwachsene ausblenden“ in den Einstellungen aktiv ist."
+    "A PIN is 4 to 6 digits.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eine PIN hat 4 bis 6 Ziffern."
           }
         }
       }
     },
-    "A PIN is 4 to 6 digits." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Eine PIN hat 4 bis 6 Ziffern."
+    "A hidden category is left out of the lists and of search, along with what is in it. Adult categories stay hidden while Hide adult content is on in Settings.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eine ausgeblendete Kategorie wird samt Inhalt in Listen und Suche weggelassen. Kategorien für Erwachsene bleiben ausgeblendet, solange „Inhalte für Erwachsene ausblenden“ in den Einstellungen aktiv ist."
           }
         }
       }
     },
-    "A player for your own TV, movies and series." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ein Player für dein eigenes Fernsehen, deine Filme und Serien."
+    "A player for your own TV, movies and series.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ein Player für dein eigenes Fernsehen, deine Filme und Serien."
           }
         }
       }
     },
-    "A secure connection to this stream could not be made." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zu diesem Stream konnte keine sichere Verbindung hergestellt werden."
+    "A secure connection to this stream could not be made.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zu diesem Stream konnte keine sichere Verbindung hergestellt werden."
           }
         }
       }
     },
-    "About Panop" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Über Panop"
+    "About Panop": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Über Panop"
           }
         }
       }
     },
-    "Action" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Action"
+    "Action": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Action"
           }
         }
       }
     },
-    "Actions for %@" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aktionen für %@"
+    "Actions for %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aktionen für %@"
           }
         }
       }
     },
-    "Add" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hinzufügen"
+    "Add": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hinzufügen"
           }
         }
       }
     },
-    "Add an M3U link or file, or an Xtream provider." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Füge einen M3U-Link, eine M3U-Datei oder einen Xtream-Anbieter hinzu."
+    "Add an M3U link or file, or an Xtream provider.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Füge einen M3U-Link, eine M3U-Datei oder einen Xtream-Anbieter hinzu."
           }
         }
       }
     },
-    "Add an M3U playlist or Xtream provider to get started." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Füge eine M3U-Playlist oder einen Xtream-Anbieter hinzu, um loszulegen."
+    "Add an M3U playlist or Xtream provider to get started.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Füge eine M3U-Playlist oder einen Xtream-Anbieter hinzu, um loszulegen."
           }
         }
       }
     },
-    "Add playlist" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Playlist hinzufügen"
+    "Add playlist": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Playlist hinzufügen"
           }
         }
       }
     },
-    "Add profile…" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Profil hinzufügen …"
+    "Add profile…": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Profil hinzufügen …"
           }
         }
       }
     },
-    "Add to Favourites" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zu Favoriten hinzufügen"
+    "Add to Favourites": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zu Favoriten hinzufügen"
           }
         }
       }
     },
-    "Adult content hidden" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Inhalte für Erwachsene ausgeblendet"
+    "Adult content hidden": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inhalte für Erwachsene ausgeblendet"
           }
         }
       }
     },
-    "AirPlay" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "AirPlay"
+    "AirPlay": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AirPlay"
           }
         }
       }
     },
-    "All" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Alle"
+    "All": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alle"
           }
         }
       }
     },
-    "All categories" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Alle Kategorien"
+    "All categories": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alle Kategorien"
           }
         }
       }
     },
-    "All channels" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Alle Sender"
+    "All channels": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alle Sender"
           }
         }
       }
     },
-    "All sources" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Alle Quellen"
+    "All sources": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alle Quellen"
           }
         }
       }
     },
-    "and enter" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "und gib ein"
+    "Audio": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Audio"
           }
         }
       }
     },
-    "Audio" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Audio"
+    "Back 10 seconds": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "10 Sekunden zurück"
           }
         }
       }
     },
-    "Back 10 seconds" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "10 Sekunden zurück"
+    "Back to Panop": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zurück zu Panop"
           }
         }
       }
     },
-    "Background" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hintergrund"
+    "Back to Panop. The stream keeps playing behind it.": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zurück zu Panop. Der Stream läuft dahinter weiter."
           }
         }
       }
     },
-    "Because you watched %@" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Weil du %@ gesehen hast"
+    "Background": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hintergrund"
           }
         }
       }
     },
-    "Best %@ Movies" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Beste %@-Filme"
+    "Because you watched %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Weil du %@ gesehen hast"
           }
         }
       }
     },
-    "Best %@ Series" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Beste %@-Serien"
+    "Best %@ Movies": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Beste %@-Filme"
           }
         }
       }
     },
-    "Best Movies of the %@s" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Beste Filme der %@er"
+    "Best %@ Series": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Beste %@-Serien"
           }
         }
       }
     },
-    "Best of %@" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Das Beste von %@"
+    "Best Movies of the %@s": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Beste Filme der %@er"
           }
         }
       }
     },
-    "Browse all channels" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Alle Sender durchsuchen"
+    "Best of %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Das Beste von %@"
           }
         }
       }
     },
-    "Browse Live TV" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Live-TV durchsuchen"
+    "Browse Live TV": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live-TV durchsuchen"
           }
         }
       }
     },
-    "By name" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nach Name"
+    "Browse all channels": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alle Sender durchsuchen"
           }
         }
       }
     },
-    "By player" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nach Player"
+    "By name": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nach Name"
           }
         }
       }
     },
-    "Cancel" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Abbrechen"
+    "By player": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nach Player"
           }
         }
       }
     },
-    "Categories" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kategorien"
+    "CFBundleDisplayName": {
+      "extractionState": "stale",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Panop"
           }
         }
       }
     },
-    "Category" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kategorie"
+    "CFBundleName": {
+      "extractionState": "stale",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Panop"
           }
         }
       }
     },
-    "CFBundleDisplayName" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Panop"
+    "Cancel": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abbrechen"
           }
         }
       }
     },
-    "CFBundleName" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Panop"
+    "Categories": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kategorien"
           }
         }
       }
     },
-    "Change PIN" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "PIN ändern"
+    "Category": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kategorie"
           }
         }
       }
     },
-    "Change PIN…" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "PIN ändern …"
+    "Change PIN": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PIN ändern"
           }
         }
       }
     },
-    "Channel" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sender"
+    "Change PIN…": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PIN ändern …"
           }
         }
       }
     },
-    "Channel schedule" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Senderprogramm"
+    "Channel": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sender"
           }
         }
       }
     },
-    "Channels" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sender"
+    "Channel schedule": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Senderprogramm"
           }
         }
       }
     },
-    "Channels you watch, and the ones you star, show up here." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sender, die du schaust oder mit einem Stern markierst, erscheinen hier."
+    "Channels": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sender"
           }
         }
       }
     },
-    "Channels, movies, series" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sender, Filme, Serien"
+    "Channels you watch, and the ones you star, show up here.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sender, die du schaust oder mit einem Stern markierst, erscheinen hier."
           }
         }
       }
     },
-    "Choose a PIN of 4 to 6 digits" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wähle eine PIN aus 4 bis 6 Ziffern"
+    "Channels, movies, series": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sender, Filme, Serien"
           }
         }
       }
     },
-    "Choose…" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Auswählen…"
+    "Choose a PIN of 4 to 6 digits": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wähle eine PIN aus 4 bis 6 Ziffern"
           }
         }
       }
     },
-    "Classics" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Klassiker"
+    "Choose…": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Auswählen…"
           }
         }
       }
     },
-    "Clear" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Löschen"
+    "Classics": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Klassiker"
           }
         }
       }
     },
-    "Clear Statistics" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Statistik löschen"
+    "Clear": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Löschen"
           }
         }
       }
     },
-    "Clear the statistics?" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Statistik löschen?"
+    "Clear Statistics": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Statistik löschen"
           }
         }
       }
     },
-    "Close" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Schließen"
+    "Clear the statistics?": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Statistik löschen?"
           }
         }
       }
     },
-    "Close search" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Suche schließen"
+    "Close": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schließen"
           }
         }
       }
     },
-    "Code %@" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Code %@"
+    "Close search": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Suche schließen"
           }
         }
       }
     },
-    "Colour" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Farbe"
+    "Code %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Code %@"
           }
         }
       }
     },
-    "Colour key" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Farblegende"
+    "Colour": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Farbe"
           }
         }
       }
     },
-    "Comedy" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Komödie"
+    "Colour key": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Farblegende"
           }
         }
       }
     },
-    "Connect Simkl" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Simkl verbinden"
+    "Comedy": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Komödie"
           }
         }
       }
     },
-    "Continue" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Weiter"
+    "Connect Simkl": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Simkl verbinden"
           }
         }
       }
     },
-    "Continue watching" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Weiterschauen"
+    "Continue": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Weiter"
           }
         }
       }
     },
-    "Continue watching %@" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ weiterschauen"
+    "Continue watching": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Weiterschauen"
           }
         }
       }
     },
-    "Could not be played at all" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Konnte gar nicht abgespielt werden"
+    "Continue watching %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ weiterschauen"
           }
         }
       }
     },
-    "Could not reach the provider. Check the address and your connection." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Der Anbieter war nicht erreichbar. Prüfe die Adresse und deine Verbindung."
+    "Could not be played at all": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Konnte gar nicht abgespielt werden"
           }
         }
       }
     },
-    "Couldn't delete" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Löschen nicht möglich"
+    "Could not reach the provider. Check the address and your connection.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der Anbieter war nicht erreichbar. Prüfe die Adresse und deine Verbindung."
           }
         }
       }
     },
-    "Couldn't load channels" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sender konnten nicht geladen werden"
+    "Couldn't delete": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Löschen nicht möglich"
           }
         }
       }
     },
-    "Couldn't load the episodes" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Folgen konnten nicht geladen werden"
+    "Couldn't load channels": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sender konnten nicht geladen werden"
           }
         }
       }
     },
-    "Couldn't reach this stream. Check your connection, and that the provider is up." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dieser Stream war nicht erreichbar. Prüfe deine Verbindung und ob der Anbieter online ist."
+    "Couldn't load the episodes": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Folgen konnten nicht geladen werden"
           }
         }
       }
     },
-    "Crime" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Krimi"
+    "Couldn't reach this stream. Check your connection, and that the provider is up.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dieser Stream war nicht erreichbar. Prüfe deine Verbindung und ob der Anbieter online ist."
           }
         }
       }
     },
-    "Currently Airing Series" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aktuell laufende Serien"
+    "Crime": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Krimi"
           }
         }
       }
     },
-    "Custom lists are for Simkl PRO and VIP accounts." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Eigene Listen gibt es nur für Simkl-PRO- und VIP-Konten."
+    "Currently Airing Series": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aktuell laufende Serien"
           }
         }
       }
     },
-    "Cyan" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cyan"
+    "Custom lists are for Simkl PRO and VIP accounts.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eigene Listen gibt es nur für Simkl-PRO- und VIP-Konten."
           }
         }
       }
     },
-    "Data" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Daten"
+    "Cyan": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cyan"
           }
         }
       }
     },
-    "Default" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Standard"
+    "Data": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Daten"
           }
         }
       }
     },
-    "Delete" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Löschen"
+    "Default": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Standard"
           }
         }
       }
     },
-    "Delete %@?" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ löschen?"
+    "Delete": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Löschen"
           }
         }
       }
     },
-    "Delete…" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Löschen …"
+    "Delete %@?": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ löschen?"
           }
         }
       }
     },
-    "Deleting…" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wird gelöscht …"
+    "Delete…": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Löschen …"
           }
         }
       }
     },
-    "Disconnect" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Trennen"
+    "Deleting…": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wird gelöscht …"
           }
         }
       }
     },
-    "Documentaries" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dokumentationen"
+    "Disconnect": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trennen"
           }
         }
       }
     },
-    "Done" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fertig"
+    "Documentaries": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dokumentationen"
           }
         }
       }
     },
-    "Drama" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Drama"
+    "Done": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fertig"
           }
         }
       }
     },
-    "Each profile keeps its own favourites, what it has watched and hidden, and its own adult filter." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Jedes Profil hat eigene Favoriten, eigenen Verlauf, eigene ausgeblendete Titel und einen eigenen Jugendschutzfilter."
+    "Drama": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Drama"
           }
         }
       }
     },
-    "Earlier" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Früher"
+    "Each profile keeps its own favourites, what it has watched and hidden, and its own adult filter.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jedes Profil hat eigene Favoriten, eigenen Verlauf, eigene ausgeblendete Titel und einen eigenen Jugendschutzfilter."
           }
         }
       }
     },
-    "Edit categories" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kategorien bearbeiten"
+    "Earlier": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Früher"
           }
         }
       }
     },
-    "Engine" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Player"
+    "Edit categories": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kategorien bearbeiten"
           }
         }
       }
     },
-    "Enter it again" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gib sie noch einmal ein"
+    "Engine": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Player"
           }
         }
       }
     },
-    "Enter PIN" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "PIN eingeben"
+    "Enter PIN": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PIN eingeben"
           }
         }
       }
     },
-    "Enter your PIN" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gib deine PIN ein"
+    "Enter it again": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gib sie noch einmal ein"
           }
         }
       }
     },
-    "Entertainment" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Unterhaltung"
+    "Enter your PIN": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gib deine PIN ein"
           }
         }
       }
     },
-    "Extra large" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sehr groß"
+    "Entertainment": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unterhaltung"
           }
         }
       }
     },
-    "Family and safety" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Familie und Sicherheit"
+    "Extra large": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sehr groß"
           }
         }
       }
     },
-    "Favourite" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Favorit"
+    "Family and safety": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Familie und Sicherheit"
           }
         }
       }
     },
-    "Favourites" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Favoriten"
+    "Favourite": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Favorit"
           }
         }
       }
     },
-    "Favourites, what you watched, hidden titles and your playlists are kept in your own iCloud, where only you can read them. Logins are encrypted before they leave this device. A change here takes effect the next time Panop opens." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Favoriten, Gesehenes, ausgeblendete Titel und deine Playlists werden in deinem eigenen iCloud gespeichert, wo nur du sie lesen kannst. Anmeldedaten werden verschlüsselt, bevor sie dieses Gerät verlassen. Eine Änderung hier gilt, sobald Panop das nächste Mal geöffnet wird."
+    "Favourites": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Favoriten"
           }
         }
       }
     },
-    "Featured title %lld of %lld" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Empfohlener Titel %1$lld von %2$lld"
+    "Favourites, what you watched, hidden titles and your playlists are kept in your own iCloud, where only you can read them. Logins are encrypted before they leave this device. A change here takes effect the next time Panop opens.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Favoriten, Gesehenes, ausgeblendete Titel und deine Playlists werden in deinem eigenen iCloud gespeichert, wo nur du sie lesen kannst. Anmeldedaten werden verschlüsselt, bevor sie dieses Gerät verlassen. Eine Änderung hier gilt, sobald Panop das nächste Mal geöffnet wird."
           }
         }
       }
     },
-    "Films" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Filme"
+    "Featured title %lld of %lld": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Empfohlener Titel %1$lld von %2$lld"
           }
         }
       }
     },
-    "for showing how much a guide-first live TV app can do." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "dafür, wie viel eine Live-TV-App mit dem Programm im Mittelpunkt kann."
+    "Films": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Filme"
           }
         }
       }
     },
-    "for what a modern, rail-based home screen can feel like." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "dafür, wie sich ein moderner Startbildschirm aus Reihen anfühlen kann."
+    "Forget": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vergessen"
           }
         }
       }
     },
-    "Forget" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vergessen"
+    "Forget what I watched": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Meinen Verlauf vergessen"
           }
         }
       }
     },
-    "Forget what I watched" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Meinen Verlauf vergessen"
+    "Forget what you watched?": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deinen Verlauf vergessen?"
           }
         }
       }
     },
-    "Forget what you watched?" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Deinen Verlauf vergessen?"
+    "Forward 10 seconds": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "10 Sekunden vor"
           }
         }
       }
     },
-    "Forward 10 seconds" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "10 Sekunden vor"
+    "Getting the episodes…": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Folgen werden geladen …"
           }
         }
       }
     },
-    "Getting the episodes…" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Folgen werden geladen …"
+    "Getting the list…": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Liste wird geladen …"
           }
         }
       }
     },
-    "Getting the list…" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Liste wird geladen …"
+    "Getting your %@…": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deine %@ werden geladen …"
           }
         }
       }
     },
-    "Getting your %@…" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Deine %@ werden geladen …"
+    "Getting your channels…": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deine Sender werden geladen …"
           }
         }
       }
     },
-    "Getting your channels…" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Deine Sender werden geladen …"
+    "Green": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Grün"
           }
         }
       }
     },
-    "Green" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Grün"
+    "Hidden": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ausgeblendet"
           }
         }
       }
     },
-    "Hidden" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ausgeblendet"
+    "Hidden Gem Movies": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geheimtipp-Filme"
           }
         }
       }
     },
-    "Hidden Gem Movies" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Geheimtipp-Filme"
+    "Hidden Gem Series": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geheimtipp-Serien"
           }
         }
       }
     },
-    "Hidden Gem Series" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Geheimtipp-Serien"
+    "Hide": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ausblenden"
           }
         }
       }
     },
-    "Hide" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ausblenden"
+    "Hide %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ ausblenden"
           }
         }
       }
     },
-    "Hide %@" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ ausblenden"
+    "Hide Channel": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sender ausblenden"
           }
         }
       }
     },
-    "Hide a channel or film from its menu, and it is listed here." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Blende einen Sender oder Film über sein Menü aus, dann steht er hier."
+    "Hide a channel or film from its menu, and it is listed here.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Blende einen Sender oder Film über sein Menü aus, dann steht er hier."
           }
         }
       }
     },
-    "Hide adult content" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Inhalte für Erwachsene ausblenden"
+    "Hide adult content": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inhalte für Erwachsene ausblenden"
           }
         }
       }
     },
-    "Hide Channel" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sender ausblenden"
+    "Hiding adult content leaves out what a provider files as adult, from lists, search and suggestions. With a PIN it cannot be turned off, or the PIN changed, without the PIN. It stays on this device.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Das Ausblenden lässt aus Listen, Suche und Vorschlägen weg, was ein Anbieter als Inhalt für Erwachsene führt. Mit einer PIN lässt es sich nicht ohne die PIN ausschalten oder die PIN ändern. Sie bleibt auf diesem Gerät."
           }
         }
       }
     },
-    "Hiding adult content leaves out what a provider files as adult, from lists, search and suggestions. With a PIN it cannot be turned off, or the PIN changed, without the PIN. It stays on this device." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Das Ausblenden lässt aus Listen, Suche und Vorschlägen weg, was ein Anbieter als Inhalt für Erwachsene führt. Mit einer PIN lässt es sich nicht ohne die PIN ausschalten oder die PIN ändern. Sie bleibt auf diesem Gerät."
+    "Home": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Start"
           }
         }
       }
     },
-    "Home" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Start"
+    "Home screen": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Startbildschirm"
           }
         }
       }
     },
-    "Home screen" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Startbildschirm"
+    "Horror": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Horror"
           }
         }
       }
     },
-    "Horror" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Horror"
+    "How fast channels start and how often they stall. Kept on this device only.": {
+      "extractionState": "stale",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wie schnell Sender starten und wie oft sie stocken. Nur auf diesem Gerät gespeichert."
           }
         }
       }
     },
-    "How fast channels start and how often they stall. Kept on this device only." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wie schnell Sender starten und wie oft sie stocken. Nur auf diesem Gerät gespeichert."
+    "If a video will not start, change the engine. Panop tries your choice first and then the others by itself. On a Mac a stream plays in the main window, and you can still use the rest of the app over it.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Startet ein Video nicht, wechsle den Player. Panop versucht zuerst deine Wahl und dann von selbst die anderen. Auf dem Mac läuft ein Stream im Hauptfenster, und du kannst darüber den Rest der App benutzen."
           }
         }
       }
     },
-    "http://provider.example:8080" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "http://provider.example:8080"
+    "Importing… %@ items": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Import läuft … %@ Einträge"
           }
         }
       }
     },
-    "https://provider.example/playlist.m3u" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "https://provider.example/playlist.m3u"
+    "In Theatres Now": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jetzt im Kino"
           }
         }
       }
     },
-    "iCloud" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "iCloud"
+    "In use": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In Benutzung"
           }
         }
       }
     },
-    "iCloud could not be opened, so this device's own copy is in use." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "iCloud konnte nicht geöffnet werden, daher wird die Kopie dieses Geräts verwendet."
+    "Include Movies and Series": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Filme und Serien einbeziehen"
           }
         }
       }
     },
-    "If a video will not start, change the engine. Panop tries your choice first and then the others by itself." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Startet ein Video nicht, wechsle den Player. Panop versucht zuerst deine Wahl und dann von selbst die anderen."
+    "Include provider logins": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anmeldedaten der Anbieter einbeziehen"
           }
         }
       }
     },
-    "Importing… %@ items" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Import läuft … %@ Einträge"
+    "It starts with adult content hidden.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Es startet mit ausgeblendeten Inhalten für Erwachsene."
           }
         }
       }
     },
-    "In Theatres Now" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Jetzt im Kino"
+    "Its channels, movies, series and guide are removed from this device.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Seine Sender, Filme, Serien und der Programmführer werden von diesem Gerät entfernt."
           }
         }
       }
     },
-    "In use" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "In Benutzung"
+    "Keep them": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Behalten"
           }
         }
       }
     },
-    "Include Movies and Series" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Filme und Serien einbeziehen"
+    "Kept on this device only, for the last %lld viewing sessions.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nur auf diesem Gerät gespeichert, für die letzten %lld Wiedergaben."
           }
         }
       }
     },
-    "Include provider logins" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Anmeldedaten der Anbieter einbeziehen"
+    "Kids": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kinder"
           }
         }
       }
     },
-    "It starts with adult content hidden." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Es startet mit ausgeblendeten Inhalten für Erwachsene."
+    "LIVE": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LIVE"
           }
         }
       }
     },
-    "Its channels, movies, series and guide are removed from this device." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Seine Sender, Filme, Serien und der Programmführer werden von diesem Gerät entfernt."
+    "Large": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Groß"
           }
         }
       }
     },
-    "Keep them" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Behalten"
+    "Latest DVD Releases": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Neueste DVD-Veröffentlichungen"
           }
         }
       }
     },
-    "Kept on this device only, for the last %lld viewing sessions." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nur auf diesem Gerät gespeichert, für die letzten %lld Wiedergaben."
+    "Leaves out categories a provider names as adult, from the lists, search and suggestions.": {
+      "extractionState": "stale",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lässt Kategorien, die ein Anbieter als jugendgefährdend benennt, in Listen, Suche und Vorschlägen weg."
           }
         }
       }
     },
-    "Kids" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kinder"
+    "Left before a picture": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Beendet vor dem ersten Bild"
           }
         }
       }
     },
-    "Large" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Groß"
+    "Library": {
+      "extractionState": "stale",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mediathek"
           }
         }
       }
     },
-    "Latest DVD Releases" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Neueste DVD-Veröffentlichungen"
+    "Live": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live"
           }
         }
       }
     },
-    "Leaves out categories a provider names as adult, from the lists, search and suggestions." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Lässt Kategorien, die ein Anbieter als jugendgefährdend benennt, in Listen, Suche und Vorschlägen weg."
+    "Live TV": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live-TV"
           }
         }
       }
     },
-    "Left before a picture" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Beendet vor dem ersten Bild"
+    "Live TV Only": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nur Live-TV"
           }
         }
       }
     },
-    "Library" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mediathek"
+    "Live TV only": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nur Live-TV"
           }
         }
       }
     },
-    "Live" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Live"
+    "M3U file": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "M3U-Datei"
           }
         }
       }
     },
-    "LIVE" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "LIVE"
+    "M3U · %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "M3U · %@"
           }
         }
       }
     },
-    "Live TV" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Live-TV"
+    "Mark as Not Watched": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Als nicht gesehen markieren"
           }
         }
       }
     },
-    "Live TV only" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nur Live-TV"
+    "Mark as Watched": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Als gesehen markieren"
           }
         }
       }
     },
-    "Live TV Only" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nur Live-TV"
+    "Medium": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mittel"
           }
         }
       }
     },
-    "M3U · %@" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "M3U · %@"
+    "More": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mehr"
           }
         }
       }
     },
-    "M3U file" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "M3U-Datei"
+    "More from %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mehr von %@"
           }
         }
       }
     },
-    "Mark as Not Watched" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Als nicht gesehen markieren"
+    "More info": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mehr Infos"
           }
         }
       }
     },
-    "Mark as Watched" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Als gesehen markieren"
+    "Most Watchlisted Movies": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Meistgemerkte Filme"
           }
         }
       }
     },
-    "Medium" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mittel"
+    "Most Watchlisted Series": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Meistgemerkte Serien"
           }
         }
       }
     },
-    "More" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mehr"
+    "Move %@ down": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ nach unten"
           }
         }
       }
     },
-    "More from %@" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mehr von %@"
+    "Move %@ up": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ nach oben"
           }
         }
       }
     },
-    "More info" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mehr Infos"
+    "Movie": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Film"
           }
         }
       }
     },
-    "Most Watchlisted Movies" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Meistgemerkte Filme"
+    "Movie, TV and anime data from Simkl": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Film-, Serien- und Anime-Daten von Simkl"
           }
         }
       }
     },
-    "Most Watchlisted Series" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Meistgemerkte Serien"
+    "Movies": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Filme"
           }
         }
       }
     },
-    "Move %@ down" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ nach unten"
+    "Movies of the %@s": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Filme der %@er"
           }
         }
       }
     },
-    "Move %@ up" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ nach oben"
+    "Music": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Musik"
           }
         }
       }
     },
-    "Movie" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Film"
+    "NOW": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "JETZT"
           }
         }
       }
     },
-    "Movie, TV and anime data from Simkl" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Film-, Serien- und Anime-Daten von Simkl"
+    "Name": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Name"
           }
         }
       }
     },
-    "Movies" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Filme"
+    "Name (optional)": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Name (optional)"
           }
         }
       }
     },
-    "Movies of the %@s" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Filme der %@er"
+    "Needed another player": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Brauchte einen anderen Player"
           }
         }
       }
     },
-    "Music" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Musik"
+    "New movies": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Neue Filme"
           }
         }
       }
     },
-    "Name" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Name"
+    "New profile": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Neues Profil"
           }
         }
       }
     },
-    "Name (optional)" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Name (optional)"
+    "New series": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Neue Serien"
           }
         }
       }
     },
-    "Needed another player" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Brauchte einen anderen Player"
+    "News": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nachrichten"
           }
         }
       }
     },
-    "New movies" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Neue Filme"
+    "Next title": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nächster Titel"
           }
         }
       }
     },
-    "New profile" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Neues Profil"
+    "Next up": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Als Nächstes"
           }
         }
       }
     },
-    "New series" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Neue Serien"
-          }
-        }
-      }
-    },
-    "News" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nachrichten"
-          }
-        }
-      }
-    },
-    "Next title" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nächster Titel"
-          }
-        }
-      }
-    },
-    "Next up" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Als Nächstes"
-          }
-        }
-      }
-    },
-    "Next: %@ · %@" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Danach: %1$@ · %2$@"
+    "Next: %@ · %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Danach: %1$@ · %2$@"
           }
         },
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Next: %1$@ · %2$@"
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Next: %1$@ · %2$@"
           }
         }
       }
     },
-    "No categories" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Keine Kategorien"
+    "No categories": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keine Kategorien"
           }
         }
       }
     },
-    "No channels" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Keine Sender"
+    "No channels": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keine Sender"
           }
         }
       }
     },
-    "No episodes" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Keine Folgen"
+    "No episodes": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keine Folgen"
           }
         }
       }
     },
-    "No favourites yet" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Noch keine Favoriten"
+    "No favourites yet": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Noch keine Favoriten"
           }
         }
       }
     },
-    "No guide for this channel" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kein Programmführer für diesen Sender"
+    "No guide for this channel": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kein Programmführer für diesen Sender"
           }
         }
       }
     },
-    "No live channels" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Keine Live-Sender"
+    "No live channels": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keine Live-Sender"
           }
         }
       }
     },
-    "No movies" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Keine Filme"
+    "No movies": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keine Filme"
           }
         }
       }
     },
-    "No playlist yet" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Noch keine Playlist"
+    "No playlist yet": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Noch keine Playlist"
           }
         }
       }
     },
-    "No playlists" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Keine Playlists"
+    "No playlists": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keine Playlists"
           }
         }
       }
     },
-    "No series" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Keine Serien"
+    "No series": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keine Serien"
           }
         }
       }
     },
-    "None" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Keiner"
+    "None": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keiner"
           }
         }
       }
     },
-    "None yet" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Noch keine"
+    "None yet": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Noch keine"
           }
         }
       }
     },
-    "Not updated yet" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Noch nicht aktualisiert"
+    "Not updated yet": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Noch nicht aktualisiert"
           }
         }
       }
     },
-    "Nothing here yet" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Noch nichts hier"
+    "Nothing here yet": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Noch nichts hier"
           }
         }
       }
     },
-    "Nothing hidden" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nichts ausgeblendet"
+    "Nothing hidden": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nichts ausgeblendet"
           }
         }
       }
     },
-    "Nothing is listed for this series." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Für diese Serie ist nichts aufgeführt."
+    "Nothing is listed for this series.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Für diese Serie ist nichts aufgeführt."
           }
         }
       }
     },
-    "Nothing watched yet" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Noch nichts geschaut"
+    "Nothing watched yet": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Noch nichts geschaut"
           }
         }
       }
     },
-    "Nothing yet" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Noch nichts"
+    "Nothing yet": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Noch nichts"
           }
         }
       }
     },
-    "NOW" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "JETZT"
+    "Now playing": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Läuft gerade"
           }
         }
       }
     },
-    "Now: %@" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Jetzt: %@"
+    "Now: %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jetzt: %@"
           }
         }
       }
     },
-    "Off" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aus"
+    "OK": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "OK"
           }
         }
       }
     },
-    "Off. Everything stays on this device." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aus. Alles bleibt auf diesem Gerät."
+    "Off": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aus"
           }
         }
       }
     },
-    "OK" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "OK"
+    "Off. Everything stays on this device.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aus. Alles bleibt auf diesem Gerät."
           }
         }
       }
     },
-    "On now" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Läuft gerade"
+    "On now": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Läuft gerade"
           }
         }
       }
     },
-    "On your list" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Auf deiner Liste"
+    "On your list": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Auf deiner Liste"
           }
         }
       }
     },
-    "On your phone or computer, go to" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Öffne auf deinem Handy oder Computer"
+    "On your phone or computer, go to": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Öffne auf deinem Handy oder Computer"
           }
         }
       }
     },
-    "On. Your data is syncing with iCloud." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "An. Deine Daten werden mit iCloud abgeglichen."
+    "On. Your data is syncing with iCloud.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "An. Deine Daten werden mit iCloud abgeglichen."
           }
         }
       }
     },
-    "Once connected, films and episodes you finish are recorded on your Simkl account. Nothing is sent while you are disconnected, and live TV is never sent." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sobald du verbunden bist, werden fertig gesehene Filme und Folgen in deinem Simkl-Konto vermerkt. Solange du getrennt bist, wird nichts gesendet, und Live-TV wird nie gesendet."
+    "Once connected, films and episodes you finish are recorded on your Simkl account. Nothing is sent while you are disconnected, and live TV is never sent.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sobald du verbunden bist, werden fertig gesehene Filme und Folgen in deinem Simkl-Konto vermerkt. Solange du getrennt bist, wird nichts gesendet, und Live-TV wird nie gesendet."
           }
         }
       }
     },
-    "One entry was left out: no address to play." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ein Eintrag wurde ausgelassen: keine Adresse zum Abspielen."
+    "One entry was left out: no address to play.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ein Eintrag wurde ausgelassen: keine Adresse zum Abspielen."
           }
         }
       }
     },
-    "Open the series to pick an episode." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Öffne die Serie, um eine Folge auszuwählen."
+    "Open the series to pick an episode.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Öffne die Serie, um eine Folge auszuwählen."
           }
         }
       }
     },
-    "Other" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sonstige"
+    "Other": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sonstige"
           }
         }
       }
     },
-    "Overall" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Insgesamt"
+    "Overall": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Insgesamt"
           }
         }
       }
     },
-    "Panop" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Panop"
+    "Panop": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Panop"
           }
         }
       }
     },
-    "Panop draws subtitles itself with the Lume player. The system player follows this once you change it." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Panop zeichnet Untertitel beim Lume-Player selbst. Der System-Player folgt dem, sobald du etwas änderst."
+    "Panop draws subtitles itself with the Lume player. The system player follows this once you change it.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Panop zeichnet Untertitel beim Lume-Player selbst. Der System-Player folgt dem, sobald du etwas änderst."
           }
         }
       }
     },
-    "Panop is free software under the MIT licence. The parts it is built from are listed in THIRD-PARTY-NOTICES.md." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Panop ist freie Software unter der MIT-Lizenz. Die Teile, aus denen es besteht, stehen in THIRD-PARTY-NOTICES.md."
+    "Panop is free software under the MIT licence. The parts it is built from are listed in THIRD-PARTY-NOTICES.md.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Panop ist freie Software unter der MIT-Lizenz. Die Teile, aus denen es besteht, stehen in THIRD-PARTY-NOTICES.md."
           }
         }
       }
     },
-    "Panop keeps its own copy. To update it, add the file again." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Panop behält eine eigene Kopie. Zum Aktualisieren füge die Datei erneut hinzu."
+    "Panop keeps its own copy. To update it, add the file again.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Panop behält eine eigene Kopie. Zum Aktualisieren füge die Datei erneut hinzu."
           }
         }
       }
     },
-    "Panop tries your choice first, and falls back through the other players when a stream will not start." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Panop versucht zuerst deine Auswahl und weicht auf die anderen Player aus, wenn ein Stream nicht startet."
+    "Panop tries your choice first, and falls back through the other players when a stream will not start.": {
+      "extractionState": "stale",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Panop versucht zuerst deine Auswahl und weicht auf die anderen Player aus, wenn ein Stream nicht startet."
           }
         }
       }
     },
-    "Parental controls" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kindersicherung"
+    "Parental controls": {
+      "extractionState": "stale",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kindersicherung"
           }
         }
       }
     },
-    "Password" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Passwort"
+    "Password": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Passwort"
           }
         }
       }
     },
-    "Pause" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pause"
+    "Pause": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pause"
           }
         }
       }
     },
-    "Picture in Picture" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bild-in-Bild"
+    "Picture in Picture": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bild-in-Bild"
           }
         }
       }
     },
-    "Play" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Abspielen"
+    "Play": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abspielen"
           }
         }
       }
     },
-    "Play a channel" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Einen Sender abspielen"
+    "Play a channel": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Einen Sender abspielen"
           }
         }
       }
     },
-    "Playback" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wiedergabe"
+    "Play in a separate window": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In einem eigenen Fenster abspielen"
           }
         }
       }
     },
-    "Playback failed." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wiedergabe fehlgeschlagen."
+    "Playback": {
+      "extractionState": "stale",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wiedergabe"
           }
         }
       }
     },
-    "Playback Statistics" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wiedergabestatistik"
+    "Playback Statistics": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wiedergabestatistik"
           }
         }
       }
     },
-    "Playback statistics show how fast channels start and how often they stall. They stay on this device." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Die Wiedergabestatistik zeigt, wie schnell Sender starten und wie oft sie stocken. Sie bleibt auf diesem Gerät."
+    "Playback failed.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wiedergabe fehlgeschlagen."
           }
         }
       }
     },
-    "Player" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Player"
+    "Playback statistics show how fast channels start and how often they stall. They stay on this device.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Wiedergabestatistik zeigt, wie schnell Sender starten und wie oft sie stocken. Sie bleibt auf diesem Gerät."
           }
         }
       }
     },
-    "Playing" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wiedergabe"
+    "Player": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Player"
           }
         }
       }
     },
-    "Playlist address" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Playlist-Adresse"
+    "Playing": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wiedergabe"
           }
         }
       }
     },
-    "Playlists" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Playlists"
+    "Playlist address": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Playlist-Adresse"
           }
         }
       }
     },
-    "Preview of the subtitle style" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vorschau des Untertitelstils"
+    "Playlists": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Playlists"
           }
         }
       }
     },
-    "Previous title" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vorheriger Titel"
+    "Preview of the subtitle style": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vorschau des Untertitelstils"
           }
         }
       }
     },
-    "Profile" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Profil"
+    "Previous title": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vorheriger Titel"
           }
         }
       }
     },
-    "Profiles" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Profile"
+    "Profile": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Profil"
           }
         }
       }
     },
-    "Programme Guide" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Programmführer"
+    "Profiles": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Profile"
           }
         }
       }
     },
-    "Progress" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fortschritt"
+    "Programme Guide": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Programmführer"
           }
         }
       }
     },
-    "Provider's order" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Reihenfolge des Anbieters"
+    "Progress": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fortschritt"
           }
         }
       }
     },
-    "Quick Watches (90 min or less)" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kurz und gut (bis 90 Min.)"
+    "Provider's order": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reihenfolge des Anbieters"
           }
         }
       }
     },
-    "Raise subtitles" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Untertitel anheben"
+    "Quick Watches (90 min or less)": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kurz und gut (bis 90 Min.)"
           }
         }
       }
     },
-    "Re-import Everything" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Alles neu importieren"
+    "Raise subtitles": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Untertitel anheben"
           }
         }
       }
     },
-    "Recently added" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zuletzt hinzugefügt"
+    "Re-import Everything": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alles neu importieren"
           }
         }
       }
     },
-    "Recently watched" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zuletzt gesehen"
+    "Recently added": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zuletzt hinzugefügt"
           }
         }
       }
     },
-    "Recently watched, watched marks and the suggestions based on them go. Favourites and hidden titles stay." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zuletzt gesehen, Gesehen-Markierungen und darauf beruhende Vorschläge werden gelöscht. Favoriten und ausgeblendete Titel bleiben."
+    "Recently watched": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zuletzt gesehen"
           }
         }
       }
     },
-    "Refresh" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aktualisieren"
+    "Recently watched, watched marks and the suggestions based on them go. Favourites and hidden titles stay.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zuletzt gesehen, Gesehen-Markierungen und darauf beruhende Vorschläge werden gelöscht. Favoriten und ausgeblendete Titel bleiben."
           }
         }
       }
     },
-    "Refresh All" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Alle aktualisieren"
+    "Refresh": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aktualisieren"
           }
         }
       }
     },
-    "Remove %lld" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld entfernen"
+    "Refresh All": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alle aktualisieren"
           }
         }
       }
     },
-    "Remove from Favourites" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aus Favoriten entfernen"
+    "Remove %lld": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld entfernen"
           }
         }
       }
     },
-    "Remove missing items?" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fehlende Einträge entfernen?"
+    "Remove PIN": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PIN entfernen"
           }
         }
       }
     },
-    "Remove PIN" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "PIN entfernen"
+    "Remove PIN…": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PIN entfernen …"
           }
         }
       }
     },
-    "Remove PIN…" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "PIN entfernen …"
+    "Remove from Favourites": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aus Favoriten entfernen"
           }
         }
       }
     },
-    "Rename" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Umbenennen"
+    "Remove missing items?": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fehlende Einträge entfernen?"
           }
         }
       }
     },
-    "Rename profile" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Profil umbenennen"
+    "Rename": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Umbenennen"
           }
         }
       }
     },
-    "Rename…" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Umbenennen …"
+    "Rename profile": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Profil umbenennen"
           }
         }
       }
     },
-    "Reset to standard" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Auf Standard zurücksetzen"
+    "Rename…": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Umbenennen …"
           }
         }
       }
     },
-    "Reset to the provider's order" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Auf die Reihenfolge des Anbieters zurücksetzen"
+    "Reset to standard": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Auf Standard zurücksetzen"
           }
         }
       }
     },
-    "Resume from %@" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fortsetzen ab %@"
+    "Reset to the provider's order": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Auf die Reihenfolge des Anbieters zurücksetzen"
           }
         }
       }
     },
-    "Schedule" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Programm"
+    "Resume from %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fortsetzen ab %@"
           }
         }
       }
     },
-    "Sci-Fi" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sci-Fi"
+    "Schedule": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Programm"
           }
         }
       }
     },
-    "Search" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Suchen"
+    "Sci-Fi": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sci-Fi"
           }
         }
       }
     },
-    "Search categories" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kategorien suchen"
+    "Search": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Suchen"
           }
         }
       }
     },
-    "Search channels" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sender suchen"
+    "Search categories": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kategorien suchen"
           }
         }
       }
     },
-    "Season %lld" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Staffel %lld"
+    "Search channels": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sender suchen"
           }
         }
       }
     },
-    "Send what I finish watching" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gesehenes an Simkl senden"
+    "Season %lld": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Staffel %lld"
           }
         }
       }
     },
-    "Series" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Serien"
+    "Send what I finish watching": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gesehenes an Simkl senden"
           }
         }
       }
     },
-    "Server address" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Serveradresse"
+    "Series": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Serien"
           }
         }
       }
     },
-    "Set a PIN" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "PIN festlegen"
+    "Server address": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Serveradresse"
           }
         }
       }
     },
-    "Set a PIN…" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "PIN festlegen …"
+    "Set a PIN": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PIN festlegen"
           }
         }
       }
     },
-    "Settings" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Einstellungen"
+    "Set a PIN…": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PIN festlegen …"
           }
         }
       }
     },
-    "Show" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Einblenden"
+    "Settings": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Einstellungen"
           }
         }
       }
     },
-    "Show %@" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ einblenden"
+    "Show": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Einblenden"
           }
         }
       }
     },
-    "Show adult content" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Inhalte für Erwachsene anzeigen"
+    "Show %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ einblenden"
           }
         }
       }
     },
-    "Show my Simkl lists" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Meine Simkl-Listen anzeigen"
+    "Show Simkl's trending and best-of lists": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Simkls Trends und Bestenlisten anzeigen"
           }
         }
       }
     },
-    "Show or hide the suggestions above the list" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Die Vorschläge über der Liste ein- oder ausblenden"
+    "Show adult content": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inhalte für Erwachsene anzeigen"
           }
         }
       }
     },
-    "Show Simkl's trending and best-of lists" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Simkls Trends und Bestenlisten anzeigen"
+    "Show my Simkl lists": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Meine Simkl-Listen anzeigen"
           }
         }
       }
     },
-    "Show suggestions" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vorschläge anzeigen"
+    "Show or hide the suggestions above the list": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Vorschläge über der Liste ein- oder ausblenden"
           }
         }
       }
     },
-    "Showing the first %@. Search to narrow it down." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Es werden die ersten %@ angezeigt. Nutze die Suche, um einzugrenzen."
+    "Show stream": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stream zeigen"
           }
         }
       }
     },
-    "Sign in to iCloud in the system settings to sync." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Melde dich in den Systemeinstellungen bei iCloud an, um abzugleichen."
+    "Show suggestions": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vorschläge anzeigen"
           }
         }
       }
     },
-    "Simkl" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Simkl"
+    "Showing the first %@. Search to narrow it down.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Es werden die ersten %@ angezeigt. Nutze die Suche, um einzugrenzen."
           }
         }
       }
     },
-    "Simkl could not be reached." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Simkl war nicht erreichbar."
+    "Sign in to iCloud in the system settings to sync.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Melde dich in den Systemeinstellungen bei iCloud an, um abzugleichen."
           }
         }
       }
     },
-    "Size" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Größe"
+    "Simkl": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Simkl"
           }
         }
       }
     },
-    "Skips the movies and series: they are not downloaded or stored, and the Movies and Series tabs are hidden unless another source has them." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Überspringt Filme und Serien: Sie werden weder geladen noch gespeichert, und die Reiter „Filme“ und „Serien“ sind ausgeblendet, außer eine andere Quelle hat sie."
+    "Simkl could not be reached.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Simkl war nicht erreichbar."
           }
         }
       }
     },
-    "Small" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Klein"
+    "Size": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Größe"
           }
         }
       }
     },
-    "Solid" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Deckend"
+    "Skips the movies and series: they are not downloaded or stored, and the Movies and Series tabs are hidden unless another source has them.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Überspringt Filme und Serien: Sie werden weder geladen noch gespeichert, und die Reiter „Filme“ und „Serien“ sind ausgeblendet, außer eine andere Quelle hat sie."
           }
         }
       }
     },
-    "Something went wrong while updating this playlist." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Beim Aktualisieren dieser Playlist ist etwas schiefgegangen."
+    "Small": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Klein"
           }
         }
       }
     },
-    "Sort" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sortieren"
+    "Solid": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deckend"
           }
         }
       }
     },
-    "Source" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Quelle"
+    "Something went wrong while updating this playlist.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Beim Aktualisieren dieser Playlist ist etwas schiefgegangen."
           }
         }
       }
     },
-    "Specials" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Specials"
+    "Sort": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sortieren"
           }
         }
       }
     },
-    "Sport" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sport"
+    "Source": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quelle"
           }
         }
       }
     },
-    "Start over" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Von vorn beginnen"
+    "Specials": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Specials"
           }
         }
       }
     },
-    "Startup" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Start"
+    "Sport": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sport"
           }
         }
       }
     },
-    "Startup channel" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Startsender"
+    "Start over": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Von vorn beginnen"
           }
         }
       }
     },
-    "Stop Updating" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aktualisierung stoppen"
+    "Startup": {
+      "extractionState": "stale",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Start"
           }
         }
       }
     },
-    "Subtitles" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Untertitel"
+    "Startup channel": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Startsender"
           }
         }
       }
     },
-    "Suggestions" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vorschläge"
+    "Stop": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stoppen"
           }
         }
       }
     },
-    "Suggestions are chosen on this device from your own library and what you watch. What is trending is Simkl's public list, fetched the same way for everyone. Nothing about you or what you watch is sent." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vorschläge werden auf diesem Gerät aus deiner eigenen Mediathek und dem, was du schaust, ausgewählt. Was beliebt ist, kommt aus der öffentlichen Liste von Simkl, die für alle gleich abgerufen wird. Über dich oder das, was du schaust, wird nichts gesendet."
+    "Stop Updating": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aktualisierung stoppen"
           }
         }
       }
     },
-    "Suggestions are picked on this device from your own library and what you watch. Nothing about you or what you watch is sent anywhere." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vorschläge werden auf diesem Gerät aus deiner Mediathek und dem, was du schaust, ausgewählt. Nichts über dich oder das, was du schaust, wird irgendwohin gesendet."
+    "Subtitles": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Untertitel"
           }
         }
       }
     },
-    "Sync with iCloud" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mit iCloud abgleichen"
+    "Suggestions": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vorschläge"
           }
         }
       }
     },
-    "Tap a programme to watch it from the start." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tippe auf eine Sendung, um sie von Anfang an zu sehen."
+    "Suggestions are chosen on this device from your own library and what you watch. What is trending is Simkl's public list, fetched the same way for everyone. Nothing about you or what you watch is sent.": {
+      "extractionState": "stale",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vorschläge werden auf diesem Gerät aus deiner eigenen Mediathek und dem, was du schaust, ausgewählt. Was beliebt ist, kommt aus der öffentlichen Liste von Simkl, die für alle gleich abgerufen wird. Über dich oder das, was du schaust, wird nichts gesendet."
           }
         }
       }
     },
-    "Thanks to" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Danke an"
+    "Suggestions are picked on this device from your own library and what you watch. Nothing about you or what you watch is sent anywhere.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vorschläge werden auf diesem Gerät aus deiner Mediathek und dem, was du schaust, ausgewählt. Nichts über dich oder das, was du schaust, wird irgendwohin gesendet."
           }
         }
       }
     },
-    "That file could not be read." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Diese Datei konnte nicht gelesen werden."
+    "Sync with iCloud": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mit iCloud abgleichen"
           }
         }
       }
     },
-    "That is not a valid web address." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Das ist keine gültige Webadresse."
+    "TV Guide": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "TV-Programm"
           }
         }
       }
     },
-    "That is not a valid web address. It should start with http:// or https://." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Das ist keine gültige Webadresse. Sie sollte mit http:// oder https:// beginnen."
+    "TV guide address (optional)": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adresse des Programmführers (optional)"
           }
         }
       }
     },
-    "That playlist was updated in the meantime. Review it again." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Diese Playlist wurde zwischenzeitlich aktualisiert. Prüfe sie erneut."
+    "Tap a programme to watch it from the start.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tippe auf eine Sendung, um sie von Anfang an zu sehen."
           }
         }
       }
     },
-    "That server address is not valid." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Diese Serveradresse ist ungültig."
+    "Thanks to": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Danke an"
           }
         }
       }
     },
-    "The address is kept in the Keychain, because it often contains your login. If the playlist names its own TV guide, you do not need to fill this in." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Die Adresse wird im Schlüsselbund gespeichert, weil sie oft deine Anmeldedaten enthält. Wenn die Playlist ihren eigenen Programmführer nennt, musst du das hier nicht ausfüllen."
+    "That file could not be read.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diese Datei konnte nicht gelesen werden."
           }
         }
       }
     },
-    "The available players can't open this stream's format." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Die verfügbaren Player können das Format dieses Streams nicht öffnen."
+    "That is not a valid web address.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Das ist keine gültige Webadresse."
           }
         }
       }
     },
-    "The channel starts playing as soon as Panop opens, from what is already on this device." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Der Sender startet, sobald Panop sich öffnet, aus dem, was schon auf diesem Gerät ist."
+    "That is not a valid web address. It should start with http:// or https://.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Das ist keine gültige Webadresse. Sie sollte mit http:// oder https:// beginnen."
           }
         }
       }
     },
-    "The channels you watch show up here." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Die Sender, die du schaust, erscheinen hier."
+    "That playlist was updated in the meantime. Review it again.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diese Playlist wurde zwischenzeitlich aktualisiert. Prüfe sie erneut."
           }
         }
       }
     },
-    "The code ran out before it was approved." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Der Code ist abgelaufen, bevor er bestätigt wurde."
+    "That server address is not valid.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diese Serveradresse ist ungültig."
           }
         }
       }
     },
-    "The download was cut off, so nothing was changed." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Der Download wurde abgebrochen, daher wurde nichts geändert."
+    "The TV guide address is not a valid web address.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Adresse des Programmführers ist keine gültige Webadresse."
           }
         }
       }
     },
-    "The login details could not be saved to the Keychain." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Die Anmeldedaten konnten nicht im Schlüsselbund gespeichert werden."
+    "The TV guide could not be downloaded.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der Programmführer konnte nicht heruntergeladen werden."
           }
         }
       }
     },
-    "The playlist could not be saved." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Die Playlist konnte nicht gespeichert werden."
+    "The TV guide could not be loaded.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der Programmführer konnte nicht geladen werden."
           }
         }
       }
     },
-    "The playlist file could not be read." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Die Playlist-Datei konnte nicht gelesen werden."
+    "The TV guide download was damaged, so it was not used.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der Download des Programmführers war beschädigt und wurde nicht verwendet."
           }
         }
       }
     },
-    "The provider answered with an error (%lld)." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Der Anbieter hat mit einem Fehler geantwortet (%lld)."
+    "The TV guide is not in a format Panop understands.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der Programmführer hat ein Format, das Panop nicht versteht."
           }
         }
       }
     },
-    "The provider could not be reached for this programme." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Der Anbieter war für diese Sendung nicht erreichbar."
+    "The address is kept in the Keychain, because it often contains your login. If the playlist names its own TV guide, you do not need to fill this in.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Adresse wird im Schlüsselbund gespeichert, weil sie oft deine Anmeldedaten enthält. Wenn die Playlist ihren eigenen Programmführer nennt, musst du das hier nicht ausfüllen."
           }
         }
       }
     },
-    "The provider did not return any channels, movies or series." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Der Anbieter hat keine Sender, Filme oder Serien geliefert."
+    "The available players can't open this stream's format.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die verfügbaren Player können das Format dieses Streams nicht öffnen."
           }
         }
       }
     },
-    "The provider has nothing at that address (404)." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Der Anbieter hat unter dieser Adresse nichts (404)."
+    "The channel starts playing as soon as Panop opens, from what is already on this device.": {
+      "extractionState": "stale",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der Sender startet, sobald Panop sich öffnet, aus dem, was schon auf diesem Gerät ist."
           }
         }
       }
     },
-    "The provider is having problems (%lld). Try again later." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Der Anbieter hat Probleme (%lld). Versuche es später erneut."
+    "The channels you watch show up here.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Sender, die du schaust, erscheinen hier."
           }
         }
       }
     },
-    "The provider refused access (%lld). Check the username and password." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Der Anbieter hat den Zugriff verweigert (%lld). Prüfe Benutzername und Passwort."
+    "The code ran out before it was approved.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der Code ist abgelaufen, bevor er bestätigt wurde."
           }
         }
       }
     },
-    "The provider rejected the username or password." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Der Anbieter hat Benutzername oder Passwort abgelehnt."
+    "The download was cut off, so nothing was changed.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der Download wurde abgebrochen, daher wurde nichts geändert."
           }
         }
       }
     },
-    "The provider's latest list is missing %lld items. That can mean the download was cut off. Removing them also removes any favourites and watch progress on them." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "In der neuesten Liste des Anbieters fehlen %lld Einträge. Das kann bedeuten, dass der Download abgebrochen wurde. Wenn du sie entfernst, gehen auch Favoriten und Fortschritt dazu verloren."
+    "The login details could not be saved to the Keychain.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Anmeldedaten konnten nicht im Schlüsselbund gespeichert werden."
           }
         }
       }
     },
-    "The provider's reply was not in the expected format." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Die Antwort des Anbieters hatte nicht das erwartete Format."
+    "The playlist could not be saved.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Playlist konnte nicht gespeichert werden."
           }
         }
       }
     },
-    "The provider's server address is not valid." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Die Serveradresse des Anbieters ist ungültig."
+    "The playlist file could not be read.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Playlist-Datei konnte nicht gelesen werden."
           }
         }
       }
     },
-    "The screen Panop opens on." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Der Bildschirm, auf dem Panop sich öffnet."
+    "The provider answered with an error (%lld).": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der Anbieter hat mit einem Fehler geantwortet (%lld)."
           }
         }
       }
     },
-    "The source has no programme information for it." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Die Quelle hat dazu keine Programminformationen."
+    "The provider could not be reached for this programme.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der Anbieter war für diese Sendung nicht erreichbar."
           }
         }
       }
     },
-    "The TV guide address is not a valid web address." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Die Adresse des Programmführers ist keine gültige Webadresse."
+    "The provider did not return any channels, movies or series.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der Anbieter hat keine Sender, Filme oder Serien geliefert."
           }
         }
       }
     },
-    "The TV guide could not be downloaded." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Der Programmführer konnte nicht heruntergeladen werden."
+    "The provider has nothing at that address (404).": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der Anbieter hat unter dieser Adresse nichts (404)."
           }
         }
       }
     },
-    "The TV guide could not be loaded." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Der Programmführer konnte nicht geladen werden."
+    "The provider is having problems (%lld). Try again later.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der Anbieter hat Probleme (%lld). Versuche es später erneut."
           }
         }
       }
     },
-    "The TV guide download was damaged, so it was not used." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Der Download des Programmführers war beschädigt und wurde nicht verwendet."
+    "The provider refused access (%lld). Check the username and password.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der Anbieter hat den Zugriff verweigert (%lld). Prüfe Benutzername und Passwort."
           }
         }
       }
     },
-    "The TV guide is not in a format Panop understands." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Der Programmführer hat ein Format, das Panop nicht versteht."
+    "The provider rejected the username or password.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der Anbieter hat Benutzername oder Passwort abgelehnt."
           }
         }
       }
     },
-    "The two did not match. Choose a PIN again." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Die beiden stimmten nicht überein. Wähle die PIN erneut."
+    "The provider's latest list is missing %lld items. That can mean the download was cut off. Removing them also removes any favourites and watch progress on them.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In der neuesten Liste des Anbieters fehlen %lld Einträge. Das kann bedeuten, dass der Download abgebrochen wurde. Wenn du sie entfernst, gehen auch Favoriten und Fortschritt dazu verloren."
           }
         }
       }
     },
-    "Their names belong to their authors. Panop is not affiliated with or endorsed by any of them." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Die Namen gehören ihren Urhebern. Panop ist weder mit ihnen verbunden noch von ihnen empfohlen."
+    "The provider's reply was not in the expected format.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Antwort des Anbieters hatte nicht das erwartete Format."
           }
         }
       }
     },
-    "This build of Panop cannot use iCloud." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Diese Version von Panop kann iCloud nicht nutzen."
+    "The provider's server address is not valid.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Serveradresse des Anbieters ist ungültig."
           }
         }
       }
     },
-    "This item has no stream address. Refresh the playlist and try again." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dieser Eintrag hat keine Stream-Adresse. Aktualisiere die Playlist und versuche es erneut."
+    "The screen Panop opens on.": {
+      "extractionState": "stale",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der Bildschirm, auf dem Panop sich öffnet."
           }
         }
       }
     },
-    "This item is missing its provider id. Refresh the playlist and try again." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Diesem Eintrag fehlt die Anbieter-ID. Aktualisiere die Playlist und versuche es erneut."
+    "The source has no programme information for it.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Quelle hat dazu keine Programminformationen."
           }
         }
       }
     },
-    "This item's address is incomplete. Refresh the playlist and try again." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Die Adresse dieses Eintrags ist unvollständig. Aktualisiere die Playlist und versuche es erneut."
+    "The two did not match. Choose a PIN again.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die beiden stimmten nicht überein. Wähle die PIN erneut."
           }
         }
       }
     },
-    "This source does not group its content." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Diese Quelle gruppiert ihre Inhalte nicht."
+    "Their names belong to their authors. Panop is not affiliated with or endorsed by any of them.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Namen gehören ihren Urhebern. Panop ist weder mit ihnen verbunden noch von ihnen empfohlen."
           }
         }
       }
     },
-    "This source loaded, but has no live channels. It may only hold movies or series." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Diese Quelle wurde geladen, hat aber keine Live-Sender. Sie enthält vielleicht nur Filme oder Serien."
+    "This build of Panop cannot use iCloud.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diese Version von Panop kann iCloud nicht nutzen."
           }
         }
       }
     },
-    "This stream needs a player Panop doesn't have yet." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dieser Stream braucht einen Player, den Panop noch nicht hat."
+    "This item has no stream address. Refresh the playlist and try again.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dieser Eintrag hat keine Stream-Adresse. Aktualisiere die Playlist und versuche es erneut."
           }
         }
       }
     },
-    "This stream wouldn't open." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dieser Stream ließ sich nicht öffnen."
+    "This item is missing its provider id. Refresh the playlist and try again.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diesem Eintrag fehlt die Anbieter-ID. Aktualisiere die Playlist und versuche es erneut."
           }
         }
       }
     },
-    "This stream's address isn't valid. Check the link, or refresh the playlist." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Die Adresse dieses Streams ist ungültig. Prüfe den Link oder aktualisiere die Playlist."
+    "This item's address is incomplete. Refresh the playlist and try again.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Adresse dieses Eintrags ist unvollständig. Aktualisiere die Playlist und versuche es erneut."
           }
         }
       }
     },
-    "Thriller" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Thriller"
+    "This source does not group its content.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diese Quelle gruppiert ihre Inhalte nicht."
           }
         }
       }
     },
-    "Time spent waiting for data" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wartezeit auf Daten"
+    "This source loaded, but has no live channels. It may only hold movies or series.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diese Quelle wurde geladen, hat aber keine Live-Sender. Sie enthält vielleicht nur Filme oder Serien."
           }
         }
       }
     },
-    "Time to first picture, slowest tenth" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zeit bis zum ersten Bild, langsamstes Zehntel"
+    "This stream needs a player Panop doesn't have yet.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dieser Stream braucht einen Player, den Panop noch nicht hat."
           }
         }
       }
     },
-    "Time to first picture, typical" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zeit bis zum ersten Bild, typisch"
+    "This stream wouldn't open.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dieser Stream ließ sich nicht öffnen."
           }
         }
       }
     },
-    "Too many tries. Try again at %@." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zu viele Versuche. Versuche es um %@ erneut."
+    "This stream's address isn't valid. Check the link, or refresh the playlist.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Adresse dieses Streams ist ungültig. Prüfe den Link oder aktualisiere die Playlist."
           }
         }
       }
     },
-    "Top Box Office Movies" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kassenschlager"
+    "Thriller": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thriller"
           }
         }
       }
     },
-    "Top rated" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Am besten bewertet"
+    "Time spent waiting for data": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wartezeit auf Daten"
           }
         }
       }
     },
-    "Top rated movies" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Am besten bewertete Filme"
+    "Time to first picture, slowest tenth": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zeit bis zum ersten Bild, langsamstes Zehntel"
           }
         }
       }
     },
-    "Top Rated Movies" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bestbewertete Filme"
+    "Time to first picture, typical": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zeit bis zum ersten Bild, typisch"
           }
         }
       }
     },
-    "Top rated series" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Am besten bewertete Serien"
+    "Too many tries. Try again at %@.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zu viele Versuche. Versuche es um %@ erneut."
           }
         }
       }
     },
-    "Top Rated Series" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bestbewertete Serien"
+    "Top Box Office Movies": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kassenschlager"
           }
         }
       }
     },
-    "Touch and hold a channel, or swipe it, to add it here." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Halte einen Sender gedrückt oder wische darüber, um ihn hier hinzuzufügen."
+    "Top Rated Movies": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bestbewertete Filme"
           }
         }
       }
     },
-    "Translucent" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Durchscheinend"
+    "Top Rated Series": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bestbewertete Serien"
           }
         }
       }
     },
-    "Trending Movie Premieres" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Beliebte Film-Premieren"
+    "Top rated": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Am besten bewertet"
           }
         }
       }
     },
-    "Trending movies on Simkl" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Beliebte Filme auf Simkl"
+    "Top rated movies": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Am besten bewertete Filme"
           }
         }
       }
     },
-    "Trending series on Simkl" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Beliebte Serien auf Simkl"
+    "Top rated series": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Am besten bewertete Serien"
           }
         }
       }
     },
-    "Trending Series Premieres" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Beliebte Serien-Premieren"
+    "Touch and hold a channel, or swipe it, to add it here.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Halte einen Sender gedrückt oder wische darüber, um ihn hier hinzuzufügen."
           }
         }
       }
     },
-    "Try again" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Erneut versuchen"
+    "Translucent": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Durchscheinend"
           }
         }
       }
     },
-    "Turns on the next time Panop opens." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wird beim nächsten Öffnen von Panop aktiv."
+    "Trending Movie Premieres": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Beliebte Film-Premieren"
           }
         }
       }
     },
-    "TV Guide" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "TV-Programm"
+    "Trending Series Premieres": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Beliebte Serien-Premieren"
           }
         }
       }
     },
-    "TV guide address (optional)" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Adresse des Programmführers (optional)"
+    "Trending movies on Simkl": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Beliebte Filme auf Simkl"
           }
         }
       }
     },
-    "Type" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Typ"
+    "Trending series on Simkl": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Beliebte Serien auf Simkl"
           }
         }
       }
     },
-    "Up next" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Als Nächstes"
+    "Try again": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Erneut versuchen"
           }
         }
       }
     },
-    "Up to date · checked %@" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aktuell · geprüft %@"
+    "Turns on the next time Panop opens.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wird beim nächsten Öffnen von Panop aktiv."
           }
         }
       }
     },
-    "Username" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Benutzername"
+    "Type": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Typ"
           }
         }
       }
     },
-    "Version %@" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Version %@"
+    "Up next": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Als Nächstes"
           }
         }
       }
     },
-    "View on Simkl" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Auf Simkl ansehen"
+    "Up to date · checked %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aktuell · geprüft %@"
           }
         }
       }
     },
-    "Viewing sessions" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wiedergaben"
+    "Username": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Benutzername"
           }
         }
       }
     },
-    "Waiting for approval…" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Warte auf Bestätigung …"
+    "Version %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Version %@"
           }
         }
       }
     },
-    "Watch %@" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ ansehen"
+    "View on Simkl": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Auf Simkl ansehen"
           }
         }
       }
     },
-    "Watch again" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nochmal ansehen"
+    "Viewing sessions": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wiedergaben"
           }
         }
       }
     },
-    "Watch from the start" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Von Anfang an ansehen"
+    "Waiting for approval…": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Warte auf Bestätigung …"
           }
         }
       }
     },
-    "Watch now" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Jetzt ansehen"
+    "Watch %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ ansehen"
           }
         }
       }
     },
-    "Watch something and its numbers show up here." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Schau etwas, dann erscheinen hier die Zahlen."
+    "Watch again": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nochmal ansehen"
           }
         }
       }
     },
-    "Watched" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gesehen"
+    "Watch from the start": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Von Anfang an ansehen"
           }
         }
       }
     },
-    "Watched %lld percent" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld Prozent gesehen"
+    "Watch now": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jetzt ansehen"
           }
         }
       }
     },
-    "Welcome to Panop" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Willkommen bei Panop"
+    "Watch something and its numbers show up here.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schau etwas, dann erscheinen hier die Zahlen."
           }
         }
       }
     },
-    "When Panop opens" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Beim Öffnen von Panop"
+    "Watched": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gesehen"
           }
         }
       }
     },
-    "Where your channels, movies and series come from. Add or update your provider here." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Woher deine Sender, Filme und Serien kommen. Hier fügst du deinen Anbieter hinzu oder aktualisierst ihn."
+    "Watched %lld percent": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld Prozent gesehen"
           }
         }
       }
     },
-    "White" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Weiß"
+    "Welcome to Panop": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Willkommen bei Panop"
           }
         }
       }
     },
-    "whose approach to long-running live streams led to Panop's LumeEngine player." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "deren Ansatz für lange laufende Live-Streams zu Panops Player LumeEngine geführt hat."
+    "When Panop opens": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Beim Öffnen von Panop"
           }
         }
       }
     },
-    "With a PIN, adult content cannot be shown again, and the PIN cannot be changed, without it. The PIN stays on this device." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mit einer PIN können Inhalte für Erwachsene ohne sie nicht wieder angezeigt und die PIN nicht geändert werden. Die PIN bleibt auf diesem Gerät."
+    "Where your channels, movies and series come from. Add or update your provider here.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Woher deine Sender, Filme und Serien kommen. Hier fügst du deinen Anbieter hinzu oder aktualisierst ihn."
           }
         }
       }
     },
-    "Wrong PIN. %lld tries left." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Falsche PIN. Noch %lld Versuche."
+    "White": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Weiß"
           }
         }
       }
     },
-    "Wrong PIN. One try left before it locks." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Falsche PIN. Noch ein Versuch, dann wird gesperrt."
+    "With a PIN, adult content cannot be shown again, and the PIN cannot be changed, without it. The PIN stays on this device.": {
+      "extractionState": "stale",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mit einer PIN können Inhalte für Erwachsene ohne sie nicht wieder angezeigt und die PIN nicht geändert werden. Die PIN bleibt auf diesem Gerät."
           }
         }
       }
     },
-    "Xtream · %@" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Xtream · %@"
+    "Wrong PIN. %lld tries left.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Falsche PIN. Noch %lld Versuche."
           }
         }
       }
     },
-    "Yellow" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gelb"
+    "Wrong PIN. One try left before it locks.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Falsche PIN. Noch ein Versuch, dann wird gesperrt."
           }
         }
       }
     },
-    "Your content" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Deine Inhalte"
+    "Xtream · %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Xtream · %@"
           }
         }
       }
     },
-    "Your list: %@" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Deine Liste: %@"
+    "Yellow": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gelb"
           }
         }
       }
     },
-    "Your login is checked with the provider, then kept in the Keychain on this device." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Deine Anmeldedaten werden beim Anbieter geprüft und dann im Schlüsselbund dieses Geräts gespeichert."
+    "Your content": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deine Inhalte"
           }
         }
       }
     },
-    "Your playlists have none yet." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Deine Playlists haben noch keine."
+    "Your list: %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deine Liste: %@"
+          }
+        }
+      }
+    },
+    "Your login is checked with the provider, then kept in the Keychain on this device.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deine Anmeldedaten werden beim Anbieter geprüft und dann im Schlüsselbund dieses Geräts gespeichert."
+          }
+        }
+      }
+    },
+    "Your playlists have none yet.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deine Playlists haben noch keine."
+          }
+        }
+      }
+    },
+    "and enter": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "und gib ein"
+          }
+        }
+      }
+    },
+    "for showing how much a guide-first live TV app can do.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "dafür, wie viel eine Live-TV-App mit dem Programm im Mittelpunkt kann."
+          }
+        }
+      }
+    },
+    "for what a modern, rail-based home screen can feel like.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "dafür, wie sich ein moderner Startbildschirm aus Reihen anfühlen kann."
+          }
+        }
+      }
+    },
+    "http://provider.example:8080": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "http://provider.example:8080"
+          }
+        }
+      }
+    },
+    "https://provider.example/playlist.m3u": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "https://provider.example/playlist.m3u"
+          }
+        }
+      }
+    },
+    "iCloud": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud"
+          }
+        }
+      }
+    },
+    "iCloud could not be opened, so this device's own copy is in use.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud konnte nicht geöffnet werden, daher wird die Kopie dieses Geräts verwendet."
+          }
+        }
+      }
+    },
+    "whose approach to long-running live streams led to Panop's LumeEngine player.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "deren Ansatz für lange laufende Live-Streams zu Panops Player LumeEngine geführt hat."
           }
         }
       }
     }
   },
-  "version" : "1.0"
+  "version": "1.0"
 }
