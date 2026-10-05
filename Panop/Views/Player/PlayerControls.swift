@@ -6,6 +6,8 @@ import SwiftUI
 /// talks to `PlayerModel`.
 struct PlayerControls: View {
     let model: PlayerModel
+    /// Opens the TV guide over the stream, to see what is on and switch to it. Nil for a film.
+    var onShowGuide: (() -> Void)?
 
     /// The scrubber's own value while a finger is on it, so the coordinator is asked to
     /// seek once, on release, and not on every movement.
@@ -13,7 +15,7 @@ struct PlayerControls: View {
 
     /// Which control has focus, on Apple TV, so the bar can stay up while it is being used.
     private enum Control: Hashable {
-        case play, back, forward, audio, subtitles
+        case play, back, forward, audio, subtitles, guide
     }
 
     @FocusState private var focused: Control?
@@ -63,6 +65,16 @@ struct PlayerControls: View {
             } else {
                 liveBadge
                 Spacer()
+            }
+
+            if let onShowGuide {
+                Button(action: onShowGuide) {
+                    Image(systemName: "calendar").font(.title3)
+                }
+                .trackFocus($focused, .guide)
+                .accessibilityLabel("TV Guide")
+                // The Live TV screen behind a full-screen player has a button of the same name.
+                .accessibilityIdentifier("playerGuide")
             }
 
             tracks

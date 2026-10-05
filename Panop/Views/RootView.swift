@@ -62,6 +62,9 @@ struct RootView: View {
     @Environment(UserStateStore.self) private var userState
     @Environment(\.horizontalSizeClass) private var sizeClass
     @State private var searchRequests = SearchCoordinator()
+    #if os(macOS)
+        @Environment(EmbeddedPlayback.self) private var embedded
+    #endif
     @Environment(\.modelContext) private var catalog
     @State private var selection: AppTab
     @State private var autoplay: PlaybackTarget?
@@ -169,113 +172,123 @@ struct RootView: View {
         #endif
         // Everything under it starts again, so no screen shows the last person's lists.
         .environment(searchRequests)
-        .id(profiles.currentID)
-        // Choosing Search does not move to a screen: the selection goes straight back to where it was, and the
-        // screen that was on show is asked to open its search field.
-        .onChange(of: selection) { old, new in
-            #if !os(tvOS)
-                if new == .search {
-                    var transaction = Transaction()
-                    transaction.disablesAnimations = true
-                    withTransaction(transaction) { selection = old }
-                    searchRequests.request(for: old)
-                }
-            #endif
-        }
-        .onChange(of: settingsInBar, initial: true) { _, inBar in
-            if !inBar, selection == .settings {
-                selection = .home
-            }
-        }
-        .onChange(of: library.offersVOD) { _, offered in
-            // A screen that went away cannot stay selected.
-            if !offered, selection == .movies || selection == .series {
-                selection = .home
-            }
-        }
         #if os(macOS)
-        .modifier(DebugPlayerWindowOpener())
+            // The guide asked for from the stream is on the Live TV screen.
+            .onChange(of: embedded.guideRequested) { _, asked in
+                if asked {
+                    selection = .live
+                }
+            }
         #endif
-        // Playlists the user added keep themselves current without being asked.
-        // The work runs on the sync service's actor, not here.
-        .task { await library.refreshStale(maxAge: 12 * 3600) }
-        .environment(discovery)
-        .environment(profiles)
-        // Logins travel with the playlists only when the person wants it and iCloud is on. Run at launch and
-        // whenever either changes: it sends what is there, takes what has arrived, or withdraws it.
-        .task(id: [syncsLogins, cloudSync.availability == .active]) {
-            let allowed = syncsLogins && cloudSync.availability == .active
-            library.syncsLogins = { allowed }
-            library.reconcileLogins()
-        }
-        // What another device changes arrives as an import: read it, and drop what was removed there.
-        .task(id: cloudSync.availability == .active) {
-            guard cloudSync.availability == .active else { return }
-            for await _ in CloudChanges.imports() {
-                userState.reloadAfterRemoteChange()
-                await library.applyRemoteChanges()
+            .id(profiles.currentID)
+            // Choosing Search does not move to a screen: the selection goes straight back to where it was, and the
+            // screen that was on show is asked to open its search field.
+            .onChange(of: selection) { old, new in
+                #if !os(tvOS)
+                    if new == .search {
+                        var transaction = Transaction()
+                        transaction.disablesAnimations = true
+                        withTransaction(transaction) { selection = old }
+                        searchRequests.request(for: old)
+                    }
+                #endif
             }
-        } // Another person's profile: their state replaces this one's, and what was suggested is dropped.
-        .onChange(of: profiles.currentID, initial: true) {
-            if userState.profile != profiles.currentID {
-                userState.switchProfile(profiles.currentID)
-                discovery.reset()
+            .onChange(of: settingsInBar, initial: true) { _, inBar in
+                if !inBar, selection == .settings {
+                    selection = .home
+                }
             }
-            userState.hidesAdult = profiles.current.hidesAdult
-        }
-        .onChange(of: profiles.current.hidesAdult, initial: true) { userState.hidesAdult = profiles.current.hidesAdult }
-        // Which categories a provider calls adult is read from the catalog, again after each sync.
-        .task(id: [library.playlists.count, status.isAnySyncing ? 1 : 0]) {
-            let reader = CatalogReader(container: catalog.container)
-            for kind in [MediaKind.live, .movie, .series] {
-                let names = await reader.categoryNames(kind: kind, source: nil)
-                userState.adultCategoryNames[kind.rawValue] = Set(names.filter(TitleMetadata.isAdultCategory))
+            .onChange(of: library.offersVOD) { _, offered in
+                // A screen that went away cannot stay selected.
+                if !offered, selection == .movies || selection == .series {
+                    selection = .home
+                }
             }
-        }
-        .environment(simkl)
-        .environment(parental)
-        .environment(simklSync)
-        // What is finished goes to Simkl only while connected and switched on; the queue belongs to the
-        // account it was made for, so signing out drops it.
-        .task(id: [sendsWatched, simkl.isConnected, showsTrending, showsSuggestions, showsCustomLists]) {
-            userState.onFinished = { [simklSync] key, date in simklSync.finished(key, at: date) }
-            simklSync.isEnabled = sendsWatched && simkl.isConnected
-            if simkl.isConnected {
-                simklSync.flushIfNeeded()
-                await simklLibrary.refresh()
-                // Simkl's real rankings and the person's own lists. A refused login signs them out.
-                do {
-                    try await discovery.refreshAccountLists(
-                        client: simklClient,
-                        wantsRanked: showsTrending && showsSuggestions,
-                        wantsCustom: showsCustomLists && showsSuggestions
-                    )
-                } catch SimklError.unauthorized {
-                    await simkl.signOut()
-                } catch {}
-            } else {
-                simklSync.discardQueue()
-                simklLibrary.clear()
-                await discovery.clearAccountLists()
+        #if os(macOS)
+            .modifier(DebugPlayerWindowOpener())
+        #endif
+            // Playlists the user added keep themselves current without being asked.
+            // The work runs on the sync service's actor, not here.
+            .task { await library.refreshStale(maxAge: 12 * 3600) }
+            .environment(discovery)
+            .environment(profiles)
+            // Logins travel with the playlists only when the person wants it and iCloud is on. Run at launch and
+            // whenever either changes: it sends what is there, takes what has arrived, or withdraws it.
+            .task(id: [syncsLogins, cloudSync.availability == .active]) {
+                let allowed = syncsLogins && cloudSync.availability == .active
+                library.syncsLogins = { allowed }
+                library.reconcileLogins()
             }
-        }
-        .onChange(of: simklLibrary.items, initial: true) { discovery.setSimklLists(simklLibrary.items) }
-        .task(id: showsTrending && showsSuggestions) {
-            await discovery.loadTrending(enabled: showsTrending && showsSuggestions, source: .panop)
-        }
-        .onChange(of: showsSuggestions, initial: true) { discovery.isEnabled = showsSuggestions }
-        // Rebuilt whenever what the rails are made from changes; an unchanged context is ignored. The
-        // playlists are part of the key: they may load after the first pass, and nothing else would rerun it.
-        .task(id: [userState.revision, library.playlists.count]) {
-            guard !library.playlists.isEmpty else { return }
-            discovery.start(
-                container: catalog.container,
-                cacheURL: DiscoveryModel.cacheURL(profile: userState.profile)
-            )
-            discovery.update(DiscoveryContext.current(userState))
-        }
-        .modifier(PlayerPresentation(target: $autoplay))
-        .task { applyStartupPlan() }
+            // What another device changes arrives as an import: read it, and drop what was removed there.
+            .task(id: cloudSync.availability == .active) {
+                guard cloudSync.availability == .active else { return }
+                for await _ in CloudChanges.imports() {
+                    userState.reloadAfterRemoteChange()
+                    await library.applyRemoteChanges()
+                }
+            } // Another person's profile: their state replaces this one's, and what was suggested is dropped.
+            .onChange(of: profiles.currentID, initial: true) {
+                if userState.profile != profiles.currentID {
+                    userState.switchProfile(profiles.currentID)
+                    discovery.reset()
+                }
+                userState.hidesAdult = profiles.current.hidesAdult
+            }
+            .onChange(of: profiles.current.hidesAdult, initial: true) {
+                userState.hidesAdult = profiles.current.hidesAdult
+            }
+            // Which categories a provider calls adult is read from the catalog, again after each sync.
+            .task(id: [library.playlists.count, status.isAnySyncing ? 1 : 0]) {
+                let reader = CatalogReader(container: catalog.container)
+                for kind in [MediaKind.live, .movie, .series] {
+                    let names = await reader.categoryNames(kind: kind, source: nil)
+                    userState.adultCategoryNames[kind.rawValue] = Set(names.filter(TitleMetadata.isAdultCategory))
+                }
+            }
+            .environment(simkl)
+            .environment(parental)
+            .environment(simklSync)
+            // What is finished goes to Simkl only while connected and switched on; the queue belongs to the
+            // account it was made for, so signing out drops it.
+            .task(id: [sendsWatched, simkl.isConnected, showsTrending, showsSuggestions, showsCustomLists]) {
+                userState.onFinished = { [simklSync] key, date in simklSync.finished(key, at: date) }
+                simklSync.isEnabled = sendsWatched && simkl.isConnected
+                if simkl.isConnected {
+                    simklSync.flushIfNeeded()
+                    await simklLibrary.refresh()
+                    // Simkl's real rankings and the person's own lists. A refused login signs them out.
+                    do {
+                        try await discovery.refreshAccountLists(
+                            client: simklClient,
+                            wantsRanked: showsTrending && showsSuggestions,
+                            wantsCustom: showsCustomLists && showsSuggestions
+                        )
+                    } catch SimklError.unauthorized {
+                        await simkl.signOut()
+                    } catch {}
+                } else {
+                    simklSync.discardQueue()
+                    simklLibrary.clear()
+                    await discovery.clearAccountLists()
+                }
+            }
+            .onChange(of: simklLibrary.items, initial: true) { discovery.setSimklLists(simklLibrary.items) }
+            .task(id: showsTrending && showsSuggestions) {
+                await discovery.loadTrending(enabled: showsTrending && showsSuggestions, source: .panop)
+            }
+            .onChange(of: showsSuggestions, initial: true) { discovery.isEnabled = showsSuggestions }
+            // Rebuilt whenever what the rails are made from changes; an unchanged context is ignored. The
+            // playlists are part of the key: they may load after the first pass, and nothing else would rerun it.
+            .task(id: [userState.revision, library.playlists.count]) {
+                guard !library.playlists.isEmpty else { return }
+                discovery.start(
+                    container: catalog.container,
+                    cacheURL: DiscoveryModel.cacheURL(profile: userState.profile)
+                )
+                discovery.update(DiscoveryContext.current(userState))
+            }
+            .modifier(PlayerPresentation(target: $autoplay))
+            .task { applyStartupPlan() }
     }
 }
 

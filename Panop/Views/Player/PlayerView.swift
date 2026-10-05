@@ -10,6 +10,9 @@ struct PlayerScreen: View {
     /// the app that leaves the stream playing.
     var onClose: (() -> Void)?
     var onBrowse: (() -> Void)?
+    /// Where the guide is part of the app (a Mac's main window): asks the app to open it, in place of a sheet over the
+    /// stream.
+    var onShowGuideInApp: (() -> Void)?
 
     @Environment(PlaylistLibrary.self) private var library
     @Environment(UserStateStore.self) private var userState
@@ -18,12 +21,24 @@ struct PlayerScreen: View {
 
     @State private var model: PlayerModel?
     @State private var problem: String?
+    /// What plays now, once the person has switched channel from the guide; until then, `target`.
+    @State private var switchedTo: PlaybackTarget?
+    @State private var showingGuide = false
+
+    private var playing: PlaybackTarget {
+        switchedTo ?? target
+    }
 
     var body: some View {
         ZStack {
             Color.black.ignoresSafeArea()
             if let model {
-                PlayerView(model: model, onClose: onClose, onBrowse: onBrowse)
+                PlayerView(
+                    model: model,
+                    onClose: onClose,
+                    onBrowse: onBrowse,
+                    onShowGuide: playing.kind == .live ? (onShowGuideInApp ?? { showingGuide = true }) : nil
+                )
             } else if let problem {
                 PlayerProblem(text: problem)
             } else {
@@ -31,10 +46,22 @@ struct PlayerScreen: View {
             }
         }
         .task { resolve() }
+        .modifier(PlayerGuidePresentation(isPresented: $showingGuide) { switchTo($0) })
+    }
+
+    /// Plays another channel in place of this one, from the guide.
+    private func switchTo(_ new: PlaybackTarget) {
+        showingGuide = false
+        switchedTo = new
+        // The old picture goes, and with it its player; the new one is made as a first one is.
+        model = nil
+        problem = nil
+        resolve()
     }
 
     private func resolve() {
         guard model == nil else { return }
+        let target = playing
         do {
             let source = try library.descriptor(for: target.playlist)?.source
             let request = try PlaybackRequestBuilder.request(
@@ -64,10 +91,52 @@ struct PlayerScreen: View {
     }
 }
 
+/// The TV guide over a playing stream: a sheet, or on Apple TV the whole screen. Choosing a channel hands it back.
+private struct PlayerGuidePresentation: ViewModifier {
+    @Binding var isPresented: Bool
+    let onPlay: (PlaybackTarget) -> Void
+
+    @Environment(UserStateStore.self) private var userState
+
+    func body(content: Content) -> some View {
+        #if os(tvOS)
+            content.fullScreenCover(isPresented: $isPresented) { guide }
+        #else
+            content.sheet(isPresented: $isPresented) {
+                NavigationStack {
+                    guide
+                        .toolbar {
+                            ToolbarItem(placement: .confirmationAction) {
+                                Button("Done") { isPresented = false }
+                            }
+                        }
+                }
+                #if os(macOS)
+                .frame(minWidth: 760, minHeight: 480)
+                #endif
+            }
+        #endif
+    }
+
+    /// Every channel, in the provider's order, minus what the person has hidden.
+    private var guide: some View {
+        GuideGridView(
+            spec: ListSpec(
+                kind: .live,
+                hidden: userState.hidden,
+                hiddenGroups: userState.hiddenCategories(of: .live)
+            ),
+            narrow: { $0 },
+            onPlayChannel: onPlay
+        )
+    }
+}
+
 struct PlayerView: View {
     let model: PlayerModel
     var onClose: (() -> Void)?
     var onBrowse: (() -> Void)?
+    var onShowGuide: (() -> Void)?
 
     @Environment(\.dismiss) private var dismiss
 
@@ -141,7 +210,7 @@ struct PlayerView: View {
             }
 
             if model.showsControls, model.failureText == nil {
-                PlayerControls(model: model)
+                PlayerControls(model: model, onShowGuide: onShowGuide)
                     .transition(.opacity)
             }
         }

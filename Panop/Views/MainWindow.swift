@@ -16,7 +16,8 @@
                     PlayerScreen(
                         target: target,
                         onClose: { playback.stop() },
-                        onBrowse: { playback.sendToBack() }
+                        onBrowse: { playback.sendToBack() },
+                        onShowGuideInApp: { playback.showGuide() }
                     )
                     .id(target.id)
                 }

@@ -32,6 +32,26 @@ final class PlayerTests: PanopUITestCase {
         XCTAssertTrue(app.staticTexts["playerClock"].exists, "the time of day is not shown with the controls")
     }
 
+    #if !os(tvOS)
+        /// The guide opens over the stream, and choosing a channel in it switches the stream to that channel.
+        func testTheGuideOpensFromThePlayerAndSwitchesChannel() {
+            openFirstChannel()
+            waitForPlayerControls()
+
+            XCTAssertTrue(app.buttons["playerGuide"].exists, "no TV Guide in the player's controls")
+            app.buttons["playerGuide"].tap()
+            let news = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Seeded News,")).firstMatch
+            XCTAssertTrue(
+                news.waitForExistence(timeout: 20),
+                "the guide did not open over the stream. Screen:\n\(app.debugDescription)"
+            )
+
+            app.buttons["Watch Arte"].tap()
+            waitForPlayerControls()
+            XCTAssertTrue(app.staticTexts["Arte"].waitForExistence(timeout: 10), "the stream did not switch to Arte")
+        }
+    #endif
+
     func testPausingChangesTheButtonToPlay() {
         openFirstChannel()
         waitForPlayerControls()

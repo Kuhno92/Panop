@@ -14,6 +14,9 @@ struct LiveTVView: View {
     @AppStorage("liveListMode") private var storedMode = LiveListMode.all.rawValue
     @AppStorage("liveSortOrder") private var storedOrder = LiveOrder.provider.rawValue
     @State private var search = ""
+    #if os(macOS)
+        @Environment(EmbeddedPlayback.self) private var embedded
+    #endif
     @State private var group: String?
     @State private var showingAdd = false
     @State private var playing: PlaybackTarget?
@@ -141,6 +144,16 @@ struct LiveTVView: View {
         .sheet(isPresented: $showingAdd) {
             NavigationStack { AddPlaylistView() }
         }
+        #if os(macOS)
+        // Asked for from the stream playing behind the app: this screen opens its guide, whether it was already on
+        // show or has only just been chosen.
+        .onChange(of: embedded.guideRequested, initial: true) {
+            if embedded.guideRequested {
+                showingGuide = true
+                embedded.guideRequested = false
+            }
+        }
+        #endif
         .modifier(GuidePresentation(isPresented: $showingGuide) {
             GuideGridView(spec: spec, narrow: {
                 LiveListNarrowing.rows(

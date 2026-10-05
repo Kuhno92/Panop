@@ -12,6 +12,9 @@ struct GuideGridView: View {
     let spec: ListSpec
     /// Narrows the rows read for `spec` the way the Live TV list does (favourites, recents, source, search).
     let narrow: ([CatalogRow]) -> [CatalogRow]
+    /// Set where the guide is opened from a stream that is already playing: choosing a channel or a programme then
+    /// switches that stream, instead of opening a second player.
+    var onPlayChannel: ((PlaybackTarget) -> Void)?
 
     @Environment(UserStateStore.self) private var userState
     @Environment(\.modelContext) private var catalog
@@ -82,7 +85,7 @@ struct GuideGridView: View {
                 GuideProgrammeSheet(
                     selection: selection,
                     onPlay: { selected = nil; play($0) },
-                    onPlayTarget: { selected = nil; playing = $0 }
+                    onPlayTarget: { selected = nil; start($0) }
                 )
             }
             .modifier(PlayerPresentation(target: $playing))
@@ -90,7 +93,15 @@ struct GuideGridView: View {
 
     private func play(_ channel: CatalogRow) {
         userState.markPlayed(channel.id)
-        playing = PlaybackTarget(row: channel)
+        start(PlaybackTarget(row: channel))
+    }
+
+    private func start(_ target: PlaybackTarget) {
+        if let onPlayChannel {
+            onPlayChannel(target)
+        } else {
+            playing = target
+        }
     }
 }
 

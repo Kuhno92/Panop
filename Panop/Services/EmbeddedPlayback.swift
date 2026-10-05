@@ -35,6 +35,17 @@
             isFront = false
         }
 
+        /// Set when the person asked, from the stream, to see the TV guide: the stream goes behind, and the Live TV
+        /// screen
+        /// opens its guide and clears this.
+        var guideRequested = false
+
+        /// Goes back to the app and on to the guide, with the stream playing on behind it.
+        func showGuide() {
+            guideRequested = true
+            isFront = false
+        }
+
         func stop() {
             target = nil
             isFront = false

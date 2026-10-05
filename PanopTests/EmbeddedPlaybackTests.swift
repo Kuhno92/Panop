@@ -55,6 +55,18 @@
         }
 
         @Test
+        func `asking for the guide goes back to the app and keeps the stream playing`() {
+            let playback = EmbeddedPlayback()
+            playback.play(target("Arte"))
+
+            playback.showGuide()
+
+            #expect(playback.guideRequested)
+            #expect(!playback.isFront)
+            #expect(playback.isPlaying, "the stream plays on behind the guide")
+        }
+
+        @Test
         func `stopping clears it, and there is nothing to bring forward`() {
             let playback = EmbeddedPlayback()
             playback.play(target("Arte"))
