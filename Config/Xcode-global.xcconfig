@@ -1,0 +1,6 @@
+// Applies to every target in the build, packages included, when Xcode is started with
+// XCODE_XCCONFIG_FILE pointing here (Scripts/xcode-env.sh). Project settings cannot reach package targets.
+//
+// macOS only: with explicit modules on, the compile of FFmpegKit (KSPlayer's FFmpeg) fails with
+// "module file '...Libavformat-<hash>.pcm' not found" (docs/engines.md, ADR 0010).
+SWIFT_ENABLE_EXPLICIT_MODULES[sdk=macosx*] = NO

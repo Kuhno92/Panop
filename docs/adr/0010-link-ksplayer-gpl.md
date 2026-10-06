@@ -32,9 +32,10 @@ Two problems, each with a workaround that lives in the repository.
 2. **Explicit modules.** On macOS the compile of FFmpegKit's module fails with `module file '...Libavformat-<hash>.pcm'
    not found` (the module is requested with a different hash than it is built with). `SWIFT_ENABLE_EXPLICIT_MODULES=NO`
    avoids it, but a project-level setting does not reach package targets, so it has to be passed on the command line.
-   `Scripts/build-all-platforms.sh` and `Scripts/test-app.sh` pass it for macOS. **Building the macOS app from the Xcode
-   window fails with that error** until Xcode or the package fixes it; build with the scripts, or run
-   `xcodebuild ... SWIFT_ENABLE_EXPLICIT_MODULES=NO`.
+   `Scripts/build-all-platforms.sh` and `Scripts/test-app.sh` pass it for macOS. For the Xcode window, run
+   `Scripts/xcode-env.sh` once (add `--login` to keep it across logins) and reopen Xcode: it points Xcode at
+   `Config/Xcode-global.xcconfig` through `XCODE_XCCONFIG_FILE`, which, unlike a project setting, applies to package
+   targets too. Without it the window fails with the `.pcm not found` error.
 
 ## Consequences
 - **App Store.** The GPL and the App Store's terms have a long history of conflict (VLC changed licence over it).

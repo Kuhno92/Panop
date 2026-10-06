@@ -345,6 +345,6 @@ LumeEngine's FFmpeg in any compile that sees both. So:
   or FFmpeg type. It is a local path package with `-enable-library-evolution` and internal imports; do not make it a
   URL dependency (SwiftPM drops unsafe flags there), and do not make its imports public.
 - macOS needs two workarounds (ADR 0010): `Scripts/deepen-frameworks.sh` (a build phase) rebuilds FFmpegKit's shallow
-  frameworks in the versioned layout, and macOS builds pass `SWIFT_ENABLE_EXPLICIT_MODULES=NO` (the scripts do; the
-  Xcode window does not, and then fails on `Libavformat-<hash>.pcm not found`).
+  frameworks in the versioned layout, and macOS builds pass `SWIFT_ENABLE_EXPLICIT_MODULES=NO` (the scripts do; for the
+  Xcode window run `Scripts/xcode-env.sh` once and reopen Xcode, or it fails on `Libavformat-<hash>.pcm not found`).
 - Dependencies stay GPL-compatible: MIT and LGPL are fine, AGPL (`reference/Lume`) is not a source of code.

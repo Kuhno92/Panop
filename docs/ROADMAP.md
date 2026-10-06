@@ -793,7 +793,7 @@ Things needing a human answer before the milestone that depends on them.
 - [x] **Install the iOS and tvOS platforms** so those builds can be verified at all (both installed, all test scripts run):
       `xcodebuild -downloadPlatform iOS` and `-downloadPlatform tvOS`.
 - [x] **KSPlayer**: linked on iOS, tvOS and macOS, Panop is GPL-3.0 (ADR 0010).
-- [ ] **Xcode window builds for macOS**: fail on `Libavformat-<hash>.pcm not found` unless `SWIFT_ENABLE_EXPLICIT_MODULES=NO` is passed; only the scripts do. Find a setting that reaches the package targets.
+- [x] **Xcode window builds for macOS**: `Scripts/xcode-env.sh` sets `XCODE_XCCONFIG_FILE` (explicit modules off). A real fix would be upstream (FFmpegKit/Xcode).
 - [ ] **KSPlayer on the real provider**: run the matrix (`PANOP_MATRIX_ENGINES=KSPlayer`), then place it in the default order; today's last place is a guess.
 - [ ] **App Store and the GPL**: take advice before submitting.
 - [ ] **Metadata enrichment** (TMDB artwork, ratings) and **scrobbling** (Trakt, Simkl). Both
