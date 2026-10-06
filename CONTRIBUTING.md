@@ -40,7 +40,8 @@ These are in [AGENTS.md](AGENTS.md) with full reasoning. Summarised:
 1. **`Packages/PanopKit` imports no Apple-only framework.** The core must keep compiling on
    Linux, Windows, and Android. A SwiftLint rule and a Linux CI job enforce this.
 2. **LumeEngine stays a submodule path dependency**, never a URL dependency.
-3. **Never add KSPlayer as a dependency.** It is GPL-3.0 and would relicense the app.
+3. **KSPlayer stays behind `Packages/KSPlayerBridge`.** Importing it (or FFmpegKit) in the app target breaks the
+   build, because its FFmpeg collides with AetherEngine's and LumeEngine's.
 4. **Every test `ModelConfiguration` sets `cloudKitDatabase: .none`.**
 5. **Never bind `@Query` against the cloud container.**
 6. **No retry or reconnect logic inside an engine adapter.**
@@ -62,17 +63,16 @@ than working around the rule.
 
 ## Licensing
 
-Panop is MIT. Two things to be careful about:
+Panop is GPL-3.0. Two things to be careful about:
 
 **`reference/` is off limits as a source of code.** It holds third-party clones for occasional
 design reference and is gitignored. `reference/Lume` is AGPL-3.0. Reading it to understand an
 approach is fine. Copying from it, including scripts and configuration, is not, and would make
 Panop undistributable. See [ADR 0001](docs/adr/0001-clean-room-mit.md).
 
-**Check the license before adding a dependency.** Copyleft licenses (GPL, AGPL) are
-incompatible with Panop and with App Store distribution. LGPL is acceptable if dynamically
-linked. This is not hypothetical: KSPlayer was dropped from the shipped build for exactly this
-reason.
+**Check the license before adding a dependency.** GPL-3.0, LGPL (dynamically
+linked) and MIT are fine. AGPL and licences with extra restrictions are not. Contributions are accepted under
+GPL-3.0. See [ADR 0010](docs/adr/0010-link-ksplayer-gpl.md).
 
 ## Using AI coding agents
 

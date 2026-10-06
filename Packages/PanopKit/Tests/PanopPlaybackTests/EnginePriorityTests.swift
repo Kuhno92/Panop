@@ -11,13 +11,16 @@ struct EnginePriorityTests {
     @Test
     func `an MP4 film starts with AVPlayer, which plays it`() {
         let order = PlaybackEngineKind.defaultPriority(for: request("http://h/movie/u/p/1.mp4", .movie))
-        #expect(order == [.avPlayer, .lumeEngine, .vlcKit, .aetherEngine])
+        #expect(order == [.avPlayer, .lumeEngine, .vlcKit, .aetherEngine, .ksPlayer])
     }
 
     @Test
     func `an MKV film does not start with AVPlayer, which refuses it`() {
         let order = PlaybackEngineKind.defaultPriority(for: request("http://h/movie/u/p/1.mkv", .movie))
-        #expect(order == [.lumeEngine, .vlcKit, .aetherEngine, .avPlayer], "AVPlayer is the last resort, not left out")
+        #expect(
+            order == [.lumeEngine, .vlcKit, .aetherEngine, .avPlayer, .ksPlayer],
+            "AVPlayer is a late resort, not left out"
+        )
     }
 
     @Test
@@ -48,7 +51,7 @@ struct EnginePriorityTests {
         #expect(PlaybackEngineKind.order(preferred: .vlcKit, for: live).first == .vlcKit)
         let rest = PlaybackEngineKind.order(preferred: .vlcKit, for: live).dropFirst()
         #expect(
-            Array(rest) == [.lumeEngine, .avPlayer],
+            Array(rest) == [.lumeEngine, .avPlayer, .ksPlayer],
             "the others follow in the default order, without repeating the choice"
         )
     }

@@ -1,6 +1,6 @@
 # 0001. Clean-room implementation under MIT
 
-**Status:** accepted
+**Status:** accepted; the licence part is superseded by ADR 0010 (GPL-3.0 from 2026-10-06). The clean-room rule stands.
 
 ## Context
 

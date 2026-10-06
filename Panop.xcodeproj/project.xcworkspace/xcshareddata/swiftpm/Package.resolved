@@ -1,5 +1,5 @@
 {
-  "originHash" : "418191cd6a1b658dcd85d341b47b58818648462514223e0f6918e4361203ac6d",
+  "originHash" : "734e28a53ebd58994c363f141c179d6906cb2be8cf4aa6f2e8957b9ba7bb84b2",
   "pins" : [
     {
       "identity" : "aetherengine",
@@ -17,6 +17,24 @@
       "state" : {
         "revision" : "fda08325455bc12c112b5b82d014b98fa0fee0be",
         "version" : "3.6.0"
+      }
+    },
+    {
+      "identity" : "ffmpegkit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/kingslay/FFmpegKit.git",
+      "state" : {
+        "revision" : "c32be9bfb628042737ad3ef622e930c5c7b15954",
+        "version" : "6.1.4"
+      }
+    },
+    {
+      "identity" : "ksplayer",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/kingslay/KSPlayer",
+      "state" : {
+        "revision" : "bdfa2da39bb18865b317c4ffd08cdef5f8efc043",
+        "version" : "2.3.4"
       }
     },
     {

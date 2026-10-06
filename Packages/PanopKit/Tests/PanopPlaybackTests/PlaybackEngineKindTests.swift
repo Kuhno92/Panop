@@ -3,20 +3,14 @@ import Testing
 
 @Suite("PlaybackEngineKind")
 struct PlaybackEngineKindTests {
-    /// This is a licensing invariant, not a preference. KSPlayer is GPL-3.0 and
-    /// its dependency is deliberately not linked, so anything that offers it to
-    /// the user would select an engine that cannot play. See docs/adr/0002.
+    /// KSPlayer is linked (iOS, tvOS), so it is offered like the others; the app's registry hides it where
+    /// there is no adapter (macOS). See docs/adr/0010.
     @Test
-    func `available excludes KSPlayer unless the build opts in`() {
-        #if PANOP_ENABLE_KSPLAYER
-            #expect(PlaybackEngineKind.available.contains(.ksPlayer))
-        #else
-            #expect(!PlaybackEngineKind.available.contains(.ksPlayer))
-            #expect(PlaybackEngineKind.available.count == 4)
-        #endif
+    func `available includes every engine`() {
+        #expect(PlaybackEngineKind.available.contains(.ksPlayer))
+        #expect(PlaybackEngineKind.available.count == 5)
     }
 
-    /// The case still exists so the adapter can compile under the flag.
     @Test
     func `the KSPlayer case is still declared`() {
         #expect(PlaybackEngineKind.allCases.contains(.ksPlayer))

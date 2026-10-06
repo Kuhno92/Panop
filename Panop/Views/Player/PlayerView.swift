@@ -178,12 +178,30 @@ struct PlayerView: View {
             AVPlayerSurface(player: engine.player, onLayer: { engine.attach(layer: $0) }).ignoresSafeArea()
         } else if let engine = model.engine as? AetherPlaybackEngine {
             AetherPlayerSurface(engine: engine.player).ignoresSafeArea()
+        } else if let engine = ksPlayerSurface {
+            VLCSurface(view: engine).ignoresSafeArea()
         } else if let engine = model.engine as? VLCEngine {
             VLCSurface(view: engine.surface).ignoresSafeArea()
         } else if let engine = model.engine as? LumePlaybackEngine {
             // The wrapper only hands an engine-owned view to SwiftUI, whichever engine.
             VLCSurface(view: engine.surface).ignoresSafeArea()
         }
+    }
+
+    private var ksPlayerSurface: PlatformView? {
+        #if os(iOS) || os(tvOS)
+            (model.engine as? KSPlayerEngine)?.surface
+        #else
+            nil
+        #endif
+    }
+
+    private var ksPlayerSubtitles: SubtitleDisplay? {
+        #if os(iOS) || os(tvOS)
+            (model.engine as? KSPlayerEngine)?.subtitles
+        #else
+            nil
+        #endif
     }
 
     /// Subtitle text for the engine that leaves drawing to us. Sits above the controls
@@ -194,6 +212,8 @@ struct PlayerView: View {
             SubtitleOverlay(display: engine.subtitles, controlsUp: model.showsControls)
         } else if let engine = model.engine as? AetherPlaybackEngine {
             SubtitleOverlay(display: engine.subtitles, controlsUp: model.showsControls)
+        } else if let display = ksPlayerSubtitles {
+            SubtitleOverlay(display: display, controlsUp: model.showsControls)
         }
     }
 

@@ -1,6 +1,6 @@
 # Third-party notices
 
-Panop is MIT licensed. It links and uses the components below.
+Panop is GPL-3.0 licensed (see docs/adr/0010-link-ksplayer-gpl.md). It links and uses the components below.
 
 **This file is the single source of truth for Panop's third-party licensing.** Any new
 dependency must be added here in the same commit that introduces it.
@@ -28,34 +28,16 @@ VLCKit bundles FFmpeg, statically linked inside `libvlccore` with hidden symbol 
   component, as the LGPL requires.
 
 ### KSPlayer
-- **License:** **GPL-3.0** by default. An LGPL license is available as a paid commercial option.
-- **Source:** https://github.com/kingslay/KSPlayer
-- **Use:** Metal-rendering playback engine
-- **Status: BLOCKED. Not currently integrated.**
-
-> **Verified 2026-09-29.** KSPlayer's README states it "defaults to the GPL license (requires
-> open-sourcing your own project code)", with an LGPL variant sold separately.
->
-> GPL-3.0 is incompatible with shipping Panop under MIT: linking it would force the combined
-> work to be GPL-3.0. It is also incompatible with App Store distribution by anyone who is not
-> the copyright holder, because GPLv3's terms conflict with the App Store's.
->
-> **Resolution:** Panop carries a KSPlayer adapter in source, guarded by the
-> `PANOP_ENABLE_KSPLAYER` compilation condition, but **does not link the dependency**. Official
-> builds ship four engines: AVPlayer, VLCKit, LumeEngine and AetherEngine. The adapter compiles only for
-> someone who adds the dependency themselves and accepts GPL-3.0 for their own build.
->
-> Do not add KSPlayer to the project's package dependencies. Doing so relicenses the shipped
-> binary as GPL-3.0 and makes App Store distribution untenable.
->
-> This changes only if an LGPL commercial license is purchased from the maintainer, in which
-> case update this entry and remove the guard.
+- **License:** **GPL-3.0** (an LGPL licence is available from the maintainer as a paid option)
+- **Source:** https://github.com/kingslay/KSPlayer, pinned to 2.3.4
+- **Use:** FFmpeg-based playback engine with a Metal renderer, on iOS, iPadOS and tvOS (not macOS)
+- **Linking:** through `Packages/KSPlayerBridge`, a dynamic library built with library evolution, so its FFmpeg
+  modules stay out of the app's compile. It is why Panop as a whole is GPL-3.0.
 
 ### FFmpegKit
 - **License:** LGPL-3.0 (with GPL build variants)
-- **Source:** https://github.com/kingslay/FFmpegKit
-- **Use:** would arrive transitively via KSPlayer
-- **Status: not linked**, because KSPlayer is not linked.
+- **Source:** https://github.com/kingslay/FFmpegKit, 6.1.4
+- **Use:** KSPlayer's FFmpeg and its libraries (dav1d, libass, gnutls, and others), linked through KSPlayer
 
 ### LumeEngine
 - **License:** MIT

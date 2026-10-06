@@ -1,6 +1,6 @@
 # 0002. Multiple user-selectable playback engines
 
-**Status:** accepted, amended 2026-09-29 (KSPlayer licensing)
+**Status:** accepted, amended 2026-09-29 (KSPlayer licensing); the KSPlayer part is superseded by ADR 0010
 
 ## Context
 

@@ -154,9 +154,8 @@ Four engines ship, selected by the user in Settings, with an ordered fallback li
 | **LumeEngine** | FFmpeg 9, purpose-built for long-running IPTV streams | Pre-1.0, unfrozen API |
 | **AetherEngine** (after VLC in the default order) | FFmpeg with VideoToolbox decoding, HDR, and a rewindable live window | Brings its own FFmpeg frameworks; retries a dead live source by itself before it fails |
 
-A fourth adapter for **KSPlayer** exists in source behind the `PANOP_ENABLE_KSPLAYER`
-compilation condition, with its dependency deliberately unlinked: KSPlayer is GPL-3.0, which
-would relicense Panop and forfeit App Store distribution. See ADR 0002.
+A fifth engine, **KSPlayer**, is linked on iOS and tvOS through `Packages/KSPlayerBridge`. It is GPL-3.0, which makes
+Panop GPL-3.0. See ADR 0010.
 
 This matters because IPTV is not just HLS. Providers serve raw MPEG-TS over HTTP, MKV VOD,
 HEVC almost everywhere, and occasionally RTSP. AVPlayer alone fails on a meaningful share of
@@ -199,15 +198,12 @@ well-defined enough to migrate later.
 
 ## 7. Licensing shaped the build
 
-Panop is MIT and written clean-room. Licensing is not a footnote here, because it has already
-changed two decisions.
+Panop is GPL-3.0 (MIT before KSPlayer was linked) and written clean-room. Licensing is not a footnote here, because
+it has already changed two decisions.
 
-**KSPlayer was dropped from the shipped build.** It is GPL-3.0 by default, with LGPL sold
-separately as a commercial license. Linking it would force the combined work to be GPL-3.0
-rather than MIT, and would forfeit App Store distribution, because GPLv3's terms conflict with
-the App Store's in a way only a copyright holder can resolve. The adapter is kept in source
-behind `PANOP_ENABLE_KSPLAYER`, with the dependency deliberately absent, so the option survives
-at near-zero cost if an LGPL license is bought later.
+**KSPlayer was first kept out, then linked.** It is GPL-3.0, so linking it makes the combined work GPL-3.0 rather than
+MIT, with an open question over App Store distribution (GPLv3 and the App Store's terms have a history of conflict).
+ADR 0002 kept it out; ADR 0010 reverses that on the owner's decision: Panop is GPL-3.0 and its source stays public.
 
 **VLCKit is LGPL and must stay dynamically linked.** That is a standing constraint, not a
 one-off check.

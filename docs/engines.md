@@ -26,18 +26,14 @@ ordered fallback list when one fails to start a stream.
 | AVPlayer / AVKit | HLS, VOD, anything Apple handles natively | No raw MPEG-TS, narrow container support |
 | VLCKit | Universal fallback, exotic containers | Large binary, weak system integration |
 | LumeEngine | Long-running live IPTV streams | Pre-1.0, API not frozen |
-| KSPlayer *(not linked)* | Metal rendering, strong tvOS performance | **GPL-3.0**, see below |
+| KSPlayer *(iOS, tvOS)* | FFmpeg with a Metal renderer | **GPL-3.0**: Panop is GPL-3.0 because of it |
 
-### KSPlayer is not shipped
+### KSPlayer
 
-KSPlayer is **GPL-3.0** by default, with LGPL sold separately as a commercial license. Linking
-it would force Panop to be GPL-3.0 rather than MIT, and would forfeit App Store distribution,
-because GPLv3's terms conflict with the App Store's in a way only the copyright holder can
-resolve.
-
-The adapter is written and lives behind the `PANOP_ENABLE_KSPLAYER` compilation condition, but
-**its dependency is not in the project**. Anyone building from source may add it and accept
-GPL-3.0 for their own build. Do not add it to the shipped configuration.
+KSPlayer is **GPL-3.0**; linking it makes Panop GPL-3.0 (ADR 0010). It is linked on iOS, iPadOS and tvOS through
+`Packages/KSPlayerBridge`, last in the default order because it has not been measured on a real provider. Not on
+macOS: FFmpegKit's macOS frameworks are packaged with `Info.plist` at the bundle root and Xcode refuses to embed them.
+A real-provider run needs an iOS build; the matrix test runs on macOS only.
 
 ---
 
@@ -47,9 +43,8 @@ GPL-3.0 for their own build. Do not add it to the shipped configuration.
 no allowable-client trickery. Coexistence comes entirely from how each engine packages its
 FFmpeg, and each uses a different mechanism.
 
-Panop's shipped configuration contains two copies (VLCKit's and LumeEngine's). A third
-(KSPlayer's, via FFmpegKit) appears only in a local build with `PANOP_ENABLE_KSPLAYER`. All
-three are described because the interactions matter.
+Panop's iOS and tvOS builds contain four copies (VLCKit's, LumeEngine's, AetherEngine's and KSPlayer's, via
+FFmpegKit); macOS three. All are described because the interactions matter.
 
 ### VLCKit: hidden by static linking
 
@@ -91,14 +86,21 @@ imports it. The package checkout is about 2.7 GB in the shared clone directory.
   the host and its certificate chain fine throughout. Cause not established; AVPlayer played the
   stream throughout.
 
-### KSPlayer: the public one (only if you enable it)
+### KSPlayer: public, so it is wrapped
 
-KSPlayer depends on FFmpegKit, whose `Libavcodec`, `Libavutil` and friends are genuinely public
-in the app's module compile. It is the copy most likely to collide with another engine's.
+KSPlayer depends on FFmpegKit, whose `Libavcodec`, `Libavutil` and friends are genuinely public in a compile that
+imports it, and would collide with AetherEngine's and Lume's:
 
-Panop does not link it (see above), so in the shipped configuration this copy is absent. It
-matters if you enable `PANOP_ENABLE_KSPLAYER` for a local build: do so and the collision
-described below becomes live.
+```
+'AV_CODEC_ID_AHX' from module 'AetherLibavcodec' is not present in
+definition of 'enum AVCodecID' in module 'Libavcodec'
+```
+
+So the app never imports it. `Packages/KSPlayerBridge` is a dynamic library with `-enable-library-evolution` and
+`InternalImportsByDefault`, so KSPlayer's modules do not appear in what the app sees (UIKit and AppKit are the only
+public imports). The `-enable-library-evolution` flag is an unsafe flag, so the package must stay a path
+dependency. Building with `SWIFT_ENABLE_EXPLICIT_MODULES=NO` was needed once while this was being set up and is not
+needed now.
 
 ### LumeEngine: isolated, and fragile about it
 
@@ -146,7 +148,7 @@ on whether its own `#filePath` contains `/checkouts/`:
 
 - Consumed as a **path or submodule** dependency, the flag applies. Its FFmpeg stays isolated.
 - Consumed by **URL**, SwiftPM resolves it into `/checkouts/`, the flag is silently dropped,
-  `CFFmpeg` leaks into the app's compile, and it collides with KSPlayer's FFmpeg.
+  `CFFmpeg` leaks into the app's compile, and it collides with AetherEngine's and KSPlayer's FFmpeg.
 
 The resulting error names a pixel format constant and looks nothing like a dependency problem:
 
@@ -158,10 +160,9 @@ definition of 'enum AVPixelFormat' in module 'Libavutil'
 **Therefore: LumeEngine is a git submodule at `vendor/LumeEngine`, referenced as a local path
 package.**
 
-Two caveats on how strong this requirement is in Panop's shipped configuration. KSPlayer is not
-linked, so the copy of FFmpeg most likely to collide is absent, and VLCKit's is statically
-hidden and vends no Swift module. So a URL dependency might happen to work today. It is still
-the wrong choice, for two reasons that do not depend on KSPlayer:
+Two caveats on how strong this requirement is. The other copies are isolated too (KSPlayer behind its bridge,
+VLCKit's statically hidden), so a URL dependency might happen to work today. It is still
+the wrong choice, for two reasons:
 
 - LumeEngine's own documentation lists VLCKit among the conflicting cases, and its symbol
   isolation is the mechanism that makes that safe. Relying on VLCKit's hiding rather than
@@ -170,7 +171,7 @@ the wrong choice, for two reasons that do not depend on KSPlayer:
 - LumeEngine is pre-1.0 with an explicitly unfrozen API, so it should be pinned to a reviewed
   commit regardless, which is exactly what a submodule gives.
 
-Enabling `PANOP_ENABLE_KSPLAYER` makes the collision live and the requirement absolute.
+With AetherEngine and KSPlayer linked, the collision is live and the requirement absolute.
 
 Converting it to a version dependency looks like tidying up. It is a build break. `AGENTS.md`
 calls this out because it is the most likely mistake for anyone, human or agent, who sees a
@@ -185,23 +186,17 @@ auto-embed it. It needs an explicit Embed Frameworks phase with Code Sign On Cop
 
 ## KSPlayer framework fixups
 
-**Only relevant if you enable `PANOP_ENABLE_KSPLAYER` for a local build.** Recorded here so the
-knowledge is not lost if the licensing situation changes.
+KSPlayer's embedded frameworks (FFmpegKit's) may need corrections before an app containing them can be accepted.
+Not yet done, because nothing has been archived or uploaded:
 
-KSPlayer's embedded frameworks need three corrections before an app containing them can be
-accepted. They would be applied by a script running as the first build phase of the app target
-with `ENABLE_USER_SCRIPT_SANDBOXING = NO`.
+1. **Underscores in `CFBundleIdentifier`.** iOS rejects embedded frameworks whose bundle ID contains one.
+2. **Shallow framework layout on macOS.** macOS requires the deep `Versions/A/` layout. This is why KSPlayer is not
+   linked on macOS today: the embed step fails with "contains Info.plist, expected
+   Versions/Current/Resources/Info.plist". A build phase that rebuilds each framework deeply would lift it.
+3. **`MinimumOSVersion` mismatch on tvOS.** ITMS-90208 **at upload time only**. Archive for tvOS before uploading.
 
-1. **Underscores in `CFBundleIdentifier`.** iOS rejects embedded frameworks whose bundle ID
-   contains an underscore.
-2. **Shallow framework layout on macOS.** macOS requires the deep `Versions/A/` layout. A
-   shallow bundle with `_CodeSignature` at its root produces "unsealed contents present in the
-   root directory".
-3. **`MinimumOSVersion` mismatch on tvOS.** The plist declares a version that disagrees with
-   the Mach-O slice, producing ITMS-90208 **at upload time only**. This does not surface in a
-   normal build, so archive for tvOS at least once after adding KSPlayer.
-
-The script also re-signs with an explicit `--identifier` to avoid error 90334.
+If any appears, the fix is a script that runs as the first build phase of the app target with
+`ENABLE_USER_SCRIPT_SANDBOXING = NO`, and re-signs with an explicit `--identifier` (error 90334).
 
 ---
 
@@ -214,7 +209,7 @@ new FFmpeg against a known-good build is tractable; debugging two at once is not
 2. **VLCKit.**
 3. **LumeEngine** as a submodule and path dependency, dynamic, embedded, signed.
 
-KSPlayer is not part of this sequence because it is not linked.
+4. **AetherEngine**, then **KSPlayer** behind its bridge (iOS and tvOS).
 
 ---
 

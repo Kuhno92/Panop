@@ -24,10 +24,9 @@ fails on a meaningful share of real streams.
 | **VLCKit** | Universal codec and container coverage | Large binary, weaker system integration |
 | **LumeEngine** | Long-running live IPTV streams (FFmpeg 9) | Pre-1.0, API not frozen |
 
-A fourth adapter for **KSPlayer** ships in source but is not linked, because KSPlayer is
-GPL-3.0 and that is incompatible with both MIT licensing and App Store distribution. Build with
-`PANOP_ENABLE_KSPLAYER` and add the dependency yourself if you accept GPL-3.0 for your own
-build. See [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
+A fifth engine, **KSPlayer** (FFmpeg with a Metal renderer), is linked on iOS, iPadOS and tvOS. It is
+GPL-3.0, which is why Panop is GPL-3.0. See [ADR 0010](docs/adr/0010-link-ksplayer-gpl.md) and
+[THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
 
 You pick one in Settings, and Panop falls back through the others when a stream refuses to
 start. Details, including how three separate copies of FFmpeg coexist in one binary, are in
@@ -138,5 +137,5 @@ Their names belong to their authors. Panop is not affiliated with or endorsed by
 
 ## License
 
-MIT, see [LICENSE](LICENSE). Third-party components and their licenses are listed in
+GPL-3.0, see [LICENSE](LICENSE) (releases before KSPlayer was linked remain MIT). Third-party components and their licenses are listed in
 [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).

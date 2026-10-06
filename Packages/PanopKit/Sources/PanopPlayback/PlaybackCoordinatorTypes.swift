@@ -159,6 +159,8 @@ public extension PlaybackEngineKind {
         if request.mediaKind == .live {
             order.removeAll { $0 == .aetherEngine }
         }
+        // Last: not yet measured on a real provider, so it picks up what the others cannot.
+        order.append(.ksPlayer)
         return order.filter { available.contains($0) }
     }
 

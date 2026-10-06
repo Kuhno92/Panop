@@ -39,7 +39,7 @@ Confirm each, or say why it does not apply. Full reasoning is in AGENTS.md.
 - [ ] Nothing under `Packages/PanopKit/Sources` imports an Apple-only framework
 - [ ] `URLSession` and `XMLParser` uses are guarded with `#if canImport(...)`
 - [ ] LumeEngine is still a submodule path dependency, not a URL dependency
-- [ ] No KSPlayer dependency was added (it is GPL-3.0)
+- [ ] KSPlayer / FFmpegKit are imported only inside `Packages/KSPlayerBridge`
 - [ ] Any new test `ModelConfiguration` sets `cloudKitDatabase: .none`
 - [ ] No `@Query` is bound against the cloud container
 - [ ] No retry or reconnect logic was added inside an engine adapter

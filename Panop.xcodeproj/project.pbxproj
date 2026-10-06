@@ -25,6 +25,7 @@
 		AAAA000000000000000000F9 /* PanopDiscover in Frameworks */ = {isa = PBXBuildFile; productRef = AAAA000000000000000000CD /* PanopDiscover */; };
 		AAAA000000000000000000FA /* LumeEngine in Embed Frameworks */ = {isa = PBXBuildFile; productRef = AAAA000000000000000000CB /* LumeEngine */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		AAAA00000000000000000120 /* AetherEngine in Frameworks */ = {isa = PBXBuildFile; productRef = AAAA00000000000000000122 /* AetherEngine */; };
+		AAAA00000000000000000124 /* KSPlayerBridge in Frameworks */ = {isa = PBXBuildFile; platformFilters = (ios, tvos, ); productRef = AAAA00000000000000000126 /* KSPlayerBridge */; };
 		BBBB000000000000000000A1 /* PanopSimkl in Frameworks */ = {isa = PBXBuildFile; productRef = BBBB000000000000000000A2 /* PanopSimkl */; };
 /* End PBXBuildFile section */
 
@@ -99,6 +100,7 @@
 				AAAA000000000000000000F6 /* VLCKit in Frameworks */,
 				AAAA000000000000000000F7 /* LumeEngine in Frameworks */,
 				AAAA00000000000000000120 /* AetherEngine in Frameworks */,
+				AAAA00000000000000000124 /* KSPlayerBridge in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -178,6 +180,7 @@
 				AAAA000000000000000000C8 /* VLCKit */,
 				AAAA000000000000000000CB /* LumeEngine */,
 				AAAA00000000000000000122 /* AetherEngine */,
+				AAAA00000000000000000126 /* KSPlayerBridge */,
 			);
 			productName = Panop;
 			productReference = AAAA000000000000000000A5 /* Panop.app */;
@@ -272,6 +275,7 @@
 				AAAA000000000000000000C9 /* XCRemoteSwiftPackageReference "VLCKit" */,
 				AAAA000000000000000000CA /* XCLocalSwiftPackageReference "vendor/LumeEngine" */,
 				AAAA00000000000000000121 /* XCRemoteSwiftPackageReference "AetherEngine" */,
+				AAAA00000000000000000125 /* XCLocalSwiftPackageReference "Packages/KSPlayerBridge" */,
 				AAAA00000000000000000123 /* XCLocalSwiftPackageReference "Packages/LibDovi" */,
 			);
 			preferredProjectObjectVersion = 77;
@@ -591,6 +595,10 @@
 			isa = XCLocalSwiftPackageReference;
 			relativePath = Packages/LibDovi;
 		};
+		AAAA00000000000000000125 /* XCLocalSwiftPackageReference "Packages/KSPlayerBridge" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Packages/KSPlayerBridge;
+		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCRemoteSwiftPackageReference section */
@@ -660,6 +668,10 @@
 			isa = XCSwiftPackageProductDependency;
 			package = AAAA00000000000000000121 /* XCRemoteSwiftPackageReference "AetherEngine" */;
 			productName = AetherEngine;
+		};
+		AAAA00000000000000000126 /* KSPlayerBridge */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = KSPlayerBridge;
 		};
 		BBBB000000000000000000A2 /* PanopSimkl */ = {
 			isa = XCSwiftPackageProductDependency;

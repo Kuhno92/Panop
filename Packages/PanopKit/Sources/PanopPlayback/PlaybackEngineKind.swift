@@ -16,13 +16,8 @@ public enum PlaybackEngineKind: String, Sendable, Codable, CaseIterable, Identif
     /// and HDR, and keeps a rewindable window of a live stream.
     case aetherEngine
 
-    /// Not present in official builds.
-    ///
-    /// KSPlayer is GPL-3.0, which would relicense Panop and forfeit App Store
-    /// distribution. The adapter is compiled only under the
-    /// `PANOP_ENABLE_KSPLAYER` condition, for someone who adds the dependency
-    /// to their own build and accepts GPL-3.0 for it.
-    /// See docs/adr/0002 and THIRD-PARTY-NOTICES.md.
+    /// KSPlayer: an FFmpeg engine with its own Metal renderer and subtitle parsing. GPL-3.0, which is why Panop
+    /// is GPL-3.0 as a whole (see LICENSE and docs/adr/0010).
     case ksPlayer
 
     public var id: String {
@@ -44,11 +39,7 @@ public enum PlaybackEngineKind: String, Sendable, Codable, CaseIterable, Identif
     /// Prefer this over `allCases` anywhere a list is shown or a fallback order
     /// is built; `allCases` includes engines that are not linked.
     public static var available: [PlaybackEngineKind] {
-        #if PANOP_ENABLE_KSPLAYER
-            return allCases
-        #else
-            return allCases.filter { $0 != .ksPlayer }
-        #endif
+        allCases
     }
 
     /// Default fallback order, most system-integrated first.

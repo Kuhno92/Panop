@@ -20,14 +20,24 @@ enum EngineRegistry {
         case .lumeEngine: LumePlaybackEngine()
         // Nil if the engine cannot start (its FFmpeg could not be set up): the coordinator then skips it.
         case .aetherEngine: AetherPlaybackEngine()
-        case .ksPlayer: nil
+        case .ksPlayer:
+            #if os(iOS) || os(tvOS)
+                KSPlayerEngine()
+            #else
+                nil
+            #endif
         }
     }
 
     nonisolated static func isImplemented(_ kind: PlaybackEngineKind) -> Bool {
         switch kind {
         case .avPlayer, .vlcKit, .lumeEngine, .aetherEngine: true
-        case .ksPlayer: false
+        case .ksPlayer:
+            #if os(iOS) || os(tvOS)
+                true
+            #else
+                false
+            #endif
         }
     }
 

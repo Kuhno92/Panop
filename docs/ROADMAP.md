@@ -778,7 +778,6 @@ Features real users expect that the brief did not name. All *(surfaced)*.
 | **VPN auto-enable** | Not possible for a third-party tunnel on Apple platforms. Shipping our own needs a Network Extension and an organisation account (ADR 0006) |
 | **Android UI** | Core stays portable, but no UI work planned. Swift 6.3's Android SDK makes this real later (ADR 0007) |
 | **Windows / Linux UI** | Same. Core compiles there; no UI planned |
-| **KSPlayer engine** | GPL-3.0. Adapter kept behind `PANOP_ENABLE_KSPLAYER`, dependency unlinked (ADR 0002) |
 | **DRM** | IPTV streams are effectively never DRM protected |
 | **Recording, Chromecast, multi-view** | Not in the brief. Revisit after M6 |
 
@@ -793,6 +792,9 @@ Things needing a human answer before the milestone that depends on them.
 - [ ] **Copyright holder name** in `LICENSE`, currently "Nico Kuhno".
 - [x] **Install the iOS and tvOS platforms** so those builds can be verified at all (both installed, all test scripts run):
       `xcodebuild -downloadPlatform iOS` and `-downloadPlatform tvOS`.
-- [ ] **Buy KSPlayer's LGPL licence?** Only if its Metal renderer proves worth it after M2.
+- [x] **KSPlayer**: linked on iOS and tvOS, Panop is GPL-3.0 (ADR 0010).
+- [ ] **KSPlayer on macOS**: needs FFmpegKit's frameworks rebuilt with a deep layout (docs/engines.md).
+- [ ] **KSPlayer on the real provider**: measure first frame and add it to the engine matrix (iOS build); its place in the default order is a guess.
+- [ ] **App Store and the GPL**: take advice before submitting.
 - [ ] **Metadata enrichment** (TMDB artwork, ratings) and **scrobbling** (Trakt, Simkl). Both
       add real value and real scope. Not currently planned.

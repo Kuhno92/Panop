@@ -1,9 +1,9 @@
 # Panop — AI Agent Guide
 
 Panop is a native IPTV player for Apple platforms (iOS 18+, iPadOS 18+, tvOS 18+, macOS 15+),
-written in Swift 6 and SwiftUI. Playback runs through four interchangeable engines the user
-picks in Settings: AVPlayer, VLCKit, LumeEngine and AetherEngine. An adapter for KSPlayer exists in
-source but is **not linked**, because KSPlayer is GPL-3.0; see Licensing below.
+written in Swift 6 and SwiftUI. Playback runs through five interchangeable engines the user
+picks in Settings: AVPlayer, VLCKit, LumeEngine, AetherEngine and KSPlayer (iOS and tvOS only; GPL-3.0, which
+makes Panop GPL-3.0; see Licensing below).
 
 `CLAUDE.md` is a symlink to this file. One guide, every agent.
 
@@ -20,7 +20,7 @@ command works because it is documented below.
 - [x] `SwiftDataCatalogStore` and the `PanopTests` target (460 tests, passing on macOS; the iOS and tvOS app-test runs last checked at 328)
 - [x] Playback coordinator (portable, `PanopPlayback`) and the AVPlayer adapter. Channels play from the Live TV list. AVPlayer cannot read raw MPEG-TS, so those streams fall through to VLC; Xtream live streams play in AVPlayer directly because the panel offers HLS
 - [x] VLCKit adapter (4.0.0-a24, the only SwiftPM line; an alpha). Plays raw MPEG-TS over HTTP, so M3U live streams now work, verified on real transport-stream bytes through the coordinator
-- [x] LumeEngine adapter (submodule `vendor/LumeEngine`, pinned to v0.2.2, dynamic and embedded). Plays raw MPEG-TS and HLS; verified on macOS, iOS and tvOS. PiP and the AirPlay picker are wired for AVPlayer (iOS, macOS) but neither is seen working on a device (KSPlayer stays unlinked)
+- [x] LumeEngine adapter (submodule `vendor/LumeEngine`, pinned to v0.2.2, dynamic and embedded). Plays raw MPEG-TS and HLS; verified on macOS, iOS and tvOS. PiP and the AirPlay picker are wired for AVPlayer (iOS, macOS) but neither is seen working on a device 
 - [x] Playlist import wired to the catalog container: add by Xtream login, M3U link or M3U file, Keychain credentials, background sync. The screens launch and are covered by service-level tests, but have not been driven by hand or by UI tests yet
 - [x] Discovery rails on Home, Movies and Series, computed on the device from the library and the viewing history (`PanopDiscover`, `Panop/Services/Discovery`; ADR 0008). Simkl is wired in (`PanopSimkl`: public trending list, device-flow sign-in, finished titles sent, the person's lists read) but **dormant until `SimklConfig.clientID` is set**, and none of it has run against Simkl's live API with an account
 
@@ -250,7 +250,7 @@ It must be referenced as a local path package at `vendor/LumeEngine`.
 `.unsafeFlags`. SwiftPM forbids unsafe flags in version-resolved dependencies, so its manifest
 gates the flag on `#filePath` not containing `/checkouts/`. Consumed by URL the flag silently
 drops, its `CFFmpeg` module leaks into the app's compile, and it collides with the FFmpeg
-KSPlayer brings in, producing `enum AVPixelFormat` redefinition errors.
+KSPlayer and AetherEngine bring in, producing `enum AVPixelFormat` redefinition errors.
 
 **This is the mistake an agent is most likely to make.** "Simplify the submodule to a version
 dependency" looks like tidying and is a build break. Do not do it. See `docs/engines.md`.
@@ -327,7 +327,7 @@ transaction with autosave disabled.
 
 ## Licensing
 
-Panop is **MIT**. Two rules protect that:
+Panop is **GPL-3.0** (ADR 0010; releases before KSPlayer was linked remain MIT). Two rules:
 
 1. `reference/` holds third-party clones for occasional design reference and is gitignored.
    **`reference/Lume` is AGPL-3.0. Never copy code from it**, not a function, not a script.
@@ -335,13 +335,15 @@ Panop is **MIT**. Two rules protect that:
 2. Any new third-party dependency must have its license recorded in `THIRD-PARTY-NOTICES.md`
    in the same commit that adds it. VLCKit is LGPL and must stay dynamically linked.
 
-### Never add KSPlayer to the project's dependencies
+### KSPlayer is reached only through `Packages/KSPlayerBridge`
 
-KSPlayer is **GPL-3.0**. Linking it would relicense the shipped binary as GPL-3.0, which Panop
-is not, and would forfeit App Store distribution, because GPLv3 conflicts with the App Store's
-terms in a way only a copyright holder can resolve.
+KSPlayer is **GPL-3.0**, which is why Panop is GPL-3.0 (ADR 0010, decided by the project owner). Its FFmpeg (FFmpegKit,
+FFmpeg 6) exports C modules named `Libavcodec`, `Libavutil` and so on that collide with AetherEngine's and
+LumeEngine's FFmpeg in any compile that sees both. So:
 
-The adapter in `Panop/Views/Player/` is guarded by `PANOP_ENABLE_KSPLAYER` and compiles only
-for someone who adds the dependency to their own build and accepts GPL-3.0 for it. **Seeing a
-`PlaybackEngineKind.ksPlayer` case with no dependency is not an oversight to fix.** Adding the
-package to make it build is a licensing violation, not a bug fix.
+- **Never `import KSPlayer` or FFmpegKit in the app target.** Go through `KSPlayerBridge`, whose API has no KSPlayer
+  or FFmpeg type. It is a local path package with `-enable-library-evolution` and internal imports; do not make it a
+  URL dependency (SwiftPM drops unsafe flags there), and do not make its imports public.
+- It is linked on **iOS and tvOS only** (platform filter on the build file): FFmpegKit's macOS frameworks cannot be
+  embedded. Code that names `KSPlayerEngine` is guarded by `#if os(iOS) || os(tvOS)`.
+- Dependencies stay GPL-compatible: MIT and LGPL are fine, AGPL (`reference/Lume`) is not a source of code.
