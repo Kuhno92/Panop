@@ -60,10 +60,10 @@ struct LiveProgrammeTimeline: View {
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
+            // The gap to the buttons is here, not in the parent, so a channel with no guide leaves no gap.
+            .padding(.bottom, 12)
             .accessibilityElement(children: .combine)
             .accessibilityIdentifier("liveProgramme")
-        } else {
-            Spacer()
         }
     }
 }

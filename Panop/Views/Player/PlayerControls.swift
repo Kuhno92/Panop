@@ -35,7 +35,7 @@ struct PlayerControls: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 0) {
             // On its own line above the buttons, so the title and what follows have the bar's whole width: squeezed
             // between the buttons on a phone the title did not show at all.
             if let guide, !model.canSeek {
