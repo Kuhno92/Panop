@@ -32,6 +32,7 @@ final class AppServices {
         self.sync = sync
         let userState = UserStateStore(context: ModelContext(cloud), profile: ProfileStore.savedCurrentID())
         self.userState = userState
+        userState.forgetEnginesIfOrderChanged()
         library = PlaylistLibrary(
             context: ModelContext(cloud),
             credentials: credentials,

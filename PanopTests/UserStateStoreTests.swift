@@ -1,5 +1,6 @@
 import Foundation
 @testable import Panop
+import PanopPlayback
 import SwiftData
 import Testing
 
@@ -348,6 +349,37 @@ struct EngineMemoryStoreTests {
 
         #expect(store.remembered(for: "p|c") == nil)
         #expect(try ModelContext(container).fetchCount(FetchDescriptor<UserContentState>()) == 0)
+    }
+
+    @Test
+    func `forgetting every engine keeps favourites and leaves nothing else behind`() throws {
+        let container = try PanopContainers.makeCloud(inMemory: true)
+        let store = UserStateStore(context: ModelContext(container))
+        store.remember(.lumeEngine, for: "p|a")
+        store.remember(.vlcKit, for: "p|b")
+        store.toggleFavorite("p|b")
+        #expect(store.rememberedEngineCount == 2)
+
+        store.forgetAllEngines()
+
+        #expect(store.rememberedEngineCount == 0)
+        #expect(store.isFavorite("p|b"), "only the engines go")
+        #expect(try ModelContext(container).fetchCount(FetchDescriptor<UserContentState>()) == 1)
+    }
+
+    @Test
+    func `a new engine order drops what was learned, once`() throws {
+        let defaults = try #require(UserDefaults(suiteName: "engine-order-\(UUID().uuidString)"))
+        let store = try UserStateStore(context: ModelContext(PanopContainers.makeCloud(inMemory: true)))
+        defaults.set(PlaybackEngineKind.orderRevision - 1, forKey: "engineOrderRevision")
+        store.remember(.vlcKit, for: "p|c")
+
+        store.forgetEnginesIfOrderChanged(defaults: defaults)
+        #expect(store.remembered(for: "p|c") == nil, "learned under an older order")
+
+        store.remember(.vlcKit, for: "p|c")
+        store.forgetEnginesIfOrderChanged(defaults: defaults)
+        #expect(store.remembered(for: "p|c") == .vlcKit, "learned under this order, so kept")
     }
 
     @Test

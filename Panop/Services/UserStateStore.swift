@@ -350,4 +350,31 @@ extension UserStateStore: EngineMemory {
         removeIfEmpty(row)
         commit()
     }
+
+    /// How many channels, films and episodes have an engine remembered for them.
+    var rememberedEngineCount: Int {
+        engines.count
+    }
+
+    /// Back to the engine order for every title: what was learned about which engine plays what is dropped.
+    func forgetAllEngines() {
+        for row in profileRows() where !row.rememberedEngine.isEmpty {
+            row.rememberedEngine = ""
+            removeIfEmpty(row)
+        }
+        commit()
+    }
+
+    /// A remembered engine was right when it was learned and may not be now: when the built-in order changes (a new
+    /// engine,
+    /// or a measured reorder) the revision in `PlaybackEngineKind.orderRevision` goes up, and what was learned under
+    /// an older order is dropped once, so the new order is tried.
+    func forgetEnginesIfOrderChanged(defaults: UserDefaults = .standard) {
+        let key = "engineOrderRevision"
+        guard defaults.integer(forKey: key) != PlaybackEngineKind.orderRevision else { return }
+        defaults.set(PlaybackEngineKind.orderRevision, forKey: key)
+        if !engines.isEmpty {
+            forgetAllEngines()
+        }
+    }
 }

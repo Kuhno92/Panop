@@ -42,6 +42,11 @@ public enum PlaybackEngineKind: String, Sendable, Codable, CaseIterable, Identif
         allCases
     }
 
+    /// Goes up whenever the built-in engine order changes (a new engine, or a reorder from measurements). The app drops
+    /// what it learned about which engine plays which title when it sees a new number, so the new order is tried
+    /// instead of an engine remembered under the old one.
+    public static let orderRevision = 2
+
     /// Default fallback order, most system-integrated first.
     ///
     /// AVPlayer leads because when it works it gives PiP, AirPlay and the best

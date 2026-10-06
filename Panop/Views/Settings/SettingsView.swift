@@ -38,6 +38,7 @@ struct SettingsView: View {
     @Environment(ParentalControls.self) private var parental
     @State private var pinPurpose: PINPurpose?
     @State private var confirmingForget = false
+    @State private var confirmingEngineReset = false
     #if os(macOS)
         @AppStorage("playsInSeparateWindow") private var separateWindow = false
     #endif
@@ -97,8 +98,7 @@ struct SettingsView: View {
     private var playing: some View {
         Section {
             Picker(selection: selectedEngine) {
-                // `selectable`: only engines with a working adapter. KSPlayer is
-                // GPL-3.0 and not linked (docs/adr/0002), so it is never offered.
+                // `selectable`: only engines with a working adapter.
                 ForEach(EngineRegistry.selectable) { kind in
                     Text(kind == .aetherEngine ? String(localized: "AetherEngine (experimental)") : kind.displayName)
                         .tag(kind)
@@ -117,11 +117,23 @@ struct SettingsView: View {
                 SettingsRow("Subtitles", symbol: "captions.bubble.fill", tint: .teal)
             }
             StartupPicker()
+            Button(role: .destructive) {
+                confirmingEngineReset = true
+            } label: {
+                SettingsRow(
+                    "Forget which engine worked",
+                    symbol: "arrow.counterclockwise",
+                    tint: .gray,
+                    value: String(userState.rememberedEngineCount)
+                )
+            }
+            .disabled(userState.rememberedEngineCount == 0)
         } header: {
             Text("Playing")
         } footer: {
             Text("""
-            If a video will not start, change the engine. Panop tries your choice first and then the others by itself. \
+            If a video will not start, change the engine. Panop tries your choice first and then the others by itself, \
+            and remembers which one played a title so it starts there next time. \
             On a Mac a stream plays in the main window, and you can still use the rest of the app over it.
             """)
         }
@@ -152,6 +164,13 @@ struct SettingsView: View {
             Suggestions are picked on this device from your own library and what you watch. \
             Nothing about you or what you watch is sent anywhere.
             """)
+        }
+        .confirmationDialog(
+            "Forget which engine worked?", isPresented: $confirmingEngineReset, titleVisibility: .visible
+        ) {
+            Button("Forget", role: .destructive) { userState.forgetAllEngines() }
+        } message: {
+            Text("Panop goes back to the engine order for every title, and learns again as you watch.")
         }
         .confirmationDialog(
             "Forget what you watched?", isPresented: $confirmingForget, titleVisibility: .visible
