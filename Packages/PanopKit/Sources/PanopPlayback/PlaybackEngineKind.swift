@@ -45,7 +45,7 @@ public enum PlaybackEngineKind: String, Sendable, Codable, CaseIterable, Identif
     /// Goes up whenever the built-in engine order changes (a new engine, or a reorder from measurements). The app drops
     /// what it learned about which engine plays which title when it sees a new number, so the new order is tried
     /// instead of an engine remembered under the old one.
-    public static let orderRevision = 2
+    public static let orderRevision = 3
 
     /// Default fallback order, most system-integrated first.
     ///
@@ -54,7 +54,7 @@ public enum PlaybackEngineKind: String, Sendable, Codable, CaseIterable, Identif
     /// open, which on real provider playlists is a substantial share.
     public static var defaultPriority: [PlaybackEngineKind] {
         available.sorted { lhs, rhs in
-            let order: [PlaybackEngineKind] = [.avPlayer, .lumeEngine, .vlcKit, .aetherEngine, .ksPlayer]
+            let order: [PlaybackEngineKind] = [.avPlayer, .lumeEngine, .vlcKit, .ksPlayer, .aetherEngine]
             let lhsIndex = order.firstIndex(of: lhs) ?? order.count
             let rhsIndex = order.firstIndex(of: rhs) ?? order.count
             return lhsIndex < rhsIndex

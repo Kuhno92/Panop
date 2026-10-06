@@ -145,6 +145,10 @@ public extension PlaybackEngineKind {
     /// - **AetherEngine comes after VLC.** It was only about half a second faster to a moving picture on films, and the
     /// same
     ///   deinterlacing code that crashed it on live channels runs for any interlaced source.
+    /// - **KSPlayer comes after VLC and before AetherEngine.** It played all 17 streams tried on a real provider
+    ///   (live raw TS, the `.m3u8` address that returns raw TS, MKV and MP4 films, MKV episodes), which the others did
+    ///   not: it is never the fastest to a moving picture (live 2.8 to 4.8 s, MKV 1.8 to 4.1 s, MP4 2.3 to 11 s) but it
+    ///   did not fail or crash once, and AetherEngine did.
     /// - **Live TV never offers AetherEngine on its own.** Version 7.27.2 crashed the whole process, inside its own
     ///   deinterlacing filter, on a real provider's live channels, with both of its deinterlacers. A person can still
     ///   choose it.
@@ -154,13 +158,11 @@ public extension PlaybackEngineKind {
         let container = URL(string: address)?.pathExtension.lowercased() ?? ""
         let readByApple = container.isEmpty || appleContainers.contains(container)
         var order: [PlaybackEngineKind] = readByApple
-            ? [.avPlayer, .lumeEngine, .vlcKit, .aetherEngine]
-            : [.lumeEngine, .vlcKit, .aetherEngine, .avPlayer]
+            ? [.avPlayer, .lumeEngine, .vlcKit, .ksPlayer, .aetherEngine]
+            : [.lumeEngine, .vlcKit, .ksPlayer, .aetherEngine, .avPlayer]
         if request.mediaKind == .live {
             order.removeAll { $0 == .aetherEngine }
         }
-        // Last: not yet measured on a real provider, so it picks up what the others cannot.
-        order.append(.ksPlayer)
         return order.filter { available.contains($0) }
     }
 
