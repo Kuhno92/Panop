@@ -2,7 +2,7 @@
 
 Panop is a native IPTV player for Apple platforms (iOS 18+, iPadOS 18+, tvOS 18+, macOS 15+),
 written in Swift 6 and SwiftUI. Playback runs through five interchangeable engines the user
-picks in Settings: AVPlayer, VLCKit, LumeEngine, AetherEngine and KSPlayer (iOS and tvOS only; GPL-3.0, which
+picks in Settings: AVPlayer, VLCKit, LumeEngine, AetherEngine and KSPlayer (GPL-3.0, which
 makes Panop GPL-3.0; see Licensing below).
 
 `CLAUDE.md` is a symlink to this file. One guide, every agent.
@@ -344,6 +344,7 @@ LumeEngine's FFmpeg in any compile that sees both. So:
 - **Never `import KSPlayer` or FFmpegKit in the app target.** Go through `KSPlayerBridge`, whose API has no KSPlayer
   or FFmpeg type. It is a local path package with `-enable-library-evolution` and internal imports; do not make it a
   URL dependency (SwiftPM drops unsafe flags there), and do not make its imports public.
-- It is linked on **iOS and tvOS only** (platform filter on the build file): FFmpegKit's macOS frameworks cannot be
-  embedded. Code that names `KSPlayerEngine` is guarded by `#if os(iOS) || os(tvOS)`.
+- macOS needs two workarounds (ADR 0010): `Scripts/deepen-frameworks.sh` (a build phase) rebuilds FFmpegKit's shallow
+  frameworks in the versioned layout, and macOS builds pass `SWIFT_ENABLE_EXPLICIT_MODULES=NO` (the scripts do; the
+  Xcode window does not, and then fails on `Libavformat-<hash>.pcm not found`).
 - Dependencies stay GPL-compatible: MIT and LGPL are fine, AGPL (`reference/Lume`) is not a source of code.

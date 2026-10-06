@@ -26,14 +26,13 @@ ordered fallback list when one fails to start a stream.
 | AVPlayer / AVKit | HLS, VOD, anything Apple handles natively | No raw MPEG-TS, narrow container support |
 | VLCKit | Universal fallback, exotic containers | Large binary, weak system integration |
 | LumeEngine | Long-running live IPTV streams | Pre-1.0, API not frozen |
-| KSPlayer *(iOS, tvOS)* | FFmpeg with a Metal renderer | **GPL-3.0**: Panop is GPL-3.0 because of it |
+| KSPlayer | FFmpeg with a Metal renderer | **GPL-3.0**: Panop is GPL-3.0 because of it |
 
 ### KSPlayer
 
-KSPlayer is **GPL-3.0**; linking it makes Panop GPL-3.0 (ADR 0010). It is linked on iOS, iPadOS and tvOS through
-`Packages/KSPlayerBridge`, last in the default order because it has not been measured on a real provider. Not on
-macOS: FFmpegKit's macOS frameworks are packaged with `Info.plist` at the bundle root and Xcode refuses to embed them.
-A real-provider run needs an iOS build; the matrix test runs on macOS only.
+KSPlayer is **GPL-3.0**; linking it makes Panop GPL-3.0 (ADR 0010). It is linked on all four platforms through
+`Packages/KSPlayerBridge`, last in the default order because it has not been measured on a real provider (run the matrix
+with `PANOP_MATRIX_ENGINES=KSPlayer`). macOS needs two workarounds, see below and ADR 0010.
 
 ---
 
@@ -43,8 +42,7 @@ A real-provider run needs an iOS build; the matrix test runs on macOS only.
 no allowable-client trickery. Coexistence comes entirely from how each engine packages its
 FFmpeg, and each uses a different mechanism.
 
-Panop's iOS and tvOS builds contain four copies (VLCKit's, LumeEngine's, AetherEngine's and KSPlayer's, via
-FFmpegKit); macOS three. All are described because the interactions matter.
+Panop's builds contain four copies (VLCKit's, LumeEngine's, AetherEngine's and KSPlayer's, via FFmpegKit). All are described because the interactions matter.
 
 ### VLCKit: hidden by static linking
 
@@ -187,15 +185,15 @@ auto-embed it. It needs an explicit Embed Frameworks phase with Code Sign On Cop
 ## KSPlayer framework fixups
 
 KSPlayer's embedded frameworks (FFmpegKit's) may need corrections before an app containing them can be accepted.
-Not yet done, because nothing has been archived or uploaded:
+Items 1 and 3 are not handled yet, because nothing has been archived or uploaded:
 
 1. **Underscores in `CFBundleIdentifier`.** iOS rejects embedded frameworks whose bundle ID contains one.
-2. **Shallow framework layout on macOS.** macOS requires the deep `Versions/A/` layout. This is why KSPlayer is not
-   linked on macOS today: the embed step fails with "contains Info.plist, expected
-   Versions/Current/Resources/Info.plist". A build phase that rebuilds each framework deeply would lift it.
+2. **Shallow framework layout on macOS.** Handled by `Scripts/deepen-frameworks.sh`, a build phase after "Embed Frameworks"
+   (versioned layout, signed again). Note the Xcode window cannot build macOS at all today because of the explicit
+   modules problem below.
 3. **`MinimumOSVersion` mismatch on tvOS.** ITMS-90208 **at upload time only**. Archive for tvOS before uploading.
 
-If any appears, the fix is a script that runs as the first build phase of the app target with
+If either appears, the fix is a script that runs as the first build phase of the app target with
 `ENABLE_USER_SCRIPT_SANDBOXING = NO`, and re-signs with an explicit `--identifier` (error 90334).
 
 ---
@@ -209,7 +207,7 @@ new FFmpeg against a known-good build is tractable; debugging two at once is not
 2. **VLCKit.**
 3. **LumeEngine** as a submodule and path dependency, dynamic, embedded, signed.
 
-4. **AetherEngine**, then **KSPlayer** behind its bridge (iOS and tvOS).
+4. **AetherEngine**, then **KSPlayer** behind its bridge.
 
 ---
 

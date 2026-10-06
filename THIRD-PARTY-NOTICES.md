@@ -30,9 +30,10 @@ VLCKit bundles FFmpeg, statically linked inside `libvlccore` with hidden symbol 
 ### KSPlayer
 - **License:** **GPL-3.0** (an LGPL licence is available from the maintainer as a paid option)
 - **Source:** https://github.com/kingslay/KSPlayer, pinned to 2.3.4
-- **Use:** FFmpeg-based playback engine with a Metal renderer, on iOS, iPadOS and tvOS (not macOS)
+- **Use:** FFmpeg-based playback engine with a Metal renderer, on all four platforms
 - **Linking:** through `Packages/KSPlayerBridge`, a dynamic library built with library evolution, so its FFmpeg
-  modules stay out of the app's compile. It is why Panop as a whole is GPL-3.0.
+  modules stay out of the app's compile. It is why Panop as a whole is GPL-3.0. On macOS its frameworks are rebuilt in the versioned layout at build time
+  (`Scripts/deepen-frameworks.sh`).
 
 ### FFmpegKit
 - **License:** LGPL-3.0 (with GPL build variants)

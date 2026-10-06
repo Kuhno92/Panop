@@ -11,7 +11,7 @@ import PackageDescription
 /// so this must stay a path dependency (see docs/engines.md).
 let package = Package(
     name: "KSPlayerBridge",
-    platforms: [.iOS(.v18), .tvOS(.v18), .macOS(.v15)],
+    platforms: [.iOS(.v18), .tvOS(.v18), .macOS(.v12)],
     products: [
         .library(name: "KSPlayerBridge", type: .dynamic, targets: ["KSPlayerBridge"])
     ],

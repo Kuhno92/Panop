@@ -792,9 +792,9 @@ Things needing a human answer before the milestone that depends on them.
 - [ ] **Copyright holder name** in `LICENSE`, currently "Nico Kuhno".
 - [x] **Install the iOS and tvOS platforms** so those builds can be verified at all (both installed, all test scripts run):
       `xcodebuild -downloadPlatform iOS` and `-downloadPlatform tvOS`.
-- [x] **KSPlayer**: linked on iOS and tvOS, Panop is GPL-3.0 (ADR 0010).
-- [ ] **KSPlayer on macOS**: needs FFmpegKit's frameworks rebuilt with a deep layout (docs/engines.md).
-- [ ] **KSPlayer on the real provider**: measure first frame and add it to the engine matrix (iOS build); its place in the default order is a guess.
+- [x] **KSPlayer**: linked on iOS, tvOS and macOS, Panop is GPL-3.0 (ADR 0010).
+- [ ] **Xcode window builds for macOS**: fail on `Libavformat-<hash>.pcm not found` unless `SWIFT_ENABLE_EXPLICIT_MODULES=NO` is passed; only the scripts do. Find a setting that reaches the package targets.
+- [ ] **KSPlayer on the real provider**: run the matrix (`PANOP_MATRIX_ENGINES=KSPlayer`), then place it in the default order; today's last place is a guess.
 - [ ] **App Store and the GPL**: take advice before submitting.
 - [ ] **Metadata enrichment** (TMDB artwork, ratings) and **scrobbling** (Trakt, Simkl). Both
       add real value and real scope. Not currently planned.

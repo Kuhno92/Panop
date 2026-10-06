@@ -24,7 +24,7 @@ fails on a meaningful share of real streams.
 | **VLCKit** | Universal codec and container coverage | Large binary, weaker system integration |
 | **LumeEngine** | Long-running live IPTV streams (FFmpeg 9) | Pre-1.0, API not frozen |
 
-A fifth engine, **KSPlayer** (FFmpeg with a Metal renderer), is linked on iOS, iPadOS and tvOS. It is
+A fifth engine, **KSPlayer** (FFmpeg with a Metal renderer), is linked on iOS, iPadOS, tvOS and macOS. It is
 GPL-3.0, which is why Panop is GPL-3.0. See [ADR 0010](docs/adr/0010-link-ksplayer-gpl.md) and
 [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
 

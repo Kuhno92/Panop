@@ -117,7 +117,7 @@
             // A provider restarts a channel after a client leaves it, and a channel just left fails for a while. So
             // each attempt gets a channel of its own: the engines take turns over the channels, and every channel
             // here carries the same kind of stream (H.264 and AAC in MPEG-TS).
-            let order: [PlaybackEngineKind] = [.avPlayer, .lumeEngine, .aetherEngine, .vlcKit]
+            let order: [PlaybackEngineKind] = [.avPlayer, .lumeEngine, .aetherEngine, .vlcKit, .ksPlayer]
             for (index, id) in working.enumerated() {
                 let address = "\(login.base)/live/\(login.user)/\(login.password)/\(id)"
                 let engine = order[index % order.count]
@@ -182,7 +182,8 @@
                 engine.player.bind(view: view)
                 return (engine, SurfaceWindow(view))
             case .ksPlayer:
-                return nil
+                let engine = KSPlayerEngine()
+                return (engine, SurfaceWindow(engine.surface))
             }
         }
 
@@ -284,7 +285,13 @@
                 .map(String.init)
             for stream in all where streamFilter.isEmpty || streamFilter.contains(where: stream.label.hasPrefix) {
                 let isLive = stream.kind == .live
-                for kind in stream.engines ?? [PlaybackEngineKind.avPlayer, .lumeEngine, .aetherEngine, .vlcKit]
+                for kind in stream.engines ?? [
+                    PlaybackEngineKind.avPlayer,
+                    .lumeEngine,
+                    .aetherEngine,
+                    .vlcKit,
+                    .ksPlayer
+                ]
                     where engineFilter.isEmpty || engineFilter.contains(kind.displayName)
                 {
                     // The provider allows one connection: wait until it will answer again, so a failure below is

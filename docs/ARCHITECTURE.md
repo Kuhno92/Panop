@@ -154,7 +154,7 @@ Four engines ship, selected by the user in Settings, with an ordered fallback li
 | **LumeEngine** | FFmpeg 9, purpose-built for long-running IPTV streams | Pre-1.0, unfrozen API |
 | **AetherEngine** (after VLC in the default order) | FFmpeg with VideoToolbox decoding, HDR, and a rewindable live window | Brings its own FFmpeg frameworks; retries a dead live source by itself before it fails |
 
-A fifth engine, **KSPlayer**, is linked on iOS and tvOS through `Packages/KSPlayerBridge`. It is GPL-3.0, which makes
+A fifth engine, **KSPlayer**, is linked through `Packages/KSPlayerBridge`. It is GPL-3.0, which makes
 Panop GPL-3.0. See ADR 0010.
 
 This matters because IPTV is not just HLS. Providers serve raw MPEG-TS over HTTP, MKV VOD,

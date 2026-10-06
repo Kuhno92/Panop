@@ -28,6 +28,9 @@ log() { printf '\033[1;34m==>\033[0m %s\n' "$1"; }
 
 build() {
     local label="$1" destination="$2"
+    # macOS: explicit modules off, or the compile of FFmpegKit (KSPlayer's FFmpeg) fails (docs/engines.md).
+    local extra=()
+    [[ "$label" == macos ]] && extra=(SWIFT_ENABLE_EXPLICIT_MODULES=NO)
     log "Building for $label"
     xcodebuild build \
         -project "$PROJECT" \
@@ -36,6 +39,7 @@ build() {
         -derivedDataPath "${DD_BASE}-${label}" \
         -clonedSourcePackagesDirPath "$SHARED_SPM" \
         CODE_SIGNING_ALLOWED=NO \
+        ${extra[@]+"${extra[@]}"} \
         -quiet
     echo "    $label ok"
 }

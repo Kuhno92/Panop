@@ -147,25 +147,16 @@ struct PlaybackMessagesTests {
 struct EngineRegistryTests {
     @Test
     func `only engines with an adapter are offered`() {
-        #if os(macOS)
-            // FFmpegKit's macOS frameworks cannot be embedded, so KSPlayer is linked on iOS and tvOS only.
-            #expect(EngineRegistry.selectable == [.avPlayer, .vlcKit, .lumeEngine, .aetherEngine])
-        #else
-            #expect(EngineRegistry.selectable == [.avPlayer, .vlcKit, .lumeEngine, .aetherEngine, .ksPlayer])
-        #endif
+        #expect(EngineRegistry.selectable == [.avPlayer, .vlcKit, .lumeEngine, .aetherEngine, .ksPlayer])
     }
 
     @Test
     @MainActor
-    func `an engine builds only where it has an adapter`() {
+    func `every engine builds`() {
         #expect(EngineRegistry.make(.avPlayer) != nil)
         #expect(EngineRegistry.make(.vlcKit) != nil)
         #expect(EngineRegistry.make(.lumeEngine) != nil)
-        #if os(macOS)
-            #expect(EngineRegistry.make(.ksPlayer) == nil, "KSPlayer is not linked on macOS, so it has no adapter")
-        #else
-            #expect(EngineRegistry.make(.ksPlayer) != nil)
-        #endif
+        #expect(EngineRegistry.make(.ksPlayer) != nil)
     }
 }
 
