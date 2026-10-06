@@ -24,6 +24,7 @@
 		AAAA000000000000000000F8 /* LumeEngine in Frameworks */ = {isa = PBXBuildFile; productRef = AAAA000000000000000000CC /* LumeEngine */; };
 		AAAA000000000000000000F9 /* PanopDiscover in Frameworks */ = {isa = PBXBuildFile; productRef = AAAA000000000000000000CD /* PanopDiscover */; };
 		AAAA000000000000000000FA /* LumeEngine in Embed Frameworks */ = {isa = PBXBuildFile; productRef = AAAA000000000000000000CB /* LumeEngine */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		AAAA00000000000000000128 /* KSPlayerBridge in Embed Frameworks */ = {isa = PBXBuildFile; productRef = AAAA00000000000000000126 /* KSPlayerBridge */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		AAAA00000000000000000120 /* AetherEngine in Frameworks */ = {isa = PBXBuildFile; productRef = AAAA00000000000000000122 /* AetherEngine */; };
 		AAAA00000000000000000124 /* KSPlayerBridge in Frameworks */ = {isa = PBXBuildFile; productRef = AAAA00000000000000000126 /* KSPlayerBridge */; };
 		BBBB000000000000000000A1 /* PanopSimkl in Frameworks */ = {isa = PBXBuildFile; productRef = BBBB000000000000000000A2 /* PanopSimkl */; };
@@ -54,6 +55,7 @@
 			dstSubfolderSpec = 10;
 			files = (
 				AAAA000000000000000000FA /* LumeEngine in Embed Frameworks */,
+				AAAA00000000000000000128 /* KSPlayerBridge in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
