@@ -68,6 +68,9 @@ struct RootView: View {
     @Environment(\.modelContext) private var catalog
     @State private var selection: AppTab
     @State private var autoplay: PlaybackTarget?
+    /// Goes up each time the person leaves Settings, so coming back starts at its main screen and not wherever they
+    /// had gone into it (a stack keeps its place when its tab is left).
+    @State private var settingsVisits = 0
     /// One set of rails for Home, Movies and Series, built off the main thread (see `DiscoveryModel`).
     @State private var discovery = DiscoveryModel()
     @State private var simkl: SimklAccount
@@ -116,7 +119,7 @@ struct RootView: View {
         TabView(selection: $selection) {
             Tab(value: AppTab.home) {
                 NavigationStack {
-                    HomeView(onBrowse: { selection = .live })
+                    HomeView(onBrowse: { selection = .live }, settingsVisits: settingsVisits)
                 }
             } label: {
                 MainTabLabel("Home", systemImage: "house")
@@ -150,6 +153,7 @@ struct RootView: View {
                     NavigationStack {
                         SettingsView()
                     }
+                    .id(settingsVisits)
                 } label: {
                     MainTabLabel("Settings", systemImage: "gearshape")
                 }
@@ -184,6 +188,11 @@ struct RootView: View {
             // Choosing Search does not move to a screen: the selection goes straight back to where it was, and the
             // screen that was on show is asked to open its search field.
             .onChange(of: selection) { old, new in
+                // Search only passes through (the selection goes straight back), which is not leaving.
+                // (A phone pushes Settings from Home, so leaving Home counts too.)
+                if old == .settings || old == .home, new != .search {
+                    settingsVisits += 1
+                }
                 #if !os(tvOS)
                     if new == .search {
                         var transaction = Transaction()

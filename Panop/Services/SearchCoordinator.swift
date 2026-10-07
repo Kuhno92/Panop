@@ -22,9 +22,6 @@ struct ScreenSearch: ViewModifier {
     @Binding var text: String
     let tab: AppTab
     let prompt: LocalizedStringKey
-    /// Apple TV shows the field only once there is something to search: before the first playlist its keyboard,
-    /// half the screen, would sit above a message about adding one.
-    let isOffered: Bool
 
     @Environment(SearchCoordinator.self) private var coordinator
     @State private var open = false
@@ -33,13 +30,9 @@ struct ScreenSearch: ViewModifier {
 
     func body(content: Content) -> some View {
         #if os(tvOS)
-            // The field is always on the screen there, and cannot be opened from outside: Search is a screen of its
-            // own.
-            if isOffered {
-                content.searchable(text: $text, prompt: prompt)
-            } else {
-                content
-            }
+            // No field on the screens there: it was always shown, with its keyboard above the content. Search is a
+            // screen of its own, reached by the icon in the top bar (`SearchTabView`).
+            content
         #else
             // The field floats over the top of the screen instead of taking room from it, and the screen under it is
             // never rebuilt or moved: putting the system's field in and out reshuffled the page and the hero started

@@ -126,7 +126,7 @@ struct LiveTVView: View {
             #endif
         }
         .navigationTitle(selectedSource?.name ?? "Live TV")
-        .modifier(ChannelSearch(text: $search, isOffered: !library.playlists.isEmpty))
+        .modifier(ChannelSearch(text: $search))
         .toolbar {
             if !library.playlists.isEmpty {
                 ToolbarItem {
@@ -555,10 +555,9 @@ struct PlayerPresentation: ViewModifier {
 /// Search for channels, in the system's field (see `ScreenSearch`).
 private struct ChannelSearch: ViewModifier {
     @Binding var text: String
-    let isOffered: Bool
 
     func body(content: Content) -> some View {
-        content.modifier(ScreenSearch(text: $text, tab: .live, prompt: "Search channels", isOffered: isOffered))
+        content.modifier(ScreenSearch(text: $text, tab: .live, prompt: "Search channels"))
     }
 }
 

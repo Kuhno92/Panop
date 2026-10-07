@@ -114,8 +114,7 @@ struct VODBrowseView: View {
         .navigationTitle(title)
         .modifier(VODSearch(
             text: $search,
-            tab: kind == .movie ? .movies : .series,
-            isOffered: !library.playlists.isEmpty
+            tab: kind == .movie ? .movies : .series
         ))
         .safeAreaInset(edge: .top, spacing: 0) {
             if !library.playlists.isEmpty {
@@ -525,9 +524,8 @@ private struct VODCard: View {
 private struct VODSearch: ViewModifier {
     @Binding var text: String
     let tab: AppTab
-    let isOffered: Bool
 
     func body(content: Content) -> some View {
-        content.modifier(ScreenSearch(text: $text, tab: tab, prompt: "Search", isOffered: isOffered))
+        content.modifier(ScreenSearch(text: $text, tab: tab, prompt: "Search"))
     }
 }

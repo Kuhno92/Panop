@@ -14,6 +14,9 @@ struct HomeView: View {
 
     /// Takes the person to the full channel list.
     let onBrowse: () -> Void
+    /// Changes when the person has been in Settings and left: a phone's Settings is pushed from here, and is closed
+    /// then.
+    var settingsVisits = 0
 
     @Environment(DiscoveryModel.self) private var discovery
     @State private var showingAdd = false
@@ -55,10 +58,10 @@ struct HomeView: View {
             .modifier(ScreenSearch(
                 text: $search,
                 tab: .home,
-                prompt: "Channels, movies, series",
-                isOffered: !library.playlists.isEmpty
+                prompt: "Channels, movies, series"
             ))
             .navigationDestination(isPresented: $showingSettings) { SettingsView() }
+            .onChange(of: settingsVisits) { showingSettings = false }
             .navigationDestination(item: $openMovie) { MovieDetailView(movie: $0) }
             .navigationDestination(item: $openSeries) { SeriesDetailView(series: $0) }
             .sheet(isPresented: $showingAdd) {
