@@ -182,8 +182,9 @@ struct PlayerModelTests {
         append(UInt16(16))
         data.append(contentsOf: "data".utf8)
         append(UInt32(count * 2))
-        for index in 0 ..< count {
-            append(Int16(6000 * sin(2 * Double.pi * 440 * Double(index) / Double(sampleRate))))
+        // Silence: the engines open, play and finish it all the same, and a test run does not beep.
+        for _ in 0 ..< count {
+            append(Int16(0))
         }
         let url = FileManager.default.temporaryDirectory.appendingPathComponent("\(UUID().uuidString).wav")
         try data.write(to: url)
