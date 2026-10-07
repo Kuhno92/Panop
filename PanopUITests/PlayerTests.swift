@@ -146,6 +146,21 @@ final class PlayerTests: PanopUITestCase {
                 app.staticTexts["Now playing"].waitForNonExistence(timeout: 10),
                 "the stream did not come back"
             )
+
+            // The stream is in front with its controls up, and the last of them takes the focus to the app again: the
+            // arrows
+            // reach it, whatever the Menu button does.
+            let menu = app.buttons["playerMenu"]
+            XCTAssertTrue(menu.waitForExistence(timeout: 10), "no Menu button in the player's controls")
+            for _ in 0 ..< 8 where !menu.hasFocus {
+                XCUIRemote.shared.press(.right)
+            }
+            XCTAssertTrue(menu.hasFocus, "the right arrow did not reach the Menu button")
+            XCUIRemote.shared.press(.select)
+            XCTAssertTrue(
+                app.staticTexts["Now playing"].waitForExistence(timeout: 10),
+                "the Menu button did not go back to the app"
+            )
         }
     #else
         func testCloseReturnsToTheList() {

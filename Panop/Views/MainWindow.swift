@@ -63,10 +63,9 @@
             // Back at the app from the stream, the focus is on the bar: Select shows the stream again, and the rest of
             // the app is one press up.
             .focusScope(focusSpace)
-            .onChange(of: playback.isFront) { _, front in
-                if !front {
-                    resetFocus(in: focusSpace)
-                }
+            .onChange(of: playback.isFront) {
+                // To the bar when the stream goes behind, to the player's controls when it comes forward.
+                resetFocus(in: focusSpace)
             }
             #endif
             .animation(.snappy(duration: 0.25), value: playback.isFront)

@@ -10,6 +10,10 @@ struct PlayerControls: View {
     var onShowGuide: (() -> Void)?
     /// The live channel's place in the guide, for the programme timeline. Nil for a film or a channel with no guide.
     var guide: GuideKey?
+    /// Where the stream is in the app's own screen (Apple TV, a Mac's main window): goes back to the app with the
+    /// stream
+    /// playing on. On Apple TV it is the last button of the row, so the right arrow always reaches it.
+    var onBrowse: (() -> Void)?
 
     /// The scrubber's own value while a finger is on it, so the coordinator is asked to
     /// seek once, on release, and not on every movement.
@@ -17,7 +21,7 @@ struct PlayerControls: View {
 
     /// Which control has focus, on Apple TV, so the bar can stay up while it is being used.
     private enum Control: Hashable {
-        case play, back, forward, audio, subtitles, guide
+        case play, back, forward, audio, subtitles, guide, menu
     }
 
     @FocusState private var focused: Control?
@@ -116,6 +120,19 @@ struct PlayerControls: View {
                 }
                 .accessibilityLabel("Picture in Picture")
             }
+
+            #if os(tvOS)
+                // The remote's Menu button does the same, but a button on the screen can always be found with the
+                // arrows.
+                if let onBrowse {
+                    Button(action: onBrowse) {
+                        Label("Menu", systemImage: "rectangle.grid.2x2.fill").font(.title3)
+                    }
+                    .trackFocus($focused, .menu)
+                    .accessibilityLabel("Menu")
+                    .accessibilityIdentifier("playerMenu")
+                }
+            #endif
         }
     }
 

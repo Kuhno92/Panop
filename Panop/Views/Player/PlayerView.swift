@@ -170,6 +170,12 @@ struct PlayerView: View {
             }
         }
         .disabled(isBehind)
+        // Brought back to the front: its controls are up, so the way back to the app is on the screen.
+        .onChange(of: isBehind) { _, behind in
+            if !behind {
+                model.showControls()
+            }
+        }
         .task { model.start() }
         .onDisappear { Task { await model.stop() } }
         #if os(macOS)
@@ -243,7 +249,7 @@ struct PlayerView: View {
             }
 
             if model.showsControls, model.failureText == nil {
-                PlayerControls(model: model, onShowGuide: onShowGuide, guide: guide)
+                PlayerControls(model: model, onShowGuide: onShowGuide, guide: guide, onBrowse: onBrowse)
                     .transition(.opacity)
             }
         }
