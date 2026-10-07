@@ -62,7 +62,7 @@ struct RootView: View {
     @Environment(UserStateStore.self) private var userState
     @Environment(\.horizontalSizeClass) private var sizeClass
     @State private var searchRequests = SearchCoordinator()
-    #if os(macOS)
+    #if os(macOS) || os(tvOS)
         @Environment(EmbeddedPlayback.self) private var embedded
     #endif
     @Environment(\.modelContext) private var catalog
@@ -185,6 +185,14 @@ struct RootView: View {
             }
         #endif
             .id(profiles.currentID)
+        #if os(tvOS)
+            // Play/Pause on the remote brings a stream playing behind the app to the front, from any screen.
+            .onPlayPauseCommand {
+                if embedded.isPlaying, !embedded.isFront {
+                    embedded.bringToFront()
+                }
+            }
+        #endif
             // Choosing Search does not move to a screen: the selection goes straight back to where it was, and the
             // screen that was on show is asked to open its search field.
             .onChange(of: selection) { old, new in

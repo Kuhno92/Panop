@@ -97,14 +97,28 @@ final class PlayerTests: PanopUITestCase {
             XCTAssertTrue(app.buttons["Pause"].exists, "the controls hid while one of them had focus")
         }
 
-        func testMenuClosesThePlayer() {
+        /// Menu goes back to the app and the stream plays on behind it, as on a Mac. Select on the bar over the app
+        /// (where the
+        /// focus lands) brings it forward again, and Stop in the bar over the app ends it.
+        func testMenuSendsTheStreamBehindTheApp() {
             openFirstChannel()
             XCTAssertTrue(app.buttons["Pause"].waitForExistence(timeout: 15))
 
             XCUIRemote.shared.press(.menu)
 
-            XCTAssertTrue(app.buttons["Pause"].waitForNonExistence(timeout: 10))
-            XCTAssertTrue(channel("3sat").waitForExistence(timeout: 10))
+            XCTAssertTrue(app.buttons["Pause"].waitForNonExistence(timeout: 10), "the controls stayed over the app")
+            XCTAssertTrue(channel("3sat").waitForExistence(timeout: 10), "the app is not back")
+            XCTAssertTrue(app.staticTexts["Now playing"].exists, "nothing says a stream is still playing")
+            XCTAssertTrue(app.buttons["Stop"].exists, "no Stop in the bar over the app")
+
+            // Back at the app the focus is on the bar, so Select shows the stream.
+            XCUIRemote.shared.press(.select)
+
+            // The stream is in front again: the bar over the app is gone (the controls may have timed out already).
+            XCTAssertTrue(
+                app.staticTexts["Now playing"].waitForNonExistence(timeout: 10),
+                "Select on the bar did not bring the stream back"
+            )
         }
     #else
         func testCloseReturnsToTheList() {

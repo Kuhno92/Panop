@@ -1,7 +1,9 @@
-#if os(macOS)
+#if os(macOS) || os(tvOS)
     import Observation
 
-    /// The stream playing inside the Mac's main window, so the rest of the app can be used over it.
+    /// The stream playing inside the main window (a Mac's, and an Apple TV's screen), so the rest of the app can be
+    /// used
+    /// over it.
     ///
     /// Playing is not a screen the person is sent to and must come back from: the stream is a layer under the whole
     /// app.

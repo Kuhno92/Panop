@@ -3,6 +3,13 @@ import PanopCore
 import PanopPlayback
 import SwiftUI
 
+extension EnvironmentValues {
+    /// True while the stream plays behind the app (see `EmbeddedPlayback`): its controls are out of sight and cannot
+    /// take
+    /// the focus or a press, which belong to the app in front.
+    @Entry var playerIsBehind: Bool = false
+}
+
 /// Resolves what to play, then shows the player. Presented full screen from a
 /// channel or movie.
 struct PlayerScreen: View {
@@ -149,14 +156,20 @@ struct PlayerView: View {
     var guide: GuideKey?
 
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.playerIsBehind) private var isBehind
 
     var body: some View {
         ZStack {
             surface
             subtitles
             tapSurface
-            overlay
+            // Not drawn at all while behind the app: faded controls would still show through it and be heard by
+            // the accessibility tree and the focus engine.
+            if !isBehind {
+                overlay
+            }
         }
+        .disabled(isBehind)
         .task { model.start() }
         .onDisappear { Task { await model.stop() } }
         #if os(macOS)
@@ -168,6 +181,8 @@ struct PlayerView: View {
         #endif
         #if os(tvOS)
         .onPlayPauseCommand { model.togglePause() }
+        // Menu goes back to the app and the stream plays on behind it (nil leaves Menu to the system).
+        .onExitCommand(perform: onBrowse)
         #endif
     }
 

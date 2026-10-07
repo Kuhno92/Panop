@@ -69,14 +69,14 @@ struct PanopApp: App {
         }
     }
 
-    #if os(macOS)
+    #if os(macOS) || os(tvOS)
         @State private var embeddedPlayback = EmbeddedPlayback()
     #endif
 
     /// The app, and on a Mac a stream playing under it in the same window.
     @ViewBuilder
     private var mainWindow: some View {
-        #if os(macOS)
+        #if os(macOS) || os(tvOS)
             MainWindow { RootView() }
         #else
             RootView()
@@ -92,7 +92,7 @@ struct PanopApp: App {
                 .environment(services.syncStatus)
                 .environment(cloudSync)
                 .environment(\.playbackMetrics, metricsStore)
-            #if os(macOS)
+            #if os(macOS) || os(tvOS)
                 .environment(embeddedPlayback)
             #endif
         }
