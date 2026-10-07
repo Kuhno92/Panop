@@ -24,12 +24,25 @@ extension View {
             // safe-area inset) the list's rows still reached under the panel, and the focus engine, finding rows where
             // the panel is, went from the panel's buttons to a channel and never from a row to the panel. Laid out
             // beside it, Right reaches the panel when nothing else on the screen is further right.
+            let showing = playback.isPlaying && !playback.isFront
             HStack(spacing: 0) {
                 content
-                if playback.isPlaying, !playback.isFront {
+                    .environment(\.pageBackgroundProvided, showing)
+                if showing {
                     NowPlayingPanel()
                 }
             }
+            // One gradient behind the screen and its panel, the same as the screen has without one (over the stream,
+            // see
+            // through), and out to the edge of the screen, past the margin the screen keeps: with the panel's column
+            // bare
+            // the gradient stopped where the screen did.
+            .background {
+                if showing {
+                    PageBackground()
+                }
+            }
+            .ignoresSafeArea(edges: .trailing)
         }
     }
 
@@ -72,7 +85,7 @@ extension View {
             .padding(.vertical, 28)
             .frame(width: 156)
             .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 28, style: .continuous))
-            .padding(.trailing, 8)
+            .padding(.trailing, 40)
             .frame(maxHeight: .infinity)
             // A section as tall as the screen: the right arrow from the last button of any row, whatever its height on
             // the screen, is handed to the panel's buttons.

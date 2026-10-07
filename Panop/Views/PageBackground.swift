@@ -4,6 +4,9 @@ extension EnvironmentValues {
     /// True while the app is laid over a stream playing behind it (a Mac's main window): the page backgrounds become
     /// see-through, so the picture shows.
     @Entry var overStream: Bool = false
+    /// True where something outside a screen already draws the page background behind it and its panel (Apple TV's Now
+    /// playing column), so the screen draws none of its own and the gradient runs on unbroken across both.
+    @Entry var pageBackgroundProvided: Bool = false
 }
 
 /// The backdrop of the browsing screens: a deep, slightly blue ground with two soft glows, so the space between and
@@ -12,8 +15,17 @@ extension EnvironmentValues {
 struct PageBackground: View {
     @Environment(\.colorScheme) private var scheme
     @Environment(\.overStream) private var overStream
+    @Environment(\.pageBackgroundProvided) private var provided
 
     var body: some View {
+        if provided {
+            Color.clear
+        } else {
+            gradients
+        }
+    }
+
+    private var gradients: some View {
         ZStack {
             LinearGradient(colors: ground, startPoint: .top, endPoint: .bottom)
             RadialGradient(

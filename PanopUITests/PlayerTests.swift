@@ -154,6 +154,33 @@ final class PlayerTests: PanopUITestCase {
             )
         }
 
+        /// The guide button in the stream's controls opens the TV guide over the stream (it used to go back to the
+        /// menu), and
+        /// Menu closes the guide and leaves the stream.
+        func testTheGuideButtonOpensTheGuideOverTheStream() {
+            openFirstChannel()
+            XCTAssertTrue(app.buttons["Pause"].waitForExistence(timeout: 15))
+
+            let guide = app.buttons["playerGuide"]
+            XCTAssertTrue(guide.exists, "no guide button in the controls")
+            for _ in 0 ..< 6 where !(guide.exists && guide.hasFocus) {
+                XCUIRemote.shared.press(.right)
+            }
+            XCUIRemote.shared.press(.select)
+
+            XCTAssertTrue(
+                app.staticTexts["TV Guide"].waitForExistence(timeout: 10),
+                "the guide did not open. Screen:\n\(app.debugDescription)"
+            )
+            XCTAssertFalse(app.buttons["Show stream"].exists, "it went back to the menu instead")
+
+            XCUIRemote.shared.press(.menu)
+            XCTAssertTrue(
+                app.buttons["Pause"].waitForExistence(timeout: 10),
+                "Menu did not leave the guide for the stream"
+            )
+        }
+
         /// Down from Show stream is Stop, and Stop ends the stream: the panel goes and nothing plays on.
         func testStopIsReachedFromShowStream() {
             openFirstChannel()

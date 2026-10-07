@@ -17,6 +17,18 @@
             @Environment(\.resetFocus) private var resetFocus
         #endif
 
+        /// The guide button in the stream's controls. On a Mac it goes to the guide in the app, with the stream playing
+        /// on
+        /// behind it. On Apple TV that went back to the menu and opened nothing (the screen that opens the guide is a
+        /// Mac's): there the guide opens over the stream, from the player itself.
+        private var guideInApp: (() -> Void)? {
+            #if os(macOS)
+                { playback.showGuide() }
+            #else
+                nil
+            #endif
+        }
+
         private var showsNowPlaying: Bool {
             playback.isPlaying && !playback.isFront
         }
@@ -28,7 +40,7 @@
                         target: target,
                         onClose: { playback.stop() },
                         onBrowse: { playback.sendToBack() },
-                        onShowGuideInApp: { playback.showGuide() }
+                        onShowGuideInApp: guideInApp
                     )
                     .id(target.id)
                     .environment(\.playerIsBehind, !playback.isFront)
