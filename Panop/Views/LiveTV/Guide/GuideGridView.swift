@@ -26,69 +26,119 @@ struct GuideGridView: View {
     @State private var position = ScrollPosition()
     /// Apple TV moves by focus, so it is told where to start: on the first channel, not wherever it lands.
     @FocusState private var focusedChannel: String?
+    /// Apple TV only. The grid scrolls up and down by itself, and sideways by this much, kept here and not by a scroll
+    /// view: the focus engine scrolls a scroll view to reveal whatever takes focus, and it did so sideways each time
+    /// the focus moved to the next channel name (which is pinned to the left edge, so its layout frame is far to the
+    /// left of the content), sliding the whole grid. With no sideways scroll view there is nothing to slide; the grid
+    /// moves sideways only when a programme takes focus and is not fully in view (`reveal`).
+    @State private var scrollX: CGFloat = 0
+    /// The width the grid has on screen, for how much of the time axis is in view.
+    @State private var viewportWidth: CGFloat = 1920
 
     var body: some View {
         let rows = narrow(list.rows)
-        ScrollView([.horizontal, .vertical]) {
-            LazyVStack(alignment: .leading, spacing: 0, pinnedViews: [.sectionHeaders]) {
-                Section {
-                    ForEach(Array(rows.enumerated()), id: \.element.id) { index, channel in
-                        GuideGridRow(
-                            channel: channel,
-                            timeline: timeline,
-                            grid: grid,
-                            isAlternate: index.isMultiple(of: 2),
-                            focus: $focusedChannel,
-                            onPlay: play,
-                            onSelect: { selected = GuideSelection(channel: channel, programme: $0) }
-                        )
-                        .onAppear { list.rowAppeared(channel) }
-                    }
-                } header: {
-                    GuideTimeHeader(timeline: timeline)
-                }
-            }
-            .frame(width: GuideMetrics.channelWidth + timeline.width, alignment: .leading)
-            // Behind the rows, so the lines show through the gaps and the light cells but never over a title.
-            .background(alignment: .topLeading) {
-                GuideHourLines(timeline: timeline)
+        scrollView(rows: rows)
+            .scrollPosition($position)
+            .coordinateSpace(.named(GuideMetrics.space))
+        #if os(tvOS)
+            .onGeometryChange(for: CGFloat.self, of: { $0.size.width }, action: { viewportWidth = $0 })
+        #endif
+        #if os(tvOS)
+        // A full-screen cover shows what is under it unless it is told not to, and the channel column
+        // must reach the edge of the screen or the programmes show in the gap beside it.
+        .background(Color.black.ignoresSafeArea())
+        .ignoresSafeArea(edges: .horizontal)
+        #endif
+        .overlay {
+            if rows.isEmpty, list.phase == .loaded {
+                ContentUnavailableView("No channels", systemImage: "tv")
             }
         }
-        .scrollPosition($position)
-        .coordinateSpace(.named(GuideMetrics.space))
-        #if os(tvOS)
-            // A full-screen cover shows what is under it unless it is told not to, and the channel column
-            // must reach the edge of the screen or the programmes show in the gap beside it.
-            .background(Color.black.ignoresSafeArea())
-            .ignoresSafeArea(edges: .horizontal)
-        #endif
-            .overlay {
-                if rows.isEmpty, list.phase == .loaded {
-                    ContentUnavailableView("No channels", systemImage: "tv")
-                }
-            }
         #if !os(tvOS)
-            .navigationTitle("TV Guide")
+        .navigationTitle("TV Guide")
         #endif
-            .onChange(of: rows.first?.id, initial: true) {
-                if focusedChannel == nil {
-                    focusedChannel = rows.first?.id
+        .onChange(of: rows.first?.id, initial: true) {
+            if focusedChannel == nil {
+                focusedChannel = rows.first?.id
+            }
+        }
+        .task(id: spec) { list.show(spec, in: catalog.container) }
+        .task(id: timeline) {
+            grid.reset(window: timeline.start ... timeline.end)
+            // Open on now, a little in from the channel column, not on the hour the axis begins at.
+            let start = max(0, timeline.x(for: .now) - 40)
+            #if os(tvOS)
+                scrollX = start
+            #else
+                position.scrollTo(x: start)
+            #endif
+        }
+        .sheet(item: $selected) { selection in
+            GuideProgrammeSheet(
+                selection: selection,
+                onPlay: { selected = nil; play($0) },
+                onPlayTarget: { selected = nil; start($0) }
+            )
+        }
+        .modifier(PlayerPresentation(target: $playing))
+    }
+
+    private func scrollView(rows: [CatalogRow]) -> some View {
+        #if os(tvOS)
+            ScrollView(.vertical) { gridContent(rows: rows) }
+        #else
+            ScrollView([.horizontal, .vertical]) { gridContent(rows: rows) }
+        #endif
+    }
+
+    private func gridContent(rows: [CatalogRow]) -> some View {
+        LazyVStack(alignment: .leading, spacing: 0, pinnedViews: [.sectionHeaders]) {
+            Section {
+                ForEach(Array(rows.enumerated()), id: \.element.id) { index, channel in
+                    GuideGridRow(
+                        channel: channel,
+                        timeline: timeline,
+                        grid: grid,
+                        isAlternate: index.isMultiple(of: 2),
+                        focus: $focusedChannel,
+                        scrollX: scrollX,
+                        viewportWidth: viewportWidth,
+                        onReveal: reveal,
+                        onPlay: play,
+                        onSelect: { selected = GuideSelection(channel: channel, programme: $0) }
+                    )
+                    .onAppear { list.rowAppeared(channel) }
                 }
+            } header: {
+                GuideTimeHeader(timeline: timeline, scrollX: scrollX, viewportWidth: viewportWidth)
             }
-            .task(id: spec) { list.show(spec, in: catalog.container) }
-            .task(id: timeline) {
-                grid.reset(window: timeline.start ... timeline.end)
-                // Open on now, a little in from the channel column, not on the hour the axis begins at.
-                position.scrollTo(x: max(0, timeline.x(for: .now) - 40))
-            }
-            .sheet(item: $selected) { selection in
-                GuideProgrammeSheet(
-                    selection: selection,
-                    onPlay: { selected = nil; play($0) },
-                    onPlayTarget: { selected = nil; start($0) }
-                )
-            }
-            .modifier(PlayerPresentation(target: $playing))
+        }
+        #if os(tvOS)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        #else
+        .frame(width: GuideMetrics.channelWidth + timeline.width, alignment: .leading)
+        #endif
+        // Behind the rows, so the lines show through the gaps and the light cells but never over a title.
+        .background(alignment: .topLeading) {
+            GuideHourLines(timeline: timeline, scrollX: scrollX)
+        }
+    }
+
+    /// Apple TV: brings a programme that took focus into view, sliding the time axis only as far as needed. `range` is
+    /// where it lies on the axis. A programme wider than the screen is shown from its start.
+    private func reveal(_ range: ClosedRange<CGFloat>) {
+        let room: CGFloat = 40
+        let visible = max(viewportWidth - GuideMetrics.channelWidth, 1)
+        var target = scrollX
+        if range.lowerBound < scrollX + room {
+            target = range.lowerBound - room
+        } else if range.upperBound > scrollX + visible - room {
+            target = min(range.upperBound - visible + room, range.lowerBound - room)
+        }
+        target = min(max(0, target), max(0, timeline.width - visible))
+        if abs(target - scrollX) > 0.5 {
+            withAnimation(.easeOut(duration: 0.2)) { scrollX = target }
+        }
     }
 
     private func play(_ channel: CatalogRow) {
@@ -179,6 +229,9 @@ private struct GuideBarBackground: View {
 
 private struct GuideTimeHeader: View {
     let timeline: GuideTimeline
+    /// Apple TV: how far the time axis is slid sideways, and the width of the screen.
+    var scrollX: CGFloat = 0
+    var viewportWidth: CGFloat = 0
 
     /// The time, and the day too at the first mark after midnight, so a guide that runs into tomorrow says so.
     static func label(for tick: Date) -> String {
@@ -202,36 +255,60 @@ private struct GuideTimeHeader: View {
                 }
                 .stuckToLeadingEdge()
                 .zIndex(1)
-            ZStack(alignment: .topLeading) {
-                GuideBarBackground()
-                ForEach(timeline.ticks, id: \.self) { tick in
-                    let whole = GuideTimeline.isWholeHour(tick)
-                    Rectangle()
-                        .fill(.secondary.opacity(whole ? 0.5 : 0.25))
-                        .frame(width: 1, height: whole ? GuideMetrics.headerHeight : GuideMetrics.headerHeight / 2)
-                        .offset(x: timeline.x(for: tick))
-                    Text(Self.label(for: tick))
-                        .font(.caption.monospacedDigit().weight(whole ? .semibold : .regular))
-                        .foregroundStyle(whole ? .primary : .secondary)
-                        .padding(.leading, 6)
-                        .offset(x: timeline.x(for: tick))
-                }
-                GuideNowChip(timeline: timeline)
-            }
-            .frame(width: timeline.width, height: GuideMetrics.headerHeight)
+            axis
         }
         .frame(height: GuideMetrics.headerHeight)
+    }
+
+    @ViewBuilder
+    private var axis: some View {
+        #if os(tvOS)
+            axisMarks
+                .offset(x: -scrollX)
+                .frame(width: max(viewportWidth - GuideMetrics.channelWidth, 0), alignment: .leading)
+                // Cut at the sides only: the "NOW" chip hangs below the bar and a plain clip would cut it off.
+                .mask(alignment: .topLeading) {
+                    Rectangle().frame(
+                        width: max(viewportWidth - GuideMetrics.channelWidth, 0),
+                        height: GuideMetrics.headerHeight + 40
+                    )
+                }
+        #else
+            axisMarks
+        #endif
+    }
+
+    private var axisMarks: some View {
+        ZStack(alignment: .topLeading) {
+            GuideBarBackground()
+            ForEach(timeline.ticks, id: \.self) { tick in
+                let whole = GuideTimeline.isWholeHour(tick)
+                Rectangle()
+                    .fill(.secondary.opacity(whole ? 0.5 : 0.25))
+                    .frame(width: 1, height: whole ? GuideMetrics.headerHeight : GuideMetrics.headerHeight / 2)
+                    .offset(x: timeline.x(for: tick))
+                Text(Self.label(for: tick))
+                    .font(.caption.monospacedDigit().weight(whole ? .semibold : .regular))
+                    .foregroundStyle(whole ? .primary : .secondary)
+                    .padding(.leading, 6)
+                    .offset(x: timeline.x(for: tick))
+            }
+            GuideNowChip(timeline: timeline)
+        }
+        .frame(width: timeline.width, height: GuideMetrics.headerHeight)
     }
 }
 
 /// Faint vertical lines at every half hour, stronger at the hour, running the height of the grid.
 private struct GuideHourLines: View {
     let timeline: GuideTimeline
+    /// Apple TV: how far the time axis is slid sideways.
+    var scrollX: CGFloat = 0
 
     var body: some View {
         Canvas { context, size in
             for tick in timeline.ticks {
-                let x = GuideMetrics.channelWidth + timeline.x(for: tick)
+                let x = GuideMetrics.channelWidth + timeline.x(for: tick) - scrollX
                 let whole = GuideTimeline.isWholeHour(tick)
                 var line = Path()
                 line.move(to: CGPoint(x: x, y: 0))
@@ -289,6 +366,11 @@ private struct GuideGridRow: View {
     /// Every other row is shaded a little, so a row can be followed across the grid.
     let isAlternate: Bool
     var focus: FocusState<String?>.Binding
+    /// How far the time axis is slid sideways, the screen's width, and what to call when a programme takes focus (Apple
+    /// TV only: see `GuideGridView.scrollX`).
+    var scrollX: CGFloat = 0
+    var viewportWidth: CGFloat = 0
+    var onReveal: (ClosedRange<CGFloat>) -> Void = { _ in }
     let onPlay: (CatalogRow) -> Void
     let onSelect: (ProgrammeSnapshot) -> Void
 
@@ -299,35 +381,54 @@ private struct GuideGridRow: View {
         return GuideKey(playlist: channel.playlist, epgKey: epgKey)
     }
 
-    var body: some View {
-        HStack(spacing: 0) {
-            Button { onPlay(channel) } label: {
-                HStack(spacing: 8) {
-                    ChannelLogo(address: channel.iconURL, size: GuideMetrics.rowHeight * 0.5)
-                    Text(channel.name)
-                        .font(.caption.weight(.semibold))
-                        .lineLimit(2)
-                        .multilineTextAlignment(.leading)
-                }
-                .padding(.horizontal, 8)
-                .frame(width: GuideMetrics.channelWidth, height: GuideMetrics.rowHeight, alignment: .leading)
-                .background { GuideColumnBackground() }
-                .contentShape(Rectangle())
+    private var channelButton: some View {
+        Button { onPlay(channel) } label: {
+            HStack(spacing: 8) {
+                ChannelLogo(address: channel.iconURL, size: GuideMetrics.rowHeight * 0.5)
+                Text(channel.name)
+                    .font(.caption.weight(.semibold))
+                    .lineLimit(2)
+                    .multilineTextAlignment(.leading)
             }
-            .buttonStyle(.plain)
-            .focused(focus, equals: channel.id)
-            .accessibilityLabel("Watch \(channel.name)")
-            .stuckToLeadingEdge()
-            .zIndex(1)
+            .padding(.horizontal, 8)
+            .frame(width: GuideMetrics.channelWidth, height: GuideMetrics.rowHeight, alignment: .leading)
+            .background { GuideColumnBackground() }
+            .contentShape(Rectangle())
+        }
+        .guideButtonStyle(cornerRadius: 10)
+        .focused(focus, equals: channel.id)
+        .accessibilityLabel("Watch \(channel.name)")
+    }
 
-            ZStack(alignment: .topLeading) {
-                Color.clear
-                programmes
-                // Over the cells, so the line is seen across a programme, and under the channel column
-                // (which is above this area), so it never crosses a channel name.
-                GuideNowMarker(timeline: timeline)
-            }
-            .frame(width: timeline.width, height: GuideMetrics.rowHeight)
+    private var programmeArea: some View {
+        ZStack(alignment: .topLeading) {
+            Color.clear
+            programmes
+            // Over the cells, so the line is seen across a programme, and under the channel column
+            // (which is above this area), so it never crosses a channel name.
+            GuideNowMarker(timeline: timeline)
+        }
+        .frame(width: timeline.width, height: GuideMetrics.rowHeight)
+    }
+
+    var body: some View {
+        Group {
+            #if os(tvOS)
+                HStack(spacing: 0) {
+                    channelButton
+                    programmeArea
+                        .offset(x: -scrollX)
+                        .frame(width: max(viewportWidth - GuideMetrics.channelWidth, 0), alignment: .leading)
+                        .clipped()
+                }
+            #else
+                HStack(spacing: 0) {
+                    channelButton
+                        .stuckToLeadingEdge()
+                        .zIndex(1)
+                    programmeArea
+                }
+            #endif
         }
         .frame(height: GuideMetrics.rowHeight)
         .background(isAlternate ? Color.primary.opacity(0.045) : Color.clear)
@@ -353,7 +454,8 @@ private struct GuideGridRow: View {
                         channel: channel,
                         programme: programme,
                         width: frame.width,
-                        action: { onSelect(programme) }
+                        action: { onSelect(programme) },
+                        onFocus: { onReveal(CGFloat(frame.x) ... CGFloat(frame.x + frame.width)) }
                     )
                     .offset(x: frame.x)
                 }
@@ -375,6 +477,8 @@ private struct GuideProgrammeCell: View {
     let programme: ProgrammeSnapshot
     let width: Double
     let action: () -> Void
+    /// Called when the cell takes focus, for Apple TV to bring it into view.
+    var onFocus: () -> Void = {}
 
     var body: some View {
         // The minute is read as the cell is drawn: a programme that ends while the grid is open is
@@ -434,7 +538,7 @@ private struct GuideProgrammeCell: View {
             .opacity(over ? 0.7 : 1)
             .contentShape(Rectangle())
         }
-        .buttonStyle(.plain)
+        .guideButtonStyle(cornerRadius: 8, onFocus: onFocus)
         .padding(.leading, 1.5)
         .padding(.top, 3)
         .accessibilityLabel("\(programme.title), \(Self.range(programme)), \(channel.name)")
@@ -460,99 +564,3 @@ private struct GuideProgrammeCell: View {
         return "\(from) – \(to)"
     }
 }
-
-// MARK: - A programme in full
-
-/// What a programme is, with the ways to watch the channel it is on.
-private struct GuideProgrammeSheet: View {
-    let selection: GuideSelection
-    let onPlay: (CatalogRow) -> Void
-    let onPlayTarget: (PlaybackTarget) -> Void
-
-    @Environment(\.dismiss) private var dismiss
-
-    var body: some View {
-        let programme = selection.programme
-        let channel = selection.channel
-        let onAir = programme.isOn(at: .now)
-        let from = programme.start.formatted(date: .abbreviated, time: .shortened)
-        let until = programme.stop.formatted(date: .omitted, time: .shortened)
-        let when = "\(from) – \(until)"
-        NavigationStack {
-            List {
-                Section {
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text(programme.title).font(.title3.bold())
-                        Text("\(when) · \(channel.name)")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                        if let subtitle = programme.subtitle, !subtitle.isEmpty {
-                            Text(subtitle).font(.callout)
-                        }
-                        if let details = programme.details, !details.isEmpty {
-                            Text(details).font(.footnote).foregroundStyle(.secondary)
-                        }
-                    }
-                    .padding(.vertical, 4)
-                }
-                Section {
-                    Button(onAir ? "Watch now" : "Watch \(channel.name)", systemImage: "play.fill") {
-                        onPlay(channel)
-                    }
-                    NavigationLink("Channel schedule", destination: {
-                        ChannelGuideView(channel: channel, onPlay: onPlay, onPlayTarget: onPlayTarget)
-                    })
-                }
-            }
-            .pageBackdrop()
-            .navigationTitle(channel.name)
-            #if os(iOS)
-                .navigationBarTitleDisplayMode(.inline)
-            #endif
-                .toolbar {
-                    ToolbarItem(placement: .cancellationAction) {
-                        Button("Done") { dismiss() }
-                    }
-                }
-        }
-    }
-}
-
-#if !os(tvOS)
-    /// A button that explains the colours: what each kind of programme is drawn in, and how what is on now is shown.
-    private struct GuideColourKeyButton: View {
-        @State private var showing = false
-
-        var body: some View {
-            Button("Colour key", systemImage: "paintpalette") { showing = true }
-                .popover(isPresented: $showing) {
-                    VStack(alignment: .leading, spacing: 10) {
-                        Text("Colour key").font(.headline)
-                        HStack(spacing: 10) {
-                            RoundedRectangle(cornerRadius: 4)
-                                .fill(LinearGradient(
-                                    colors: [.blue, .blue.opacity(0.78)],
-                                    startPoint: .top,
-                                    endPoint: .bottom
-                                ))
-                                .overlay(RoundedRectangle(cornerRadius: 4).strokeBorder(.white, lineWidth: 2))
-                                .frame(width: 26, height: 18)
-                            Text("On now")
-                        }
-                        ForEach(ProgrammeCategory.allCases, id: \.self) { kind in
-                            HStack(spacing: 10) {
-                                RoundedRectangle(cornerRadius: 4)
-                                    .fill(kind.color.opacity(0.17))
-                                    .overlay(alignment: .leading) { Rectangle().fill(kind.color).frame(width: 4) }
-                                    .clipShape(RoundedRectangle(cornerRadius: 4))
-                                    .frame(width: 26, height: 18)
-                                Text(kind.title)
-                            }
-                        }
-                    }
-                    .padding()
-                    .presentationCompactAdaptation(.popover)
-                }
-        }
-    }
-#endif
