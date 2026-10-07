@@ -121,6 +121,28 @@ final class PlayerTests: PanopUITestCase {
             )
         }
 
+        /// The panel with Show stream and Stop is down the right side, and the right arrow reaches it from the list.
+        func testTheRightArrowReachesTheNowPlayingPanel() {
+            openFirstChannel()
+            XCTAssertTrue(app.buttons["Pause"].waitForExistence(timeout: 15))
+            XCUIRemote.shared.press(.menu)
+            let show = app.buttons["Show stream"]
+            XCTAssertTrue(show.waitForExistence(timeout: 10))
+            XCTAssertTrue(app.buttons["Stop"].exists)
+
+            // Into the list, and back to the panel with the right arrow alone.
+            XCUIRemote.shared.press(.left)
+            XCTAssertFalse(show.hasFocus, "the left arrow did not leave the panel")
+            XCUIRemote.shared.press(.right)
+            XCTAssertTrue(show.hasFocus, "the right arrow did not reach the panel")
+
+            XCUIRemote.shared.press(.select)
+            XCTAssertTrue(
+                app.staticTexts["Now playing"].waitForNonExistence(timeout: 10),
+                "Show stream did not bring the stream back"
+            )
+        }
+
         /// From anywhere in the app, an icon in the tab bar brings the stream back: the bar over the app is at the
         /// bottom
         /// of the screen, which the remote cannot reach once the focus has moved up into a long list.
@@ -147,19 +169,11 @@ final class PlayerTests: PanopUITestCase {
                 "the stream did not come back"
             )
 
-            // The stream is in front with its controls up, and the last of them takes the focus to the app again: the
-            // arrows
-            // reach it, whatever the Menu button does.
-            let menu = app.buttons["playerMenu"]
-            XCTAssertTrue(menu.waitForExistence(timeout: 10), "no Menu button in the player's controls")
-            for _ in 0 ..< 8 where !menu.hasFocus {
-                XCUIRemote.shared.press(.right)
-            }
-            XCTAssertTrue(menu.hasFocus, "the right arrow did not reach the Menu button")
-            XCUIRemote.shared.press(.select)
+            // Back in the stream, the Back button (Menu) opens the app again and does not close it.
+            XCUIRemote.shared.press(.menu)
             XCTAssertTrue(
                 app.staticTexts["Now playing"].waitForExistence(timeout: 10),
-                "the Menu button did not go back to the app"
+                "Menu did not return to the app after the stream was brought back from the tab bar"
             )
         }
     #else

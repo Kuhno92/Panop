@@ -249,7 +249,7 @@ struct PlayerView: View {
             }
 
             if model.showsControls, model.failureText == nil {
-                PlayerControls(model: model, onShowGuide: onShowGuide, guide: guide, onBrowse: onBrowse)
+                PlayerControls(model: model, onShowGuide: onShowGuide, guide: guide)
                     .transition(.opacity)
             }
         }

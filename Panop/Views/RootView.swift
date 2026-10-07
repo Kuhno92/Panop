@@ -124,6 +124,7 @@ struct RootView: View {
                 NavigationStack {
                     HomeView(onBrowse: { selection = .live }, settingsVisits: settingsVisits)
                 }
+                .nowPlayingPanel()
             } label: {
                 MainTabLabel("Home", systemImage: "house")
             }
@@ -131,6 +132,7 @@ struct RootView: View {
                 NavigationStack {
                     LiveTVView()
                 }
+                .nowPlayingPanel()
             } label: {
                 MainTabLabel("Live TV", systemImage: "tv")
             }
@@ -140,6 +142,7 @@ struct RootView: View {
                     NavigationStack {
                         VODBrowseView(kind: .movie)
                     }
+                    .nowPlayingPanel()
                 } label: {
                     MainTabLabel("Movies", systemImage: "film")
                 }
@@ -147,6 +150,7 @@ struct RootView: View {
                     NavigationStack {
                         VODBrowseView(kind: .series)
                     }
+                    .nowPlayingPanel()
                 } label: {
                     MainTabLabel("Series", systemImage: "rectangle.stack")
                 }
@@ -156,6 +160,7 @@ struct RootView: View {
                     NavigationStack {
                         SettingsView()
                     }
+                    .nowPlayingPanel()
                     .id(settingsVisits)
                 } label: {
                     MainTabLabel("Settings", systemImage: "gearshape")
@@ -176,6 +181,7 @@ struct RootView: View {
             Tab(value: AppTab.search, role: .search) {
                 #if os(tvOS)
                     NavigationStack { SearchTabView() }
+                        .nowPlayingPanel()
                 #else
                     Color.clear
                 #endif

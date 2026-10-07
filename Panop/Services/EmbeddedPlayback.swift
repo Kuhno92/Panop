@@ -52,5 +52,13 @@
             target = nil
             isFront = false
         }
+
+        /// Apple TV: goes up each time the focus should go to the panel that says what is playing. The panel watches it
+        /// (the focus engine does not move from a list row to a panel beside it on the right arrow).
+        private(set) var panelFocusRequests = 0
+
+        func focusPanel() {
+            panelFocusRequests &+= 1
+        }
     }
 #endif
