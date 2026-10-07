@@ -134,6 +134,9 @@ nonisolated enum SyncErrorMessage {
         case let .http(status): httpText(status)
         case .download: unreachable
         case .cannotReadFile: String(localized: "The playlist file could not be read.")
+        case .notAPlaylist: String(
+                localized: "That address is a web page, not a playlist. Use the link to the file itself."
+            )
         case .invalidSource: String(localized: "That is not a valid web address.")
         case .everySectionFailed: String(localized: "The provider did not return any channels, movies or series.")
         case .staleConfirmation: String(localized: "That playlist was updated in the meantime. Review it again.")

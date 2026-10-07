@@ -2,6 +2,7 @@ import Foundation
 import Observation
 import PanopCatalog
 import PanopCore
+import PanopPlaylist
 import PanopXtream
 import SwiftData
 
@@ -254,6 +255,13 @@ final class PlaylistLibrary {
         switch draft {
         case let .m3uURL(name, url, guideURL):
             let trimmed = url.trimmingCharacters(in: .whitespacesAndNewlines)
+            // GitHub's page about a file is not the file, and is not turned into it: the person is told what to copy.
+            if PlaylistLink.isGitHubPage(trimmed) {
+                throw PlaylistAddError(message: String(localized: """
+                That is GitHub's page for the file, not the file itself. Open the file on GitHub, press the Raw button, \
+                and use that address (it starts with raw.githubusercontent.com).
+                """))
+            }
             guard let host = Self.webHost(trimmed) else {
                 throw PlaylistAddError(
                     message: String(
@@ -265,6 +273,7 @@ final class PlaylistLibrary {
             if let guide, Self.webHost(guide) == nil {
                 throw PlaylistAddError(message: String(localized: "The TV guide address is not a valid web address."))
             }
+            try await rejectWebPage(at: trimmed)
             return Prepared(
                 name: name.nilIfBlank ?? host,
                 kind: .remoteM3U,
@@ -310,6 +319,24 @@ final class PlaylistLibrary {
                     password: credentials.password
                 )
             )
+        }
+    }
+
+    /// Looks at the first bytes behind a pasted link, so a link to a web page is refused here and not added as a
+    /// playlist that never fills. An address that cannot be reached right now is let through: that is for the sync to
+    /// report, and a playlist can be added while offline.
+    private func rejectWebPage(at address: String) async throws {
+        guard let url = URL(string: address) else { return }
+        let request = HTTPRequest(url: url, headers: ["Range": "bytes=0-2047"], timeout: 15)
+        guard let response = try? await transport.stream(request),
+              (200 ..< 300).contains(response.statusCode)
+        else { return }
+        var iterator = response.chunks.makeAsyncIterator()
+        guard let head = try? await iterator.next() else { return }
+        if PlaylistLink.looksLikeWebPage(head) {
+            throw PlaylistAddError(message: String(
+                localized: "That address is a web page, not a playlist. Use the link to the file itself."
+            ))
         }
     }
 

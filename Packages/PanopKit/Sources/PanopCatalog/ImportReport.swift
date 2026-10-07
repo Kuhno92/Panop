@@ -143,6 +143,8 @@ public enum CatalogError: Error, Equatable, Sendable {
     /// The download failed. Credentials are scrubbed from the message.
     case download(message: String)
     case cannotReadFile
+    /// What came back is a web page, not a playlist, such as GitHub's page about a file and not the file.
+    case notAPlaylist
     /// The playlist's source is not something that can be fetched, such as a
     /// malformed URL.
     case invalidSource

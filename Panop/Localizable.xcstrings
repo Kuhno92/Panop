@@ -767,6 +767,16 @@
         }
       }
     },
+    "Checking iCloud for your playlists": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prüfe iCloud auf deine Playlists"
+          }
+        }
+      }
+    },
     "Choose a PIN of 4 to 6 digits": {
       "localizations": {
         "de": {
@@ -2342,6 +2352,16 @@
         }
       }
     },
+    "Nothing is saved in this iCloud account yet. To bring your playlists from another device:\n1. Use the same Apple Account here as there.\n2. On the other device, open Panop once and check that Settings > iCloud says it is on. That saves everything to iCloud, and the device can be switched off afterwards.\n3. Look again here.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In diesem iCloud-Account ist noch nichts gespeichert. So holst du deine Playlists von einem anderen Gerät:\n1. Nutze hier denselben Apple-Account wie dort.\n2. Öffne auf dem anderen Gerät Panop einmal und prüfe, dass in den Einstellungen unter iCloud „An“ steht. Damit wird alles in iCloud gesichert, danach kann das Gerät ausgeschaltet werden.\n3. Such hier erneut."
+          }
+        }
+      }
+    },
     "Nothing watched yet": {
       "localizations": {
         "de": {
@@ -2483,6 +2503,16 @@
         }
       }
     },
+    "Open Panop on the new device. What the others saved arrives in a minute or two; they do not need to be on.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Öffne Panop auf dem neuen Gerät. Was die anderen gespeichert haben, kommt in ein bis zwei Minuten an; sie müssen nicht eingeschaltet sein."
+          }
+        }
+      }
+    },
     "Open the series to pick an episode.": {
       "localizations": {
         "de": {
@@ -2529,6 +2559,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Panop zeichnet Untertitel beim Lume-Player selbst. Der System-Player folgt dem, sobald du etwas änderst."
+          }
+        }
+      }
+    },
+    "Panop found these saved in your iCloud: %@. Use them here?": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Panop hat diese in deinem iCloud gefunden: %@. Hier verwenden?"
           }
         }
       }
@@ -2743,6 +2783,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Playlists auf diesem Gerät"
+          }
+        }
+      }
+    },
+    "Playlists, favourites and watched titles you saved with Panop on another device are kept in your iCloud. They download here by themselves. The other device does not need to be on.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Playlists, Favoriten und gesehene Titel, die du mit Panop auf einem anderen Gerät gespeichert hast, liegen in deinem iCloud. Sie werden hier von selbst geladen. Das andere Gerät muss nicht eingeschaltet sein."
           }
         }
       }
@@ -3484,12 +3534,32 @@
         }
       }
     },
+    "That address is a web page, not a playlist. Use the link to the file itself.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diese Adresse ist eine Webseite, keine Playlist. Verwende den Link zur Datei selbst."
+          }
+        }
+      }
+    },
     "That file could not be read.": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
             "value": "Diese Datei konnte nicht gelesen werden."
+          }
+        }
+      }
+    },
+    "That is GitHub's page for the file, not the file itself. Open the file on GitHub, press the Raw button, and use that address (it starts with raw.githubusercontent.com).": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Das ist die GitHub-Seite zur Datei, nicht die Datei selbst. Öffne die Datei auf GitHub, tippe auf „Raw“ und verwende diese Adresse (sie beginnt mit raw.githubusercontent.com)."
           }
         }
       }
@@ -3952,6 +4022,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Zeit bis zum ersten Bild, typisch"
+          }
+        }
+      }
+    },
+    "To bring your saved playlists here, sign in to iCloud in this device's system settings, then open Panop again. Or add a playlist here.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Um deine gespeicherten Playlists hierher zu holen, melde dich in den Systemeinstellungen dieses Geräts bei iCloud an und öffne Panop erneut. Oder füge hier eine Playlist hinzu."
           }
         }
       }
@@ -4463,66 +4543,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Deine Playlists haben noch keine."
-          }
-        }
-      }
-    },
-    "Checking iCloud for your playlists": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Prüfe iCloud auf deine Playlists"
-          }
-        }
-      }
-    },
-    "Panop found these saved in your iCloud: %@. Use them here?": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Panop hat diese in deinem iCloud gefunden: %@. Hier verwenden?"
-          }
-        }
-      }
-    },
-    "Playlists, favourites and watched titles you saved with Panop on another device are kept in your iCloud. They download here by themselves. The other device does not need to be on.": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Playlists, Favoriten und gesehene Titel, die du mit Panop auf einem anderen Gerät gespeichert hast, liegen in deinem iCloud. Sie werden hier von selbst geladen. Das andere Gerät muss nicht eingeschaltet sein."
-          }
-        }
-      }
-    },
-    "Nothing is saved in this iCloud account yet. To bring your playlists from another device:\n1. Use the same Apple Account here as there.\n2. On the other device, open Panop once and check that Settings > iCloud says it is on. That saves everything to iCloud, and the device can be switched off afterwards.\n3. Look again here.": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "In diesem iCloud-Account ist noch nichts gespeichert. So holst du deine Playlists von einem anderen Gerät:\n1. Nutze hier denselben Apple-Account wie dort.\n2. Öffne auf dem anderen Gerät Panop einmal und prüfe, dass in den Einstellungen unter iCloud „An“ steht. Damit wird alles in iCloud gesichert, danach kann das Gerät ausgeschaltet werden.\n3. Such hier erneut."
-          }
-        }
-      }
-    },
-    "To bring your saved playlists here, sign in to iCloud in this device's system settings, then open Panop again. Or add a playlist here.": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Um deine gespeicherten Playlists hierher zu holen, melde dich in den Systemeinstellungen dieses Geräts bei iCloud an und öffne Panop erneut. Oder füge hier eine Playlist hinzu."
-          }
-        }
-      }
-    },
-    "Open Panop on the new device. What the others saved arrives in a minute or two; they do not need to be on.": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Öffne Panop auf dem neuen Gerät. Was die anderen gespeichert haben, kommt in ein bis zwei Minuten an; sie müssen nicht eingeschaltet sein."
           }
         }
       }

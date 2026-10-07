@@ -96,6 +96,15 @@ public struct CatalogImporter: Sendable {
                 try? FileManager.default.removeItem(atPath: file.path)
             }
         }
+        // A page of HTML read as a playlist gives junk entries and sweeps away the real ones: stop before anything
+        // is touched.
+        if let handle = FileHandle(forReadingAtPath: file.path) {
+            let head = (try? handle.read(upToCount: 2048)) ?? Data()
+            try? handle.close()
+            if PlaylistLink.looksLikeWebPage(head) {
+                throw CatalogError.notAPlaylist
+            }
+        }
 
         var state = try await store.syncState(playlist: playlist) ?? SyncState()
         if !force, state.digest == file.digest {
