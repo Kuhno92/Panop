@@ -44,7 +44,7 @@ struct CloudSyncSection: View {
                     Label("Use the same Apple Account on every device.", systemImage: "1.circle.fill")
                     Label("Turn on Sync with iCloud on each of them.", systemImage: "2.circle.fill")
                     Label(
-                        "Open Panop on the other device and wait a minute or two. Everything above arrives there.",
+                        "Open Panop on the new device. What the others saved arrives in a minute or two; they do not need to be on.",
                         systemImage: "3.circle.fill"
                     )
                 } header: {

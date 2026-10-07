@@ -42,7 +42,7 @@ struct SyncWelcomeView: View {
         case .offer:
             Text("Found your playlists").font(.title.bold())
         case .searching:
-            Text("Looking for your other devices").font(.title.bold())
+            Text("Checking iCloud for your playlists").font(.title.bold())
         case .nothingFound:
             Text("Nothing from iCloud yet").font(.title.bold())
         case .unavailable, .plain:
@@ -54,21 +54,22 @@ struct SyncWelcomeView: View {
     private var description: some View {
         switch phase {
         case let .offer(names):
-            Text("These came from your other devices through iCloud: \(names.joined(separator: ", ")). Use them here?")
+            Text("Panop found these saved in your iCloud: \(names.joined(separator: ", ")). Use them here?")
         case .searching:
             VStack(spacing: 12) {
                 ProgressView()
                 Text("""
-                If you use Panop on another device with the same Apple Account, your playlists, favourites and watched \
-                titles come here by themselves. There is nothing to do on this device.
+                Playlists, favourites and watched titles you saved with Panop on another device are kept in your iCloud. \
+                They download here by themselves. The other device does not need to be on.
                 """)
             }
         case .nothingFound:
             Text("""
-            To bring your playlists from another device:
-            1. Open Panop there and check that Settings > iCloud says it is on.
-            2. Use the same Apple Account on both devices.
-            3. Keep Panop open there for a minute, then look again here.
+            Nothing is saved in this iCloud account yet. To bring your playlists from another device:
+            1. Use the same Apple Account here as there.
+            2. On the other device, open Panop once and check that Settings > iCloud says it is on. That saves \
+            everything to iCloud, and the device can be switched off afterwards.
+            3. Look again here.
             """)
         case let .unavailable(availability):
             Text(unavailableText(availability))
@@ -104,8 +105,8 @@ struct SyncWelcomeView: View {
         switch availability {
         case .noAccount:
             String(localized: """
-            To bring your playlists from another device, sign in to iCloud in this device's system settings, then open \
-            Panop again. Or add a playlist here.
+            To bring your saved playlists here, sign in to iCloud in this device's system settings, then open Panop \
+            again. Or add a playlist here.
             """)
         case .notEntitled:
             String(localized: "This build of Panop cannot use iCloud, so playlists have to be added here.")
