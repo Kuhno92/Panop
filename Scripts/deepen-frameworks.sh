@@ -32,7 +32,8 @@ for fw in "$frameworks"/*.framework; do
         base="$(basename "$entry")"
         ln -s "Versions/Current/$base" "$fw/$base"
     done
-    [[ -e "$fw/Versions/A/$exe" ]] || { echo "error: $fw has no executable $exe" >&2; exit 1; }
+    # A few of FFmpegKit's frameworks carry only headers and resources; signing them is still right.
+    [[ -e "$fw/Versions/A/$exe" ]] || echo "warning: $name.framework has no executable $exe" >&2
 
     if [[ -n "$identity" ]]; then
         codesign --force --sign "$identity" --timestamp=none --preserve-metadata=identifier,entitlements,flags "$fw"

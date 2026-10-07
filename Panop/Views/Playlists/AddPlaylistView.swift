@@ -68,6 +68,9 @@ struct AddPlaylistView: View {
         }
         .formStyle(.grouped)
         .pageBackdrop()
+        // The sheet's own background too: the form's backdrop stops at the sheet's navigation bar and its edges, and
+        // the system's plain material showed around it.
+        .presentationBackground { PageBackground() }
         .navigationTitle("Add playlist")
         #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
