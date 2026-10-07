@@ -19,6 +19,11 @@
 	     iPhone or Apple TV app cannot read its own entitlements. NO where the scripts build without them. -->
 	<key>PanopICloudEntitled</key>
 	<string>$(PANOP_ICLOUD_ENTITLED)</string>
+	<!-- Providers and playlists are often on the home network (an address like 192.168.x.x). Since iOS and tvOS 14 an app
+	     may only talk to such a device after the person has allowed it, and the system asks only for an app that says
+	     why. Without this the request fails at once, which the app reports as "could not reach the provider". -->
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>Panop connects to your IPTV provider or playlist when it is on your home network.</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>audio</string>

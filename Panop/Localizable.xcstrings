@@ -963,7 +963,18 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Der Anbieter war nicht erreichbar. Prüfe die Adresse und deine Verbindung."
+            "value": "Der Anbieter ist nicht erreichbar. Prüfe die Adresse und deine Verbindung."
+          }
+        }
+      }
+    },
+    "Could not reach the provider. Check the address and your connection. If it is on your home network, Panop needs to be allowed to use the local network, in the system settings under Privacy and Security.": {
+      "extractionState": "stale",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der Anbieter ist nicht erreichbar. Prüfe die Adresse und deine Verbindung. Liegt er in deinem Heimnetz, muss Panop das lokale Netzwerk nutzen dürfen: in den Systemeinstellungen unter Datenschutz & Sicherheit."
           }
         }
       }

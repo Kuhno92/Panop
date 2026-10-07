@@ -152,7 +152,10 @@ nonisolated enum SyncErrorMessage {
     }
 
     private static var unreachable: String {
-        String(localized: "Could not reach the provider. Check the address and your connection.")
+        String(localized: """
+        Could not reach the provider. Check the address and your connection. If it is on your home network, Panop \
+        needs to be allowed to use the local network, in the system settings under Privacy and Security.
+        """)
     }
 
     private static func httpText(_ status: Int) -> String {
