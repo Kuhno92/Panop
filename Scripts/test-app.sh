@@ -91,7 +91,7 @@ if [[ "$platform" == macos ]]; then
     # entitlements that no provisioning profile backs.
     # Explicit modules off: with them, the macOS compile of FFmpegKit (KSPlayer's FFmpeg) fails with a module file
     # that is "not found" (docs/engines.md).
-    flags+=(CODE_SIGN_IDENTITY=- DEVELOPMENT_TEAM= CODE_SIGN_ENTITLEMENTS= SWIFT_ENABLE_EXPLICIT_MODULES=NO)
+    flags+=(CODE_SIGN_IDENTITY=- DEVELOPMENT_TEAM= CODE_SIGN_ENTITLEMENTS= PANOP_ICLOUD_ENTITLED=NO SWIFT_ENABLE_EXPLICIT_MODULES=NO)
 fi
 
 # PANOP_ONLY=LiveStreamSmokeTests runs one suite (or Suite/test) instead of everything;

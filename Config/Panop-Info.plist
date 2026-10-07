@@ -15,6 +15,10 @@
 	     controls and Picture in Picture work. The build setting INFOPLIST_KEY_UIBackgroundModes
 	     does not produce this: it was set to "audio" for a long time and the built app had no
 	     such key. It has to be an array, so it lives here. -->
+	<!-- Whether the build carries the iCloud entitlements (Config/Panop.entitlements); CloudSync reads it because an
+	     iPhone or Apple TV app cannot read its own entitlements. NO where the scripts build without them. -->
+	<key>PanopICloudEntitled</key>
+	<string>$(PANOP_ICLOUD_ENTITLED)</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>audio</string>

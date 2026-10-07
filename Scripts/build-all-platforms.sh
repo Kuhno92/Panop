@@ -39,6 +39,7 @@ build() {
         -derivedDataPath "${DD_BASE}-${label}" \
         -clonedSourcePackagesDirPath "$SHARED_SPM" \
         CODE_SIGNING_ALLOWED=NO \
+        PANOP_ICLOUD_ENTITLED=NO \
         ${extra[@]+"${extra[@]}"} \
         -quiet
     echo "    $label ok"

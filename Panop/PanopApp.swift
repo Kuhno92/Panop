@@ -24,7 +24,17 @@ struct PanopApp: App {
                 availability: CloudSync.current(underTest: underTest)
             )
             let cloud = opened.container
-            cloudSync = CloudSyncStatus(opened.availability)
+            let status = CloudSyncStatus(opened.availability)
+            cloudSync = status
+            // The account is not known at once everywhere (an Apple TV): CloudKit is asked a moment after launch, and
+            // Settings says so if there is none.
+            if opened.availability == .active {
+                Task {
+                    if await !CloudSync.accountIsAvailable() {
+                        status.update(.noAccount)
+                    }
+                }
+            }
             catalogContainer = catalog
             cloudContainer = cloud
             // The real file only for the real app: a test run must not write to it.
