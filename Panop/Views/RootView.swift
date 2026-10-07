@@ -55,9 +55,6 @@ struct MainTabLabel: View {
 
 nonisolated enum AppTab: Hashable {
     case home, live, movies, series, settings, search
-    /// Apple TV: an icon in the bar while a stream plays behind the app. Never a screen: choosing it brings the stream
-    /// back (see `onChange(of: selection)`).
-    case nowPlaying
 }
 
 struct RootView: View {
@@ -166,17 +163,6 @@ struct RootView: View {
                     MainTabLabel("Settings", systemImage: "gearshape")
                 }
             }
-            #if os(tvOS)
-                // The way back to a stream that is playing behind the app, from any screen: the bar over the app is at
-                // the bottom, which the remote reaches only by going down a long list.
-                if embedded.isPlaying, !embedded.isFront {
-                    Tab(value: AppTab.nowPlaying) {
-                        Color.clear
-                    } label: {
-                        MainTabLabel("Now playing", systemImage: "play.tv.fill")
-                    }
-                }
-            #endif
             // A magnifier at the end of the bar. It is never a screen of its own: see `tabSelection`.
             Tab(value: AppTab.search, role: .search) {
                 #if os(tvOS)
@@ -221,14 +207,6 @@ struct RootView: View {
                 if old == .settings || old == .home, new != .search {
                     settingsVisits += 1
                 }
-                #if os(tvOS)
-                    if new == .nowPlaying {
-                        var transaction = Transaction()
-                        transaction.disablesAnimations = true
-                        withTransaction(transaction) { selection = old }
-                        embedded.bringToFront()
-                    }
-                #endif
                 #if !os(tvOS)
                     if new == .search {
                         var transaction = Transaction()

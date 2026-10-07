@@ -1,9 +1,11 @@
 import SwiftUI
 
 extension View {
-    /// Apple TV: a panel down the right side while a stream plays behind the app, with Show stream and Stop. It is part
-    /// of each screen, not laid over the whole app: the focus engine does not move out of a screen's own focus area
-    /// to something outside it, so a panel outside could not be reached with the right arrow. Elsewhere it is nothing.
+    /// Apple TV: a slim column down the right side while a stream plays behind the app, with a button to show the
+    /// stream
+    /// and one to stop it. It is part of each screen, not laid over the whole app: the focus engine does not move out
+    /// of
+    /// a screen's own focus area to something outside it. Elsewhere it is nothing.
     func nowPlayingPanel() -> some View {
         #if os(tvOS)
             modifier(NowPlayingPanelModifier())
@@ -18,62 +20,64 @@ extension View {
         @Environment(EmbeddedPlayback.self) private var playback
 
         func body(content: Content) -> some View {
-            // A column of its own, so the screen is narrower and nothing is hidden behind it, and as tall as the screen
-            // so Right from any row reaches it.
-            content
-                // The right arrow anywhere on the screen goes to the panel. Before the panel is added, so a press
-                // inside
-                // the panel is not taken for one outside it.
-                .onMoveCommand { direction in
-                    if direction == .right, playback.isPlaying, !playback.isFront {
-                        playback.focusPanel()
-                    }
+            // Beside the screen, in a row of its own, so the screen is really narrower: with the panel laid over it (a
+            // safe-area inset) the list's rows still reached under the panel, and the focus engine, finding rows where
+            // the panel is, went from the panel's buttons to a channel and never from a row to the panel. Laid out
+            // beside it, Right reaches the panel when nothing else on the screen is further right.
+            HStack(spacing: 0) {
+                content
+                if playback.isPlaying, !playback.isFront {
+                    NowPlayingPanel()
                 }
-                .safeAreaInset(edge: .trailing, spacing: 0) {
-                    if playback.isPlaying, !playback.isFront {
-                        NowPlayingPanel()
-                            .transition(.move(edge: .trailing).combined(with: .opacity))
-                    }
-                }
+            }
         }
     }
 
-    /// What is playing behind the app: Show stream and Stop, one above the other.
+    /// What is playing behind the app, in as little room as it takes: the channel's name over two round buttons, Show
+    /// stream and Stop.
     private struct NowPlayingPanel: View {
         @Environment(EmbeddedPlayback.self) private var playback
-        @FocusState private var focused: Bool
+
+        private enum Control: Hashable {
+            case show, stop
+        }
+
+        @FocusState private var focus: Control?
 
         var body: some View {
-            VStack(spacing: 28) {
-                Image(systemName: "play.tv.fill").font(.system(size: 56))
-                VStack(spacing: 6) {
-                    Text("Now playing").font(.callout).foregroundStyle(.secondary)
-                    Text(playback.target?.name ?? "")
-                        .font(.title3.bold())
-                        .multilineTextAlignment(.center)
-                        .lineLimit(4)
+            VStack(spacing: 22) {
+                Image(systemName: "play.tv.fill").font(.title2).foregroundStyle(.secondary)
+                Text(playback.target?.name ?? "")
+                    .font(.callout.weight(.semibold))
+                    .multilineTextAlignment(.center)
+                    .lineLimit(3)
+                Button {
+                    playback.bringToFront()
+                } label: {
+                    Image(systemName: "arrow.up.left.and.arrow.down.right").frame(width: 56, height: 56)
                 }
-                VStack(spacing: 16) {
-                    Button {
-                        playback.bringToFront()
-                    } label: {
-                        Label("Show stream", systemImage: "arrow.up.left.and.arrow.down.right")
-                            .frame(maxWidth: .infinity)
-                    }
-                    .focused($focused)
-                    Button(role: .destructive) {
-                        playback.stop()
-                    } label: {
-                        Label("Stop", systemImage: "stop.fill").frame(maxWidth: .infinity)
-                    }
+                .buttonBorderShape(.circle)
+                .focused($focus, equals: .show)
+                .accessibilityLabel("Show stream")
+                Button(role: .destructive) {
+                    playback.stop()
+                } label: {
+                    Image(systemName: "stop.fill").frame(width: 56, height: 56)
                 }
+                .buttonBorderShape(.circle)
+                .focused($focus, equals: .stop)
+                .accessibilityLabel("Stop")
             }
-            .padding(.horizontal, 28)
-            .padding(.vertical, 40)
-            .frame(width: 400)
+            .padding(.horizontal, 14)
+            .padding(.vertical, 28)
+            .frame(width: 156)
+            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 28, style: .continuous))
+            .padding(.trailing, 8)
             .frame(maxHeight: .infinity)
-            .background(.regularMaterial)
-            .onChange(of: playback.panelFocusRequests) { focused = true }
+            // A section as tall as the screen: the right arrow from the last button of any row, whatever its height on
+            // the screen, is handed to the panel's buttons.
+            .focusSection()
+            .onChange(of: playback.panelFocusRequests) { focus = .show }
         }
     }
 #endif

@@ -12,6 +12,17 @@ final class PlayerTests: PanopUITestCase {
     }
 
     /// Fails with the screen's contents, which is the only clue to why a player never came up.
+    /// Whether `element` takes the focus within a couple of seconds: it moves with an animation.
+    private func hasFocusSoon(_ element: XCUIElement) -> Bool {
+        for _ in 0 ..< 20 {
+            if element.exists, element.hasFocus {
+                return true
+            }
+            Thread.sleep(forTimeInterval: 0.1)
+        }
+        return false
+    }
+
     private func waitForPlayerControls(file: StaticString = #filePath, line: UInt = #line) {
         let shown = app.buttons["Pause"].waitForExistence(timeout: 15)
         XCTAssertTrue(
@@ -108,7 +119,7 @@ final class PlayerTests: PanopUITestCase {
 
             XCTAssertTrue(app.buttons["Pause"].waitForNonExistence(timeout: 10), "the controls stayed over the app")
             XCTAssertTrue(channel("3sat").waitForExistence(timeout: 10), "the app is not back")
-            XCTAssertTrue(app.staticTexts["Now playing"].exists, "nothing says a stream is still playing")
+            XCTAssertTrue(app.buttons["Show stream"].exists, "nothing says a stream is still playing")
             XCTAssertTrue(app.buttons["Stop"].exists, "no Stop in the bar over the app")
 
             // Back at the app the focus is on the bar, so Select shows the stream.
@@ -116,7 +127,7 @@ final class PlayerTests: PanopUITestCase {
 
             // The stream is in front again: the bar over the app is gone (the controls may have timed out already).
             XCTAssertTrue(
-                app.staticTexts["Now playing"].waitForNonExistence(timeout: 10),
+                app.buttons["Show stream"].waitForNonExistence(timeout: 10),
                 "Select on the bar did not bring the stream back"
             )
         }
@@ -138,42 +149,79 @@ final class PlayerTests: PanopUITestCase {
 
             XCUIRemote.shared.press(.select)
             XCTAssertTrue(
-                app.staticTexts["Now playing"].waitForNonExistence(timeout: 10),
+                app.buttons["Show stream"].waitForNonExistence(timeout: 10),
                 "Show stream did not bring the stream back"
             )
         }
 
-        /// From anywhere in the app, an icon in the tab bar brings the stream back: the bar over the app is at the
-        /// bottom
-        /// of the screen, which the remote cannot reach once the focus has moved up into a long list.
-        func testTheTabBarBringsTheStreamBack() {
+        /// Down from Show stream is Stop, and Stop ends the stream: the panel goes and nothing plays on.
+        func testStopIsReachedFromShowStream() {
             openFirstChannel()
             XCTAssertTrue(app.buttons["Pause"].waitForExistence(timeout: 15))
             XCUIRemote.shared.press(.menu)
-            XCTAssertTrue(app.staticTexts["Now playing"].waitForExistence(timeout: 10))
+            let show = app.buttons["Show stream"]
+            XCTAssertTrue(show.waitForExistence(timeout: 10))
+            XCTAssertTrue(show.hasFocus)
 
-            // Up to the tab bar, along it to the Now playing icon, and Select.
-            let live = app.buttons["Live TV"].firstMatch
-            for _ in 0 ..< 15 where !live.hasFocus {
+            XCUIRemote.shared.press(.down)
+            XCTAssertTrue(app.buttons["Stop"].hasFocus, "Down from Show stream did not reach Stop")
+            XCUIRemote.shared.press(.up)
+            XCTAssertTrue(show.hasFocus, "Up from Stop did not go back to Show stream")
+
+            XCUIRemote.shared.press(.down)
+            XCUIRemote.shared.press(.select)
+            XCTAssertTrue(show.waitForNonExistence(timeout: 10), "Stop did not end the stream")
+        }
+
+        /// The right arrow goes to the panel only when nothing on the screen is further right: along the row of buttons
+        /// ("All channels", "Favourites", "Recently watched") it moves between them first.
+        func testTheRightArrowIsTheLastOptionBeforeThePanel() {
+            openFirstChannel()
+            XCTAssertTrue(app.buttons["Pause"].waitForExistence(timeout: 15))
+            XCUIRemote.shared.press(.menu)
+            XCTAssertTrue(app.buttons["Show stream"].waitForExistence(timeout: 10))
+
+            // Into the list, and up to the first of the row of buttons.
+            XCUIRemote.shared.press(.left)
+            let all = app.buttons["All channels"]
+            for _ in 0 ..< 10 where !(all.exists && all.hasFocus) {
                 XCUIRemote.shared.press(.up)
             }
-            let icon = app.buttons["Now playing"].firstMatch
-            XCTAssertTrue(icon.exists, "no Now playing icon in the tab bar. Screen:\n\(app.debugDescription)")
-            for _ in 0 ..< 6 where !icon.hasFocus {
-                XCUIRemote.shared.press(.right)
-            }
-            XCUIRemote.shared.press(.select)
+            XCTAssertTrue(all.hasFocus, "could not get to the row of buttons. Screen:\n\(app.debugDescription)")
 
+            XCUIRemote.shared.press(.right)
             XCTAssertTrue(
-                app.staticTexts["Now playing"].waitForNonExistence(timeout: 10),
-                "the stream did not come back"
+                hasFocusSoon(app.buttons["Favourites"]),
+                "the first right press did not move along the buttons"
             )
-
-            // Back in the stream, the Back button (Menu) opens the app again and does not close it.
-            XCUIRemote.shared.press(.menu)
+            XCUIRemote.shared.press(.right)
             XCTAssertTrue(
-                app.staticTexts["Now playing"].waitForExistence(timeout: 10),
-                "Menu did not return to the app after the stream was brought back from the tab bar"
+                hasFocusSoon(app.buttons["Recently watched"]),
+                "the second right press did not move along the buttons"
+            )
+            XCTAssertFalse(app.buttons["Show stream"].hasFocus, "the panel took the right arrow too early")
+
+            XCUIRemote.shared.press(.right)
+            XCTAssertTrue(
+                hasFocusSoon(app.buttons["Show stream"]),
+                "from the last button the right arrow did not reach the panel"
+            )
+        }
+
+        /// Back in the stream, the Back button (Menu) opens the app again and does not close it.
+        func testMenuStillGoesBackToTheAppAfterShowingTheStream() {
+            openFirstChannel()
+            XCTAssertTrue(app.buttons["Pause"].waitForExistence(timeout: 15))
+            XCUIRemote.shared.press(.menu)
+            XCTAssertTrue(app.buttons["Show stream"].waitForExistence(timeout: 10))
+            XCUIRemote.shared.press(.select)
+            XCTAssertTrue(app.buttons["Show stream"].waitForNonExistence(timeout: 10), "the stream did not come back")
+
+            XCUIRemote.shared.press(.menu)
+
+            XCTAssertTrue(
+                app.buttons["Show stream"].waitForExistence(timeout: 10),
+                "Menu did not return to the app after the stream was shown again"
             )
         }
     #else
