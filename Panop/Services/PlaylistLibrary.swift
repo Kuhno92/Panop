@@ -34,6 +34,12 @@ final class PlaylistLibrary {
     private(set) var playlists: [PlaylistSummary] = []
     /// Playlists being deleted right now, so the screen can show it and refuse a second tap.
     private(set) var removing: Set<String> = []
+    /// The names of playlists that came from iCloud onto a device that had none, waiting for the person to say they
+    /// are wanted. Until then nothing is downloaded for them. Nil when there is no such offer.
+    private(set) var pendingOffer: [String]?
+    static let offerDecidedKey = "syncOfferDecided"
+    private let defaults: UserDefaults
+
     /// Called with a playlist's id once it has been deleted, so what hangs off it can go too.
     var onRemoved: ((String) -> Void)?
 
@@ -54,14 +60,20 @@ final class PlaylistLibrary {
         credentials: any CredentialStore,
         sync: SyncService,
         transport: any HTTPTransport,
-        directory: URL
+        directory: URL,
+        defaults: UserDefaults = .standard
     ) {
+        self.defaults = defaults
         self.context = context
         self.credentials = credentials
         self.sync = sync
         self.transport = transport
         self.directory = directory
         reload()
+        // A device that already has playlists has nothing to be asked about.
+        if !playlists.isEmpty {
+            defaults.set(true, forKey: Self.offerDecidedKey)
+        }
     }
 
     func reload() {
@@ -98,8 +110,22 @@ final class PlaylistLibrary {
             onRemoved?(id)
         }
         if !after.subtracting(before).isEmpty {
+            // On a device that had none, the person is asked first: their catalogs are large, and they may have meant
+            // to start with something else. Otherwise they come at once, as before.
+            if before.isEmpty, !defaults.bool(forKey: Self.offerDecidedKey) {
+                pendingOffer = playlists.map(\.name)
+                return
+            }
             await refreshStale(maxAge: 12 * 3600)
         }
+    }
+
+    /// The person wants what arrived from iCloud: it is fetched now.
+    func acceptOffer() async {
+        guard pendingOffer != nil else { return }
+        pendingOffer = nil
+        defaults.set(true, forKey: Self.offerDecidedKey)
+        await refreshStale(maxAge: 12 * 3600)
     }
 
     /// Brings each playlist's login and its record into line, as the person's setting says: logins go to the
@@ -196,8 +222,15 @@ final class PlaylistLibrary {
         }
 
         reload()
+        // Adding their own is an answer to the offer too: what came from iCloud stays listed and is fetched.
+        defaults.set(true, forKey: Self.offerDecidedKey)
+        let hadOffer = pendingOffer != nil
+        pendingOffer = nil
         if let descriptor = try? descriptor(for: id) {
             await sync.start(descriptor)
+        }
+        if hadOffer {
+            await refreshStale(maxAge: 12 * 3600)
         }
         return PlaylistSummary(
             id: id,

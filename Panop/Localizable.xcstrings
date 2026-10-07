@@ -253,6 +253,16 @@
         }
       }
     },
+    "A device with no playlists yet asks before it downloads the channels of what arrives. A playlist removed on one device is removed on the others.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ein Gerät ohne Playlists fragt, bevor es die Sender des Angekommenen herunterlädt. Eine Playlist, die auf einem Gerät entfernt wird, wird auch auf den anderen entfernt."
+          }
+        }
+      }
+    },
     "A hidden category is left out of the lists and of search, along with what is in it. Adult categories stay hidden while Hide adult content is on in Settings.": {
       "localizations": {
         "de": {
@@ -329,6 +339,36 @@
           "stringUnit": {
             "state": "translated",
             "value": "Hinzufügen"
+          }
+        }
+      }
+    },
+    "Add a different playlist": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Andere Playlist hinzufügen"
+          }
+        }
+      }
+    },
+    "Add a playlist": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Playlist hinzufügen"
+          }
+        }
+      }
+    },
+    "Add a playlist instead": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stattdessen eine Playlist hinzufügen"
           }
         }
       }
@@ -1349,6 +1389,16 @@
         }
       }
     },
+    "Found your playlists": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deine Playlists wurden gefunden"
+          }
+        }
+      }
+    },
     "Getting the episodes…": {
       "localizations": {
         "de": {
@@ -1365,6 +1415,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Liste wird geladen …"
+          }
+        }
+      }
+    },
+    "Getting them…": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wird geladen …"
           }
         }
       }
@@ -1560,12 +1620,42 @@
         }
       }
     },
+    "iCloud could not be opened, so playlists have to be added here for now.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud konnte nicht geöffnet werden, daher müssen Playlists vorerst hier hinzugefügt werden."
+          }
+        }
+      }
+    },
     "iCloud could not be opened, so this device's own copy is in use.": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
             "value": "iCloud konnte nicht geöffnet werden, daher wird die Kopie dieses Geräts verwendet."
+          }
+        }
+      }
+    },
+    "If a video will not start, change the engine. Panop tries your choice first and then the others by itself, and remembers which one played a title so it starts there next time. On a Mac a stream plays in the main window, and you can still use the rest of the app over it.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Startet ein Video nicht, ändere die Engine. Panop probiert zuerst deine Wahl und dann selbst die anderen, und merkt sich, welche einen Titel abgespielt hat, damit sie beim nächsten Mal zuerst dran ist. Auf dem Mac läuft ein Stream im Hauptfenster, und du kannst die übrige App darüber weiter benutzen."
+          }
+        }
+      }
+    },
+    "If you use Panop on another device with the same Apple Account, your playlists, favourites and watched titles come here by themselves. There is nothing to do on this device.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wenn du Panop auf einem anderen Gerät mit demselben Apple-Account nutzt, kommen deine Playlists, Favoriten und gesehenen Titel von selbst hierher. Auf diesem Gerät musst du nichts tun."
           }
         }
       }
@@ -1680,6 +1770,16 @@
         }
       }
     },
+    "Last update from iCloud": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Letzte Aktualisierung aus iCloud"
+          }
+        }
+      }
+    },
     "Latest DVD Releases": {
       "localizations": {
         "de": {
@@ -1778,6 +1878,26 @@
           "stringUnit": {
             "state": "translated",
             "value": "Nur Live-TV"
+          }
+        }
+      }
+    },
+    "Look again": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Erneut suchen"
+          }
+        }
+      }
+    },
+    "Looking for your other devices": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Suche nach deinen anderen Geräten"
           }
         }
       }
@@ -2202,6 +2322,16 @@
         }
       }
     },
+    "Nothing from iCloud yet": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Noch nichts aus iCloud"
+          }
+        }
+      }
+    },
     "Nothing here yet": {
       "localizations": {
         "de": {
@@ -2369,6 +2499,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ein Eintrag wurde ausgelassen: keine Adresse zum Abspielen."
+          }
+        }
+      }
+    },
+    "Open Panop on the other device and wait a minute or two. Everything above arrives there.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Öffne Panop auf dem anderen Gerät und warte ein bis zwei Minuten. Alles oben Genannte kommt dort an."
           }
         }
       }
@@ -2623,6 +2763,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Playlists"
+          }
+        }
+      }
+    },
+    "Playlists on this device": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Playlists auf diesem Gerät"
           }
         }
       }
@@ -3696,6 +3846,26 @@
         }
       }
     },
+    "These came from your other devices through iCloud: %@. Use them here?": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diese kommen von deinen anderen Geräten über iCloud: %@. Hier verwenden?"
+          }
+        }
+      }
+    },
+    "This build of Panop cannot use iCloud, so playlists have to be added here.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diese Version von Panop kann iCloud nicht nutzen, daher müssen Playlists hier hinzugefügt werden."
+          }
+        }
+      }
+    },
     "This build of Panop cannot use iCloud.": {
       "localizations": {
         "de": {
@@ -3822,6 +3992,36 @@
           "stringUnit": {
             "state": "translated",
             "value": "Zeit bis zum ersten Bild, typisch"
+          }
+        }
+      }
+    },
+    "To bring your playlists from another device, sign in to iCloud in this device's system settings, then open Panop again. Or add a playlist here.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Um deine Playlists von einem anderen Gerät zu holen, melde dich in den Systemeinstellungen dieses Geräts bei iCloud an und öffne Panop erneut. Oder füge hier eine Playlist hinzu."
+          }
+        }
+      }
+    },
+    "To bring your playlists from another device:\n1. Open Panop there and check that Settings > iCloud says it is on.\n2. Use the same Apple Account on both devices.\n3. Keep Panop open there for a minute, then look again here.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "So holst du deine Playlists von einem anderen Gerät:\n1. Öffne dort Panop und prüfe, dass in den Einstellungen unter iCloud „An“ steht.\n2. Nutze auf beiden Geräten denselben Apple-Account.\n3. Lass Panop dort eine Minute geöffnet und such dann hier erneut."
+          }
+        }
+      }
+    },
+    "To sync another device": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ein weiteres Gerät abgleichen"
           }
         }
       }
@@ -3976,6 +4176,16 @@
         }
       }
     },
+    "Turn on Sync with iCloud on each of them.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schalte auf jedem „Mit iCloud abgleichen“ ein."
+          }
+        }
+      }
+    },
     "Turns on the next time Panop opens.": {
       "localizations": {
         "de": {
@@ -4032,6 +4242,26 @@
           "stringUnit": {
             "state": "translated",
             "value": "Aktuell · geprüft %@"
+          }
+        }
+      }
+    },
+    "Use the same Apple Account on every device.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nutze auf jedem Gerät denselben Apple-Account."
+          }
+        }
+      }
+    },
+    "Use these playlists": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diese Playlists verwenden"
           }
         }
       }
@@ -4293,16 +4523,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Deine Playlists haben noch keine."
-          }
-        }
-      }
-    },
-    "If a video will not start, change the engine. Panop tries your choice first and then the others by itself, and remembers which one played a title so it starts there next time. On a Mac a stream plays in the main window, and you can still use the rest of the app over it.": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Startet ein Video nicht, ändere die Engine. Panop probiert zuerst deine Wahl und dann selbst die anderen, und merkt sich, welche einen Titel abgespielt hat, damit sie beim nächsten Mal zuerst dran ist. Auf dem Mac läuft ein Stream im Hauptfenster, und du kannst die übrige App darüber weiter benutzen."
           }
         }
       }

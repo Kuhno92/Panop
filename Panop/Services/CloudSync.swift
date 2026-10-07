@@ -105,6 +105,8 @@ nonisolated enum CloudSync {
 @Observable
 final class CloudSyncStatus {
     private(set) var availability: CloudSync.Availability
+    /// When a change from another device last arrived in this run, for Settings to show that something is happening.
+    private(set) var lastImport: Date?
 
     init(_ availability: CloudSync.Availability = .off) {
         self.availability = availability
@@ -112,5 +114,9 @@ final class CloudSyncStatus {
 
     func update(_ availability: CloudSync.Availability) {
         self.availability = availability
+    }
+
+    func noteImport(at date: Date = .now) {
+        lastImport = date
     }
 }

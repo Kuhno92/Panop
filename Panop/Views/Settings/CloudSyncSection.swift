@@ -5,6 +5,7 @@ import SwiftUI
 /// the switch alone does not tell: mirroring needs this build to be allowed and an account to be signed in.
 struct CloudSyncSection: View {
     @Environment(CloudSyncStatus.self) private var status
+    @Environment(PlaylistLibrary.self) private var library
     @AppStorage(CloudSync.enabledKey) private var isOn = true
     @AppStorage(CloudSync.loginsKey) private var syncsLogins = true
 
@@ -19,6 +20,16 @@ struct CloudSyncSection: View {
                 Label(message, systemImage: symbol)
                     .font(.footnote)
                     .foregroundStyle(tint)
+                if isOn, status.availability == .active {
+                    LabeledContent("Playlists on this device", value: String(library.playlists.count))
+                    LabeledContent("Last update from iCloud") {
+                        if let last = status.lastImport {
+                            Text(last, style: .relative)
+                        } else {
+                            Text("None yet")
+                        }
+                    }
+                }
             } header: {
                 Text("iCloud")
             } footer: {
@@ -27,6 +38,23 @@ struct CloudSyncSection: View {
                 only you can read them. Logins are encrypted before they leave this device. \
                 A change here takes effect the next time Panop opens.
                 """)
+            }
+            if isOn {
+                Section {
+                    Label("Use the same Apple Account on every device.", systemImage: "1.circle.fill")
+                    Label("Turn on Sync with iCloud on each of them.", systemImage: "2.circle.fill")
+                    Label(
+                        "Open Panop on the other device and wait a minute or two. Everything above arrives there.",
+                        systemImage: "3.circle.fill"
+                    )
+                } header: {
+                    Text("To sync another device")
+                } footer: {
+                    Text("""
+                    A device with no playlists yet asks before it downloads the channels of what arrives. \
+                    A playlist removed on one device is removed on the others.
+                    """)
+                }
             }
         }
     }

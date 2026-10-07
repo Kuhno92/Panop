@@ -127,17 +127,26 @@ struct TestApp {
     let credentials: InMemoryCredentialStore
     let directory: URL
 
-    init(transport: any HTTPTransport, credentials: InMemoryCredentialStore = InMemoryCredentialStore()) throws {
+    /// `offerDecided` false is a device that has never been asked about playlists arriving from iCloud.
+    init(
+        transport: any HTTPTransport,
+        credentials: InMemoryCredentialStore = InMemoryCredentialStore(),
+        offerDecided: Bool = true
+    ) throws {
         catalog = try OnDiskCatalog()
         cloud = try PanopContainers.makeCloud(inMemory: true)
         self.credentials = credentials
         directory = catalog.directory.appendingPathComponent("Playlists")
+        // Preferences of its own: a test must not read or write the real ones.
+        let defaults = UserDefaults(suiteName: "test-\(UUID().uuidString)") ?? .standard
+        defaults.set(offerDecided, forKey: PlaylistLibrary.offerDecidedKey)
         services = AppServices(
             catalog: catalog.container,
             cloud: cloud,
             credentials: credentials,
             transport: transport,
-            playlistsDirectory: directory
+            playlistsDirectory: directory,
+            defaults: defaults
         )
         // A test must not write to the real preferences, and starts with logins kept to the device.
         services.library.loginMemory = InMemoryLoginMemory()

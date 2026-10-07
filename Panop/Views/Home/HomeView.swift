@@ -70,8 +70,8 @@ struct HomeView: View {
     private var rails: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: RailMetrics.rowSpacing) {
-                if library.playlists.isEmpty {
-                    noPlaylist
+                if library.playlists.isEmpty || library.pendingOffer != nil {
+                    SyncWelcomeView { showingAdd = true }
                 } else {
                     let hasHistory = !userState.recents.isEmpty || !userState.favorites.isEmpty
                     HeroCarousel(
@@ -199,20 +199,6 @@ struct HomeView: View {
             target.resumeAt = userState.resumePosition(for: key)
         }
         playing = target
-    }
-
-    private var noPlaylist: some View {
-        ContentUnavailableView {
-            VStack(spacing: 16) {
-                AppLogo(size: 110)
-                Text("Welcome to Panop").font(.title.bold())
-            }
-        } description: {
-            Text("Add an M3U playlist or Xtream provider to get started.")
-        } actions: {
-            Button("Add playlist") { showingAdd = true }
-        }
-        .frame(maxWidth: .infinity, minHeight: 360)
     }
 
     private var nothingYet: some View {

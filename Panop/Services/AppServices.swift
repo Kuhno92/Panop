@@ -20,7 +20,8 @@ final class AppServices {
         cloud: ModelContainer,
         credentials: any CredentialStore,
         transport: any HTTPTransport = URLSessionTransport(),
-        playlistsDirectory: URL = AppServices.defaultPlaylistsDirectory
+        playlistsDirectory: URL = AppServices.defaultPlaylistsDirectory,
+        defaults: UserDefaults = .standard
     ) {
         let status = SyncStatusCenter()
         let store = SwiftDataCatalogStore(container: catalog)
@@ -38,7 +39,8 @@ final class AppServices {
             credentials: credentials,
             sync: sync,
             transport: transport,
-            directory: playlistsDirectory
+            directory: playlistsDirectory,
+            defaults: defaults
         )
         // A deleted playlist's favourites and history go with it.
         library.onRemoved = { id in userState.forget(playlist: id) }

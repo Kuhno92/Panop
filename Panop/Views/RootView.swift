@@ -223,6 +223,7 @@ struct RootView: View {
             .task(id: cloudSync.availability == .active) {
                 guard cloudSync.availability == .active else { return }
                 for await _ in CloudChanges.imports() {
+                    cloudSync.noteImport()
                     userState.reloadAfterRemoteChange()
                     await library.applyRemoteChanges()
                 }
