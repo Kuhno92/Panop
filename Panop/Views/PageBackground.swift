@@ -1,8 +1,8 @@
 import SwiftUI
 
 extension EnvironmentValues {
-    // True while the app is laid over a stream playing behind it (a Mac's main window): the page backgrounds become
-    // see-through, so the picture shows.
+    /// True while the app is laid over a stream playing behind it (a Mac's main window): the page backgrounds become
+    /// see-through, so the picture shows.
     @Entry var overStream: Bool = false
 }
 
@@ -49,6 +49,18 @@ struct PageBackground: View {
 }
 
 extension View {
+    /// Apple TV: no navigation bar under the tab bar. Its title repeats the tab's own, and the bar's buttons sat
+    /// between
+    /// the tab bar and the content, taking the room (and the focus: Up from them did not reach the tab bar). A no-op
+    /// elsewhere.
+    func withoutTVTitleBar() -> some View {
+        #if os(tvOS)
+            toolbar(.hidden, for: .navigationBar)
+        #else
+            self
+        #endif
+    }
+
     /// The gradient page behind a list or form: the list's own background is hidden so it shows through (Apple TV
     /// has no way to hide it, and keeps its own).
     func pageBackdrop() -> some View {

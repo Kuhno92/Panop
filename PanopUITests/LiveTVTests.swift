@@ -6,6 +6,24 @@ final class LiveTVTests: PanopUITestCase {
         XCTAssertTrue(channel("Arte").exists)
     }
 
+    #if os(tvOS)
+        /// Up alone gets back to the tab bar from the list: nothing between them holds the focus. A navigation bar
+        /// with its own buttons used to, so the Menu button was the only way back.
+        func testUpFromTheListReachesTheTabBar() {
+            waitForChannels()
+            focusFirstChannel()
+
+            var reached = false
+            for _ in 0 ..< 10 where !reached {
+                XCUIRemote.shared.press(.up)
+                let tab = app.buttons["Live TV"].firstMatch
+                reached = tab.exists && tab.hasFocus && tab.frame.minY < 150
+            }
+
+            XCTAssertTrue(reached, "Up did not reach the tab bar. Screen:\n\(app.debugDescription)")
+        }
+    #endif
+
     #if !os(tvOS)
         func testSearchNarrowsTheList() {
             waitForChannels()

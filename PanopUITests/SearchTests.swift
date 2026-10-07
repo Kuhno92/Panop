@@ -60,12 +60,22 @@ final class SearchTests: PanopUITestCase {
             "home"
         }
 
-        /// The magnifier is the last icon of the tab bar, and the field is on the screen.
+        /// The magnifier is the last icon of the tab bar, and it opens the Search screen, which has the field. The
+        /// other
+        /// screens have none of their own: it filled the top of each, with its keyboard above the content.
         func testTheTabBarOffersSearch() {
             XCTAssertTrue(app.tabBars.buttons["Search"].waitForExistence(timeout: 30), "no Search in the tab bar")
+            XCTAssertFalse(app.searchFields.firstMatch.exists, "Home shows a search field of its own")
+
+            // Focus is on the tab bar, at Home: the magnifier is five icons to the right.
+            for _ in 0 ..< 5 {
+                XCUIRemote.shared.press(.right)
+            }
+            XCUIRemote.shared.press(.select)
+
             XCTAssertTrue(
                 app.searchFields.firstMatch.waitForExistence(timeout: 10),
-                "no search field. Screen:\n\(app.debugDescription)"
+                "no search field on the Search screen. Screen:\n\(app.debugDescription)"
             )
         }
     #endif

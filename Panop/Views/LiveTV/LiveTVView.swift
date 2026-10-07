@@ -118,50 +118,62 @@ struct LiveTVView: View {
             }
         )
         .safeAreaInset(edge: .top, spacing: 0) {
-            // Apple TV has no room above its list, so there the chips are the list's first row.
-            #if !os(tvOS)
+            // Apple TV has no room above its list, so there the chips are the list's first row, and the source choice
+            // (when there are several) a row of its own: its toolbar is gone.
+            #if os(tvOS)
+                if hasSeveralSources {
+                    HStack {
+                        sourceMenu
+                        Spacer()
+                    }
+                    .padding(.horizontal)
+                }
+            #else
                 if mode == .all, !library.playlists.isEmpty {
                     CategoryChips(kind: .live, source: selectedSource?.id, group: $group)
                 }
             #endif
         }
         .navigationTitle(selectedSource?.name ?? "Live TV")
+        .withoutTVTitleBar()
         .modifier(ChannelSearch(text: $search))
-        .toolbar {
-            if !library.playlists.isEmpty {
-                ToolbarItem {
-                    Button("TV Guide", systemImage: "calendar") { showingGuide = true }
+        #if !os(tvOS)
+            .toolbar {
+                if !library.playlists.isEmpty {
+                    ToolbarItem {
+                        Button("TV Guide", systemImage: "calendar") { showingGuide = true }
+                    }
+                    ToolbarItem { modeMenu }
+                    ToolbarItem { orderMenu }
                 }
-                ToolbarItem { modeMenu }
-                ToolbarItem { orderMenu }
+                if hasSeveralSources {
+                    ToolbarItem { sourceMenu }
+                }
             }
-            if hasSeveralSources {
-                ToolbarItem { sourceMenu }
-            }
-        }
-        // The category may not exist in the other source.
-        .onChange(of: storedSource) { group = nil }
-        .sheet(isPresented: $showingAdd) {
-            NavigationStack { AddPlaylistView() }
-        }
-        #if os(macOS)
-        // Asked for from the stream playing behind the app: this screen opens its guide, whether it was already on
-        // show or has only just been chosen.
-        .onChange(of: embedded.guideRequested, initial: true) {
-            if embedded.guideRequested {
-                showingGuide = true
-                embedded.guideRequested = false
-            }
-        }
         #endif
-        .modifier(GuidePresentation(isPresented: $showingGuide) {
-            GuideGridView(spec: spec, narrow: {
-                LiveListNarrowing.rows(
-                    $0, mode: mode, sourceID: selectedSource?.id, search: search, userState: userState
-                )
+            // The category may not exist in the other source.
+            .onChange(of: storedSource) { group = nil }
+            .sheet(isPresented: $showingAdd) {
+                NavigationStack { AddPlaylistView() }
+            }
+        #if os(macOS)
+            // Asked for from the stream playing behind the app: this screen opens its guide, whether it was already on
+            // show or has only just been chosen.
+            .onChange(of: embedded.guideRequested, initial: true) {
+                if embedded.guideRequested {
+                    showingGuide = true
+                    embedded.guideRequested = false
+                }
+            }
+        #endif
+            .modifier(GuidePresentation(isPresented: $showingGuide) {
+                GuideGridView(spec: spec, narrow: {
+                    LiveListNarrowing.rows(
+                        $0, mode: mode, sourceID: selectedSource?.id, search: search, userState: userState
+                    )
+                })
             })
-        })
-        .modifier(PlayerPresentation(target: $playing))
+            .modifier(PlayerPresentation(target: $playing))
     }
 
     private var modeMenu: some View {

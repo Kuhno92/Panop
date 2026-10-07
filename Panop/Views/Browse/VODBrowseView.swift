@@ -112,6 +112,7 @@ struct VODBrowseView: View {
         )
         .background { PageBackground() }
         .navigationTitle(title)
+        .withoutTVTitleBar()
         .modifier(VODSearch(
             text: $search,
             tab: kind == .movie ? .movies : .series
