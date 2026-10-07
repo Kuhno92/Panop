@@ -153,9 +153,7 @@ struct LiveTVView: View {
         #endif
             // The category may not exist in the other source.
             .onChange(of: storedSource) { group = nil }
-            .sheet(isPresented: $showingAdd) {
-                NavigationStack { AddPlaylistView() }
-            }
+            .addPlaylistSheet(isPresented: $showingAdd)
         #if os(macOS)
             // Asked for from the stream playing behind the app: this screen opens its guide, whether it was already on
             // show or has only just been chosen.

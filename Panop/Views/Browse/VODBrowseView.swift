@@ -156,9 +156,7 @@ struct VODBrowseView: View {
         .onChange(of: storedSource) { group = nil }
         .navigationDestination(item: $openSeries) { SeriesDetailView(series: $0) }
         .navigationDestination(item: $openMovie) { MovieDetailView(movie: $0) }
-        .sheet(isPresented: $showingAdd) {
-            NavigationStack { AddPlaylistView() }
-        }
+        .addPlaylistSheet(isPresented: $showingAdd)
         .resumeDialog($resume)
         .modifier(PlayerPresentation(target: $playing))
     }

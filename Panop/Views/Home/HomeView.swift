@@ -64,9 +64,7 @@ struct HomeView: View {
             .onChange(of: settingsVisits) { showingSettings = false }
             .navigationDestination(item: $openMovie) { MovieDetailView(movie: $0) }
             .navigationDestination(item: $openSeries) { SeriesDetailView(series: $0) }
-            .sheet(isPresented: $showingAdd) {
-                NavigationStack { AddPlaylistView() }
-            }
+            .addPlaylistSheet(isPresented: $showingAdd)
             .modifier(PlayerPresentation(target: $playing))
     }
 

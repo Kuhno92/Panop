@@ -1,6 +1,18 @@
 import SwiftUI
 import UniformTypeIdentifiers
 
+extension View {
+    /// The add-playlist form over this screen: a sheet, and on Apple TV the whole screen, where a sheet is a small
+    /// floating card that cut the form off and squeezed its title and buttons into one line.
+    func addPlaylistSheet(isPresented: Binding<Bool>) -> some View {
+        #if os(tvOS)
+            fullScreenCover(isPresented: isPresented) { NavigationStack { AddPlaylistView() } }
+        #else
+            sheet(isPresented: isPresented) { NavigationStack { AddPlaylistView() } }
+        #endif
+    }
+}
+
 /// The form for adding a playlist by M3U link, M3U file or Xtream login.
 struct AddPlaylistView: View {
     private enum Mode: String, CaseIterable, Identifiable {
@@ -65,6 +77,19 @@ struct AddPlaylistView: View {
                     Label(errorMessage, systemImage: "exclamationmark.triangle.fill").foregroundStyle(.red)
                 }
             }
+
+            #if os(tvOS)
+                // No toolbar on Apple TV: the buttons are the last rows, which the remote reaches by going down. Menu
+                // closes the form as well.
+                Section {
+                    if isAdding {
+                        ProgressView()
+                    } else {
+                        Button("Add playlist", action: add).disabled(!isValid)
+                    }
+                    Button("Cancel") { dismiss() }
+                }
+            #endif
         }
         .formStyle(.grouped)
         .pageBackdrop()
@@ -75,19 +100,21 @@ struct AddPlaylistView: View {
         #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
         #endif
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }
-                }
-                ToolbarItem(placement: .confirmationAction) {
-                    if isAdding {
-                        ProgressView()
-                    } else {
-                        Button("Add", action: add).disabled(!isValid)
-                    }
+        #if !os(tvOS)
+        .toolbar {
+            ToolbarItem(placement: .cancellationAction) {
+                Button("Cancel") { dismiss() }
+            }
+            ToolbarItem(placement: .confirmationAction) {
+                if isAdding {
+                    ProgressView()
+                } else {
+                    Button("Add", action: add).disabled(!isValid)
                 }
             }
-            .disabled(isAdding)
+        }
+        #endif
+        .disabled(isAdding)
         #if !os(tvOS)
             .fileImporter(isPresented: $showingFilePicker, allowedContentTypes: [.data, .plainText]) { result in
                 if case let .success(url) = result {

@@ -12,6 +12,17 @@ struct PlaylistsView: View {
 
     var body: some View {
         List {
+            #if os(tvOS)
+                // No toolbar on Apple TV (its buttons were squeezed to "Ref...h All" and "+..."): the actions are the
+                // first rows.
+                Section {
+                    Button("Add playlist", systemImage: "plus") { showingAdd = true }
+                    Button("Refresh All", systemImage: "arrow.clockwise") {
+                        Task { await library.refreshAll() }
+                    }
+                    .disabled(library.playlists.isEmpty)
+                }
+            #endif
             ForEach(library.playlists) { playlist in
                 PlaylistRow(playlist: playlist, onDelete: { pendingDelete = playlist })
             }
@@ -19,46 +30,47 @@ struct PlaylistsView: View {
         .pageBackdrop()
         .overlay { emptyState }
         .navigationTitle("Playlists")
-        .toolbar {
-            ToolbarItemGroup {
-                Button("Refresh All", systemImage: "arrow.clockwise") {
-                    Task { await library.refreshAll() }
+        .withoutTVTitleBar()
+        #if !os(tvOS)
+            .toolbar {
+                ToolbarItemGroup {
+                    Button("Refresh All", systemImage: "arrow.clockwise") {
+                        Task { await library.refreshAll() }
+                    }
+                    .disabled(library.playlists.isEmpty)
+                    Button("Add", systemImage: "plus") { showingAdd = true }
                 }
-                .disabled(library.playlists.isEmpty)
-                Button("Add", systemImage: "plus") { showingAdd = true }
             }
-        }
-        .sheet(isPresented: $showingAdd) {
-            NavigationStack { AddPlaylistView() }
-        }
-        .confirmationDialog(
-            "Delete \(pendingDelete?.name ?? "playlist")?",
-            isPresented: Binding(get: { pendingDelete != nil }, set: {
-                if !$0 {
-                    pendingDelete = nil
+        #endif
+            .addPlaylistSheet(isPresented: $showingAdd)
+            .confirmationDialog(
+                "Delete \(pendingDelete?.name ?? "playlist")?",
+                isPresented: Binding(get: { pendingDelete != nil }, set: {
+                    if !$0 {
+                        pendingDelete = nil
+                    }
+                }),
+                titleVisibility: .visible,
+                presenting: pendingDelete
+            ) { playlist in
+                Button("Delete", role: .destructive) {
+                    Task { deleteError = await library.remove(playlist.id) }
                 }
-            }),
-            titleVisibility: .visible,
-            presenting: pendingDelete
-        ) { playlist in
-            Button("Delete", role: .destructive) {
-                Task { deleteError = await library.remove(playlist.id) }
+            } message: { _ in
+                Text("Its channels, movies, series and guide are removed from this device.")
             }
-        } message: { _ in
-            Text("Its channels, movies, series and guide are removed from this device.")
-        }
-        .alert(
-            "Couldn't delete",
-            isPresented: Binding(get: { deleteError != nil }, set: {
-                if !$0 {
-                    deleteError = nil
-                }
-            })
-        ) {
-            Button("OK", role: .cancel) {}
-        } message: {
-            Text(deleteError ?? "")
-        }
+            .alert(
+                "Couldn't delete",
+                isPresented: Binding(get: { deleteError != nil }, set: {
+                    if !$0 {
+                        deleteError = nil
+                    }
+                })
+            ) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text(deleteError ?? "")
+            }
     }
 
     @ViewBuilder
