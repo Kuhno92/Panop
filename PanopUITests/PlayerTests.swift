@@ -120,6 +120,33 @@ final class PlayerTests: PanopUITestCase {
                 "Select on the bar did not bring the stream back"
             )
         }
+
+        /// From anywhere in the app, an icon in the tab bar brings the stream back: the bar over the app is at the
+        /// bottom
+        /// of the screen, which the remote cannot reach once the focus has moved up into a long list.
+        func testTheTabBarBringsTheStreamBack() {
+            openFirstChannel()
+            XCTAssertTrue(app.buttons["Pause"].waitForExistence(timeout: 15))
+            XCUIRemote.shared.press(.menu)
+            XCTAssertTrue(app.staticTexts["Now playing"].waitForExistence(timeout: 10))
+
+            // Up to the tab bar, along it to the Now playing icon, and Select.
+            let live = app.buttons["Live TV"].firstMatch
+            for _ in 0 ..< 15 where !live.hasFocus {
+                XCUIRemote.shared.press(.up)
+            }
+            let icon = app.buttons["Now playing"].firstMatch
+            XCTAssertTrue(icon.exists, "no Now playing icon in the tab bar. Screen:\n\(app.debugDescription)")
+            for _ in 0 ..< 6 where !icon.hasFocus {
+                XCUIRemote.shared.press(.right)
+            }
+            XCUIRemote.shared.press(.select)
+
+            XCTAssertTrue(
+                app.staticTexts["Now playing"].waitForNonExistence(timeout: 10),
+                "the stream did not come back"
+            )
+        }
     #else
         func testCloseReturnsToTheList() {
             openFirstChannel()
