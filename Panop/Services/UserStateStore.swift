@@ -50,6 +50,8 @@ final class UserStateStore {
     var hiddenCategoryNames: [String: Set<String>] = [:]
     var categoryPositions: [String: [String: Int]] = [:]
     private var engines: [String: PlaybackEngineKind] = [:]
+    /// The version of a channel the person chose, by the key of its guide (see `variantKey`).
+    private var preferredVariants: [String: String] = [:]
     /// Told when a film or episode becomes watched, by reaching its end or by being marked. For what
     /// keeps another place (a Simkl account) in step.
     @ObservationIgnored var onFinished: ((_ key: String, _ date: Date) -> Void)?
@@ -268,6 +270,10 @@ final class UserStateStore {
             rows.compactMap { row in PlaybackEngineKind(rawValue: row.rememberedEngine).map { (row.streamID, $0) } },
             uniquingKeysWith: { first, _ in first }
         )
+        preferredVariants = Dictionary(
+            rows.filter { !$0.preferredVariantID.isEmpty }.map { ($0.streamID, $0.preferredVariantID) },
+            uniquingKeysWith: { first, _ in first }
+        )
         recents = rows
             .filter { $0.lastPlayedAt > .distantPast }
             .sorted { $0.lastPlayedAt > $1.lastPlayedAt }
@@ -295,7 +301,7 @@ final class UserStateStore {
 
     private func removeIfEmpty(_ row: UserContentState) {
         if !row.isFavorite, row.lastPlayedAt == .distantPast, row.positionSeconds == 0, row.rememberedEngine.isEmpty,
-           !row.isWatched, !row.isHidden
+           row.preferredVariantID.isEmpty, !row.isWatched, !row.isHidden
         {
             context.delete(row)
         }
@@ -376,5 +382,27 @@ extension UserStateStore: EngineMemory {
         if !engines.isEmpty {
             forgetAllEngines()
         }
+    }
+}
+
+// MARK: - Which version of a channel
+
+extension UserStateStore {
+    /// Where the choice of version is kept: under the playlist, so it goes with the playlist when that is removed.
+    private func variantKey(playlist: String, epgKey: String) -> String {
+        Self.key(playlist: playlist, entry: "guide:\(epgKey)")
+    }
+
+    /// The entry id of the version of this channel (the channels that share a guide key) the person chose, if they did.
+    func preferredVariant(playlist: String, epgKey: String) -> String? {
+        preferredVariants[variantKey(playlist: playlist, epgKey: epgKey)]
+    }
+
+    func setPreferredVariant(_ entryID: String, playlist: String, epgKey: String) {
+        let key = variantKey(playlist: playlist, epgKey: epgKey)
+        guard preferredVariants[key] != entryID else { return }
+        let row = state(for: key) ?? insert(key)
+        row.preferredVariantID = entryID
+        commit()
     }
 }

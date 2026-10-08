@@ -34,6 +34,7 @@ struct SettingsView: View {
     @Environment(UserStateStore.self) private var userState
     @AppStorage(DiscoveryModel.enabledKey) private var showsSuggestions = true
     @AppStorage(DiscoveryModel.trendingKey) private var showsTrending = true
+    @AppStorage(ChannelGrouping.key) private var groupsByGuide = ChannelGrouping.isOnByDefault
     @Environment(ProfileStore.self) private var profiles
     @Environment(ParentalControls.self) private var parental
     @State private var pinPurpose: PINPurpose?
@@ -47,6 +48,7 @@ struct SettingsView: View {
         Form {
             sources
             playing
+            liveTV
             homeScreen
             familyAndSafety
             accounts
@@ -135,6 +137,24 @@ struct SettingsView: View {
             If a video will not start, change the engine. Panop tries your choice first and then the others by itself, \
             and remembers which one played a title so it starts there next time. \
             On a Mac a stream plays in the main window, and you can still use the rest of the app over it.
+            """)
+        }
+    }
+
+    // MARK: - Live TV
+
+    private var liveTV: some View {
+        Section {
+            Toggle(isOn: $groupsByGuide) {
+                SettingsRow("Group channels with the same guide", symbol: "square.stack.3d.up", tint: .purple)
+            }
+        } header: {
+            Text("Live TV")
+        } footer: {
+            Text("""
+            Channels that share a guide, such as the HD and SD versions of one channel, are listed once. Pick the version \
+            from the button at the end of its row, or while it plays. A playlist updated before this was added \
+            groups after its next refresh.
             """)
         }
     }

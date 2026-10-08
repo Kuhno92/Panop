@@ -80,6 +80,10 @@ nonisolated struct ListSpec: Hashable, Sendable {
     var hiddenGroups: Set<String> = []
     /// Only the entries with no category (see `LiveChannelQuery.ungroupedDescriptor`).
     var ungrouped = false
+    /// One channel per guide key (see `CatalogEntry.isGuideLead`). Not while searching: a search for "HD" must find the
+    /// HD
+    /// version even when the SD one is the one the list shows.
+    var groupsByGuide = false
 
     func descriptor() -> FetchDescriptor<CatalogEntryRecord> {
         if let restrictedTo {
@@ -87,7 +91,7 @@ nonisolated struct ListSpec: Hashable, Sendable {
         }
         if ungrouped {
             var descriptor = LiveChannelQuery.ungroupedDescriptor(
-                kind: kind ?? .live, source: source, search: search, order: order
+                kind: kind ?? .live, source: source, search: search, order: order, leadsOnly: leadsOnly
             )
             descriptor.fetchLimit = LiveChannelQuery.maxRows
             return descriptor
@@ -98,8 +102,13 @@ nonisolated struct ListSpec: Hashable, Sendable {
             search: search,
             limit: LiveChannelQuery.maxRows,
             order: order,
-            group: group
+            group: group,
+            leadsOnly: leadsOnly
         )
+    }
+
+    private var leadsOnly: Bool {
+        groupsByGuide && search.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 }
 

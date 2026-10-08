@@ -94,7 +94,7 @@ enum UITestMode {
             for key in [
                 "liveListMode", "liveSourceFilter", "liveSortOrder", "playbackEngine",
                 "vodSourceFilter", "vodSortOrder", "showsSuggestionsOnMovies", "showsSuggestionsOnSeries",
-                "playsInSeparateWindow",
+                "playsInSeparateWindow", ChannelGrouping.key,
                 StartupPreference.actionKey, StartupPreference.channelKey, StartupPreference.channelNameKey
             ] {
                 UserDefaults.standard.removeObject(forKey: key)
@@ -138,6 +138,12 @@ enum UITestMode {
             var lines = channelNames.enumerated().map { index, name in
                 "#EXTINF:-1 tvg-id=\"c\(index)\" group-title=\"\(index < 6 ? "Germany" : "Other")\",\(name)\n" +
                     "http://127.0.0.1:9/live/\(index).ts"
+            }
+            // A second version of the first channel, sharing its guide: with `PANOP_VERSIONS` the list can group them.
+            if ProcessInfo.processInfo.environment["PANOP_VERSIONS"] == "1" {
+                lines.append(
+                    "#EXTINF:-1 tvg-id=\"c0\" group-title=\"Germany\",Das Erste HD\nhttp://127.0.0.1:9/live/100.ts"
+                )
             }
             lines += movieNames.enumerated().map { index, name in
                 "#EXTINF:5400 tvg-id=\"m\(index)\" group-title=\"\(index < 3 ? "Films" : "Classics")\",\(name)\nhttp://127.0.0.1:9/movie/u/p/\(index).mp4"

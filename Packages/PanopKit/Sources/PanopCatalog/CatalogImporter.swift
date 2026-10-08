@@ -335,8 +335,18 @@ struct KindTracker {
     var groups = Set<String>()
     /// The same groups in the order the file first named them, which is the order they are shown in.
     var groupOrder: [String] = []
+    /// Live only: the guide keys met so far, and each with the category it was met in, so the first channel of a guide
+    /// (overall, and within its category) is marked as the one a grouped list shows.
+    private var guideKeys = Set<String>()
+    private var categoryGuideKeys = Set<String>()
 
     mutating func add(_ entry: CatalogEntry) {
+        var entry = entry
+        if kind == .live, let key = entry.epgKey, !key.isEmpty {
+            entry.isGuideLead = guideKeys.insert(key).inserted
+            // The unit separator cannot be in either, so two pairs never join into one.
+            entry.isCategoryLead = categoryGuideKeys.insert("\(entry.groupName ?? "")\u{1F}\(key)").inserted
+        }
         pending.append(entry)
         seen.insert(CatalogID.hash64(entry.id))
         imported += 1

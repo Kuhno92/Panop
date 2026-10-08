@@ -216,6 +216,8 @@ struct RootView: View {
                     }
                 #endif
             }
+            // What an import wrote may have changed which channels share a guide.
+            .onChange(of: status.isAnySyncing) { ChannelVariantsStore.shared.reset() }
             .onChange(of: settingsInBar, initial: true) { _, inBar in
                 if !inBar, selection == .settings {
                     selection = .home
@@ -233,6 +235,10 @@ struct RootView: View {
             // Playlists the user added keep themselves current without being asked.
             // The work runs on the sync service's actor, not here.
             .task { await library.refreshStale(maxAge: 12 * 3600) }
+            // A catalog imported before channels were marked as the first of their guide gets its marks once.
+            .task(id: library.playlists.map(\.id)) {
+                await GuideLeadBackfill.runOnce(container: catalog.container, playlists: library.playlists.map(\.id))
+            }
             .environment(discovery)
             .environment(profiles)
             // Logins travel with the playlists only when the person wants it and iCloud is on. Run at launch and

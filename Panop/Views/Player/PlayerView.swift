@@ -25,6 +25,9 @@ struct PlayerScreen: View {
     @Environment(PlaylistLibrary.self) private var library
     @Environment(UserStateStore.self) private var userState
     @Environment(\.playbackMetrics) private var metricsStore
+    @Environment(\.channelVariants) private var variantsStore
+    @Environment(\.modelContext) private var catalog
+    @AppStorage(ChannelGrouping.key) private var groupsByGuide = ChannelGrouping.isOnByDefault
     @AppStorage("playbackEngine") private var engineRaw = PlaybackEngineKind.avPlayer.rawValue
 
     @State private var model: PlayerModel?
@@ -46,7 +49,10 @@ struct PlayerScreen: View {
                     onClose: onClose,
                     onBrowse: onBrowse,
                     onShowGuide: playing.kind == .live ? (onShowGuideInApp ?? { showingGuide = true }) : nil,
-                    guide: guideKey
+                    guide: guideKey,
+                    versions: versionRows.map { TrackDescriptor(id: $0.entryID, label: $0.name) },
+                    currentVersion: playing.entryID,
+                    onPickVersion: pickVersion
                 )
             } else if let problem {
                 PlayerProblem(text: problem)
@@ -55,7 +61,28 @@ struct PlayerScreen: View {
             }
         }
         .task { resolve() }
+        // The other versions of this channel, when the list groups them: read once, then the picker has them.
+        .task(id: playing.id) {
+            if groupsByGuide, playing.kind == .live {
+                variantsStore.request(playlist: playing.playlist, epgKey: playing.epgKey, in: catalog.container)
+            }
+        }
         .modifier(PlayerGuidePresentation(isPresented: $showingGuide) { switchTo($0) })
+    }
+
+    /// The channels that share the playing one's guide key, without any the person hid, when the list is grouped by
+    /// guide.
+    private var versionRows: [CatalogRow] {
+        guard groupsByGuide, playing.kind == .live, playing.catchup == nil else { return [] }
+        let all = variantsStore.variants(playlist: playing.playlist, epgKey: playing.epgKey) ?? []
+        return all.filter { $0.entryID == playing.entryID || !userState.hidden.contains($0.id) }
+    }
+
+    /// Plays another version of the channel and remembers it for the next time the channel is chosen from the list.
+    private func pickVersion(_ entryID: String) {
+        guard entryID != playing.entryID, let row = versionRows.first(where: { $0.entryID == entryID }) else { return }
+        ChannelVersions.remember(row, userState: userState)
+        switchTo(PlaybackTarget(row: row))
     }
 
     /// Where the live channel is in the guide, for its timeline. Not for an aired programme from the archive, which has
@@ -113,6 +140,7 @@ private struct PlayerGuidePresentation: ViewModifier {
     let onPlay: (PlaybackTarget) -> Void
 
     @Environment(UserStateStore.self) private var userState
+    @AppStorage(ChannelGrouping.key) private var groupsByGuide = ChannelGrouping.isOnByDefault
 
     func body(content: Content) -> some View {
         #if os(tvOS)
@@ -140,7 +168,8 @@ private struct PlayerGuidePresentation: ViewModifier {
             spec: ListSpec(
                 kind: .live,
                 hidden: userState.hidden,
-                hiddenGroups: userState.hiddenCategories(of: .live)
+                hiddenGroups: userState.hiddenCategories(of: .live),
+                groupsByGuide: groupsByGuide
             ),
             narrow: { $0 },
             onPlayChannel: onPlay
@@ -154,6 +183,10 @@ struct PlayerView: View {
     var onBrowse: (() -> Void)?
     var onShowGuide: (() -> Void)?
     var guide: GuideKey?
+    /// The other versions of the channel that plays, which one plays, and what choosing another does.
+    var versions: [TrackDescriptor] = []
+    var currentVersion: String?
+    var onPickVersion: ((String) -> Void)?
 
     @Environment(\.dismiss) private var dismiss
     @Environment(\.playerIsBehind) private var isBehind
@@ -249,8 +282,15 @@ struct PlayerView: View {
             }
 
             if model.showsControls, model.failureText == nil {
-                PlayerControls(model: model, onShowGuide: onShowGuide, guide: guide)
-                    .transition(.opacity)
+                PlayerControls(
+                    model: model,
+                    onShowGuide: onShowGuide,
+                    guide: guide,
+                    versions: versions,
+                    currentVersion: currentVersion,
+                    onPickVersion: onPickVersion
+                )
+                .transition(.opacity)
             }
         }
         .animation(.default, value: model.notice)

@@ -13,6 +13,7 @@ struct LiveTVView: View {
     @AppStorage("liveSourceFilter") private var storedSource = LiveSourceFilter.allID
     @AppStorage("liveListMode") private var storedMode = LiveListMode.all.rawValue
     @AppStorage("liveSortOrder") private var storedOrder = LiveOrder.provider.rawValue
+    @AppStorage(ChannelGrouping.key) private var groupsByGuide = ChannelGrouping.isOnByDefault
     @State private var search = ""
     #if os(macOS)
         @Environment(EmbeddedPlayback.self) private var embedded
@@ -57,7 +58,8 @@ struct LiveTVView: View {
                 order: order,
                 group: group,
                 hidden: userState.hidden,
-                hiddenGroups: userState.hiddenCategories(of: .live)
+                hiddenGroups: userState.hiddenCategories(of: .live),
+                groupsByGuide: groupsByGuide
             )
         case .favourites:
             ListSpec(
@@ -251,6 +253,8 @@ enum LiveListNarrowing {
 private struct LiveChannelList: View {
     @Environment(UserStateStore.self) private var userState
     @Environment(\.modelContext) private var catalog
+    @Environment(\.channelVariants) private var variantsStore
+    @AppStorage(ChannelGrouping.key) private var groupsByGuide = ChannelGrouping.isOnByDefault
     @State private var model = CatalogListModel()
     @State private var guideFor: CatalogRow?
 
@@ -338,14 +342,22 @@ private struct LiveChannelList: View {
             }
             ForEach(shown) { channel in
                 let key = channel.id
-                Button { onPlay(channel) } label: {
-                    // A plain button answers only where something is drawn, so the empty
-                    // middle of a row would swallow a tap. The whole row is the target, which
-                    // is also what Apple TV focus needs.
-                    row(channel, isFavorite: userState.isFavorite(key)).contentShape(Rectangle())
+                // A plain button answers only where something is drawn, so the empty middle of a row would swallow
+                // a tap: the whole row is the target, which is also what Apple TV focus needs. A channel with several
+                // versions (the list is grouped by guide) has the way to pick another at its end.
+                ChannelListRow(
+                    channel: channel,
+                    play: { onPlay(versionToPlay(channel)) },
+                    playVersion: onPlay,
+                    label: { row(channel, isFavorite: userState.isFavorite(key)) }
+                )
+                .onAppear {
+                    model.rowAppeared(channel)
+                    if groupsByGuide {
+                        variantsStore.request(playlist: channel.playlist, epgKey: channel.epgKey, in: catalog.container)
+                    }
                 }
-                .buttonStyle(.plain)
-                .onAppear { model.rowAppeared(channel) }
+                .onDisappear { variantsStore.withdraw(playlist: channel.playlist, epgKey: channel.epgKey) }
                 // Touch and hold (or the remote's long press) on every platform; a swipe too
                 // where there is one.
                 .contextMenu {
@@ -382,6 +394,13 @@ private struct LiveChannelList: View {
                     }
             }
         }
+    }
+
+    /// What choosing the row plays: the version the person picked for this channel before, else the channel itself.
+    private func versionToPlay(_ channel: CatalogRow) -> CatalogRow {
+        guard groupsByGuide else { return channel }
+        let versions = ChannelVersions.usable(channel, store: variantsStore, userState: userState)
+        return ChannelVersions.chosen(for: channel, among: versions, userState: userState)
     }
 
     private var shown: [CatalogRow] {
@@ -523,52 +542,6 @@ extension PlaybackTarget {
             containerExtension: entry.containerExtension,
             epgKey: entry.epgKey
         )
-    }
-}
-
-/// Full screen where the platform has it; a window of its own on the Mac.
-struct PlayerPresentation: ViewModifier {
-    @Binding var target: PlaybackTarget?
-
-    #if os(macOS) || os(tvOS)
-        @Environment(EmbeddedPlayback.self) private var embedded
-    #endif
-    #if os(macOS)
-        @Environment(\.openWindow) private var openWindow
-        /// Off by default: a stream plays in the main window, with the rest of the app usable over it. On, it opens in
-        /// a
-        /// window of its own that can be moved, resized and put on another display.
-        @AppStorage("playsInSeparateWindow") private var separateWindow = false
-    #endif
-
-    func body(content: Content) -> some View {
-        #if os(tvOS)
-            // In the screen under the app, as on a Mac: Menu sends the stream to the back and it plays on.
-            content.onChange(of: target) {
-                if let target {
-                    embedded.play(target)
-                    self.target = nil
-                }
-            }
-        #elseif os(macOS)
-            // In the main window unless the person asked for a window of its own (a window that can be moved,
-            // resized, put on another display and taken full screen). Opening the same item again in its own
-            // window brings that window forward instead of making a second one.
-            content.onChange(of: target) {
-                if let target {
-                    if separateWindow {
-                        openWindow(id: PlayerWindow.id, value: PlayerWindowRequest(target))
-                    } else {
-                        embedded.play(target)
-                    }
-                    self.target = nil
-                }
-            }
-        #else
-            content.fullScreenCover(item: $target) { target in
-                PlayerScreen(target: target)
-            }
-        #endif
     }
 }
 

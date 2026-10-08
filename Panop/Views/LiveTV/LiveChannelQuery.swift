@@ -27,10 +27,13 @@ nonisolated enum LiveChannelQuery {
         search: String,
         limit: Int,
         order: LiveOrder = .provider,
-        group: String? = nil
+        group: String? = nil,
+        leadsOnly: Bool = false
     ) -> FetchDescriptor<CatalogEntryRecord> {
         if let group {
-            var descriptor = groupDescriptor(kind: kind, source: source, group: group, search: search, order: order)
+            var descriptor = groupDescriptor(
+                kind: kind, source: source, group: group, search: search, order: order, leadsOnly: leadsOnly
+            )
             descriptor.fetchLimit = Swift.min(Swift.max(limit, 1), maxRows)
             return descriptor
         }
@@ -47,19 +50,29 @@ nonisolated enum LiveChannelQuery {
         var descriptor: FetchDescriptor<CatalogEntryRecord> = switch (source, term.isEmpty) {
         case let (source?, true):
             FetchDescriptor(
-                predicate: #Predicate { $0.playlist == source && $0.kindRaw == live },
+                predicate: #Predicate {
+                    $0.playlist == source && $0.kindRaw == live && (!leadsOnly || $0.isGuideLead)
+                },
                 sortBy: sort
             )
         case let (source?, false):
             FetchDescriptor(
-                predicate: #Predicate { $0.playlist == source && $0.kindRaw == live && $0.nameKey.contains(term) },
+                predicate: #Predicate {
+                    $0.playlist == source && $0.kindRaw == live && $0.nameKey.contains(term)
+                        && (!leadsOnly || $0.isGuideLead)
+                },
                 sortBy: sort
             )
         case (nil, true):
-            FetchDescriptor(predicate: #Predicate { $0.kindRaw == live }, sortBy: sort)
+            FetchDescriptor(
+                predicate: #Predicate { $0.kindRaw == live && (!leadsOnly || $0.isGuideLead) },
+                sortBy: sort
+            )
         case (nil, false):
             FetchDescriptor(
-                predicate: #Predicate { $0.kindRaw == live && $0.nameKey.contains(term) },
+                predicate: #Predicate {
+                    $0.kindRaw == live && $0.nameKey.contains(term) && (!leadsOnly || $0.isGuideLead)
+                },
                 sortBy: sort
             )
         }
@@ -107,7 +120,8 @@ nonisolated enum LiveChannelQuery {
         source: String?,
         group: String,
         search: String,
-        order: LiveOrder
+        order: LiveOrder,
+        leadsOnly: Bool = false
     ) -> FetchDescriptor<CatalogEntryRecord> {
         let raw = kind.rawValue
         let term = CatalogEntryRecord.nameKey(for: search.trimmingCharacters(in: .whitespacesAndNewlines))
@@ -117,6 +131,7 @@ nonisolated enum LiveChannelQuery {
             FetchDescriptor(
                 predicate: #Predicate {
                     $0.kindRaw == raw && $0.groupName == group && $0.playlist == source && $0.seriesID == nil
+                        && (!leadsOnly || $0.isCategoryLead)
                 },
                 sortBy: sort
             )
@@ -124,19 +139,23 @@ nonisolated enum LiveChannelQuery {
             FetchDescriptor(
                 predicate: #Predicate {
                     $0.kindRaw == raw && $0.groupName == group && $0.playlist == source && $0.seriesID == nil
-                        && $0.nameKey.contains(term)
+                        && $0.nameKey.contains(term) && (!leadsOnly || $0.isCategoryLead)
                 },
                 sortBy: sort
             )
         case (nil, true):
             FetchDescriptor(
-                predicate: #Predicate { $0.kindRaw == raw && $0.groupName == group && $0.seriesID == nil },
+                predicate: #Predicate {
+                    $0.kindRaw == raw && $0.groupName == group && $0.seriesID == nil
+                        && (!leadsOnly || $0.isCategoryLead)
+                },
                 sortBy: sort
             )
         case (nil, false):
             FetchDescriptor(
                 predicate: #Predicate {
                     $0.kindRaw == raw && $0.groupName == group && $0.seriesID == nil && $0.nameKey.contains(term)
+                        && (!leadsOnly || $0.isCategoryLead)
                 },
                 sortBy: sort
             )
@@ -148,7 +167,8 @@ nonisolated enum LiveChannelQuery {
         kind: MediaKind,
         source: String?,
         search: String,
-        order: LiveOrder
+        order: LiveOrder,
+        leadsOnly: Bool = false
     ) -> FetchDescriptor<CatalogEntryRecord> {
         let raw = kind.rawValue
         let term = CatalogEntryRecord.nameKey(for: search.trimmingCharacters(in: .whitespacesAndNewlines))
@@ -158,6 +178,7 @@ nonisolated enum LiveChannelQuery {
             FetchDescriptor(
                 predicate: #Predicate {
                     $0.kindRaw == raw && $0.groupName == nil && $0.playlist == source && $0.seriesID == nil
+                        && (!leadsOnly || $0.isCategoryLead)
                 },
                 sortBy: sort
             )
@@ -165,19 +186,22 @@ nonisolated enum LiveChannelQuery {
             FetchDescriptor(
                 predicate: #Predicate {
                     $0.kindRaw == raw && $0.groupName == nil && $0.playlist == source && $0.seriesID == nil
-                        && $0.nameKey.contains(term)
+                        && $0.nameKey.contains(term) && (!leadsOnly || $0.isCategoryLead)
                 },
                 sortBy: sort
             )
         case (nil, true):
             FetchDescriptor(
-                predicate: #Predicate { $0.kindRaw == raw && $0.groupName == nil && $0.seriesID == nil },
+                predicate: #Predicate {
+                    $0.kindRaw == raw && $0.groupName == nil && $0.seriesID == nil && (!leadsOnly || $0.isCategoryLead)
+                },
                 sortBy: sort
             )
         case (nil, false):
             FetchDescriptor(
                 predicate: #Predicate {
                     $0.kindRaw == raw && $0.groupName == nil && $0.seriesID == nil && $0.nameKey.contains(term)
+                        && (!leadsOnly || $0.isCategoryLead)
                 },
                 sortBy: sort
             )

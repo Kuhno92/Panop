@@ -71,7 +71,9 @@ extension UserStateStore {
             row.playCount = 0
             row.parentKey = ""
             row.isWatched = false
-            if !row.isFavorite, !row.isHidden, row.positionSeconds == 0, row.rememberedEngine.isEmpty {
+            if !row.isFavorite, !row.isHidden, row.positionSeconds == 0, row.rememberedEngine.isEmpty,
+               row.preferredVariantID.isEmpty
+            {
                 context.delete(row)
             }
         }

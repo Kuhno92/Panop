@@ -10,6 +10,10 @@ struct PlayerControls: View {
     var onShowGuide: (() -> Void)?
     /// The live channel's place in the guide, for the programme timeline. Nil for a film or a channel with no guide.
     var guide: GuideKey?
+    /// The other versions of the channel that plays (HD, SD...), when the list groups them, and the one that plays.
+    var versions: [TrackDescriptor] = []
+    var currentVersion: String?
+    var onPickVersion: ((String) -> Void)?
 
     /// The scrubber's own value while a finger is on it, so the coordinator is asked to
     /// seek once, on release, and not on every movement.
@@ -17,7 +21,7 @@ struct PlayerControls: View {
 
     /// Which control has focus, on Apple TV, so the bar can stay up while it is being used.
     private enum Control: Hashable {
-        case play, back, forward, audio, subtitles, guide
+        case play, back, forward, audio, subtitles, guide, versions
     }
 
     @FocusState private var focused: Control?
@@ -159,7 +163,8 @@ struct PlayerControls: View {
         /// What holds the bar up while the choice is open.
         var reason: String
         var focus: Control
-        var noneTitle: String
+        /// The first entry, for "no track"; nil where there is no such choice (the versions of a channel).
+        var noneTitle: String?
         var tracks: [TrackDescriptor]
         var selected: String?
         var select: (String?) -> Void
@@ -167,6 +172,22 @@ struct PlayerControls: View {
 
     @ViewBuilder
     private var tracks: some View {
+        if versions.count > 1, let onPickVersion {
+            trackChoice(Choice(
+                symbol: "square.stack.3d.up",
+                label: String(localized: "Version"),
+                reason: "versions",
+                focus: .versions,
+                noneTitle: nil,
+                tracks: versions,
+                selected: currentVersion,
+                select: { id in
+                    if let id {
+                        onPickVersion(id)
+                    }
+                }
+            ))
+        }
         if model.audioTracks.count > 1 {
             trackChoice(Choice(
                 symbol: "speaker.wave.2",
@@ -201,7 +222,9 @@ struct PlayerControls: View {
     private func trackChoice(_ choice: Choice) -> some View {
         #if os(tvOS)
             Menu {
-                Button { choice.select(nil) } label: { checked(choice.noneTitle, choice.selected == nil) }
+                if let noneTitle = choice.noneTitle {
+                    Button { choice.select(nil) } label: { checked(noneTitle, choice.selected == nil) }
+                }
                 ForEach(choice.tracks) { track in
                     Button { choice.select(track.id) } label: { checked(track.label, choice.selected == track.id) }
                 }
@@ -251,7 +274,7 @@ private extension View {
     private struct TrackPopoverButton: View {
         let symbol: String
         let label: String
-        let noneTitle: String
+        let noneTitle: String?
         let tracks: [TrackDescriptor]
         let selected: String?
         let select: (String?) -> Void
@@ -266,7 +289,9 @@ private extension View {
             .accessibilityLabel(label)
             .popover(isPresented: $showing) {
                 VStack(alignment: .leading, spacing: 4) {
-                    option(noneTitle, isSelected: selected == nil, id: nil)
+                    if let noneTitle {
+                        option(noneTitle, isSelected: selected == nil, id: nil)
+                    }
                     ForEach(tracks) { track in
                         option(track.label, isSelected: selected == track.id, id: track.id)
                     }

@@ -28,6 +28,11 @@ class PanopUITestCase: XCTestCase {
         nil
     }
 
+    /// Seed a second version of the first channel, sharing its guide, and group the list by guide.
+    var groupsByGuide: Bool {
+        false
+    }
+
     /// Seed the playlist as a live-only source, which hides the Movies and Series tabs.
     var liveOnly: Bool {
         false
@@ -53,6 +58,10 @@ class PanopUITestCase: XCTestCase {
         }
         if liveOnly {
             app.launchEnvironment["PANOP_LIVE_ONLY"] = "1"
+        }
+        if groupsByGuide {
+            app.launchEnvironment["PANOP_VERSIONS"] = "1"
+            app.launchArguments += ["-groupsByGuide", "YES"]
         }
         app.launch()
     }

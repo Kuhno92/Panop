@@ -51,6 +51,12 @@ public struct CatalogEntry: Sendable, Equatable, Hashable {
     /// As the provider writes it, such as `Krimi / Drama`.
     public var genre: String?
     public var cast: String?
+    /// For a live channel with a guide key: whether it is the first in the playlist to have that key, so a list that
+    /// shows one channel per guide shows this one. True for every other entry, and for a channel with no key.
+    public var isGuideLead: Bool
+    /// The same within its category: the first channel of that category with its guide key. A category's list shows
+    /// these, so a variant that lives in another category is not missing from this one.
+    public var isCategoryLead: Bool
 
     public init(
         id: String,
@@ -77,7 +83,9 @@ public struct CatalogEntry: Sendable, Equatable, Hashable {
         isAdult: Bool = false,
         year: Int? = nil,
         genre: String? = nil,
-        cast: String? = nil
+        cast: String? = nil,
+        isGuideLead: Bool = true,
+        isCategoryLead: Bool = true
     ) {
         self.id = id
         self.kind = kind
@@ -104,6 +112,8 @@ public struct CatalogEntry: Sendable, Equatable, Hashable {
         self.year = year
         self.genre = genre
         self.cast = cast
+        self.isGuideLead = isGuideLead
+        self.isCategoryLead = isCategoryLead
     }
 }
 

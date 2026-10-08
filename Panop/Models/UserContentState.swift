@@ -27,6 +27,10 @@ final class UserContentState {
     /// The engine that played this when the person's own choice could not, as its raw value, or
     /// empty. Defaulted, so a store made before this existed still opens.
     var rememberedEngine: String = ""
+    /// For a channel's guide key (the row is filed under `guide:<key>`): the entry id of the version of that channel
+    /// the
+    /// person chose to play, or empty. Defaulted, so a store made before this existed still opens.
+    var preferredVariantID: String = ""
     /// Seen to the end, or marked so. Defaulted, so a store made before this existed still opens.
     var isWatched: Bool = false
     /// Hidden by the person from every list, for an entry that is no use to them, such as a
