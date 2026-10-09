@@ -6,6 +6,14 @@
 	     playlists are mirrored to a private CloudKit database that only they can read. The container is
 	     named after the bundle identifier. Whether mirroring is used at all is decided at launch from the
 	     Settings switch and the iCloud account (see CloudSync). -->
+	<!-- The Mac App Store and TestFlight require the sandbox. Panop talks to the person's provider and playlists over the
+	     network (also on the home network) and opens a playlist file the person chooses. -->
+	<key>com.apple.security.app-sandbox</key>
+	<true/>
+	<key>com.apple.security.network.client</key>
+	<true/>
+	<key>com.apple.security.files.user-selected.read-only</key>
+	<true/>
 	<key>com.apple.developer.icloud-container-identifiers</key>
 	<array>
 		<string>iCloud.com.panop.Panop</string>
@@ -15,9 +23,8 @@
 		<string>CloudKit</string>
 	</array>
 	<!-- CloudKit tells the app a change has arrived by a silent push. Xcode swaps this for the production
-	     value when it archives for distribution. iOS and tvOS name the key `aps-environment`; the Mac names it
-	     `com.apple.developer.aps-environment` and has its own file (Panop-macOS.entitlements). -->
-	<key>aps-environment</key>
+	     value when it archives for distribution. -->
+	<key>com.apple.developer.aps-environment</key>
 	<string>development</string>
 </dict>
 </plist>
