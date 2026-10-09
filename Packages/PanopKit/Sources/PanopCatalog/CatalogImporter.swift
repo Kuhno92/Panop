@@ -340,6 +340,13 @@ struct KindTracker {
     private var guideKeys = Set<String>()
     private var categoryGuideKeys = Set<String>()
 
+    /// Written out: a private stored property makes the memberwise initializer private too, which the compiler on the
+    /// CI runner enforces (the one here did not), and the Xtream import builds trackers from another file.
+    init(kind: MediaKind, before: Int) {
+        self.kind = kind
+        self.before = before
+    }
+
     mutating func add(_ entry: CatalogEntry) {
         var entry = entry
         if kind == .live, let key = GuideGrouping.key(epgKey: entry.epgKey, name: entry.name) {
