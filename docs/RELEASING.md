@@ -1,0 +1,27 @@
+# Releasing to TestFlight
+
+Panop is always signed and uploaded under the **personal** Apple developer team (`4HUJUM5AUG`, "Nico Kuhn"), never the
+company team. The App Store Connect record is **PanopTV**, bundle ID `com.panop.Panop`, one record for iOS, tvOS and macOS.
+
+Once, in the developer portal and App Store Connect (only the account holder can):
+
+- The App ID `com.panop.Panop` has the iCloud (CloudKit) capability, and the container `iCloud.com.panop.Panop` exists.
+- The Xcode account of the personal team is signed in (Xcode → Settings → Accounts), so `-allowProvisioningUpdates` can
+  make the distribution certificate and profiles.
+- Testers: internal ones (App Store Connect users) get builds at once; for a public link, add an external group, and
+  the first build of each version goes through Beta App Review. Say in the review notes that Panop ships no content and
+  plays only sources the user adds.
+
+For each build:
+
+```bash
+Scripts/bump-build.sh                       # a build number higher than the last upload
+git commit -am "chore: build N"             # a build comes from a commit
+Scripts/archive-testflight.sh all           # archives iOS, tvOS and macOS into build/archives/
+Scripts/archive-testflight.sh all --upload  # the same, and sends each to App Store Connect
+```
+
+A release gets a tag with its version, `v0.1.0`, on the commit its first build was made from. The version is
+`MARKETING_VERSION` in the project; the build number is `CURRENT_PROJECT_VERSION`.
+
+The source is at https://github.com/Kuhno92/Panop (linked from About), as the GPL-3.0 licence asks.

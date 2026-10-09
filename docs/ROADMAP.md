@@ -673,15 +673,28 @@ Features real users expect that the brief did not name. All *(surfaced)*.
       changes or the app quits, with a limit for Apple TV's storage. Needs a design note first: one
       download feeding both the engine and the file (a local loopback server or a custom loader), and how
       each engine plays a growing file. Not started.
+- [ ] **OpenSubtitles support** *(asked for, 2026-10-09)*. Search subtitles for a film or an episode by title, year,
+      season and episode (and the file hash where the engine can give one) from the player's subtitle menu, pick
+      one in the person's language and load it into the playing stream through the engines' external-subtitle hook
+      (`loadExternalSubtitles`, M2), drawn with the style from Settings. Needs the OpenSubtitles REST API (an API
+      key for the app, and the person's own login for downloads beyond the free quota, kept in the Keychain), a
+      remembered choice per title, and a note in `THIRD-PARTY-NOTICES.md` and the privacy text, since the title
+      leaves the device. Not started.
+- [ ] **Chromecast support** *(asked for, 2026-10-09)*. Cast the playing stream to a Chromecast or Google TV from the
+      player (iOS, iPadOS, macOS; tvOS has no sender). The Google Cast SDK is not open source and has to be linked
+      as a binary, which sits badly with a GPL-3.0 app: check its terms before any work, and the alternative
+      (a DIAL and CASTv2 sender of our own, or only AirPlay, which already works) in a short ADR. Live TV needs the
+      stream in a format the receiver plays (HLS or MP4), so MPEG-TS from a panel may need a re-wrap. Not started.
 - [ ] **Preview image while seeking** *(asked for)*. Scrubbing the timeline shows a thumbnail of that
       moment. For VOD: frames sampled from the file (AVAssetImageGenerator for AVPlayer, the engine's own
       snapshot for the others), generated lazily around the scrub position and cached. For live rewind:
       frames taken from the buffer above. Not started.
-- [ ] **Download VOD for offline viewing** *(asked for)*. Save a movie or an episode to the device and play
+- [ ] **Offline movies and series** *(asked for, again 2026-10-09)*. Download VOD for offline viewing. Save a movie or an episode to the device and play
       it without a connection: a download queue with progress, pause and resume, background transfer
       (`URLSession` background configuration), a storage limit and a Downloads screen to delete from.
       Plays from the local file through the same engines. Not available on tvOS, which has no persistent
-      storage for it. Open question: whether providers' terms allow it, so it should be off unless the
+      storage for it. Series: download a season or the next few episodes, with the watched ones removed by
+      themselves. Open question: whether providers' terms allow it, so it should be off unless the
       person turns it on. Not started.
 - [x] **AetherEngine as an engine** *(asked for)*. A fourth engine behind `PlaybackEngine`, chosen in Settings and
       third in the fallback order (AVPlayer, LumeEngine, AetherEngine, VLC). Pinned to 7.27.2 through SwiftPM; licence
@@ -713,7 +726,7 @@ Features real users expect that the brief did not name. All *(surfaced)*.
       **Cautions:** the project says it is "only suitable for learning" and will not be maintained often;
       Metal support is experimental; it brings a third copy of FFmpeg (n9.0.1), with the same collision risk as
       Lume's. Floors are macOS 12, iOS 15, tvOS 15, below Panop's. Not started.
-- [ ] **Catch-up and timeshift**. Xtream supports it; the M3U attributes are already parsed.
+- [ ] **Catch-up and timeshift** *(asked for, again 2026-10-09; what is left is below)*. Xtream supports it; the M3U attributes are already parsed.
       **Catch-up for Xtream is built**: a channel the panel archives (`tv_archive`) lists the
       programmes that aired within its window under "Earlier" in its guide, and tapping one plays
       it from the start through the panel's timeshift address (`XtreamClient.catchupURL`, written
@@ -779,7 +792,7 @@ Features real users expect that the brief did not name. All *(surfaced)*.
 | **Android UI** | Core stays portable, but no UI work planned. Swift 6.3's Android SDK makes this real later (ADR 0007) |
 | **Windows / Linux UI** | Same. Core compiles there; no UI planned |
 | **DRM** | IPTV streams are effectively never DRM protected |
-| **Recording, Chromecast, multi-view** | Not in the brief. Revisit after M6 |
+| **Recording, multi-view** | Not in the brief. Revisit after M6 (Chromecast is now asked for, in M6) |
 
 ---
 
