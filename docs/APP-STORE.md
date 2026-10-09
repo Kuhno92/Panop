@@ -58,6 +58,8 @@ YOURS
 
 PanopTV is free software under the GNU GPL v3. The source is on GitHub.
 
+Posters in the screenshots: films by the Blender Foundation (CC BY, blender.org) and silent classics in the public domain. Credits: github.com/Kuhno92/Panop/blob/main/docs/store-art/CREDITS.md
+
 **Keywords (100)**
 iptv,m3u,xtream,player,live tv,epg,tv guide,streams,playlist,series,movies,hls
 
@@ -97,6 +99,8 @@ DEINS
 - Kein Konto, keine Werbung, kein Tracking. Der Entwickler sammelt nichts
 
 PanopTV ist freie Software unter der GNU GPL v3. Der Quellcode liegt auf GitHub.
+
+Poster in den Screenshots: Filme der Blender Foundation (CC BY, blender.org) und gemeinfreie Stummfilm-Klassiker. Nachweise: github.com/Kuhno92/Panop/blob/main/docs/store-art/CREDITS.md
 
 **Schlüsselwörter**
 iptv,m3u,xtream,player,live tv,epg,tv programm,streams,playlist,serien,filme,hls
