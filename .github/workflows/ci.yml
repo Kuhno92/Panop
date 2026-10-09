@@ -64,4 +64,6 @@ jobs:
       # portable package. They use real on-disk SQLite, which is what catches
       # collation and paging bugs that an in-memory store hides.
       - name: Test
+        env:
+          TEST_RUNNER_PANOP_CI: "1"
         run: Scripts/test-app.sh macos

@@ -37,7 +37,7 @@ struct KSPlayerEngineTests {
         return url
     }
 
-    @Test
+    @Test(.needsAudioDevice)
     func `plays a file, reports ready with its duration, then ends`() async throws {
         let url = try writeWAV(seconds: 2)
         defer { try? FileManager.default.removeItem(at: url) }

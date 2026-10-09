@@ -68,10 +68,11 @@ extension Trait where Self == ConditionTrait {
     /// device
     /// (libVLC logs "AudioObjectAddPropertyListener failed"), so a state change comes late or not at all there. Run it
     /// on a
-    /// Mac with sound.
+    /// Mac with sound. Xcode hands the test process only variables named `TEST_RUNNER_...`, so the workflow sets
+    /// `TEST_RUNNER_PANOP_CI`, and the test sees `PANOP_CI`.
     static var needsAudioDevice: Self {
         .enabled(
-            if: ProcessInfo.processInfo.environment["GITHUB_ACTIONS"] == nil,
+            if: ProcessInfo.processInfo.environment["PANOP_CI"] == nil,
             "needs an audio device, which a CI runner does not have"
         )
     }
