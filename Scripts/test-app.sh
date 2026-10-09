@@ -154,7 +154,9 @@ for attempt in 1 2 3; do
 done
 
 grep -E "^Test case .* (passed|failed)" "$log" | sed -E "s/ on '.*'//" || true
-grep -E "error:|Failing tests:|^\s+[A-Za-z]+Tests\." "$log" | head -20 || true
+# Swift Testing marks a failed test with ✘ and the XCTest summary has "Failing tests:". The database errors some tests
+# provoke on purpose ("disk I/O error") are noise and would fill the 20 lines, so they are left out.
+grep -E "✘|Failing tests:|^Test Case .* failed|^\s+[A-Za-z]+Tests\.|error:" "$log" | grep -v "CoreData: error\|SQLite error code" | head -40 || true
 if [[ $benchmark -eq 1 && -f /tmp/panop-bench-results.txt ]]; then
     echo
     echo "==> Benchmark results"
