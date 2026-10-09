@@ -26,6 +26,9 @@
 	     here so that an upload to App Store Connect does not stop to ask. -->
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+	<!-- The Mac App Store (and so TestFlight for the Mac) requires a category. -->
+	<key>LSApplicationCategoryType</key>
+	<string>public.app-category.entertainment</string>
 	<key>NSLocalNetworkUsageDescription</key>
 	<string>Panop connects to your IPTV provider or playlist when it is on your home network.</string>
 	<!-- Every orientation on iPad, which App Store Connect requires of an app that runs in iPad multitasking; a phone
