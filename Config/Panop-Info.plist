@@ -28,6 +28,21 @@
 	<false/>
 	<key>NSLocalNetworkUsageDescription</key>
 	<string>Panop connects to your IPTV provider or playlist when it is on your home network.</string>
+	<!-- Every orientation on iPad, which App Store Connect requires of an app that runs in iPad multitasking; a phone
+	     is held upright or on its side. -->
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>UISupportedInterfaceOrientations~ipad</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>audio</string>
