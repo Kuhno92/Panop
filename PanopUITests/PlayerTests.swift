@@ -11,17 +11,21 @@ final class PlayerTests: PanopUITestCase {
         #endif
     }
 
-    /// Fails with the screen's contents, which is the only clue to why a player never came up.
-    /// Whether `element` takes the focus within a couple of seconds: it moves with an animation.
-    private func hasFocusSoon(_ element: XCUIElement) -> Bool {
-        for _ in 0 ..< 20 {
-            if element.exists, element.hasFocus {
-                return true
+    #if os(tvOS)
+        /// Whether `element` takes the focus within a couple of seconds: it moves with an animation. Apple TV only:
+        /// `hasFocus` is not in the macOS SDK the CI runner builds against.
+        private func hasFocusSoon(_ element: XCUIElement) -> Bool {
+            for _ in 0 ..< 20 {
+                if element.exists, element.hasFocus {
+                    return true
+                }
+                Thread.sleep(forTimeInterval: 0.1)
             }
-            Thread.sleep(forTimeInterval: 0.1)
+            return false
         }
-        return false
-    }
+    #endif
+
+    // Fails with the screen's contents, which is the only clue to why a player never came up.
 
     private func waitForPlayerControls(file: StaticString = #filePath, line: UInt = #line) {
         let shown = app.buttons["Pause"].waitForExistence(timeout: 15)
