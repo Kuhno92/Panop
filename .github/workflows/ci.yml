@@ -1,10 +1,17 @@
 name: CI
 
-# Not on every commit: the tests run for a release (a tag, through release.yml, which calls this) and by hand from
-# the Actions tab ("Run workflow"). Run them locally before pushing (docs/RELEASING.md).
+# Every commit to main and every pull request, and by hand. A release (a version tag, release.yml) calls it too, so a
+# tag never uploads to App Store Connect without the tests passing on it. A newer push cancels the run before it.
 on:
+  push:
+    branches: [main]
+  pull_request:
   workflow_call:
   workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   core:

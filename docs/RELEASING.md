@@ -42,5 +42,6 @@ It needs three repository secrets, made once, from an App Store Connect API key 
 Connect API; the App Manager role) under the personal team: `ASC_KEY_ID`, `ASC_ISSUER_ID` and `ASC_KEY_P8` (the `.p8` file
 as base64: `base64 -i AuthKey_XXXX.p8 | pbcopy`). Xcode signs with the key (cloud signing), so no certificate is stored.
 
-The tests are not run on every commit, only for a release or by hand (Actions, CI, Run workflow). This repository is public,
-so the minutes are free either way (private repositories get a few thousand a month, and macOS minutes count ten times).
+The tests run on every commit to `main`, on pull requests, and by hand (Actions, CI, Run workflow); the upload to
+App Store Connect runs only for a version tag, and only after the tests pass on it. This repository is public, so the
+minutes are free (private repositories get a few thousand a month, and macOS minutes count ten times).
