@@ -2,6 +2,7 @@
 # Never part of Panop's build graph, and never a source of copied code:
 # Lume is AGPL-3.0 and Panop is MIT.
 reference/
+.secrets
 
 # macOS
 .DS_Store
