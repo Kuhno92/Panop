@@ -35,6 +35,8 @@ nonisolated struct PlaybackTarget: Identifiable, Equatable, Hashable, Sendable {
     var catchup: CatchupWindow?
     /// The channel's key in the guide, so the player can say what is on.
     var epgKey: String?
+    /// What groups the channel with its other versions, so the player can offer them.
+    var groupKey: String?
 
     var id: String {
         "\(playlist)|\(entryID)"
@@ -59,6 +61,7 @@ nonisolated struct PlayerWindowRequest: Codable, Hashable {
     var catchup: CatchupWindow?
     /// Not a secret, so it may be saved with the window: the key the guide files the channel under.
     var epgKey: String?
+    var groupKey: String?
 
     init(_ target: PlaybackTarget) {
         playlist = target.playlist
@@ -70,6 +73,7 @@ nonisolated struct PlayerWindowRequest: Codable, Hashable {
         resumeAt = target.resumeAt
         catchup = target.catchup
         epgKey = target.epgKey
+        groupKey = target.groupKey
     }
 
     /// The target to play, given the address if the catalog has one for this item.
@@ -85,7 +89,8 @@ nonisolated struct PlayerWindowRequest: Codable, Hashable {
             containerExtension: containerExtension,
             resumeAt: resumeAt,
             catchup: catchup,
-            epgKey: epgKey
+            epgKey: epgKey,
+            groupKey: groupKey
         )
     }
 }

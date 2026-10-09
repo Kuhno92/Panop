@@ -59,7 +59,7 @@ final class CatalogEntryRecord {
         [\.kindRaw, \.isAdult, \.year, \.rating, \.nameKey, \.id],
         [\.kindRaw, \.tmdbID],
         // The channels that share a guide key, for the choice of which to play.
-        [\.playlist, \.kindRaw, \.epgKey]
+        [\.playlist, \.kindRaw, \.groupKey]
     )
 
     var playlist: String
@@ -102,6 +102,8 @@ final class CatalogEntryRecord {
     /// a store made before this existed opens, with every channel listed until the next import marks the rest.
     var isGuideLead: Bool = true
     var isCategoryLead: Bool = true
+    /// What groups the channel with its other versions (see `GuideGrouping`).
+    var groupKey: String?
 
     init(playlist: String, entry: CatalogEntry) {
         self.playlist = playlist
@@ -133,6 +135,7 @@ final class CatalogEntryRecord {
         cast = entry.cast
         isGuideLead = entry.isGuideLead
         isCategoryLead = entry.isCategoryLead
+        groupKey = entry.groupKey
     }
 
     var kind: MediaKind {
@@ -182,6 +185,7 @@ final class CatalogEntryRecord {
         assign(\.cast, entry.cast)
         assign(\.isGuideLead, entry.isGuideLead)
         assign(\.isCategoryLead, entry.isCategoryLead)
+        assign(\.groupKey, entry.groupKey)
         return changed
     }
 }

@@ -8,12 +8,18 @@ struct HeroCarousel: View {
     /// Nil where playing straight away is not on offer (the Movies and Series screens).
     var onPlay: ((CatalogRow) -> Void)?
     let onInfo: (CatalogRow) -> Void
+    /// Controls shown above the slides, inside the carousel, so the artwork that reaches up behind them is drawn under
+    /// them (as a neighbour in a list it was drawn over them, tinting them).
+    var above: AnyView?
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.horizontalSizeClass) private var sizeClass
     @State private var index = 0
     /// A button in the hero has focus, or a finger has just moved it: not the moment to slide away.
     @State private var engaged = false
+    /// The navigation bar's height above the page, which the artwork reaches up through (iPhone and iPad). Measured by
+    /// the screen around the scroll view: inside it the bar is a content inset, not a safe area.
+    @Environment(\.heroReach) private var topInset
 
     private static let interval = Duration.seconds(7)
 
@@ -30,39 +36,20 @@ struct HeroCarousel: View {
     var body: some View {
         if !rows.isEmpty {
             let row = rows[current]
-            ZStack(alignment: .bottom) {
-                HeroView(
-                    row: row,
-                    backdrop: backdrop(row),
-                    onPlay: onPlay.map { play in { play(row) } },
-                    onInfo: { onInfo(row) },
-                    engaged: $engaged,
-                    showsBackdrop: false,
-                    onStep: { move(by: $0) }
-                )
-                .id(row.id)
-                .transition(.opacity)
-                if rows.count > 1 {
-                    dots
-                }
-                #if !os(tvOS)
-                    if rows.count > 1, sizeClass != .compact {
-                        arrows
-                    }
-                #endif
+            VStack(spacing: 0) {
+                above
+                slides(row)
             }
             // The artwork is its own layer behind the slides, crossfading while they stay put. As a background it
             // reaches up under the bar without moving the slides, and it is not clipped, so it fades into the rows.
             // Anchored at the bottom, so what it gains by reaching under the bars goes upward, to the top of the
             // screen as on a film's page, and never down over the rows (where it would block them).
             .background(alignment: .bottom) {
-                HeroArtwork(address: backdrop(row) ?? row.iconURL, blurred: backdrop(row) == nil)
+                HeroArtwork(address: backdrop(row) ?? row.iconURL, blurred: backdrop(row) == nil, reach: topInset)
                     .id("art-" + row.id)
                     .transition(.opacity)
                     .allowsHitTesting(false)
             }
-            // One height for every slide, so the page below does not move as titles change.
-            .frame(height: Self.height(compact: sizeClass == .compact))
             // Above the rows that follow it, so the dots are never behind them.
             .zIndex(1)
             #if !os(tvOS)
@@ -78,6 +65,32 @@ struct HeroCarousel: View {
                     }
                 }
         }
+    }
+
+    private func slides(_ row: CatalogRow) -> some View {
+        ZStack(alignment: .bottom) {
+            HeroView(
+                row: row,
+                backdrop: backdrop(row),
+                onPlay: onPlay.map { play in { play(row) } },
+                onInfo: { onInfo(row) },
+                engaged: $engaged,
+                showsBackdrop: false,
+                onStep: { move(by: $0) }
+            )
+            .id(row.id)
+            .transition(.opacity)
+            if rows.count > 1 {
+                dots
+            }
+            #if !os(tvOS)
+                if rows.count > 1, sizeClass != .compact {
+                    arrows
+                }
+            #endif
+        }
+        // One height for every slide, so the page below does not move as titles change.
+        .frame(height: Self.height(compact: sizeClass == .compact))
     }
 
     /// Where on the carousel it stands, and a way to go to one: each dot is a button where there is a pointer or a

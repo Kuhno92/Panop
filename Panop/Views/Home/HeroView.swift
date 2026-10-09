@@ -164,11 +164,20 @@ struct HeroView: View {
     }
 }
 
+extension EnvironmentValues {
+    /// How far a hero's artwork reaches up past its content, to the top of the screen (see `HeroArtwork.reach`).
+    @Entry var heroReach: CGFloat = 0
+}
+
 /// The artwork behind a hero: wide where there is some, otherwise the poster enlarged and softened, faded away at
 /// the bottom so it runs into the rows below instead of ending in an edge, and reaching up under the bar.
 struct HeroArtwork: View {
     let address: String?
     let blurred: Bool
+    /// How far to reach up past the top of the content, to the top of the screen. Inside a scroll view
+    /// `ignoresSafeArea`
+    /// does not do it on iPhone and iPad: the content starts below the navigation bar, and so did the artwork.
+    var reach: CGFloat = 0
 
     var body: some View {
         BackdropView(address: address, blurred: blurred)
@@ -182,6 +191,15 @@ struct HeroArtwork: View {
                 startPoint: .top,
                 endPoint: .bottom
             ))
-            .ignoresSafeArea(edges: .top)
+        // Edge to edge: on Apple TV the safe area is a margin of the screen's own, and the artwork stopped short of
+        // it.
+        #if os(iOS)
+            // `reach` does the top on iPhone and iPad; ignoring the top safe area as well drew the artwork above its
+            // neighbours, over the buttons that sit above the hero.
+            .ignoresSafeArea(edges: .horizontal)
+        #else
+            .ignoresSafeArea(edges: [.top, .horizontal])
+        #endif
+            .padding(.top, -reach)
     }
 }

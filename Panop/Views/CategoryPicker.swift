@@ -134,13 +134,13 @@ struct CategoryChips: View {
                             Button { sheet = .list } label: {
                                 Image(systemName: "list.bullet")
                             }
-                            .buttonStyle(.bordered)
+                            .buttonStyle(Self.edgeButtonStyle)
                             .accessibilityLabel("All categories")
                         }
                         Button { sheet = .editor } label: {
                             Image(systemName: "slider.horizontal.3")
                         }
-                        .buttonStyle(.bordered)
+                        .buttonStyle(Self.edgeButtonStyle)
                         .accessibilityLabel("Edit categories")
                     }
                     .padding(.trailing)
@@ -181,13 +181,29 @@ struct CategoryChips: View {
         let selected = group == value
         if selected {
             Button { group = value } label: { Text(title).lineLimit(1) }
+            #if os(tvOS) || os(iOS)
+                .buttonStyle(HeaderButtonStyle(isChosen: true))
+                .focusEffectDisabled()
+            #else
                 .buttonStyle(.borderedProminent)
+            #endif
                 .accessibilityAddTraits(.isSelected)
         } else {
             Button { group = value } label: { Text(title).lineLimit(1) }
+            #if os(tvOS) || os(iOS)
+                .buttonStyle(HeaderButtonStyle())
+                .focusEffectDisabled()
+            #else
                 .buttonStyle(.bordered)
+            #endif
         }
     }
+
+    #if os(tvOS) || os(iOS)
+        private static let edgeButtonStyle = HeaderButtonStyle()
+    #else
+        private static let edgeButtonStyle = BorderedButtonStyle()
+    #endif
 
     private static var spacing: CGFloat {
         #if os(tvOS)

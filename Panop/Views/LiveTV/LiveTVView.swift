@@ -117,45 +117,15 @@ struct LiveTVView: View {
                         await library.refresh(id)
                     }
                 }
-            }
+            },
+            header: { header }
         )
-        .safeAreaInset(edge: .top, spacing: 0) {
-            // Apple TV has no room above its list, so there the chips are the list's first row, and the source choice
-            // (when there are several) a row of its own: its toolbar is gone.
-            #if os(tvOS)
-                if hasSeveralSources {
-                    HStack {
-                        sourceMenu
-                        Spacer()
-                    }
-                    .padding(.horizontal)
-                }
-            #else
-                if mode == .all, !library.playlists.isEmpty {
-                    CategoryChips(kind: .live, source: selectedSource?.id, group: $group)
-                }
-            #endif
-        }
         .navigationTitle(selectedSource?.name ?? "Live TV")
         .withoutTVTitleBar()
         .modifier(ChannelSearch(text: $search))
-        #if !os(tvOS)
-            .toolbar {
-                if !library.playlists.isEmpty {
-                    ToolbarItem {
-                        Button("TV Guide", systemImage: "calendar") { showingGuide = true }
-                    }
-                    ToolbarItem { modeMenu }
-                    ToolbarItem { orderMenu }
-                }
-                if hasSeveralSources {
-                    ToolbarItem { sourceMenu }
-                }
-            }
-        #endif
-            // The category may not exist in the other source.
-            .onChange(of: storedSource) { group = nil }
-            .addPlaylistSheet(isPresented: $showingAdd)
+        // The category may not exist in the other source.
+        .onChange(of: storedSource) { group = nil }
+        .addPlaylistSheet(isPresented: $showingAdd)
         #if os(macOS)
             // Asked for from the stream playing behind the app: this screen opens its guide, whether it was already on
             // show or has only just been chosen.
@@ -176,17 +146,40 @@ struct LiveTVView: View {
             .modifier(PlayerPresentation(target: $playing))
     }
 
-    private var modeMenu: some View {
-        Menu {
+    /// The choices at the top of the list, as its first rows so they scroll away with it: what to show, then the
+    /// guide, the source and the sort, then the categories.
+    @ViewBuilder
+    private var header: some View {
+        if !library.playlists.isEmpty {
             Picker("Show", selection: $storedMode) {
                 ForEach(LiveListMode.allCases) { mode in
-                    Label(mode.title, systemImage: mode.symbol).tag(mode.rawValue)
+                    Text(mode.title).tag(mode.rawValue)
                 }
             }
-        } label: {
-            Label(mode.title, systemImage: mode.symbol)
+            .pickerStyle(.segmented)
+            .labelsHidden()
+            HStack(spacing: 16) {
+                Button("TV Guide", systemImage: "calendar") { showingGuide = true }
+                if hasSeveralSources {
+                    sourceMenu
+                }
+                orderMenu
+                Spacer()
+            }
+            // Several buttons in one list row: each answers on its own, not the row. A list's own button style makes
+            // the
+            // whole row one button, which on Apple TV left only the first reachable.
+            #if os(tvOS) || os(iOS)
+            .buttonStyle(HeaderButtonStyle())
+            .focusEffectDisabled()
+            #else
+            .buttonStyle(.borderless)
+            #endif
+            if mode == .all {
+                CategoryChips(kind: .live, source: selectedSource?.id, group: $group)
+                    .listRowInsets(EdgeInsets())
+            }
         }
-        .accessibilityLabel("Show")
     }
 
     private var orderMenu: some View {
@@ -250,7 +243,7 @@ enum LiveListNarrowing {
 
 /// The list itself. Its `@Query` is rebuilt whenever the descriptor changes, which
 /// is how the source, the search and the growing page reach the database.
-private struct LiveChannelList: View {
+private struct LiveChannelList<Header: View>: View {
     @Environment(UserStateStore.self) private var userState
     @Environment(\.modelContext) private var catalog
     @Environment(\.channelVariants) private var variantsStore
@@ -274,6 +267,7 @@ private struct LiveChannelList: View {
     let onAdd: () -> Void
     let onShowGuide: () -> Void
     let onRetry: ([String]) -> Void
+    let header: Header
 
     init(
         spec: ListSpec,
@@ -291,7 +285,8 @@ private struct LiveChannelList: View {
         onPlayTarget: @escaping (PlaybackTarget) -> Void,
         onAdd: @escaping () -> Void,
         onShowGuide: @escaping () -> Void,
-        onRetry: @escaping ([String]) -> Void
+        onRetry: @escaping ([String]) -> Void,
+        @ViewBuilder header: () -> Header
     ) {
         self.spec = spec
         _group = group
@@ -309,32 +304,12 @@ private struct LiveChannelList: View {
         self.onAdd = onAdd
         self.onShowGuide = onShowGuide
         self.onRetry = onRetry
+        self.header = header()
     }
 
     var body: some View {
         List {
-            #if os(tvOS)
-                // Apple TV shows no toolbar here, so the filter is the first row instead.
-                if emptyState != .noPlaylists {
-                    Button("TV Guide", systemImage: "calendar", action: onShowGuide)
-                    Picker("Show", selection: $modeRaw) {
-                        ForEach(LiveListMode.allCases) { mode in
-                            Text(mode.title).tag(mode.rawValue)
-                        }
-                    }
-                    .pickerStyle(.segmented)
-                    Picker("Sort", selection: $orderRaw) {
-                        ForEach(LiveOrder.forChannels) { order in
-                            Text(order.title).tag(order.rawValue)
-                        }
-                    }
-                    .pickerStyle(.segmented)
-                    if mode == .all {
-                        CategoryChips(kind: .live, source: sourceID, group: $group)
-                            .listRowInsets(EdgeInsets())
-                    }
-                }
-            #endif
+            header
             // Channels are showing, but a source behind them could not be updated: say so,
             // and offer the retry, rather than let the list look current.
             if !shown.isEmpty, !problems.isEmpty {
@@ -354,10 +329,14 @@ private struct LiveChannelList: View {
                 .onAppear {
                     model.rowAppeared(channel)
                     if groupsByGuide {
-                        variantsStore.request(playlist: channel.playlist, epgKey: channel.epgKey, in: catalog.container)
+                        variantsStore.request(
+                            playlist: channel.playlist,
+                            groupKey: channel.groupKey,
+                            in: catalog.container
+                        )
                     }
                 }
-                .onDisappear { variantsStore.withdraw(playlist: channel.playlist, epgKey: channel.epgKey) }
+                .onDisappear { variantsStore.withdraw(playlist: channel.playlist, groupKey: channel.groupKey) }
                 // Touch and hold (or the remote's long press) on every platform; a swipe too
                 // where there is one.
                 .contextMenu {
@@ -375,6 +354,11 @@ private struct LiveChannelList: View {
                     .foregroundStyle(.secondary)
             }
         }
+        #if os(iOS)
+        // Rows straight on the page, as on the Mac and Apple TV, not in a lighter rounded card. Before the backdrop,
+        // which hides the list's own background for the style it is given.
+        .listStyle(.plain)
+        #endif
         .pageBackdrop()
         .overlay {
             // Not while the first page is still being read: an empty list is not a list with
@@ -420,7 +404,9 @@ private struct LiveChannelList: View {
     }
 
     private func row(_ channel: CatalogRow, isFavorite: Bool) -> some View {
-        LabeledContent {
+        // The version that would play, so the name is the one chosen when a channel has several.
+        let name = versionToPlay(channel).name
+        return LabeledContent {
             VStack(alignment: .trailing, spacing: 2) {
                 if let group = channel.groupName {
                     Text(group)
@@ -434,7 +420,7 @@ private struct LiveChannelList: View {
             HStack(spacing: 12) {
                 ChannelLogo(address: channel.iconURL)
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(channel.name)
+                    Text(name)
                     NowOnAirLine(channel: channel)
                 }
                 if isFavorite {
@@ -526,7 +512,8 @@ extension PlaybackTarget {
             streamURL: row.streamURL,
             remoteID: row.remoteID,
             containerExtension: row.containerExtension,
-            epgKey: row.epgKey
+            epgKey: row.epgKey,
+            groupKey: row.groupKey
         )
     }
 
@@ -540,7 +527,8 @@ extension PlaybackTarget {
             streamURL: entry.streamURL,
             remoteID: entry.remoteID,
             containerExtension: entry.containerExtension,
-            epgKey: entry.epgKey
+            epgKey: entry.epgKey,
+            groupKey: entry.groupKey
         )
     }
 }

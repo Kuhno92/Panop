@@ -10,6 +10,9 @@ struct AboutView: View {
         return build.map { "\(short) (\($0))" } ?? short
     }
 
+    /// Where the source is, as the licence asks.
+    static let sourceCode = URL(string: "https://github.com/Kuhno92/Panop")
+
     var body: some View {
         Form {
             Section {
@@ -35,13 +38,23 @@ struct AboutView: View {
                 Text("Their names belong to their authors. Panop is not affiliated with or endorsed by any of them.")
             }
             Section {
+                if let source = Self.sourceCode {
+                    Link(destination: source) {
+                        Label("Source code on GitHub", systemImage: "chevron.left.forwardslash.chevron.right")
+                    }
+                }
+            } footer: {
+                Text("Panop ships no content. It only plays the sources you add yourself.")
+            }
+            Section {
                 Text("Movie, TV and anime data from Simkl")
             } header: {
                 Text("Data")
             } footer: {
-                Text(
-                    "Panop is free software under the MIT licence. The parts it is built from are listed in THIRD-PARTY-NOTICES.md."
-                )
+                Text("""
+                Panop is free software under the GNU General Public Licence, version 3. \
+                The parts it is built from are listed in THIRD-PARTY-NOTICES.md.
+                """)
             }
         }
         .formStyle(.grouped)

@@ -19,6 +19,11 @@ class PanopUITestCase: XCTestCase {
         false
     }
 
+    /// Gives the hero a bright picture, to see how controls look over real artwork.
+    var showsBrightArtwork: Bool {
+        false
+    }
+
     var startTab: String {
         "live"
     }
@@ -55,6 +60,9 @@ class PanopUITestCase: XCTestCase {
         app.launchEnvironment["PANOP_START_TAB"] = startTab
         if showsHero {
             app.launchEnvironment["PANOP_HERO"] = "1"
+            if showsBrightArtwork {
+                app.launchEnvironment["PANOP_HERO_ART"] = "1"
+            }
         }
         if liveOnly {
             app.launchEnvironment["PANOP_LIVE_ONLY"] = "1"

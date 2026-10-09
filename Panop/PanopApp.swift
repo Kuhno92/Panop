@@ -95,6 +95,11 @@ struct PanopApp: App {
             #if os(macOS) || os(tvOS)
                 .environment(embeddedPlayback)
             #endif
+            #if os(iOS)
+            // Dark like Apple TV and the Mac, where the page is a dark gradient and the posters and logos stand out
+            // on it; on a light page the lists were glaring.
+            .preferredColorScheme(.dark)
+            #endif
         }
         .modelContainer(catalogContainer)
 

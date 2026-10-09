@@ -234,6 +234,7 @@ struct RootView: View {
         #endif
             // Playlists the user added keep themselves current without being asked.
             // The work runs on the sync service's actor, not here.
+            .modifier(FirstLaunchNotice())
             .task { await library.refreshStale(maxAge: 12 * 3600) }
             // A catalog imported before channels were marked as the first of their guide gets its marks once.
             .task(id: library.playlists.map(\.id)) {

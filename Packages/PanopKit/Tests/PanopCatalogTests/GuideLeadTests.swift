@@ -83,3 +83,23 @@ struct GuideLeadTests {
         #expect(found["Two"]?.guide == true)
     }
 }
+
+@Suite("Guide grouping key")
+struct GuideGroupingTests {
+    @Test func `a shared guide key is the key`() {
+        #expect(GuideGrouping.key(epgKey: "daserste.de", name: "Das Erste HD") == "epg:daserste.de")
+    }
+
+    @Test func `a number of the panel's own groups by name, without the quality words`() {
+        let hdKey = GuideGrouping.key(epgKey: "6567", name: "DE - DAS ERSTE HD")
+        let uhdKey = GuideGrouping.key(epgKey: "6568", name: "DE - DAS ERSTE UHD")
+        #expect(hdKey == uhdKey)
+        #expect(hdKey == "name:de - das erste")
+        #expect(hdKey != GuideGrouping.key(epgKey: "1", name: "AT - DAS ERSTE HD"))
+        #expect(GuideGrouping.key(epgKey: "1", name: "ZDF") != GuideGrouping.key(epgKey: "2", name: "ZDF neo"))
+    }
+
+    @Test func `a divider has nothing to group by`() {
+        #expect(GuideGrouping.key(epgKey: "", name: "#####") == nil)
+    }
+}

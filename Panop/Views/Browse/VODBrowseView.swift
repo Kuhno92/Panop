@@ -108,7 +108,8 @@ struct VODBrowseView: View {
             nextEpisodes: discovery.nextEpisodes,
             onSelect: select,
             backdrop: { discovery.backdrop(for: $0) },
-            onAdd: { showingAdd = true }
+            onAdd: { showingAdd = true },
+            header: { header }
         )
         .background { PageBackground() }
         .navigationTitle(title)
@@ -117,36 +118,6 @@ struct VODBrowseView: View {
             text: $search,
             tab: kind == .movie ? .movies : .series
         ))
-        .safeAreaInset(edge: .top, spacing: 0) {
-            if !library.playlists.isEmpty {
-                VStack(spacing: 0) {
-                    #if os(tvOS)
-                        // Apple TV has no toolbar, so the choices are a row above the chips.
-                        HStack(spacing: 24) {
-                            sortMenu
-                            if sources.count > 1 {
-                                sourceMenu
-                            }
-                            suggestionsToggle
-                            Spacer()
-                        }
-                        .padding(.horizontal)
-                    #endif
-                    CategoryChips(kind: kind, source: selectedSource?.id, group: $group)
-                }
-            }
-        }
-        .toolbar {
-            #if !os(tvOS)
-                if !library.playlists.isEmpty {
-                    ToolbarItem { suggestionsToggle }
-                    ToolbarItem { sortMenu }
-                    if sources.count > 1 {
-                        ToolbarItem { sourceMenu }
-                    }
-                }
-            #endif
-        }
         .task(id: CategoryLoad(source: selectedSource?.id, syncing: status.isAnySyncing)) {
             providerCategories = await CatalogReader(container: catalog.container)
                 .categoryNames(kind: kind, source: selectedSource?.id)
@@ -161,15 +132,60 @@ struct VODBrowseView: View {
         .modifier(PlayerPresentation(target: $playing))
     }
 
-    /// Shows or hides the carousel and the rails above the list.
-    private var suggestionsToggle: some View {
-        Toggle(isOn: showsSuggestions) {
-            Label("Suggestions", systemImage: "sparkles")
+    /// The choices above the list, which scroll away with it: suggestions, sort and source, then the categories.
+    @ViewBuilder
+    private var header: some View {
+        if !library.playlists.isEmpty {
+            VStack(alignment: .leading, spacing: 0) {
+                HStack(spacing: 10) {
+                    suggestionsToggle
+                    sortMenu
+                    if sources.count > 1 {
+                        sourceMenu
+                    }
+                    Spacer()
+                }
+                #if os(tvOS) || os(iOS)
+                // Light pills, so the three read as buttons and not as dark bars the width of the row.
+                .buttonStyle(HeaderButtonStyle())
+                .focusEffectDisabled()
+                #endif
+                .padding(.horizontal)
+                CategoryChips(kind: kind, source: selectedSource?.id, group: $group)
+            }
         }
-        #if !os(tvOS)
-        .toggleStyle(.button)
+    }
+
+    /// Shows or hides the carousel and the rails above the list.
+    @ViewBuilder
+    private var suggestionsToggle: some View {
+        #if os(tvOS)
+            // A toggle stretches over the whole row on Apple TV and hides the buttons beside it: a button, like them.
+            Button {
+                showsSuggestions.wrappedValue.toggle()
+            } label: {
+                Label(
+                    showsSuggestions.wrappedValue ? "Suggestions: On" : "Suggestions: Off",
+                    systemImage: "sparkles"
+                )
+            }
+        #elseif os(iOS)
+            // A button like the others beside it, lighter while on; it reads as a switch to VoiceOver and to tests.
+            Button {
+                showsSuggestions.wrappedValue.toggle()
+            } label: {
+                Label("Suggestions", systemImage: "sparkles")
+            }
+            .buttonStyle(HeaderButtonStyle(isChosen: showsSuggestions.wrappedValue))
+            .accessibilityValue(Text(verbatim: showsSuggestions.wrappedValue ? "1" : "0"))
+            .accessibilityAddTraits(.isToggle)
+        #else
+            Toggle(isOn: showsSuggestions) {
+                Label("Suggestions", systemImage: "sparkles")
+            }
+            .toggleStyle(.button)
+            .help("Show or hide the suggestions above the list")
         #endif
-        .help("Show or hide the suggestions above the list")
     }
 
     private var sortMenu: some View {
@@ -265,9 +281,13 @@ struct SeriesReference: Hashable, Identifiable {
 
 /// The grid itself: one section per category under its heading, fed in pages by a background read
 /// (see `CategorySectionsModel`).
-private struct VODGrid: View {
+private struct VODGrid<Header: View>: View {
     @Environment(\.modelContext) private var catalog
     @State private var model = CategorySectionsModel()
+    /// What the hero's artwork reaches up through to the top of the screen: the navigation bar (iPhone and iPad; inside
+    /// a
+    /// scroll view `ignoresSafeArea` does not do it).
+    @State private var barHeight: CGFloat = 0
     /// Nil while what to show is not yet known.
     let plan: CategorySectionsModel.Plan?
 
@@ -283,6 +303,7 @@ private struct VODGrid: View {
     /// Wide artwork for a title, if any is known.
     let backdrop: (CatalogRow) -> String?
     let onAdd: () -> Void
+    let header: Header
 
     init(
         plan: CategorySectionsModel.Plan?,
@@ -296,7 +317,8 @@ private struct VODGrid: View {
         nextEpisodes: [String: SimklNextEpisode],
         onSelect: @escaping (CatalogRow) -> Void,
         backdrop: @escaping (CatalogRow) -> String?,
-        onAdd: @escaping () -> Void
+        onAdd: @escaping () -> Void,
+        @ViewBuilder header: () -> Header
     ) {
         self.plan = plan
         self.kind = kind
@@ -310,16 +332,24 @@ private struct VODGrid: View {
         self.onSelect = onSelect
         self.backdrop = backdrop
         self.onAdd = onAdd
+        self.header = header()
     }
 
     var body: some View {
         ScrollView {
             LazyVStack(alignment: .leading, spacing: Self.spacing, pinnedViews: Self.pinnedHeadings) {
-                HeroCarousel(
-                    rows: HeroSelection.rows(rails: rails, rows: railRows, backdrop: backdrop),
-                    backdrop: backdrop,
-                    onInfo: onSelect
-                )
+                // The choices go inside the carousel when there is one, so its artwork, which reaches up behind them,
+                // is drawn under them.
+                if heroRows.isEmpty {
+                    header
+                } else {
+                    HeroCarousel(
+                        rows: heroRows,
+                        backdrop: backdrop,
+                        onInfo: onSelect,
+                        above: AnyView(header)
+                    )
+                }
                 ForEach(rails) { rail in
                     PosterRail(
                         rail: rail,
@@ -351,6 +381,10 @@ private struct VODGrid: View {
             }
             .padding(.vertical)
         }
+        #if os(iOS)
+        .onGeometryChange(for: CGFloat.self) { $0.safeAreaInsets.top } action: { barHeight = $0 }
+        .environment(\.heroReach, barHeight + 56)
+        #endif
         .overlay {
             if plan != nil, model.sections.isEmpty, model.phase == .loaded {
                 emptyContent
@@ -361,6 +395,12 @@ private struct VODGrid: View {
                 model.show(plan, in: catalog.container)
             }
         }
+    }
+
+    /// The carousel's titles: from the rails, or, in a UI test about the hero, the ones it seeded (films only).
+    private var heroRows: [CatalogRow] {
+        let seeded = kind == .movie ? UITestMode.heroTitles : []
+        return seeded.isEmpty ? HeroSelection.rows(rails: rails, rows: railRows, backdrop: backdrop) : seeded
     }
 
     /// The category being browsed. Left out when the list is a single run with no category at all,
@@ -445,6 +485,14 @@ private struct VODCard: View {
         item.id
     }
 
+    private static var namePadding: CGFloat {
+        #if os(tvOS)
+            14
+        #else
+            0
+        #endif
+    }
+
     var body: some View {
         let isFavorite = userState.isFavorite(key)
         let fraction = userState.progress[key]?.fraction
@@ -468,6 +516,20 @@ private struct VODCard: View {
                                 .accessibilityLabel("Favourite")
                         }
                     }
+                    .overlay(alignment: .bottomLeading) {
+                        if let rating = item.rating, rating > 0 {
+                            Label(rating.formatted(.number.precision(.fractionLength(1))), systemImage: "star.fill")
+                                .font(.caption.weight(.semibold))
+                                .foregroundStyle(.white)
+                                .padding(.horizontal, 7)
+                                .padding(.vertical, 3)
+                                .background(.black.opacity(0.65), in: Capsule())
+                                // Above the progress bar when there is one.
+                                .padding(.leading, 6)
+                                .padding(.bottom, fraction == nil ? 6 : 22)
+                                .accessibilityLabel("Rated \(rating.formatted(.number.precision(.fractionLength(1))))")
+                        }
+                    }
                     .overlay(alignment: .topLeading) {
                         if isWatched {
                             Image(systemName: "checkmark.circle.fill")
@@ -480,6 +542,10 @@ private struct VODCard: View {
                     .font(.callout)
                     .lineLimit(2)
                     .multilineTextAlignment(.leading)
+                    // Room round the name, so it does not sit on the card's edge (the card style on Apple TV
+                    // draws one round the poster and the name).
+                    .padding(.horizontal, Self.namePadding)
+                    .padding(.bottom, Self.namePadding)
             }
             .contentShape(Rectangle())
         }

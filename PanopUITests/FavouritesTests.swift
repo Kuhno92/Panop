@@ -51,7 +51,6 @@ final class FavouritesTests: PanopUITestCase {
             addButton.tap()
             XCTAssertTrue(app.images["Favourite"].waitForExistence(timeout: 10), "no star appeared on the channel")
 
-            app.buttons["Show"].tap()
             app.buttons["Favourites"].tap()
 
             XCTAssertTrue(channel("3sat").waitForExistence(timeout: 10))
@@ -63,7 +62,6 @@ final class FavouritesTests: PanopUITestCase {
 
         func testAnEmptyFavouritesListSaysHowToAddOne() {
             waitForChannels()
-            app.buttons["Show"].tap()
             app.buttons["Favourites"].tap()
 
             XCTAssertTrue(app.staticTexts["No favourites yet"].waitForExistence(timeout: 10))

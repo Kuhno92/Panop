@@ -64,7 +64,7 @@ struct PlayerScreen: View {
         // The other versions of this channel, when the list groups them: read once, then the picker has them.
         .task(id: playing.id) {
             if groupsByGuide, playing.kind == .live {
-                variantsStore.request(playlist: playing.playlist, epgKey: playing.epgKey, in: catalog.container)
+                variantsStore.request(playlist: playing.playlist, groupKey: playing.groupKey, in: catalog.container)
             }
         }
         .modifier(PlayerGuidePresentation(isPresented: $showingGuide) { switchTo($0) })
@@ -74,7 +74,7 @@ struct PlayerScreen: View {
     /// guide.
     private var versionRows: [CatalogRow] {
         guard groupsByGuide, playing.kind == .live, playing.catchup == nil else { return [] }
-        let all = variantsStore.variants(playlist: playing.playlist, epgKey: playing.epgKey) ?? []
+        let all = variantsStore.variants(playlist: playing.playlist, groupKey: playing.groupKey) ?? []
         return all.filter { $0.entryID == playing.entryID || !userState.hidden.contains($0.id) }
     }
 

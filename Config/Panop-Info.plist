@@ -22,6 +22,10 @@
 	<!-- Providers and playlists are often on the home network (an address like 192.168.x.x). Since iOS and tvOS 14 an app
 	     may only talk to such a device after the person has allowed it, and the system asks only for an app that says
 	     why. Without this the request fails at once, which the app reports as "could not reach the provider". -->
+	<!-- Panop uses only the encryption the system provides (HTTPS to a provider, Keychain, CloudKit), which is exempt. Said
+	     here so that an upload to App Store Connect does not stop to ask. -->
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>NSLocalNetworkUsageDescription</key>
 	<string>Panop connects to your IPTV provider or playlist when it is on your home network.</string>
 	<key>UIBackgroundModes</key>

@@ -1,4 +1,5 @@
 import Foundation
+import PanopCatalog
 import PanopCore
 import SwiftData
 
@@ -11,7 +12,9 @@ import SwiftData
 /// import does, from what is already stored: the first channel of each guide key in the provider's order, overall and
 /// within its category. Once, in the background, a page of channels at a time.
 nonisolated enum GuideLeadBackfill {
-    static let doneKey = "guideLeadsMarked"
+    // v2: channels are grouped by name where a panel gives each stream a guide key of its own, so a catalog marked by the
+    // first version is marked again.
+    static let doneKey = "guideLeadsMarked.v2"
     /// Channels read and written at a time, so memory stays flat on an 80,000-channel playlist.
     static let pageSize = 2000
 
@@ -29,7 +32,7 @@ nonisolated enum GuideLeadBackfill {
         }
     }
 
-    /// One playlist's live channels with a guide key, in the provider's order. Returns how many were changed.
+    /// One playlist's live channels, in the provider's order. Returns how many were changed.
     @discardableResult
     static func mark(playlist: String, in container: ModelContainer) async -> Int {
         await Task.detached(priority: .utility) {
@@ -43,7 +46,7 @@ nonisolated enum GuideLeadBackfill {
                 let context = ModelContext(container)
                 context.autosaveEnabled = false
                 var descriptor = FetchDescriptor<CatalogEntryRecord>(
-                    predicate: #Predicate { $0.playlist == playlist && $0.kindRaw == live && $0.epgKey != nil },
+                    predicate: #Predicate { $0.playlist == playlist && $0.kindRaw == live },
                     sortBy: [
                         SortDescriptor(\CatalogEntryRecord.sortNumber),
                         SortDescriptor(\CatalogEntryRecord.nameKey, comparator: .lexical),
@@ -54,7 +57,22 @@ nonisolated enum GuideLeadBackfill {
                 descriptor.fetchOffset = offset
                 guard let page = try? context.fetch(descriptor), !page.isEmpty else { break }
                 for record in page {
-                    guard let key = record.epgKey, !key.isEmpty else { continue }
+                    guard let key = GuideGrouping.key(epgKey: record.epgKey, name: record.name) else {
+                        if record.groupKey != nil {
+                            record.groupKey = nil
+                            changed += 1
+                        }
+                        if !record.isGuideLead || !record.isCategoryLead {
+                            record.isGuideLead = true
+                            record.isCategoryLead = true
+                            changed += 1
+                        }
+                        continue
+                    }
+                    if record.groupKey != key {
+                        record.groupKey = key
+                        changed += 1
+                    }
                     let guide = guideKeys.insert(key).inserted
                     let category = categoryKeys.insert("\(record.groupName ?? "")\u{1F}\(key)").inserted
                     if record.isGuideLead != guide {

@@ -39,6 +39,8 @@ enum UITestMode {
         static let opensPlayerWindow = isActive && ProcessInfo.processInfo.arguments
             .contains("-panop-open-player-window")
 
+        static let brightArtwork = "uitest://bright"
+
         /// Titles for Home's hero, from the environment `PANOP_HERO`: the seeded library has no suggestion rails
         /// (they need ratings, years and a trending list), so a test that is about the hero gives it some.
         static var heroTitles: [CatalogRow] {
@@ -48,6 +50,9 @@ enum UITestMode {
                     id: "hero\(index)",
                     kind: .movie,
                     name: film.0,
+                    // A bright picture drawn by `BackdropView`, to see what text and buttons look like over real
+                    // artwork.
+                    iconURL: ProcessInfo.processInfo.environment["PANOP_HERO_ART"] == "1" ? brightArtwork : nil,
                     streamURL: "http://127.0.0.1:9/movie/u/p/\(index).mp4",
                     rating: film.2,
                     year: film.1,

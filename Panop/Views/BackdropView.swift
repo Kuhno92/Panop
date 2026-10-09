@@ -29,8 +29,28 @@ struct BackdropView: View {
         .task(id: address) { await load() }
     }
 
+    #if DEBUG
+        /// A bright, busy picture for the UI test that checks controls over artwork (`PANOP_HERO_ART`).
+        private static func testPicture(scale: CGFloat) -> CGImage? {
+            let size = CGSize(width: 512, height: 288)
+            let renderer = ImageRenderer(content: LinearGradient(
+                colors: [.white, .yellow, .orange, .white],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            ).frame(width: size.width, height: size.height))
+            renderer.scale = scale
+            return renderer.cgImage
+        }
+    #endif
+
     private func load() async {
         image = nil
+        #if DEBUG
+            if address == UITestMode.brightArtwork {
+                image = Self.testPicture(scale: 1)
+                return
+            }
+        #endif
         guard let address, let url = URL(string: address), url.scheme?.hasPrefix("http") == true else { return }
         // One size for every backdrop, so each is decoded once however it is shown.
         let loaded = await pipeline.image(for: url, maxPixel: Self.pixels)

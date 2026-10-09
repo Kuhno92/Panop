@@ -77,7 +77,10 @@ final class MoviesTests: PanopUITestCase {
         }
 
         func testOpeningAFilmShowsItsPage() {
-            XCTAssertTrue(poster("Dune").waitForExistence(timeout: 30))
+            // Dune is in the second category: below the first screen now that the choices scroll with the page.
+            XCTAssertTrue(poster("Alien").waitForExistence(timeout: 30))
+            scrollTo(poster("Dune"))
+            XCTAssertTrue(poster("Dune").waitForExistence(timeout: 10))
             poster("Dune").tap()
 
             XCTAssertTrue(app.buttons["Play"].waitForExistence(timeout: 10), "no Play button on the film's page")

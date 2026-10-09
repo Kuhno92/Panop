@@ -24,6 +24,7 @@ struct HomeView: View {
     @State private var showingSettings = false
     @Environment(\.horizontalSizeClass) private var sizeClass
     @State private var playing: PlaybackTarget?
+    @State private var heroReach: CGFloat = 0
     @State private var openMovie: MovieReference?
     @State private var openSeries: SeriesReference?
 
@@ -130,6 +131,11 @@ struct HomeView: View {
             }
             .padding(.vertical)
         }
+        #if os(iOS)
+        .onGeometryChange(for: CGFloat.self) { $0.safeAreaInsets.top } action: { heroReach = $0 }
+        // Plus the column's own padding above the hero, and then some: what lies past the screen's edge is not drawn.
+        .environment(\.heroReach, heroReach + 24)
+        #endif
     }
 
     /// The titles Home leads with, one from each of the first suggestion rows. Chosen from what the rails already

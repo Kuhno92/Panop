@@ -57,6 +57,9 @@ public struct CatalogEntry: Sendable, Equatable, Hashable {
     /// The same within its category: the first channel of that category with its guide key. A category's list shows
     /// these, so a variant that lives in another category is not missing from this one.
     public var isCategoryLead: Bool
+    /// What makes channels versions of one another: see ``GuideGrouping``. Nil for anything but a live channel with
+    /// something to group by. Set by the import.
+    public var groupKey: String?
 
     public init(
         id: String,
@@ -85,7 +88,8 @@ public struct CatalogEntry: Sendable, Equatable, Hashable {
         genre: String? = nil,
         cast: String? = nil,
         isGuideLead: Bool = true,
-        isCategoryLead: Bool = true
+        isCategoryLead: Bool = true,
+        groupKey: String? = nil
     ) {
         self.id = id
         self.kind = kind
@@ -114,6 +118,7 @@ public struct CatalogEntry: Sendable, Equatable, Hashable {
         self.cast = cast
         self.isGuideLead = isGuideLead
         self.isCategoryLead = isCategoryLead
+        self.groupKey = groupKey
     }
 }
 
@@ -197,5 +202,34 @@ public struct SyncState: Sendable, Equatable {
 public enum EPGKey {
     public static func normalize(_ raw: String) -> String {
         raw.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+    }
+}
+
+/// Which live channels are versions of one channel (the HD, UHD and SD of Das Erste), so a list can show them once.
+///
+/// A guide key that more than one channel shares says so best. But a panel often gives every stream an id of its own
+/// as its guide key (a plain number, the stream's), which groups nothing; there the name does it, with the quality
+/// words taken off. The prefix is kept, so `DE - ZDF` and `AT - ZDF` stay two.
+public enum GuideGrouping {
+    /// Words that name a version of a channel, not the channel.
+    private static let qualityWords: Set<String> = [
+        "hd", "uhd", "fhd", "sd", "4k", "8k", "hevc", "h265", "h.265", "raw", "hq", "lq", "fullhd", "1080p", "720p",
+        "50fps", "60fps", "ᴴᴰ", "ᵁᴴᴰ", "ᶠᴴᴰ", "ˢᴰ", "ᴿᴬᵂ", "ᴴᴱᵛᶜ"
+    ]
+
+    public static func key(epgKey: String?, name: String) -> String? {
+        if let epgKey, !epgKey.isEmpty, !epgKey.allSatisfy(\.isNumber) {
+            return "epg:" + epgKey
+        }
+        let words = name.lowercased()
+            .replacingOccurrences(of: "[", with: " ").replacingOccurrences(of: "]", with: " ")
+            .replacingOccurrences(of: "(", with: " ").replacingOccurrences(of: ")", with: " ")
+            .split(whereSeparator: \.isWhitespace)
+            .map(String.init)
+            .filter { !qualityWords.contains($0) }
+        let joined = words.joined(separator: " ")
+        // A name that was only quality words, or a divider, has nothing to group by.
+        guard joined.contains(where: \.isLetter) else { return nil }
+        return "name:" + joined
     }
 }

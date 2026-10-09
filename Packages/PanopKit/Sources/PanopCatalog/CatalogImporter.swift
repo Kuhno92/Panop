@@ -342,7 +342,8 @@ struct KindTracker {
 
     mutating func add(_ entry: CatalogEntry) {
         var entry = entry
-        if kind == .live, let key = entry.epgKey, !key.isEmpty {
+        if kind == .live, let key = GuideGrouping.key(epgKey: entry.epgKey, name: entry.name) {
+            entry.groupKey = key
             entry.isGuideLead = guideKeys.insert(key).inserted
             // The unit separator cannot be in either, so two pairs never join into one.
             entry.isCategoryLead = categoryGuideKeys.insert("\(entry.groupName ?? "")\u{1F}\(key)").inserted

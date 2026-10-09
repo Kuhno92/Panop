@@ -37,15 +37,16 @@ final class ChannelVariantsStore {
     /// The channels that share this one's guide key, in the provider's order, this one among them; nil until read, and
     /// for
     /// a channel with no guide key. Reads memory only.
-    func variants(playlist: String, epgKey: String?) -> [CatalogRow]? {
-        guard let epgKey, !epgKey.isEmpty else { return nil }
-        return entries[Self.id(playlist, epgKey)]
+    func variants(playlist: String, groupKey: String?) -> [CatalogRow]? {
+        guard let groupKey, !groupKey.isEmpty else { return nil }
+        return entries[Self.id(playlist, groupKey)]
     }
 
     /// Asks for a channel's versions. Cheap, and folded with the others asked for at about the same moment.
-    func request(playlist: String, epgKey: String?, in container: ModelContainer) {
-        guard let epgKey, !epgKey.isEmpty, entries[Self.id(playlist, epgKey)] == nil else { return }
-        let key = GuideKey(playlist: playlist, epgKey: epgKey)
+    func request(playlist: String, groupKey: String?, in container: ModelContainer) {
+        guard let groupKey, !groupKey.isEmpty, entries[Self.id(playlist, groupKey)] == nil else { return }
+        // `GuideKey`'s second part is the group key here.
+        let key = GuideKey(playlist: playlist, epgKey: groupKey)
         guard !inFlight.contains(key) else { return }
         wanted.insert(key)
         if reader == nil {
@@ -69,15 +70,15 @@ final class ChannelVariantsStore {
             inFlight.subtract(keys)
             batch = nil
             if let any = wanted.first {
-                request(playlist: any.playlist, epgKey: any.epgKey, in: container)
+                request(playlist: any.playlist, groupKey: any.epgKey, in: container)
             }
         }
     }
 
     /// A row that scrolled away before its answer was wanted: it need not be read.
-    func withdraw(playlist: String, epgKey: String?) {
-        guard let epgKey else { return }
-        wanted.remove(GuideKey(playlist: playlist, epgKey: epgKey))
+    func withdraw(playlist: String, groupKey: String?) {
+        guard let groupKey else { return }
+        wanted.remove(GuideKey(playlist: playlist, epgKey: groupKey))
     }
 
     /// Forgets everything, for when the catalog has been replaced by an import.
@@ -109,9 +110,9 @@ private actor VariantsReader {
         var found: [GuideKey: [CatalogRow]] = [:]
         for key in keys {
             let playlist = key.playlist
-            let epgKey = key.epgKey
+            let groupKey: String? = key.epgKey
             var descriptor = FetchDescriptor<CatalogEntryRecord>(
-                predicate: #Predicate { $0.playlist == playlist && $0.kindRaw == live && $0.epgKey == epgKey },
+                predicate: #Predicate { $0.playlist == playlist && $0.kindRaw == live && $0.groupKey == groupKey },
                 sortBy: [
                     SortDescriptor(\CatalogEntryRecord.sortNumber),
                     SortDescriptor(\CatalogEntryRecord.nameKey, comparator: .lexical),

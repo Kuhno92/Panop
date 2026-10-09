@@ -7,14 +7,14 @@ enum ChannelVersions {
     /// The channels that share this one's guide key, in the provider's order, without any the person has hidden. Empty
     /// until they are read, and for a channel with no guide key.
     static func usable(_ channel: CatalogRow, store: ChannelVariantsStore, userState: UserStateStore) -> [CatalogRow] {
-        guard let all = store.variants(playlist: channel.playlist, epgKey: channel.epgKey) else { return [] }
+        guard let all = store.variants(playlist: channel.playlist, groupKey: channel.groupKey) else { return [] }
         return all.filter { $0.entryID == channel.entryID || !userState.hidden.contains($0.id) }
     }
 
     /// The version to play when the channel is chosen: the one the person picked last time, else the channel itself.
     static func chosen(for channel: CatalogRow, among versions: [CatalogRow], userState: UserStateStore) -> CatalogRow {
-        guard versions.count > 1, let epgKey = channel.epgKey,
-              let id = userState.preferredVariant(playlist: channel.playlist, epgKey: epgKey),
+        guard versions.count > 1, let groupKey = channel.groupKey,
+              let id = userState.preferredVariant(playlist: channel.playlist, epgKey: groupKey),
               let match = versions.first(where: { $0.entryID == id })
         else { return channel }
         return match
@@ -22,8 +22,8 @@ enum ChannelVersions {
 
     /// Remembers the person's pick for next time.
     static func remember(_ version: CatalogRow, userState: UserStateStore) {
-        guard let epgKey = version.epgKey, !epgKey.isEmpty else { return }
-        userState.setPreferredVariant(version.entryID, playlist: version.playlist, epgKey: epgKey)
+        guard let groupKey = version.groupKey, !groupKey.isEmpty else { return }
+        userState.setPreferredVariant(version.entryID, playlist: version.playlist, epgKey: groupKey)
     }
 }
 
