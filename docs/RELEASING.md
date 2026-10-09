@@ -25,3 +25,22 @@ A release gets a tag with its version, `v0.1.0`, on the commit its first build w
 `MARKETING_VERSION` in the project; the build number is `CURRENT_PROJECT_VERSION`.
 
 The source is at https://github.com/Kuhno92/Panop (linked from About), as the GPL-3.0 licence asks.
+
+## From GitHub
+
+Pushing a tag named for a version starts `.github/workflows/release.yml`: it runs the tests (`ci.yml`), then archives and
+uploads iOS, tvOS and macOS to App Store Connect, each as its own job. The tag must match `MARKETING_VERSION`.
+
+```bash
+git tag -a v0.1.1 -m "Panop 0.1.1" && git push origin v0.1.1
+```
+
+The build number is the workflow's run number (`Scripts/bump-build.sh`), so it only goes up; after a release made from
+GitHub, a build made by hand must use a higher number than the last run's.
+
+It needs three repository secrets, made once, from an App Store Connect API key (Users and Access, Integrations, App Store
+Connect API; the App Manager role) under the personal team: `ASC_KEY_ID`, `ASC_ISSUER_ID` and `ASC_KEY_P8` (the `.p8` file
+as base64: `base64 -i AuthKey_XXXX.p8 | pbcopy`). Xcode signs with the key (cloud signing), so no certificate is stored.
+
+The tests are not run on every commit, only for a release or by hand (Actions, CI, Run workflow). This repository is public,
+so the minutes are free either way (private repositories get a few thousand a month, and macOS minutes count ten times).

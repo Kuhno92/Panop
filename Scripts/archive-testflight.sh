@@ -8,6 +8,9 @@
 # Signed under the personal team (4HUJUM5AUG, see Config/ExportOptions.plist), by Xcode's automatic signing:
 # -allowProvisioningUpdates lets it make the distribution certificate and profiles itself, so the Xcode account for
 # that team must be signed in. The build number must be higher than the last upload: Scripts/bump-build.sh.
+#
+# Without an Xcode account (a CI runner), give an App Store Connect API key instead, and Xcode signs from that:
+#   PANOP_ASC_KEY_PATH=/path/AuthKey_XXXX.p8 PANOP_ASC_KEY_ID=XXXX PANOP_ASC_ISSUER_ID=uuid Scripts/archive-testflight.sh ...
 
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -28,6 +31,14 @@ for arg in "$@"; do
         *) echo "usage: $0 [ios|tvos|macos|all] [--upload]" >&2; exit 1 ;;
     esac
 done
+
+# An API key in place of a signed-in Xcode account.
+auth=()
+if [[ -n "${PANOP_ASC_KEY_PATH:-}" ]]; then
+    auth=(-authenticationKeyPath "$PANOP_ASC_KEY_PATH"
+        -authenticationKeyID "${PANOP_ASC_KEY_ID:?PANOP_ASC_KEY_ID is needed with PANOP_ASC_KEY_PATH}"
+        -authenticationKeyIssuerID "${PANOP_ASC_ISSUER_ID:?PANOP_ASC_ISSUER_ID is needed with PANOP_ASC_KEY_PATH}")
+fi
 
 log() { printf '\033[1;34m==>\033[0m %s\n' "$1"; }
 mkdir -p "$OUT"
@@ -54,6 +65,7 @@ for label in "${platforms[@]}"; do
         -derivedDataPath "$DD_BASE-$label" \
         -clonedSourcePackagesDirPath "$SHARED_SPM" \
         -allowProvisioningUpdates \
+        ${auth[@]+"${auth[@]}"} \
         DEVELOPMENT_TEAM="$TEAM" \
         ${extra[@]+"${extra[@]}"} \
         -quiet
@@ -65,6 +77,7 @@ for label in "${platforms[@]}"; do
             -archivePath "$archive" \
             -exportOptionsPlist Config/ExportOptions.plist \
             -exportPath "$OUT/export-$label" \
+            ${auth[@]+"${auth[@]}"} \
             -allowProvisioningUpdates
     fi
 done

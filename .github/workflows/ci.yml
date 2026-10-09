@@ -1,14 +1,10 @@
 name: CI
 
+# Not on every commit: the tests run for a release (a tag, through release.yml, which calls this) and by hand from
+# the Actions tab ("Run workflow"). Run them locally before pushing (docs/RELEASING.md).
 on:
-  push:
-    branches: [main]
-  pull_request:
+  workflow_call:
   workflow_dispatch:
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
 
 jobs:
   core:

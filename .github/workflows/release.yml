@@ -1,0 +1,72 @@
+name: Release
+
+# A tag named for a version (v0.1.0) tests the code, then archives Panop for iOS, tvOS and macOS and uploads each to
+# App Store Connect, where it appears in TestFlight. The tag must match MARKETING_VERSION in the project.
+#
+# Secrets (Settings -> Secrets and variables -> Actions), from App Store Connect -> Users and Access -> Integrations ->
+# App Store Connect API, a key with the App Manager role, made under the personal team:
+#   ASC_KEY_ID      the key's ID
+#   ASC_ISSUER_ID   the issuer ID shown above the keys
+#   ASC_KEY_P8      the downloaded AuthKey_XXXX.p8, as base64:  base64 -i AuthKey_XXXX.p8 | pbcopy
+# Xcode uses the key to make and fetch the signing certificate and profiles itself (cloud signing), so no
+# certificate is stored here.
+on:
+  push:
+    tags: ["v*"]
+
+# Never cancel a release half-way: an upload that stops in the middle leaves the build number used.
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  tests:
+    uses: ./.github/workflows/ci.yml
+
+  testflight:
+    name: TestFlight (${{ matrix.platform }})
+    needs: tests
+    runs-on: macos-26
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [ios, tvos, macos]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: The tag matches the version
+        run: |
+          version="$(grep -m1 -o 'MARKETING_VERSION = [^;]*' Panop.xcodeproj/project.pbxproj | sed 's/.*= //')"
+          if [ "${GITHUB_REF_NAME}" != "v${version}" ]; then
+            echo "::error::tag ${GITHUB_REF_NAME} does not match MARKETING_VERSION ${version}"
+            exit 1
+          fi
+
+      - name: Cache packages
+        uses: actions/cache@v4
+        with:
+          path: ~/Library/Developer/Panop-SharedSPM
+          key: spm-release-${{ hashFiles('**/Package.resolved') }}
+          restore-keys: spm-release-
+
+      # Each upload needs a build number higher than the last. The run number only goes up, and is the same for
+      # the three platforms of one release.
+      - name: Build number
+        run: Scripts/bump-build.sh "${{ github.run_number }}"
+
+      - name: App Store Connect key
+        run: |
+          mkdir -p "$RUNNER_TEMP/asc"
+          echo "${{ secrets.ASC_KEY_P8 }}" | base64 --decode > "$RUNNER_TEMP/asc/AuthKey.p8"
+          echo "PANOP_ASC_KEY_PATH=$RUNNER_TEMP/asc/AuthKey.p8" >> "$GITHUB_ENV"
+          echo "PANOP_ASC_KEY_ID=${{ secrets.ASC_KEY_ID }}" >> "$GITHUB_ENV"
+          echo "PANOP_ASC_ISSUER_ID=${{ secrets.ASC_ISSUER_ID }}" >> "$GITHUB_ENV"
+
+      - name: Archive and upload
+        run: Scripts/archive-testflight.sh ${{ matrix.platform }} --upload
+
+      - name: Remove the key
+        if: always()
+        run: rm -rf "$RUNNER_TEMP/asc"
