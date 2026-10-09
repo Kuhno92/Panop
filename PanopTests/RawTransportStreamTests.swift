@@ -114,7 +114,7 @@ struct RawTransportStreamTests {
 
     /// With a short stall tolerance, any spurious "buffering" would trigger a
     /// reconnect. A healthy stream must be left alone.
-    @Test
+    @Test(.needsAudioDevice)
     func `a healthy VLC stream is not reconnected`() async throws {
         let stream = try await TransportStreamFixture.shared()
         let server = try LocalStreamServer(body: stream)

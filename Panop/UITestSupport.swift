@@ -45,6 +45,9 @@ enum UITestMode {
         /// (they need ratings, years and a trending list), so a test that is about the hero gives it some.
         static var heroTitles: [CatalogRow] {
             guard isActive, ProcessInfo.processInfo.environment["PANOP_HERO"] == "1" else { return [] }
+            if DemoContent.isActive {
+                return DemoContent.heroRows
+            }
             return [("Dune", 2021, 8.1), ("Arrival", 2016, 7.9), ("Tenet", 2020, 7.3)].enumerated().map { index, film in
                 CatalogRow(CatalogEntryRecord(playlist: "uitest", entry: CatalogEntry(
                     id: "hero\(index)",
@@ -137,6 +140,10 @@ enum UITestMode {
         }
 
         static func seed(_ services: AppServices) async {
+            if DemoContent.isActive {
+                await DemoContent.seed(services)
+                return
+            }
             if await seedDevProvider(services) {
                 return
             }

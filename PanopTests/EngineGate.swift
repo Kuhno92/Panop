@@ -1,3 +1,4 @@
+import Foundation
 import Testing
 
 /// Lets one real-engine test run at a time, across suites.
@@ -59,5 +60,19 @@ struct EngineGate: SuiteTrait, TestTrait, TestScoping {
 extension Trait where Self == EngineGate {
     static var engineGate: Self {
         Self()
+    }
+}
+
+extension Trait where Self == ConditionTrait {
+    /// For a test that plays real audio through libVLC and times what it reports: a hosted CI runner has no audio
+    /// device
+    /// (libVLC logs "AudioObjectAddPropertyListener failed"), so a state change comes late or not at all there. Run it
+    /// on a
+    /// Mac with sound.
+    static var needsAudioDevice: Self {
+        .enabled(
+            if: ProcessInfo.processInfo.environment["GITHUB_ACTIONS"] == nil,
+            "needs an audio device, which a CI runner does not have"
+        )
     }
 }

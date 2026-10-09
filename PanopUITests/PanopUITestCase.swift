@@ -24,6 +24,11 @@ class PanopUITestCase: XCTestCase {
         false
     }
 
+    /// Fictional content with generated artwork, for the store screenshots (`Scripts/make-store-screenshots.sh`).
+    var isDemo: Bool {
+        false
+    }
+
     var startTab: String {
         "live"
     }
@@ -58,6 +63,13 @@ class PanopUITestCase: XCTestCase {
         }
         app.launchEnvironment["PANOP_CONTROLS_TIMEOUT"] = String(controlsTimeout)
         app.launchEnvironment["PANOP_START_TAB"] = startTab
+        if isDemo {
+            app.launchEnvironment["PANOP_DEMO"] = "1"
+            // The posters of the real films the demo shows, in the repository.
+            app.launchEnvironment["PANOP_DEMO_ART_DIR"] = URL(fileURLWithPath: #filePath)
+                .deletingLastPathComponent().deletingLastPathComponent()
+                .appendingPathComponent("docs/store-art").path
+        }
         if showsHero {
             app.launchEnvironment["PANOP_HERO"] = "1"
             if showsBrightArtwork {

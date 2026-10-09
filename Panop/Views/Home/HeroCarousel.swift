@@ -169,8 +169,17 @@ struct HeroCarousel: View {
 
     /// Waits, then moves on. Keyed on the position and on `engaged`, so a move by hand or a button taking focus
     /// starts the wait again.
+    /// Not in the App Store screenshots, where a slide caught half-way would show two titles over one another.
+    private static var holdsStill: Bool {
+        #if DEBUG
+            DemoContent.isActive
+        #else
+            false
+        #endif
+    }
+
     private func slide() async {
-        guard rows.count > 1, !engaged, !reduceMotion else { return }
+        guard rows.count > 1, !engaged, !reduceMotion, !Self.holdsStill else { return }
         try? await Task.sleep(for: Self.interval)
         guard !Task.isCancelled else { return }
         move(by: 1)

@@ -23,8 +23,8 @@ DD_BASE="${PANOP_DD:-/tmp/panop-dd}"
 platform="${1:-ios}"
 
 case "$platform" in
-    ios) runtime="iOS"; wanted="iPhone 17 Pro" ;;
-    tvos) runtime="tvOS"; wanted="Apple TV 4K (3rd generation)" ;;
+    ios) runtime="iOS"; wanted="${PANOP_UI_DEVICE:-iPhone 17 Pro}" ;;
+    tvos) runtime="tvOS"; wanted="${PANOP_UI_DEVICE:-Apple TV 4K (3rd generation)}" ;;
     *) echo "usage: $0 [ios|tvos]" >&2; exit 2 ;;
 esac
 

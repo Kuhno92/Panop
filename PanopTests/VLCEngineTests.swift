@@ -94,7 +94,7 @@ struct VLCEngineTests {
         await engine.stop()
     }
 
-    @Test
+    @Test(.needsAudioDevice)
     func `pausing and resuming are reported`() async throws {
         let url = try writeWAV(seconds: 20)
         defer { try? FileManager.default.removeItem(at: url) }

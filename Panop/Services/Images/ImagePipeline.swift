@@ -133,6 +133,20 @@ actor ImagePipeline {
 
     private func load(_ url: URL, diskKey: String, memoryKey: String, maxPixel: Int) async -> CGImage? {
         defer { flights[memoryKey] = nil }
+        #if DEBUG
+            // Generated artwork for the App Store screenshots (see `DemoContent`).
+            if url.host == DemoArt.host {
+                let drawn = await MainActor.run { DemoArt.render(url) }
+                if let drawn {
+                    memory.setObject(
+                        Entry(drawn),
+                        forKey: memoryKey as NSString,
+                        cost: ImageDownsampler.cost(of: drawn)
+                    )
+                }
+                return drawn
+            }
+        #endif
 
         var data = await disk.data(forKey: diskKey)
         if data == nil {
