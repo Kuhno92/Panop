@@ -67,8 +67,8 @@ First version for TestFlight.
 ## Version information (German)
 
 **Werbetext**
-Ein schneller, nativer Player für das Live-TV, die Filme und Serien, die du schon hast. Mit TV-Programm, schnellem Umschalten
-und gleich auf iPhone, iPad, Apple TV und Mac.
+Ein schneller, nativer Player für Live-TV, Filme und Serien, die du schon hast. Mit TV-Programm, schnellem Umschalten,
+gleich auf iPhone, iPad, Apple TV und Mac.
 
 **Beschreibung**
 PanopTV ist ein nativer Player für deine eigenen IPTV-Quellen. Füge einen Xtream-Zugang, einen M3U-Link oder eine
