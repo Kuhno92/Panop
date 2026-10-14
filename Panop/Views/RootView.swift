@@ -109,10 +109,11 @@ struct RootView: View {
         ))
     }
 
-    /// Whether the person has a sportapi.ai key and has not hidden the Sports tab.
+    /// Whether the Sports tab is shown: always, unless the person hid it. Without a key it says what is needed and
+    /// leads to where the key is entered, so the feature can be found.
     private var showsSports: Bool {
         _ = sportsSync.revision
-        return sportsAccount.hasKey && sportsSync.showsTab()
+        return sportsSync.showsTab()
     }
 
     /// Whether Settings has a tab. A phone's bar holds five and Search takes the last, so there it is a button on Home.
@@ -161,7 +162,7 @@ struct RootView: View {
                     MainTabLabel("Series", systemImage: "rectangle.stack")
                 }
             }
-            // The sports hub, for a person who has entered a key. A phone's bar is full, so there it is a button on
+            // The sports hub. A phone's bar is full, so there it is a button on
             // Home.
             if showsSports, settingsInBar {
                 Tab(value: AppTab.sports) {

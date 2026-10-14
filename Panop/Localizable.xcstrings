@@ -41,6 +41,19 @@
         }
       }
     },
+    "· %@" : {
+
+    },
+    "%@ – %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ – %2$@"
+          }
+        }
+      }
+    },
     "%@ · %@" : {
       "localizations" : {
         "de" : {
@@ -443,6 +456,9 @@
         }
       }
     },
+    "AET" : {
+
+    },
     "AetherEngine (experimental)" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -513,6 +529,9 @@
           }
         }
       }
+    },
+    "Assist: %@" : {
+
     },
     "Audio" : {
       "localizations" : {
@@ -645,6 +664,9 @@
         }
       }
     },
+    "C" : {
+
+    },
     "Cancel" : {
       "localizations" : {
         "de" : {
@@ -654,6 +676,9 @@
           }
         }
       }
+    },
+    "Cancelled" : {
+
     },
     "Cast" : {
       "localizations" : {
@@ -706,6 +731,9 @@
           }
         }
       }
+    },
+    "Change leagues and teams" : {
+
     },
     "Change PIN" : {
       "localizations" : {
@@ -797,6 +825,9 @@
         }
       }
     },
+    "Checking…" : {
+
+    },
     "Choose a PIN of 4 to 6 digits" : {
       "localizations" : {
         "de" : {
@@ -816,6 +847,9 @@
           }
         }
       }
+    },
+    "Choose leagues" : {
+
     },
     "Choose…" : {
       "localizations" : {
@@ -1099,6 +1133,18 @@
         }
       }
     },
+    "Data by sportapi.ai" : {
+
+    },
+    "Day" : {
+
+    },
+    "Day's limit reached" : {
+
+    },
+    "Day's limit reached, until %@" : {
+
+    },
     "Default" : {
       "localizations" : {
         "de" : {
@@ -1259,6 +1305,9 @@
         }
       }
     },
+    "Enter the key" : {
+
+    },
     "Enter your PIN" : {
       "localizations" : {
         "de" : {
@@ -1308,6 +1357,9 @@
           }
         }
       }
+    },
+    "Favourite teams" : {
+
     },
     "Favourites" : {
       "localizations" : {
@@ -1440,6 +1492,9 @@
         }
       }
     },
+    "Fouls" : {
+
+    },
     "Found your playlists" : {
       "localizations" : {
         "de" : {
@@ -1449,6 +1504,15 @@
           }
         }
       }
+    },
+    "FT" : {
+
+    },
+    "Get a free key" : {
+
+    },
+    "Get a free key at sportapi.ai" : {
+
     },
     "Getting the episodes…" : {
       "localizations" : {
@@ -1651,6 +1715,9 @@
         }
       }
     },
+    "HT" : {
+
+    },
     "http://provider.example:8080" : {
       "localizations" : {
         "de" : {
@@ -1771,6 +1838,9 @@
         }
       }
     },
+    "It uses your own free account at sportapi.ai: get a key there and enter it in Settings, in the Sports section. The free plan allows 2,000 requests a day, which is plenty." : {
+
+    },
     "Its channels, movies, series and guide are removed from this device." : {
       "localizations" : {
         "de" : {
@@ -1780,6 +1850,9 @@
           }
         }
       }
+    },
+    "Keep the key in iCloud" : {
+
     },
     "Keep them" : {
       "localizations" : {
@@ -1800,6 +1873,9 @@
           }
         }
       }
+    },
+    "Key" : {
+
     },
     "Kids" : {
       "localizations" : {
@@ -1840,6 +1916,12 @@
           }
         }
       }
+    },
+    "Leagues" : {
+
+    },
+    "Leagues and teams" : {
+
     },
     "Leaves out categories a provider names as adult, from the lists, search and suggestions." : {
       "extractionState" : "stale",
@@ -1882,6 +1964,12 @@
           }
         }
       }
+    },
+    "Line-ups" : {
+
+    },
+    "Line-ups appear shortly before the kick-off, where the service has them." : {
+
     },
     "Live" : {
       "localizations" : {
@@ -1933,6 +2021,12 @@
         }
       }
     },
+    "Loading leagues…" : {
+
+    },
+    "Loading teams…" : {
+
+    },
     "Look again" : {
       "localizations" : {
         "de" : {
@@ -1982,6 +2076,9 @@
           }
         }
       }
+    },
+    "Match" : {
+
     },
     "Medium" : {
       "localizations" : {
@@ -2126,6 +2223,9 @@
         }
       }
     },
+    "My teams" : {
+
+    },
     "Name" : {
       "localizations" : {
         "de" : {
@@ -2195,6 +2295,9 @@
           }
         }
       }
+    },
+    "Next" : {
+
     },
     "Next title" : {
       "extractionState" : "manual",
@@ -2283,6 +2386,9 @@
         }
       }
     },
+    "No league matches “%@”." : {
+
+    },
     "No live channels" : {
       "localizations" : {
         "de" : {
@@ -2292,6 +2398,12 @@
           }
         }
       }
+    },
+    "No matches today" : {
+
+    },
+    "No matches tomorrow" : {
+
     },
     "No movies" : {
       "localizations" : {
@@ -2353,6 +2465,9 @@
         }
       }
     },
+    "Not accepted" : {
+
+    },
     "Not updated yet" : {
       "localizations" : {
         "de" : {
@@ -2402,6 +2517,9 @@
           }
         }
       }
+    },
+    "Nothing is on in the leagues and for the teams you follow." : {
+
     },
     "Nothing is saved in this iCloud account yet. To bring your playlists from another device:\n1. Use the same Apple Account here as there.\n2. On the other device, open Panop once and check that Settings > iCloud says it is on. That saves everything to iCloud, and the device can be switched off afterwards.\n3. Look again here." : {
       "localizations" : {
@@ -2501,6 +2619,12 @@
         }
       }
     },
+    "Offline. Showing what was loaded at %@." : {
+
+    },
+    "Offline. The service could not be reached." : {
+
+    },
     "OK" : {
       "localizations" : {
         "de" : {
@@ -2540,6 +2664,9 @@
           }
         }
       }
+    },
+    "On: %@" : {
+
     },
     "On. Your data is syncing with iCloud." : {
       "localizations" : {
@@ -2724,6 +2851,12 @@
         }
       }
     },
+    "Pass accuracy" : {
+
+    },
+    "Passes" : {
+
+    },
     "Password" : {
       "localizations" : {
         "de" : {
@@ -2743,6 +2876,12 @@
           }
         }
       }
+    },
+    "Pens" : {
+
+    },
+    "Pick the leagues you want to see, and, if you like, favourite teams. You can change them any time." : {
+
     },
     "Picture in Picture" : {
       "localizations" : {
@@ -2895,6 +3034,12 @@
           }
         }
       }
+    },
+    "Popular" : {
+
+    },
+    "Postponed" : {
+
     },
     "Preview of the subtitle style" : {
       "localizations" : {
@@ -3088,6 +3233,9 @@
         }
       }
     },
+    "Remove key" : {
+
+    },
     "Remove missing items?" : {
       "localizations" : {
         "de" : {
@@ -3117,6 +3265,9 @@
           }
         }
       }
+    },
+    "Remove the sports key?" : {
+
     },
     "Rename" : {
       "localizations" : {
@@ -3148,6 +3299,9 @@
         }
       }
     },
+    "Requests today" : {
+
+    },
     "Reset to standard" : {
       "localizations" : {
         "de" : {
@@ -3178,6 +3332,15 @@
         }
       }
     },
+    "Retry" : {
+
+    },
+    "Save key" : {
+
+    },
+    "Saves" : {
+
+    },
     "Schedule" : {
       "localizations" : {
         "de" : {
@@ -3197,6 +3360,9 @@
           }
         }
       }
+    },
+    "Scores" : {
+
     },
     "Search" : {
       "localizations" : {
@@ -3227,6 +3393,12 @@
           }
         }
       }
+    },
+    "Search leagues" : {
+
+    },
+    "Search teams" : {
+
     },
     "Season" : {
       "localizations" : {
@@ -3307,6 +3479,12 @@
           }
         }
       }
+    },
+    "Shots" : {
+
+    },
+    "Shots on target" : {
+
     },
     "Show" : {
       "localizations" : {
@@ -3389,6 +3567,9 @@
           }
         }
       }
+    },
+    "Show the Sports tab" : {
+
     },
     "Showing the first %@. Search to narrow it down." : {
       "localizations" : {
@@ -3530,6 +3711,18 @@
         }
       }
     },
+    "sportapi.ai did not accept the key." : {
+
+    },
+    "sportapi.ai key" : {
+
+    },
+    "Sports" : {
+
+    },
+    "Sports are not available." : {
+
+    },
     "Start over" : {
       "localizations" : {
         "de" : {
@@ -3561,6 +3754,9 @@
         }
       }
     },
+    "Statistics" : {
+
+    },
     "Stop" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -3581,6 +3777,9 @@
           }
         }
       }
+    },
+    "Substitutes · %@" : {
+
     },
     "Subtitles" : {
       "localizations" : {
@@ -3653,6 +3852,9 @@
         }
       }
     },
+    "Tackles" : {
+
+    },
     "Tap a programme to watch it from the start." : {
       "localizations" : {
         "de" : {
@@ -3662,6 +3864,9 @@
           }
         }
       }
+    },
+    "Teams of leagues with a table show up here. Choose a league first." : {
+
     },
     "Thanks to" : {
       "localizations" : {
@@ -3722,6 +3927,9 @@
           }
         }
       }
+    },
+    "That key was not accepted." : {
+
     },
     "That playlist was updated in the meantime. Review it again." : {
       "localizations" : {
@@ -3794,6 +4002,15 @@
         }
       }
     },
+    "The day's requests are used up. Scores update again after the reset." : {
+
+    },
+    "The day's requests are used up. Scores update again at %@." : {
+
+    },
+    "The day's requests are used up. Try again after the reset." : {
+
+    },
     "The download was cut off, so nothing was changed." : {
       "localizations" : {
         "de" : {
@@ -3803,6 +4020,18 @@
           }
         }
       }
+    },
+    "The key is kept in the Keychain on this device. With iCloud on it also travels, encrypted, to your other devices. Only match, league and team requests go to sportapi.ai: nothing about your playlists or what you watch." : {
+
+    },
+    "The key was accepted but could not be saved on this device." : {
+
+    },
+    "The key was not accepted. Check it in Settings." : {
+
+    },
+    "The leagues could not be loaded. Check the connection and try again." : {
+
     },
     "The login details could not be saved to the Keychain." : {
       "localizations" : {
@@ -3934,6 +4163,9 @@
         }
       }
     },
+    "The reply from sportapi.ai could not be read." : {
+
+    },
     "The screen Panop opens on." : {
       "extractionState" : "stale",
       "localizations" : {
@@ -3945,6 +4177,12 @@
         }
       }
     },
+    "The service could not be reached. Check the connection and try again." : {
+
+    },
+    "The service returned no leagues." : {
+
+    },
     "The source has no programme information for it." : {
       "localizations" : {
         "de" : {
@@ -3954,6 +4192,9 @@
           }
         }
       }
+    },
+    "The sports hub shows today's football matches and the channel of your playlist that has them. It uses your own free account at sportapi.ai: enter its key here. The free plan allows 2,000 requests a day." : {
+
     },
     "The TV guide address is not a valid web address." : {
       "localizations" : {
@@ -4165,6 +4406,12 @@
         }
       }
     },
+    "Timeline" : {
+
+    },
+    "to" : {
+
+    },
     "To bring your saved playlists here, sign in to iCloud in this device's system settings, then open Panop again. Or add a playlist here." : {
       "localizations" : {
         "de" : {
@@ -4184,6 +4431,15 @@
           }
         }
       }
+    },
+    "Today" : {
+
+    },
+    "Today's football matches in the leagues and for the teams you follow, with scores, tables and line-ups, and a button for the channel of your playlist that shows the match." : {
+
+    },
+    "Tomorrow" : {
+
     },
     "Too many tries. Try again at %@." : {
       "localizations" : {
@@ -4405,6 +4661,9 @@
         }
       }
     },
+    "Updated %@" : {
+
+    },
     "Use the same Apple Account on every device." : {
       "localizations" : {
         "de" : {
@@ -4455,6 +4714,9 @@
         }
       }
     },
+    "versus" : {
+
+    },
     "View on Simkl" : {
       "localizations" : {
         "de" : {
@@ -4484,6 +4746,9 @@
           }
         }
       }
+    },
+    "Watch" : {
+
     },
     "Watch %@" : {
       "localizations" : {
@@ -4525,6 +4790,9 @@
         }
       }
     },
+    "Watch on %@" : {
+
+    },
     "Watch something and its numbers show up here." : {
       "localizations" : {
         "de" : {
@@ -4534,6 +4802,9 @@
           }
         }
       }
+    },
+    "Watch…" : {
+
     },
     "Watched" : {
       "localizations" : {
@@ -4564,6 +4835,9 @@
           }
         }
       }
+    },
+    "What do you follow?" : {
+
     },
     "When Panop opens" : {
       "localizations" : {
@@ -4616,6 +4890,9 @@
         }
       }
     },
+    "With iCloud on, it is removed from your other devices too. Your leagues and teams are kept." : {
+
+    },
     "Wrong PIN. %lld tries left." : {
       "localizations" : {
         "de" : {
@@ -4655,6 +4932,9 @@
           }
         }
       }
+    },
+    "Yellow cards" : {
+
     },
     "Your content" : {
       "localizations" : {

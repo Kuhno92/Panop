@@ -6,9 +6,9 @@ import SwiftUI
 struct MatchRow: View {
     let fixture: Fixture
     var followed: Set<Int> = []
-    var channel: MatchLink?
+    var links: [MatchLink] = []
     var onOpen: () -> Void
-    var onWatch: () -> Void = {}
+    var onWatch: (MatchLink) -> Void = { _ in }
 
     var body: some View {
         HStack(spacing: 10) {
@@ -44,8 +44,8 @@ struct MatchRow: View {
             #endif
             .accessibilityElement(children: .ignore)
             .accessibilityLabel(MatchText.spoken(fixture))
-            if let channel {
-                WatchButton(link: channel, action: onWatch)
+            if !links.isEmpty {
+                WatchControl(links: links, onPick: onWatch)
             }
         }
         #if !os(tvOS)
@@ -118,32 +118,56 @@ struct LiveDot: View {
     }
 }
 
-/// "Watch" with the channel's name: starts the channel that has the match.
-struct WatchButton: View {
-    let link: MatchLink
-    var prominent = false
-    let action: () -> Void
+/// "Watch" with the channel's name. When one channel is sure it is a button that starts it; when several could be the
+/// match (or none is sure), it is a menu to choose from, each with what the guide says is on.
+struct WatchControl: View {
+    let links: [MatchLink]
+    var onPick: (MatchLink) -> Void
+
+    private var top: MatchLink? {
+        links.first
+    }
 
     var body: some View {
-        Button(action: action) {
-            VStack(spacing: 2) {
-                Label("Watch", systemImage: "play.fill")
-                    .font(.subheadline.weight(.semibold))
-                Text(link.channel.name)
-                    .font(.caption2)
-                    .lineLimit(1)
-                    .opacity(0.8)
+        if let top {
+            if links.count == 1, top.score.tier >= .likely {
+                Button { onPick(top) } label: { label(top) }
+                    .buttonStyle(style)
+                    .tint(top.score.tier == .watch ? .green : .gray)
+                    .accessibilityLabel(Text("Watch on \(top.channel.name)"))
+            } else {
+                Menu {
+                    ForEach(links) { link in
+                        Button { onPick(link) } label: {
+                            Text("\(link.channel.name) · \(link.programme.title)")
+                        }
+                    }
+                } label: { label(top, many: true) }
+                    .buttonStyle(style)
+                    .tint(top.score.tier == .watch ? .green : .gray)
             }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 8)
-            .frame(maxWidth: 140)
         }
+    }
+
+    private var style: some PrimitiveButtonStyle {
         #if os(tvOS)
-        .buttonStyle(.card)
+            .card
         #else
-        .buttonStyle(.borderedProminent)
-        .tint(link.score.tier == .watch ? .green : .gray)
+            .borderedProminent
         #endif
-        .accessibilityLabel(Text("Watch on \(link.channel.name)"))
+    }
+
+    private func label(_ link: MatchLink, many: Bool = false) -> some View {
+        VStack(spacing: 2) {
+            Label(many ? String(localized: "Watch…") : String(localized: "Watch"), systemImage: "play.fill")
+                .font(.subheadline.weight(.semibold))
+            Text(link.channel.name)
+                .font(.caption2)
+                .lineLimit(1)
+                .opacity(0.8)
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
+        .frame(maxWidth: 150)
     }
 }

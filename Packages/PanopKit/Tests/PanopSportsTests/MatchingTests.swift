@@ -224,3 +224,38 @@ struct ChannelMatchTests {
         #expect(fixture.flatMap(MatchSignature.init) == nil)
     }
 }
+
+@Suite("the first look at a guide line")
+struct PrefilterTests {
+    private let kickoff = Date(timeIntervalSince1970: 1_792_077_000)
+    private var match: MatchSignature {
+        MatchSignature(
+            home: TeamKey(name: "Bayern Munich", short: "Bayern"), away: TeamKey(
+                name: "Borussia Dortmund",
+                short: "Dortmund"
+            ),
+            league: LeagueKey(name: "Bundesliga"), kickoff: kickoff
+        )
+    }
+
+    private func line(_ title: String, subtitle: String? = nil, categories: [String] = []) -> ProgrammeSnippet {
+        ProgrammeSnippet(
+            channelID: "c", start: kickoff, stop: kickoff.addingTimeInterval(7200), title: title,
+            subtitle: subtitle, categories: categories
+        )
+    }
+
+    @Test
+    func `a line that names a team of the match is looked at`() {
+        #expect(MatchChannelResolver.isCandidate(line("Bayern München - Leverkusen"), for: [match]))
+        #expect(MatchChannelResolver.isCandidate(line("Bundesliga live", subtitle: "BVB gegen Mainz"), for: [match]))
+    }
+
+    @Test
+    func `sport is looked at, so a generic title can still be found, and nothing else is`() {
+        #expect(MatchChannelResolver.isCandidate(line("Football Live", categories: ["Sports"]), for: [match]))
+        #expect(MatchChannelResolver.isCandidate(line("Fußball live aus Berlin"), for: [match]))
+        #expect(!MatchChannelResolver.isCandidate(line("Tagesschau", categories: ["News"]), for: [match]))
+        #expect(!MatchChannelResolver.isCandidate(line("Action Movie"), for: [match]))
+    }
+}

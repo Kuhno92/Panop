@@ -4,11 +4,11 @@ import SwiftUI
 /// The match to put first: both crests large, the score or the kick-off, and the way to watch it.
 struct HeroMatchCard: View {
     let fixture: Fixture
-    var channel: MatchLink?
+    var links: [MatchLink] = []
     /// False on the match's own screen, where there is nowhere further to go.
     var showsOpen = true
     var onOpen: () -> Void
-    var onWatch: () -> Void = {}
+    var onWatch: (MatchLink) -> Void = { _ in }
 
     var body: some View {
         VStack(spacing: 18) {
@@ -34,8 +34,8 @@ struct HeroMatchCard: View {
                 team(fixture.awayShort, logo: fixture.awayLogo)
             }
             HStack(spacing: 12) {
-                if let channel {
-                    WatchButton(link: channel, prominent: true, action: onWatch)
+                if !links.isEmpty {
+                    WatchControl(links: links, onPick: onWatch)
                 }
                 if showsOpen {
                     Button(action: onOpen) {

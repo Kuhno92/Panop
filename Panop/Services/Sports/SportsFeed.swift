@@ -87,11 +87,14 @@ final class SportsFeed {
 
     // MARK: - Leagues
 
+    /// The service always has leagues: an empty list is a reply gone wrong, and is neither shown nor kept for two
+    /// weeks.
     func leagues(force: Bool = false) async -> SportsFetched<[LeagueGroup]> {
         await load(
             name: "leagues", maxAge: Age.leagues, force: force,
             fetch: { client in let reply = try await client.leagues(); return (reply.raw, reply.quota) },
-            parse: SportsParsing.leagues
+            parse: SportsParsing.leagues,
+            isUsable: { !$0.isEmpty }
         )
     }
 
@@ -125,10 +128,11 @@ final class SportsFeed {
         maxAge: TimeInterval,
         force: Bool,
         fetch: @escaping @Sendable (SportsClient) async throws -> (Data, SportsQuota?),
-        parse: (Data) throws -> Value
+        parse: (Data) throws -> Value,
+        isUsable: (Value) -> Bool = { _ in true }
     ) async -> SportsFetched<Value> {
         let kept = await cache.read(name)
-        let keptValue = kept.flatMap { try? parse($0.data) }
+        let keptValue = kept.flatMap { try? parse($0.data) }.flatMap { isUsable($0) ? $0 : nil }
         if let kept, let keptValue, !force, now().timeIntervalSince(kept.fetchedAt) < maxAge {
             return SportsFetched(value: keptValue, fetchedAt: kept.fetchedAt, error: nil, isFresh: true)
         }
@@ -144,11 +148,13 @@ final class SportsFeed {
 
         switch await fetchRaw(name, fetch) {
         case let .success(data):
-            guard let value = try? parse(data) else {
+            // Kept only once it is known to be usable: an error the service put in a body must not be served for days.
+            guard let value = try? parse(data), isUsable(value) else {
                 var result = stale
                 result.error = .undecodable
                 return result
             }
+            await cache.write(name, data: data)
             return SportsFetched(value: value, fetchedAt: now(), error: nil, isFresh: true)
         case let .failure(error):
             var result = stale
@@ -184,12 +190,10 @@ final class SportsFeed {
             return await running.value
         }
         let client = account.client
-        let cache = cache
         let account = account
         let task = Task { @MainActor () -> Result<Data, SportsError> in
             do {
                 let (data, quota) = try await fetch(client)
-                await cache.write(name, data: data)
                 account.note(quota)
                 return .success(data)
             } catch let error as SportsError {

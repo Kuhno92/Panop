@@ -22,8 +22,8 @@ struct MatchDetailView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
                 HeroMatchCard(
-                    fixture: shown, channel: model.links[fixture.id]?.first, showsOpen: false,
-                    onOpen: {}, onWatch: { play() }
+                    fixture: shown, links: model.links[fixture.id] ?? [], showsOpen: false,
+                    onOpen: {}, onWatch: { play($0) }
                 )
                 .padding(.horizontal)
                 if !shown.events.isEmpty {
@@ -54,8 +54,8 @@ struct MatchDetailView: View {
             .task { await run() }
     }
 
-    private func play() {
-        playing = model.target(for: fixture)
+    private func play(_ link: MatchLink) {
+        playing = model.target(for: link, in: fixture)
     }
 
     /// Reads the match, and while it is played reads it again every minute.

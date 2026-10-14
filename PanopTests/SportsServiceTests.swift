@@ -259,6 +259,42 @@ struct SportsFeedTests {
     }
 
     @Test
+    func `an empty list of leagues is a reply gone wrong, and is not kept`() async throws {
+        let env = try Harness()
+        defer { env.cleanUp() }
+        env.service.body = "{\"success\": true, \"data\": []}"
+        let empty = await env.feed.leagues()
+        #expect(empty.value == nil && empty.error == .undecodable)
+        #expect(await env.cache.read("leagues") == nil)
+        // The next ask is not answered from a bad reply: it goes to the service again, and a good one is kept.
+        env.service.body = leagueList
+        let good = await env.feed.leagues()
+        #expect(good.value?.first?.country == "England" && env.service.requests.count == 2)
+        #expect(await env.cache.read("leagues") != nil)
+    }
+
+    @Test
+    func `an error the service put in a body is not kept either`() async throws {
+        let env = try Harness()
+        defer { env.cleanUp() }
+        env.service.body = "{\"success\": false, \"error\": \"nope\"}"
+        let result = await env.feed.leagues()
+        #expect(result.value == nil && result.error == .undecodable)
+        #expect(await env.cache.read("leagues") == nil)
+    }
+
+    @Test
+    func `a bad list kept by an earlier version is not served`() async throws {
+        let env = try Harness()
+        defer { env.cleanUp() }
+        await env.cache.write("leagues", data: Data("{\"success\": true, \"data\": []}".utf8))
+        env.service.body = leagueList
+        let result = await env.feed.leagues()
+        #expect(result.value?.first?.country == "England" && result.isFresh)
+        #expect(env.service.requests.count == 1)
+    }
+
+    @Test
     func `taking the key out takes what was fetched with it`() async throws {
         let env = try Harness()
         defer { env.cleanUp() }
@@ -296,6 +332,26 @@ struct SportsAccountTests {
         #expect(env.keys.load() == "sk_good_key" && env.account.state == .ready)
         #expect(env.account.maskedKey == "••••_key")
         #expect(env.account.quota?.limit == 2000)
+    }
+
+    @Test
+    func `a key the device cannot keep is not called accepted`() async throws {
+        final class Forgetful: SportsKeyStore, @unchecked Sendable {
+            func load() -> String? {
+                nil
+            }
+
+            func save(_ key: String) {}
+            func delete() {}
+        }
+        let env = try Harness(key: nil, keys: InMemorySportsKeyStore())
+        let account = SportsAccount(
+            keyStore: Forgetful(), sync: env.sync, transport: env.service,
+            memory: SportsKeyMemory(defaults: env.defaults)
+        )
+        defer { env.cleanUp() }
+        #expect(await account.setKey("sk_good_key") == .notSaved)
+        #expect(account.state == .noKey && env.sync.keyRecord.blob == nil)
     }
 
     @Test

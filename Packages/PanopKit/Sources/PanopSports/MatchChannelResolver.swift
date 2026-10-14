@@ -3,6 +3,17 @@ import Foundation
 /// Which channels of the person's playlist show a match: scores every programme that could be it, keeps the best
 /// line of each channel, and puts the likeliest first.
 public enum MatchChannelResolver {
+    /// A cheap first look at a guide line, before its description is read: whether it names a team of one of these
+    /// matches, or is sport at all. A guide has hundreds of thousands of lines and a day has a handful of matches, so
+    /// everything else is left unread.
+    public static func isCandidate(_ snippet: ProgrammeSnippet, for matches: [MatchSignature]) -> Bool {
+        let headline = TeamNames.tokens(snippet.title + " | " + (snippet.subtitle ?? ""))
+        if matches.contains(where: { $0.home.isNamed(in: headline) || $0.away.isNamed(in: headline) }) {
+            return true
+        }
+        return MatchChannelScorer.isSportLike(headline: headline, categories: snippet.categories)
+    }
+
     /// - Parameters:
     ///   - programmes: the guide lines at the time of the match, read by ``PreparedProgramme``. A line whose channel is
     ///     not in `channels` is ignored.

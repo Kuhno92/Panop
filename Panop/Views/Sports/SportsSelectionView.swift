@@ -76,6 +76,12 @@ struct SportsSelectionView: View {
                 Text(text).foregroundStyle(.secondary)
                 Button("Try again") { Task { await loadLeagues(force: true) } }
             case .ready:
+                if groups.isEmpty {
+                    Text("The service returned no leagues.").foregroundStyle(.secondary)
+                    Button("Try again") { Task { await loadLeagues(force: true) } }
+                } else if filteredGroups.isEmpty {
+                    Text("No league matches “\(query)”.").foregroundStyle(.secondary)
+                }
                 if query.isEmpty, !popular.isEmpty {
                     Section("Popular") {
                         ForEach(popular) { league in leagueRow(league.choice, chosen: chosen.contains(league.id)) }
@@ -137,20 +143,31 @@ struct SportsSelectionView: View {
         }
     }
 
-    /// The competitions most people look for, found by name.
+    /// The competitions most people look for, by the names the service gives them, in this order. A name must be the
+    /// whole name: "Austrian Bundesliga" is not "Bundesliga", and a national league called "Premier League" in another
+    /// country is told from the English one by its country.
     private var popular: [PopularLeague] {
-        let wanted = [
-            "premier league", "bundesliga", "la liga", "laliga", "serie a", "ligue 1", "champions league",
-            "europa league", "eredivisie", "primeira liga", "major league soccer"
+        let wanted: [(name: String, country: String?)] = [
+            ("Premier League", "England"), ("Spanish La Liga", nil), ("German Bundesliga", nil), (
+                "Italian Serie A",
+                nil
+            ),
+            ("French Ligue 1", nil), ("UEFA Champions League", nil), ("UEFA Europa League", nil), (
+                "Dutch Eredivisie",
+                nil
+            ),
+            ("Portuguese Primeira Liga", nil), ("US Major League Soccer", nil)
         ]
         var found: [PopularLeague] = []
-        for group in groups {
-            for league in group.leagues where wanted.contains(where: { league.name.lowercased().hasSuffix($0) }) {
-                found.append(PopularLeague(choice: SportsLeagueChoice(
-                    id: league.id,
-                    name: league.name,
-                    country: group.country
-                )))
+        for entry in wanted {
+            for group in groups where entry.country == nil || group.country == entry.country {
+                for league in group.leagues where league.name.caseInsensitiveCompare(entry.name) == .orderedSame {
+                    found.append(PopularLeague(choice: SportsLeagueChoice(
+                        id: league.id,
+                        name: league.name,
+                        country: group.country
+                    )))
+                }
             }
         }
         return found
@@ -272,5 +289,18 @@ struct SportsSelectionView: View {
         case .dailyLimit?: String(localized: "The day's requests are used up. Try again after the reset.")
         default: String(localized: "The leagues could not be loaded. Check the connection and try again.")
         }
+    }
+}
+
+extension View {
+    /// A sheet on a Mac takes the size of its content, and a list has none of its own: without this the leagues sheet
+    /// is a
+    /// strip with a search field and nothing under it. Elsewhere a sheet is sized by the system.
+    func sportsSheetSize() -> some View {
+        #if os(macOS)
+            frame(minWidth: 520, idealWidth: 560, minHeight: 560, idealHeight: 680)
+        #else
+            self
+        #endif
     }
 }

@@ -1,6 +1,7 @@
 #if DEBUG
     import Foundation
     import PanopCore
+    import PanopEPG
 
     /// The sports hub without the real service, for UI tests, screenshots and trying the screens: `PANOP_DEMO_SPORTS=1`
     /// with `-panop-uitest` gives a key, leagues and teams, and a transport that answers like sportapi.ai with invented
@@ -26,6 +27,35 @@
 
         static var transport: (any HTTPTransport)? {
             isActive ? DemoSportsTransport() : nil
+        }
+
+        /// The guide for the demo matches, on the channels the UI-test playlist already has (`c0` to `c5`): one channel
+        /// that says the match in its title, one that says only "Football Live" and names the teams in the description,
+        /// and a second channel for the first match, so a choice has to be made.
+        static func programmes() -> [EPGProgramme] {
+            let now = Date.now
+            func line(
+                _ channel: String, _ title: String, from start: Double, for length: Double = 125,
+                details: String? = nil, categories: [String] = []
+            ) -> EPGProgramme {
+                EPGProgramme(
+                    channelID: channel, start: now.addingTimeInterval(start * 60),
+                    stop: now.addingTimeInterval((start + length) * 60),
+                    title: title, details: details, categories: categories
+                )
+            }
+            return [
+                line("c4", "Northern Division: Northgate Rovers - Harbour United", from: -68),
+                line("c1", "Football: Harbour United v Northgate Rovers", from: -65, categories: ["Sports"]),
+                line(
+                    "c0",
+                    "Football Live",
+                    from: -17,
+                    details: "Kronen Liga: Falkenberg SV gegen Rhein 04, live.",
+                    categories: ["Sports"]
+                ),
+                line("c2", "Elm Park - Fir Albion", from: 85)
+            ]
         }
 
         /// What the person follows at the start: leagues 1 and 2 and the first team, or the leagues asked for.

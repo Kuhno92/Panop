@@ -39,14 +39,26 @@ final class SportsHubModel {
     private let now: @Sendable () -> Date
     var profile: String
 
+    /// Where the channels that show a match are looked for: the person's playlists and what they favour.
+    struct ChannelSource {
+        var reader: MatchChannelReader
+        var playlists: @MainActor () -> [String]
+        var favourites: @MainActor () -> Set<String>
+    }
+
+    private let channels: ChannelSource?
+    /// What the channels were last looked for with, so a refresh that changed nothing does not read the guide again.
+    private var linksKey = ""
+
     init(
         feed: SportsFeed, account: SportsAccount, sync: SportsSyncStore, profile: String,
-        now: @escaping @Sendable () -> Date = { .now }
+        channels: ChannelSource? = nil, now: @escaping @Sendable () -> Date = { .now }
     ) {
         self.feed = feed
         self.account = account
         self.sync = sync
         self.profile = profile
+        self.channels = channels
         self.now = now
     }
 
@@ -100,6 +112,34 @@ final class SportsHubModel {
         fetchedAt = oldest
         error = failure
         hasLoaded = true
+        await refreshLinks()
+    }
+
+    /// Looks for the channels that show the matches still to come or on now, when what is asked has changed or the
+    /// guide
+    /// may have: the guide moves slowly, so a match's channel is asked again at most every quarter of an hour.
+    private func refreshLinks() async {
+        guard let channels else { return }
+        let fixtures = (layout.sections.flatMap(\.fixtures) + (layout.hero.map { [$0] } ?? []))
+            .filter { $0.status == .scheduled || $0.isLive }
+        var seen = Set<Int>()
+        let unique = fixtures.filter { seen.insert($0.id).inserted }
+        let playlists = channels.playlists()
+        let key = "\(unique.map(\.id).sorted())|\(playlists)|\(Int(now().timeIntervalSince1970 / 900))|\(sync.revision)"
+        guard key != linksKey else { return }
+        linksKey = key
+        guard !unique.isEmpty, !playlists.isEmpty else {
+            setLinks([:], rows: [:])
+            return
+        }
+        var remembered: [Int: Set<String>] = [:]
+        for league in Set(unique.compactMap(\.leagueID)) {
+            remembered[league] = Set(sync.channelChoices(league: league, profile: profile).keys)
+        }
+        let output = await channels.reader.read(MatchChannelReader.Request(
+            fixtures: unique, playlists: playlists, remembered: remembered, favourites: channels.favourites()
+        ))
+        setLinks(output.links, rows: output.rows)
     }
 
     /// How old an answer may be before it is asked for again.
@@ -124,9 +164,13 @@ final class SportsHubModel {
         teams = sync.teams(profile: profile)
     }
 
-    /// What to play to watch a match: the channel that has it, best first.
-    func target(for fixture: Fixture) -> PlaybackTarget? {
-        guard let link = links[fixture.id]?.first, let row = channelRows[link.channel.id] else { return nil }
+    /// What to play to watch a match on a channel. The choice is remembered for the league, so the next match of it
+    /// offers the same channel first.
+    func target(for link: MatchLink, in fixture: Fixture) -> PlaybackTarget? {
+        guard let row = channelRows[link.channel.id] else { return nil }
+        if let league = fixture.leagueID {
+            sync.rememberChannel(link.channel.id, league: league, profile: profile)
+        }
         return PlaybackTarget(row: row)
     }
 

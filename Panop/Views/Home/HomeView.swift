@@ -23,7 +23,6 @@ struct HomeView: View {
     @State private var search = ""
     @State private var showingSettings = false
     @State private var showingSports = false
-    @Environment(SportsAccount.self) private var sportsAccount
     @Environment(SportsSyncStore.self) private var sportsSync
     @Environment(\.horizontalSizeClass) private var sizeClass
     @State private var playing: PlaybackTarget?
@@ -52,7 +51,7 @@ struct HomeView: View {
                     #if os(iOS)
                         // On a phone Settings has no tab (the bar is full), so it is here.
                         if sizeClass == .compact {
-                            if sportsAccount.hasKey, sportsSync.showsTab() {
+                            if sportsSync.showsTab() {
                                 Button("Sports", systemImage: "sportscourt") { showingSports = true }
                             }
                             Button("Settings", systemImage: "gearshape") { showingSettings = true }

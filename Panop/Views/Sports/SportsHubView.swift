@@ -9,6 +9,9 @@ struct SportsHubView: View {
     @Environment(SportsSyncStore.self) private var sync
     @Environment(ProfileStore.self) private var profiles
     @Environment(\.sportsFeed) private var feed
+    @Environment(\.modelContext) private var catalog
+    @Environment(PlaylistLibrary.self) private var library
+    @Environment(UserStateStore.self) private var userState
     @State private var model: SportsHubModel?
     @State private var showsSelection = false
 
@@ -32,7 +35,18 @@ struct SportsHubView: View {
             model = nil
             return
         }
-        let made = SportsHubModel(feed: feed, account: account, sync: sync, profile: profiles.currentID)
+        let source = SportsHubModel.ChannelSource(
+            reader: MatchChannelReader(container: catalog.container),
+            playlists: { library.playlists.map(\.id) },
+            favourites: { userState.favorites }
+        )
+        let made = SportsHubModel(
+            feed: feed,
+            account: account,
+            sync: sync,
+            profile: profiles.currentID,
+            channels: source
+        )
         model = made
         await feed.prune()
         await made.run()
@@ -46,6 +60,7 @@ struct SportsHubView: View {
                     NavigationStack {
                         SportsSelectionView(isSetup: true) { showsSelection = false }
                     }
+                    .sportsSheetSize()
                 }
         } else {
             SportsHubScroll(model: model)
@@ -112,6 +127,7 @@ private struct SportsHubScroll: View {
                         }
                     }
             }
+            .sportsSheetSize()
         }
         .modifier(PlayerPresentation(target: $playing))
         .task(id: model.day) { await model.reload() }
@@ -134,9 +150,9 @@ private struct SportsHubScroll: View {
         if let hero = layout.hero {
             HeroMatchCard(
                 fixture: hero,
-                channel: model.links[hero.id]?.first,
+                links: model.links[hero.id] ?? [],
                 onOpen: { open(hero) },
-                onWatch: { watch(hero) }
+                onWatch: { watch($0, in: hero) }
             )
             .padding(.horizontal)
         }
@@ -164,9 +180,9 @@ private struct SportsHubScroll: View {
         MatchRow(
             fixture: fixture,
             followed: model.followedTeamIDs,
-            channel: model.links[fixture.id]?.first,
+            links: model.links[fixture.id] ?? [],
             onOpen: { open(fixture) },
-            onWatch: { watch(fixture) }
+            onWatch: { watch($0, in: fixture) }
         )
         .padding(.horizontal)
     }
@@ -190,8 +206,8 @@ private struct SportsHubScroll: View {
         opened = fixture
     }
 
-    private func watch(_ fixture: Fixture) {
-        guard let target = model.target(for: fixture) else { return }
+    private func watch(_ link: MatchLink, in fixture: Fixture) {
+        guard let target = model.target(for: link, in: fixture) else { return }
         playing = target
     }
 }

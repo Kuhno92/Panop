@@ -28,6 +28,8 @@ final class SportsAccount {
         case rejected
         /// The service could not be asked, so the key is neither accepted nor refused.
         case unreachable
+        /// The service accepted it, but this device could not keep it (the Keychain refused), so it would be lost.
+        case notSaved
     }
 
     private(set) var state: State
@@ -105,6 +107,10 @@ final class SportsAccount {
         do {
             let quota = try await candidate.validate()
             keyStore.save(key)
+            guard keyStore.load() == key else {
+                state = previous == .validating ? .noKey : previous
+                return .notSaved
+            }
             self.quota = quota
             state = .ready
             reconcile()
@@ -115,6 +121,10 @@ final class SportsAccount {
         } catch let SportsError.dailyLimit(resetsAt) {
             // The key is good, and the day's requests are spent: it is kept.
             keyStore.save(key)
+            guard keyStore.load() == key else {
+                state = previous == .validating ? .noKey : previous
+                return .notSaved
+            }
             state = .limitReached(resetsAt: resetsAt)
             reconcile()
             return .accepted

@@ -168,6 +168,16 @@ enum MatchChannelScorer {
         return between.count <= 2 && between.contains { separators.contains($0) }
     }
 
+    /// Whether the words of a line and its categories say sport: a sport category, or "live" with a sport word.
+    static func isSportLike(headline: [String], categories: [String]) -> Bool {
+        if categories.contains(where: { !Set(TeamNames.tokens($0)).isDisjoint(with: sportWords) }) {
+            return true
+        }
+        let live = headline.contains { liveWords.contains($0) }
+        let sport = headline.contains { titleSportWords.contains($0) }
+        return live && sport
+    }
+
     private static func isSport(_ programme: PreparedProgramme) -> Bool {
         if !programme.categories.isDisjoint(with: sportWords) {
             return true

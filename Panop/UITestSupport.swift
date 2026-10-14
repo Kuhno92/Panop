@@ -205,7 +205,7 @@ enum UITestMode {
                     programme("c4", "Kids Cartoon Hour", ["Kids"], from: 70, to: 130),
                     programme("c5", "Headlines", ["Nachrichten"], from: -5, to: 25),
                     programme("c5", "Mystery Hour", [], from: 25, to: 85)
-                ], playlist: playlist.id)
+                ] + SportsDemo.programmes(), playlist: playlist.id)
             } catch {
                 assertionFailure("UI test seed failed: \(error)")
             }

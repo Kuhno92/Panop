@@ -156,3 +156,24 @@ private struct LineupEnvelope: Decodable {
 
     var data: Teams?
 }
+
+@Suite("an error in a body is not data")
+struct ErrorBodyTests {
+    private let failure = Data(#"{"success": false, "error": "something went wrong"}"#.utf8)
+
+    @Test
+    func `a reply that says it failed is not read as an empty list`() {
+        #expect(throws: SportsError.undecodable) { try SportsParsing.leagues(failure) }
+        #expect(throws: SportsError.undecodable) { try SportsParsing.fixtures(failure) }
+        #expect(throws: SportsError.undecodable) { try SportsParsing.standings(failure) }
+        #expect(throws: SportsError.undecodable) { try SportsParsing.events(failure) }
+        #expect(throws: SportsError.undecodable) { try SportsParsing.lineups(failure) }
+        #expect(throws: SportsError.undecodable) { try SportsParsing.stats(failure) }
+    }
+
+    @Test
+    func `a day with nothing on is still an empty list`() throws {
+        #expect(try SportsParsing.fixtures(Data(#"{"success": true, "data": []}"#.utf8)).isEmpty)
+        #expect(try SportsParsing.fixtures(Data(#"{"data": []}"#.utf8)).isEmpty)
+    }
+}

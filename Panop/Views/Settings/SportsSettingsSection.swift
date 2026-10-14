@@ -9,6 +9,7 @@ struct SportsSettingsSection: View {
     @Environment(CloudSyncStatus.self) private var cloud
     @Environment(\.sportsFeed) private var feed
     @AppStorage(SportsConfig.syncsKeyKey) private var syncsKey = true
+    @State private var showsTab = true
     @State private var draft = ""
     @State private var message: String?
     @State private var confirmsRemoval = false
@@ -37,11 +38,16 @@ struct SportsSettingsSection: View {
             } else {
                 entry
             }
+            Toggle(isOn: $showsTab) {
+                SettingsRow("Show the Sports tab", symbol: "sportscourt", tint: .green)
+            }
+            .onChange(of: showsTab) { _, shown in sync.setShowsTab(shown) }
         } header: {
             Text("Sports")
         } footer: {
             Text(footer)
         }
+        .onAppear { showsTab = sync.showsTab() }
         .confirmationDialog("Remove the sports key?", isPresented: $confirmsRemoval, titleVisibility: .visible) {
             Button("Remove key", role: .destructive) {
                 account.removeKey()
@@ -99,6 +105,8 @@ struct SportsSettingsSection: View {
             message = String(localized: "That key was not accepted.")
         case .unreachable:
             message = String(localized: "The service could not be reached. Check the connection and try again.")
+        case .notSaved:
+            message = String(localized: "The key was accepted but could not be saved on this device.")
         }
     }
 

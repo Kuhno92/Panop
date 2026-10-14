@@ -34,6 +34,13 @@ class PanopUITestCase: XCTestCase {
         false
     }
 
+    /// A path to a file with a real sportapi.ai key, for a run against the real service (never in the repository: the
+    /// key
+    /// is in the git-ignored `.secrets`). Nil in every ordinary test.
+    var devSportsKeyFile: String? {
+        nil
+    }
+
     var startTab: String {
         "live"
     }
@@ -74,6 +81,9 @@ class PanopUITestCase: XCTestCase {
             app.launchEnvironment["PANOP_DEMO_ART_DIR"] = URL(fileURLWithPath: #filePath)
                 .deletingLastPathComponent().deletingLastPathComponent()
                 .appendingPathComponent("docs/store-art").path
+        }
+        if let file = devSportsKeyFile {
+            app.launchEnvironment["PANOP_DEV_SPORTSAPI"] = file
         }
         if demoSports {
             app.launchEnvironment["PANOP_DEMO_SPORTS"] = "1"

@@ -18,15 +18,15 @@ struct SportsNoKeyView: View {
                 .multilineTextAlignment(.center)
                 .foregroundStyle(.secondary)
                 Text("""
-                It uses your own free account at sportapi.ai. Enter its key in Settings, in the Sports section: the free \
-                plan allows 2,000 requests a day, which is plenty.
+                It uses your own free account at sportapi.ai: get a key there and enter it in Settings, in the Sports \
+                section. The free plan allows 2,000 requests a day, which is plenty.
                 """)
                 .multilineTextAlignment(.center)
                 .font(.callout)
                 NavigationLink {
-                    SettingsView()
+                    SportsKeySettingsView()
                 } label: {
-                    Label("Open Settings", systemImage: "gearshape")
+                    Label("Enter the key", systemImage: "key.fill")
                         .font(.headline)
                         .padding(.horizontal, 8)
                 }
@@ -81,7 +81,7 @@ struct SportsNoticeBanner: View {
                 Button("Retry", action: onRetry).font(.subheadline.weight(.semibold))
             }
             if case .keyRefused = notice {
-                NavigationLink("Settings") { SettingsView() }.font(.subheadline.weight(.semibold))
+                NavigationLink("Key") { SportsKeySettingsView() }.font(.subheadline.weight(.semibold))
             }
         }
         .padding(12)
