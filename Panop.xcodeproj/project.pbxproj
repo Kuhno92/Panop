@@ -24,10 +24,11 @@
 		AAAA000000000000000000F8 /* LumeEngine in Frameworks */ = {isa = PBXBuildFile; productRef = AAAA000000000000000000CC /* LumeEngine */; };
 		AAAA000000000000000000F9 /* PanopDiscover in Frameworks */ = {isa = PBXBuildFile; productRef = AAAA000000000000000000CD /* PanopDiscover */; };
 		AAAA000000000000000000FA /* LumeEngine in Embed Frameworks */ = {isa = PBXBuildFile; productRef = AAAA000000000000000000CB /* LumeEngine */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		AAAA00000000000000000128 /* KSPlayerBridge in Embed Frameworks */ = {isa = PBXBuildFile; productRef = AAAA00000000000000000126 /* KSPlayerBridge */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		AAAA00000000000000000120 /* AetherEngine in Frameworks */ = {isa = PBXBuildFile; productRef = AAAA00000000000000000122 /* AetherEngine */; };
 		AAAA00000000000000000124 /* KSPlayerBridge in Frameworks */ = {isa = PBXBuildFile; productRef = AAAA00000000000000000126 /* KSPlayerBridge */; };
+		AAAA00000000000000000128 /* KSPlayerBridge in Embed Frameworks */ = {isa = PBXBuildFile; productRef = AAAA00000000000000000126 /* KSPlayerBridge */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		BBBB000000000000000000A1 /* PanopSimkl in Frameworks */ = {isa = PBXBuildFile; productRef = BBBB000000000000000000A2 /* PanopSimkl */; };
+		BBBB000000000000000000B1 /* PanopSports in Frameworks */ = {isa = PBXBuildFile; productRef = BBBB000000000000000000B2 /* PanopSports */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -99,6 +100,7 @@
 				AAAA000000000000000000D7 /* PanopCatalog in Frameworks */,
 				AAAA000000000000000000D8 /* PanopDiscover in Frameworks */,
 				BBBB000000000000000000A1 /* PanopSimkl in Frameworks */,
+				BBBB000000000000000000B1 /* PanopSports in Frameworks */,
 				AAAA000000000000000000F6 /* VLCKit in Frameworks */,
 				AAAA000000000000000000F7 /* LumeEngine in Frameworks */,
 				AAAA00000000000000000120 /* AetherEngine in Frameworks */,
@@ -180,6 +182,7 @@
 				AAAA000000000000000000C7 /* PanopCatalog */,
 				AAAA000000000000000000CD /* PanopDiscover */,
 				BBBB000000000000000000A2 /* PanopSimkl */,
+				BBBB000000000000000000B2 /* PanopSports */,
 				AAAA000000000000000000C8 /* VLCKit */,
 				AAAA000000000000000000CB /* LumeEngine */,
 				AAAA00000000000000000122 /* AetherEngine */,
@@ -429,7 +432,7 @@
 				"ASSETCATALOG_COMPILER_APPICON_NAME[sdk=appletvos*]" = "App Icon & Top Shelf Image";
 				"ASSETCATALOG_COMPILER_APPICON_NAME[sdk=appletvsimulator*]" = "App Icon & Top Shelf Image";
 				CODE_SIGN_ENTITLEMENTS = Config/Panop.entitlements;
-				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = Config/Panop-macOS.entitlements;
+				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = "Config/Panop-macOS.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = 4HUJUM5AUG;
@@ -437,7 +440,6 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Config/Panop-Info.plist";
-				PANOP_ICLOUD_ENTITLED = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Panop;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -449,6 +451,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MARKETING_VERSION = 0.1.0;
+				PANOP_ICLOUD_ENTITLED = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.panop.Panop;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
@@ -467,7 +470,7 @@
 				"ASSETCATALOG_COMPILER_APPICON_NAME[sdk=appletvos*]" = "App Icon & Top Shelf Image";
 				"ASSETCATALOG_COMPILER_APPICON_NAME[sdk=appletvsimulator*]" = "App Icon & Top Shelf Image";
 				CODE_SIGN_ENTITLEMENTS = Config/Panop.entitlements;
-				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = Config/Panop-macOS.entitlements;
+				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = "Config/Panop-macOS.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = 4HUJUM5AUG;
@@ -475,7 +478,6 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Config/Panop-Info.plist";
-				PANOP_ICLOUD_ENTITLED = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Panop;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -487,6 +489,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MARKETING_VERSION = 0.1.0;
+				PANOP_ICLOUD_ENTITLED = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.panop.Panop;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
@@ -705,6 +708,10 @@
 		BBBB000000000000000000A2 /* PanopSimkl */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = PanopSimkl;
+		};
+		BBBB000000000000000000B2 /* PanopSports */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PanopSports;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
