@@ -460,3 +460,52 @@ struct SportsAccountTests {
         #expect(told)
     }
 }
+
+@MainActor
+@Suite("Home's row of today's matches")
+struct TodaysMatchesTests {
+    private func day(_ kickoff: String, status: String, id: Int = 1, league: Int = 1) -> String {
+        """
+        {"success": true, "data": [
+          {"id": \(id), "league_id": \(league), "league_name": "L", "home_id": 5, "away_id": 6, "home_team": "A", "away_team": "B",
+           "kickoff_utc": "\(kickoff)", "status": "\(status)"}]}
+        """
+    }
+
+    @Test
+    func `a followed league's match of today is in the row, and nothing is asked when nothing is followed`(
+    ) async throws {
+        let env = try Harness()
+        defer { env.cleanUp() }
+        let now = env.clock.now
+        let kickoff = ISO8601DateFormatter().string(from: now.addingTimeInterval(3600))
+        env.service.body = day(kickoff, status: "Scheduled")
+        let utc = try #require(TimeZone(identifier: "UTC"))
+
+        let nothing = await TodaysMatches.load(feed: env.feed, sync: env.sync, profile: "", now: now, timeZone: utc)
+        #expect(nothing.isEmpty && env.service.requests.isEmpty)
+
+        env.sync.setLeague(SportsLeagueChoice(id: 1, name: "L", country: "X"), chosen: true, profile: "")
+        let found = await TodaysMatches.load(feed: env.feed, sync: env.sync, profile: "", now: now, timeZone: utc)
+        #expect(found.map(\.id) == [1])
+    }
+
+    @Test
+    func `what is on comes first, then what is to come, then what is over`() async throws {
+        let env = try Harness()
+        defer { env.cleanUp() }
+        let now = env.clock.now
+        let stamp = { (minutes: Double) in ISO8601DateFormatter().string(from: now.addingTimeInterval(minutes * 60)) }
+        func row(_ id: Int, _ minutes: Double, _ status: String) -> String {
+            "{\"id\": \(id), \"league_id\": 1, \"league_name\": \"L\", \"home_team\": \"A\", \"away_team\": \"B\", "
+                + "\"kickoff_utc\": \"\(stamp(minutes))\", \"status\": \"\(status)\", \"minute\": \"10'\"}"
+        }
+        env.service.body = "{\"success\": true, \"data\": [\(row(1, -200, "FT")), \(row(2, 90, "Scheduled")), \(row(3, -10, "LIVE"))]}"
+        env.sync.setLeague(SportsLeagueChoice(id: 1, name: "L", country: "X"), chosen: true, profile: "")
+        let utc = try #require(TimeZone(identifier: "UTC"))
+        // Kick-offs are on the clock's day in UTC only when it is not near midnight: the test clock is 2026-10-14
+        // ~08:00.
+        let found = await TodaysMatches.load(feed: env.feed, sync: env.sync, profile: "", now: now, timeZone: utc)
+        #expect(found.map(\.id) == [3, 2, 1])
+    }
+}

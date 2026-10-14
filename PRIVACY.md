@@ -24,6 +24,13 @@ with the developer, no analytics, no advertising and no tracking, and nothing is
 - **Simkl, only if you sign in to it.** If a build offers it and you sign in, Panop sends the titles you finished to your
   Simkl account and reads your lists, and it fetches Simkl's public lists of what is popular. Nothing is sent to Simkl
   without your sign-in. Simkl's own policy applies to what it holds.
+- **sportapi.ai, only if you enter a key for it.** The sports hub (today's football matches) uses your own free account at
+  sportapi.ai. Panop sends your key and what it asks for (a day's matches, a league's table, a match) to sportapi.ai, and
+  loads team crests from its public files. Nothing about your playlists, channels or what you watch is sent: which channel
+  shows a match is worked out on your device, from your own guide. The key is kept in the Keychain on your device and, if
+  iCloud is on, also travels to your other devices in an end-to-end encrypted field of your own iCloud; you can turn that off
+  in Settings, and removing the key removes it from your devices. The leagues and teams you follow and the channels you chose
+  for a league travel through your iCloud as well. sportapi.ai's own policy applies to what it holds.
 - **Artwork and guide data** are fetched from the addresses your provider gives.
 
 ## Children
@@ -33,7 +40,7 @@ optional PIN, in Settings.
 
 ## Your choices
 
-You can remove a source, forget what you watched, or turn iCloud and Simkl off in Settings, and delete the app, which
+You can remove a source, forget what you watched, or turn iCloud, Simkl and the sports key off in Settings, and delete the app, which
 removes what it stored on the device. Data in your iCloud can be removed in iPhone Settings, Apple Account, iCloud,
 Manage Storage.
 

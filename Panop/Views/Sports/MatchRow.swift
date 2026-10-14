@@ -133,7 +133,7 @@ struct WatchControl: View {
             if links.count == 1, top.score.tier >= .likely {
                 Button { onPick(top) } label: { label(top) }
                     .buttonStyle(style)
-                    .tint(top.score.tier == .watch ? .green : .gray)
+                    .modifier(WatchTint(sure: top.score.tier == .watch))
                     .accessibilityLabel(Text("Watch on \(top.channel.name)"))
             } else {
                 Menu {
@@ -144,7 +144,7 @@ struct WatchControl: View {
                     }
                 } label: { label(top, many: true) }
                     .buttonStyle(style)
-                    .tint(top.score.tier == .watch ? .green : .gray)
+                    .modifier(WatchTint(sure: top.score.tier == .watch))
             }
         }
     }
@@ -169,5 +169,20 @@ struct WatchControl: View {
         .padding(.horizontal, 12)
         .padding(.vertical, 8)
         .frame(maxWidth: 150)
+    }
+}
+
+/// Green for a channel that is sure, grey for one to confirm. Not on Apple TV: a tinted card there is a bright slab
+/// with
+/// pale text on it, and the focus already says what is selected.
+private struct WatchTint: ViewModifier {
+    let sure: Bool
+
+    func body(content: Content) -> some View {
+        #if os(tvOS)
+            content
+        #else
+            content.tint(sure ? .green : .gray)
+        #endif
     }
 }

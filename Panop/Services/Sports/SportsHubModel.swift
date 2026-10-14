@@ -151,12 +151,31 @@ final class SportsHubModel {
     }
 
     /// Keeps the hub current while it is on screen. Ends when the screen goes (the task is cancelled).
+    ///
+    /// Right after a launch the person's playlists and their guide may still be arriving, so a match found no channel
+    /// yet:
+    /// that is asked again after a few seconds, a few times, before settling into the slow rhythm.
     func run() async {
+        var quickRetries = 4
         while !Task.isCancelled {
             await reload()
-            let wait = min(600, account.quota?.refreshInterval(isLive: hasLive) ?? (hasLive ? 60 : 600))
+            var wait = min(600, account.quota?.refreshInterval(isLive: hasLive) ?? (hasLive ? 60 : 600))
+            if quickRetries > 0, channels != nil, links.isEmpty, hasMatchesToLink {
+                quickRetries -= 1
+                wait = 6
+            }
             try? await Task.sleep(for: .seconds(wait))
         }
+    }
+
+    private var hasMatchesToLink: Bool {
+        layout.sections.contains { $0.fixtures.contains { $0.status == .scheduled || $0.isLive } }
+    }
+
+    /// The person's playlists or their guide changed: the channels are looked for again.
+    func relink() async {
+        linksKey = ""
+        await refreshLinks()
     }
 
     private func readSelection() {

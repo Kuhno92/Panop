@@ -154,3 +154,14 @@ artwork.
 | Feedback email | the address testers write to |
 | Beta App Review contact and notes | as under App Review information above |
 | What to Test | Add a source; Live TV list, search, categories and the TV guide; channels with several versions (the button at the end of a row); playing, switching channel, going back to browse with the stream still playing; Movies and Series browsing and resume. |
+
+## Sports hub (added with the hub)
+
+- **Description line:** "Optional sports hub: today's football matches with scores, tables and line-ups, and the channel of your
+  own playlist that shows them. It uses your own free sportapi.ai key." (Add to the description in both languages.)
+- **Privacy label:** still "Data Not Collected": the developer receives nothing. The person's key and requests go from their device
+  to sportapi.ai, which is a service they set up themselves.
+- **Review notes (add):** "The sports hub is optional and needs a personal API key from sportapi.ai, which the reviewer does not
+  need: the tab explains this and leads to the key setting. Everything else works without it. No match data or channel comes from
+  the developer."
+- **Open:** sportapi.ai publishes no terms for apps; ask them in writing before this ships (`docs/sportapi-notes.md`).

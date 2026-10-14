@@ -1,5 +1,6 @@
 import PanopCore
 import PanopDiscover
+import PanopSports
 import SwiftData
 import SwiftUI
 
@@ -23,6 +24,10 @@ struct HomeView: View {
     @State private var search = ""
     @State private var showingSettings = false
     @State private var showingSports = false
+    @State private var sportsToday: [Fixture] = []
+    @Environment(SportsAccount.self) private var sportsAccount
+    @Environment(ProfileStore.self) private var sportsProfiles
+    @Environment(\.sportsFeed) private var sportsFeed
     @Environment(SportsSyncStore.self) private var sportsSync
     @Environment(\.horizontalSizeClass) private var sizeClass
     @State private var playing: PlaybackTarget?
@@ -68,6 +73,18 @@ struct HomeView: View {
             ))
             .navigationDestination(isPresented: $showingSettings) { SettingsView() }
             .navigationDestination(isPresented: $showingSports) { SportsHubView() }
+            // Read here and not in the rail: a task on a view that draws nothing never runs.
+            .task(id: "\(sportsProfiles.currentID)|\(sportsAccount.hasKey)|\(sportsSync.revision)") {
+                guard sportsAccount.hasKey, let sportsFeed else {
+                    sportsToday = []
+                    return
+                }
+                sportsToday = await TodaysMatches.load(
+                    feed: sportsFeed,
+                    sync: sportsSync,
+                    profile: sportsProfiles.currentID
+                )
+            }
             .onChange(of: settingsVisits) { showingSettings = false }
             .navigationDestination(item: $openMovie) { MovieDetailView(movie: $0) }
             .navigationDestination(item: $openSeries) { SeriesDetailView(series: $0) }
@@ -115,6 +132,8 @@ struct HomeView: View {
                             onPlay: play
                         )
                     }
+                    // What is on today in the sports the person follows. Not there without a key, or without matches.
+                    TodaysMatchesRail(fixtures: sportsToday, onOpen: { showingSports = true })
                     // Suggestions drawn from the library itself.
                     ForEach(discovery.rails.filter(showsOnHome)) { rail in
                         PosterRail(
@@ -125,7 +144,7 @@ struct HomeView: View {
                             onSelect: open
                         )
                     }
-                    if !hasHistory, discovery.rails.isEmpty, discovery.phase == .loaded {
+                    if !hasHistory, discovery.rails.isEmpty, sportsToday.isEmpty, discovery.phase == .loaded {
                         nothingYet
                     } else {
                         browseButton

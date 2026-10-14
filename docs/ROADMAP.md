@@ -760,6 +760,18 @@ Features real users expect that the brief did not name. All *(surfaced)*.
 - [ ] **Performance benchmarks** in a separate target and configuration. Never benchmark in
       Debug; `-Onone` makes parser numbers fiction.
 
+- [x] **Sports hub** *(asked for)*. Today's football matches of the leagues and teams the person follows, from sportapi.ai with
+      **the person's own key** (entered in Settings; the free plan's 2,000 requests a day). A hero match, a scoreboard strip, the
+      leagues' matches with scores and minute, the match screen (events, line-ups drawn on a pitch from the position names,
+      numbers), league tables, Today and Tomorrow, a row on Home, and a **Watch** button for the channel of the person's own
+      playlist that is showing the match, found from the guide (team names in the title, subtitle or description, time against
+      kick-off; sport that names no team is offered to choose from). Leagues, favourite teams, channels chosen, and the key
+      itself sync through iCloud (ADR 0011). `PanopSports` (portable) holds the client, models, matching and layout;
+      `Panop/Services/Sports` and `Panop/Views/Sports` the rest. The budget is read from the service's own headers. A debug-only
+      fake service (invented clubs) drives the UI tests. **Not done:** goal alerts, a score overlay while playing, multi-view,
+      the WebSocket feed, other sports (the service is football only). **Open:** sportapi.ai publishes no terms for use in an
+      app (the page returns 404): ask them in writing before a release that includes it (`docs/sportapi-notes.md`).
+
 ---
 
 ## M7 — Release readiness

@@ -12,15 +12,13 @@ class SportsScene: PanopUITestCase {
 
     /// The hub: its tab where there is one, and on a compact phone the button on Home.
     func openHub() {
-        #if os(tvOS)
-            // The tab bar has focus first; the Sports tab is the one named so.
-            XCUIRemote.shared.press(.select)
-        #else
-            if !app.tabBars.buttons["Sports"].exists {
+        // On Apple TV the Sports tab is the one the app opens on, so the hub is already showing.
+        #if !os(tvOS)
+            if app.tabBars.buttons["Sports"].exists {
+                app.tabBars.buttons["Sports"].tap()
+            } else {
                 app.tabBars.buttons.element(boundBy: 0).tap()
                 app.buttons["Sports"].tap()
-            } else {
-                app.tabBars.buttons["Sports"].tap()
             }
         #endif
     }
@@ -43,14 +41,70 @@ final class SportsHubTests: SportsScene {
             "the demo matches never appeared. Screen:\n\(app.debugDescription)"
         )
         // The first demo match has a channel with the match in its title, and a second one: a choice to make.
+        _ = app.descendants(matching: .any).matching(NSPredicate(format: "label CONTAINS 'Watch'")).firstMatch
+            .waitForExistence(timeout: 30)
+        capture("sports-hub")
         XCTAssertTrue(
-            app.buttons.matching(NSPredicate(format: "label CONTAINS 'Watch'")).firstMatch
+            app.descendants(matching: .any).matching(NSPredicate(format: "label CONTAINS 'Watch'")).firstMatch
                 .waitForExistence(timeout: 30),
             "no match had a channel to watch. Screen:\n\(app.debugDescription)"
         )
-        capture("sports-hub")
         XCTAssertTrue(app.staticTexts["Northern Division"].exists || app.buttons
             .matching(NSPredicate(format: "label CONTAINS 'Harbour'")).firstMatch.exists)
+    }
+}
+
+/// Home has a row with today's matches, and the hub has tables.
+final class SportsRailAndTablesTests: PanopUITestCase {
+    override var demoSports: Bool {
+        true
+    }
+
+    override var startTab: String {
+        "home"
+    }
+
+    func testHomeShowsTodaysMatches() {
+        #if !os(tvOS)
+            let heading = app.staticTexts["Today's matches"]
+            _ = heading.waitForExistence(timeout: 20)
+            scrollTo(heading)
+            let first = XCTAttachment(screenshot: app.screenshot())
+            first.name = "sports-home-rail"
+            first.lifetime = .keepAlways
+            add(first)
+            XCTAssertTrue(
+                heading.waitForExistence(timeout: 30),
+                "Home had no row of today's matches. Screen:\n\(app.debugDescription)"
+            )
+            let shot = XCTAttachment(screenshot: app.screenshot())
+            shot.name = "sports-home-rail"
+            shot.lifetime = .keepAlways
+            add(shot)
+        #endif
+    }
+
+    func testTheHubShowsTables() {
+        #if !os(tvOS)
+            app.tabBars.buttons.element(boundBy: 0).tap()
+            if app.tabBars.buttons["Sports"].exists {
+                app.tabBars.buttons["Sports"].tap()
+            } else {
+                XCTAssertTrue(app.buttons["Sports"].waitForExistence(timeout: 15))
+                app.buttons["Sports"].tap()
+            }
+            XCTAssertTrue(app.buttons["Tables"].waitForExistence(timeout: 30), "Screen:\n\(app.debugDescription)")
+            app.buttons["Tables"].tap()
+            XCTAssertTrue(
+                app.staticTexts["Northgate"].waitForExistence(timeout: 20),
+                "the table did not show. Screen:\n\(app.debugDescription)"
+            )
+            Thread.sleep(forTimeInterval: 2)
+            let shot = XCTAttachment(screenshot: app.screenshot())
+            shot.name = "sports-tables"
+            shot.lifetime = .keepAlways
+            add(shot)
+        #endif
     }
 }
 

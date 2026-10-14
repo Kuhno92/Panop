@@ -72,10 +72,26 @@ struct SportsHubView: View {
 private struct SportsHubScroll: View {
     @Bindable var model: SportsHubModel
     @Environment(SportsSyncStore.self) private var sync
+    @Environment(PlaylistLibrary.self) private var library
+    @Environment(SyncStatusCenter.self) private var status
     @Environment(\.horizontalSizeClass) private var sizeClass
     @State private var playing: PlaybackTarget?
     @State private var opened: Fixture?
     @State private var showsSelection = false
+    @State private var section: Section = .matches
+
+    /// A column that reads well: wider on a television, which is seen from a distance.
+    private static var contentWidth: CGFloat {
+        #if os(tvOS)
+            1500
+        #else
+            900
+        #endif
+    }
+
+    private enum Section: Hashable {
+        case matches, tables
+    }
 
     var body: some View {
         // Read, so the hub follows a change of leagues or teams from another device.
@@ -89,7 +105,9 @@ private struct SportsHubScroll: View {
                     SportsNoticeBanner(notice: notice) { Task { await model.reload(force: true) } }
                         .padding(.horizontal)
                 }
-                if !model.hasLoaded {
+                if section == .tables {
+                    StandingsView(leagues: model.leagues, followedTeams: model.followedTeamIDs)
+                } else if !model.hasLoaded {
                     SportsSkeleton()
                 } else if model.layout == .empty {
                     SportsEmptyDay(day: model.day, hasSelection: model.hasSelection) { showsSelection = true }
@@ -99,7 +117,7 @@ private struct SportsHubScroll: View {
                 footer
             }
             .padding(.vertical)
-            .frame(maxWidth: 900)
+            .frame(maxWidth: Self.contentWidth)
             .frame(maxWidth: .infinity)
         }
         #if !os(tvOS)
@@ -110,11 +128,13 @@ private struct SportsHubScroll: View {
         }
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
-                Button("Leagues and teams", systemImage: "slider.horizontal.3") { showsSelection = true }
+                Button { showsSelection = true } label: { Image(systemName: "slider.horizontal.3") }
+                    .accessibilityLabel(Text("Leagues and teams"))
             }
             #if !os(iOS)
                 ToolbarItem(placement: .primaryAction) {
-                    Button("Refresh", systemImage: "arrow.clockwise") { Task { await model.reload(force: true) } }
+                    Button { Task { await model.reload(force: true) } } label: { Image(systemName: "arrow.clockwise") }
+                        .accessibilityLabel(Text("Refresh"))
                 }
             #endif
         }
@@ -131,16 +151,29 @@ private struct SportsHubScroll: View {
         }
         .modifier(PlayerPresentation(target: $playing))
         .task(id: model.day) { await model.reload() }
+        // A playlist that arrived, or a guide that was imported, may be the channel of a match.
+        .task(id: [library.playlists.map(\.id).joined(separator: ","), status.isAnySyncing ? "sync" : "idle"]) {
+            await model.relink()
+        }
     }
 
     // MARK: - Parts
 
     private var header: some View {
-        Picker("Day", selection: $model.day) {
-            Text("Today").tag(SportsHubModel.Day.today)
-            Text("Tomorrow").tag(SportsHubModel.Day.tomorrow)
+        VStack(spacing: 10) {
+            Picker("Show", selection: $section) {
+                Text("Matches").tag(Section.matches)
+                Text("Tables").tag(Section.tables)
+            }
+            .pickerStyle(.segmented)
+            if section == .matches {
+                Picker("Day", selection: $model.day) {
+                    Text("Today").tag(SportsHubModel.Day.today)
+                    Text("Tomorrow").tag(SportsHubModel.Day.tomorrow)
+                }
+                .pickerStyle(.segmented)
+            }
         }
-        .pickerStyle(.segmented)
         .padding(.horizontal)
         .frame(maxWidth: 420)
     }

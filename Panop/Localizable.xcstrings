@@ -42,7 +42,24 @@
       }
     },
     "· %@" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "· %@"
+          }
+        }
+      }
+    },
+    "#" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "#"
+          }
+        }
+      }
     },
     "%@ – %@" : {
       "localizations" : {
@@ -50,6 +67,12 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "%1$@ – %2$@"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ – %@"
           }
         }
       }
@@ -250,6 +273,32 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$lld. %2$@"
+          }
+        }
+      }
+    },
+    "%lld. %@, %lld %@, %lld %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld. %2$@, %3$lld %4$@, %5$lld %6$@"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld. %@, %lld %@, %lld %@"
+          }
+        }
+      }
+    },
+    "+%lld" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "+%lld"
           }
         }
       }
@@ -457,7 +506,14 @@
       }
     },
     "AET" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "n. V."
+          }
+        }
+      }
     },
     "AetherEngine (experimental)" : {
       "extractionState" : "manual",
@@ -531,7 +587,14 @@
       }
     },
     "Assist: %@" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vorlage: %@"
+          }
+        }
+      }
     },
     "Audio" : {
       "localizations" : {
@@ -665,7 +728,14 @@
       }
     },
     "C" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "K"
+          }
+        }
+      }
     },
     "Cancel" : {
       "localizations" : {
@@ -678,7 +748,14 @@
       }
     },
     "Cancelled" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abgesagt"
+          }
+        }
+      }
     },
     "Cast" : {
       "localizations" : {
@@ -733,7 +810,14 @@
       }
     },
     "Change leagues and teams" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ligen und Teams ändern"
+          }
+        }
+      }
     },
     "Change PIN" : {
       "localizations" : {
@@ -826,7 +910,14 @@
       }
     },
     "Checking…" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wird geprüft …"
+          }
+        }
+      }
     },
     "Choose a PIN of 4 to 6 digits" : {
       "localizations" : {
@@ -849,7 +940,14 @@
       }
     },
     "Choose leagues" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ligen wählen"
+          }
+        }
+      }
     },
     "Choose…" : {
       "localizations" : {
@@ -1134,16 +1232,44 @@
       }
     },
     "Data by sportapi.ai" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Daten von sportapi.ai"
+          }
+        }
+      }
     },
     "Day" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tag"
+          }
+        }
+      }
     },
     "Day's limit reached" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tageslimit erreicht"
+          }
+        }
+      }
     },
     "Day's limit reached, until %@" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tageslimit erreicht, bis %@"
+          }
+        }
+      }
     },
     "Default" : {
       "localizations" : {
@@ -1306,7 +1432,14 @@
       }
     },
     "Enter the key" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schlüssel eingeben"
+          }
+        }
+      }
     },
     "Enter your PIN" : {
       "localizations" : {
@@ -1359,7 +1492,14 @@
       }
     },
     "Favourite teams" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lieblingsteams"
+          }
+        }
+      }
     },
     "Favourites" : {
       "localizations" : {
@@ -1482,6 +1622,16 @@
         }
       }
     },
+    "Form" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Form"
+          }
+        }
+      }
+    },
     "Forward 10 seconds" : {
       "localizations" : {
         "de" : {
@@ -1493,7 +1643,14 @@
       }
     },
     "Fouls" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fouls"
+          }
+        }
+      }
     },
     "Found your playlists" : {
       "localizations" : {
@@ -1506,13 +1663,44 @@
       }
     },
     "FT" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ende"
+          }
+        }
+      }
+    },
+    "GD" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "TD"
+          }
+        }
+      }
     },
     "Get a free key" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kostenlosen Schlüssel holen"
+          }
+        }
+      }
     },
     "Get a free key at sportapi.ai" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kostenlosen Schlüssel bei sportapi.ai holen"
+          }
+        }
+      }
     },
     "Getting the episodes…" : {
       "localizations" : {
@@ -1716,7 +1904,14 @@
       }
     },
     "HT" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pause"
+          }
+        }
+      }
     },
     "http://provider.example:8080" : {
       "localizations" : {
@@ -1839,7 +2034,14 @@
       }
     },
     "It uses your own free account at sportapi.ai: get a key there and enter it in Settings, in the Sports section. The free plan allows 2,000 requests a day, which is plenty." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Es nutzt dein eigenes, kostenloses Konto bei sportapi.ai: Hole dir dort einen Schlüssel und gib ihn in den Einstellungen im Bereich „Sport“ ein. Der kostenlose Tarif erlaubt 2.000 Anfragen am Tag, das reicht reichlich."
+          }
+        }
+      }
     },
     "Its channels, movies, series and guide are removed from this device." : {
       "localizations" : {
@@ -1852,7 +2054,14 @@
       }
     },
     "Keep the key in iCloud" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schlüssel in iCloud behalten"
+          }
+        }
+      }
     },
     "Keep them" : {
       "localizations" : {
@@ -1875,7 +2084,14 @@
       }
     },
     "Key" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schlüssel"
+          }
+        }
+      }
     },
     "Kids" : {
       "localizations" : {
@@ -1918,10 +2134,24 @@
       }
     },
     "Leagues" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ligen"
+          }
+        }
+      }
     },
     "Leagues and teams" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ligen und Teams"
+          }
+        }
+      }
     },
     "Leaves out categories a provider names as adult, from the lists, search and suggestions." : {
       "extractionState" : "stale",
@@ -1966,10 +2196,24 @@
       }
     },
     "Line-ups" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aufstellungen"
+          }
+        }
+      }
     },
     "Line-ups appear shortly before the kick-off, where the service has them." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aufstellungen erscheinen kurz vor dem Anstoß, sofern der Dienst sie hat."
+          }
+        }
+      }
     },
     "Live" : {
       "localizations" : {
@@ -2022,10 +2266,24 @@
       }
     },
     "Loading leagues…" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ligen werden geladen …"
+          }
+        }
+      }
     },
     "Loading teams…" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Teams werden geladen …"
+          }
+        }
+      }
     },
     "Look again" : {
       "localizations" : {
@@ -2078,7 +2336,24 @@
       }
     },
     "Match" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spiel"
+          }
+        }
+      }
+    },
+    "Matches" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spiele"
+          }
+        }
+      }
     },
     "Medium" : {
       "localizations" : {
@@ -2224,7 +2499,14 @@
       }
     },
     "My teams" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Meine Teams"
+          }
+        }
+      }
     },
     "Name" : {
       "localizations" : {
@@ -2297,7 +2579,14 @@
       }
     },
     "Next" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weiter"
+          }
+        }
+      }
     },
     "Next title" : {
       "extractionState" : "manual",
@@ -2387,7 +2676,14 @@
       }
     },
     "No league matches “%@”." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Liga passt zu „%@“."
+          }
+        }
+      }
     },
     "No live channels" : {
       "localizations" : {
@@ -2400,10 +2696,24 @@
       }
     },
     "No matches today" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Heute keine Spiele"
+          }
+        }
+      }
     },
     "No matches tomorrow" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Morgen keine Spiele"
+          }
+        }
+      }
     },
     "No movies" : {
       "localizations" : {
@@ -2466,7 +2776,14 @@
       }
     },
     "Not accepted" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nicht akzeptiert"
+          }
+        }
+      }
     },
     "Not updated yet" : {
       "localizations" : {
@@ -2519,7 +2836,14 @@
       }
     },
     "Nothing is on in the leagues and for the teams you follow." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In den Ligen und für die Teams, denen du folgst, läuft nichts."
+          }
+        }
+      }
     },
     "Nothing is saved in this iCloud account yet. To bring your playlists from another device:\n1. Use the same Apple Account here as there.\n2. On the other device, open Panop once and check that Settings > iCloud says it is on. That saves everything to iCloud, and the device can be switched off afterwards.\n3. Look again here." : {
       "localizations" : {
@@ -2620,10 +2944,24 @@
       }
     },
     "Offline. Showing what was loaded at %@." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Offline. Gezeigt wird, was um %@ geladen wurde."
+          }
+        }
+      }
     },
     "Offline. The service could not be reached." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Offline. Der Dienst war nicht erreichbar."
+          }
+        }
+      }
     },
     "OK" : {
       "localizations" : {
@@ -2666,7 +3004,14 @@
       }
     },
     "On: %@" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein: %@"
+          }
+        }
+      }
     },
     "On. Your data is syncing with iCloud." : {
       "localizations" : {
@@ -2734,6 +3079,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Insgesamt"
+          }
+        }
+      }
+    },
+    "P" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sp"
           }
         }
       }
@@ -2852,10 +3207,24 @@
       }
     },
     "Pass accuracy" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passquote"
+          }
+        }
+      }
     },
     "Passes" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pässe"
+          }
+        }
+      }
     },
     "Password" : {
       "localizations" : {
@@ -2878,10 +3247,24 @@
       }
     },
     "Pens" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "i. E."
+          }
+        }
+      }
     },
     "Pick the leagues you want to see, and, if you like, favourite teams. You can change them any time." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wähle die Ligen, die du sehen möchtest, und, wenn du magst, Lieblingsteams. Du kannst sie jederzeit ändern."
+          }
+        }
+      }
     },
     "Picture in Picture" : {
       "localizations" : {
@@ -2975,6 +3358,16 @@
         }
       }
     },
+    "played" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "gespielt"
+          }
+        }
+      }
+    },
     "Player" : {
       "localizations" : {
         "de" : {
@@ -3035,11 +3428,35 @@
         }
       }
     },
+    "points" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Punkte"
+          }
+        }
+      }
+    },
     "Popular" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beliebt"
+          }
+        }
+      }
     },
     "Postponed" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verlegt"
+          }
+        }
+      }
     },
     "Preview of the subtitle style" : {
       "localizations" : {
@@ -3108,6 +3525,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Reihenfolge des Anbieters"
+          }
+        }
+      }
+    },
+    "Pts" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pkt"
           }
         }
       }
@@ -3234,7 +3661,14 @@
       }
     },
     "Remove key" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schlüssel entfernen"
+          }
+        }
+      }
     },
     "Remove missing items?" : {
       "localizations" : {
@@ -3267,7 +3701,14 @@
       }
     },
     "Remove the sports key?" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sport-Schlüssel entfernen?"
+          }
+        }
+      }
     },
     "Rename" : {
       "localizations" : {
@@ -3300,7 +3741,14 @@
       }
     },
     "Requests today" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anfragen heute"
+          }
+        }
+      }
     },
     "Reset to standard" : {
       "localizations" : {
@@ -3333,13 +3781,34 @@
       }
     },
     "Retry" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erneut versuchen"
+          }
+        }
+      }
     },
     "Save key" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schlüssel speichern"
+          }
+        }
+      }
     },
     "Saves" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paraden"
+          }
+        }
+      }
     },
     "Schedule" : {
       "localizations" : {
@@ -3362,7 +3831,14 @@
       }
     },
     "Scores" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ergebnisse"
+          }
+        }
+      }
     },
     "Search" : {
       "localizations" : {
@@ -3395,10 +3871,24 @@
       }
     },
     "Search leagues" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ligen suchen"
+          }
+        }
+      }
     },
     "Search teams" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Teams suchen"
+          }
+        }
+      }
     },
     "Season" : {
       "localizations" : {
@@ -3416,6 +3906,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Staffel %lld"
+          }
+        }
+      }
+    },
+    "See all" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle ansehen"
           }
         }
       }
@@ -3481,10 +3981,24 @@
       }
     },
     "Shots" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schüsse"
+          }
+        }
+      }
     },
     "Shots on target" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schüsse aufs Tor"
+          }
+        }
+      }
     },
     "Show" : {
       "localizations" : {
@@ -3569,7 +4083,14 @@
       }
     },
     "Show the Sports tab" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sport-Reiter anzeigen"
+          }
+        }
+      }
     },
     "Showing the first %@. Search to narrow it down." : {
       "localizations" : {
@@ -3712,16 +4233,44 @@
       }
     },
     "sportapi.ai did not accept the key." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "sportapi.ai hat den Schlüssel nicht akzeptiert."
+          }
+        }
+      }
     },
     "sportapi.ai key" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "sportapi.ai-Schlüssel"
+          }
+        }
+      }
     },
     "Sports" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sport"
+          }
+        }
+      }
     },
     "Sports are not available." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sport ist nicht verfügbar."
+          }
+        }
+      }
     },
     "Start over" : {
       "localizations" : {
@@ -3755,7 +4304,14 @@
       }
     },
     "Statistics" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Statistik"
+          }
+        }
+      }
     },
     "Stop" : {
       "extractionState" : "manual",
@@ -3779,7 +4335,14 @@
       }
     },
     "Substitutes · %@" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ersatzbank · %@"
+          }
+        }
+      }
     },
     "Subtitles" : {
       "localizations" : {
@@ -3852,8 +4415,25 @@
         }
       }
     },
+    "Tables" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tabellen"
+          }
+        }
+      }
+    },
     "Tackles" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zweikämpfe"
+          }
+        }
+      }
     },
     "Tap a programme to watch it from the start." : {
       "localizations" : {
@@ -3865,8 +4445,25 @@
         }
       }
     },
+    "Team" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Team"
+          }
+        }
+      }
+    },
     "Teams of leagues with a table show up here. Choose a league first." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Teams von Ligen mit Tabelle erscheinen hier. Wähle zuerst eine Liga."
+          }
+        }
+      }
     },
     "Thanks to" : {
       "localizations" : {
@@ -3929,7 +4526,14 @@
       }
     },
     "That key was not accepted." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieser Schlüssel wurde nicht akzeptiert."
+          }
+        }
+      }
     },
     "That playlist was updated in the meantime. Review it again." : {
       "localizations" : {
@@ -4003,13 +4607,34 @@
       }
     },
     "The day's requests are used up. Scores update again after the reset." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Anfragen des Tages sind aufgebraucht. Ergebnisse aktualisieren sich nach dem Zurücksetzen wieder."
+          }
+        }
+      }
     },
     "The day's requests are used up. Scores update again at %@." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Anfragen des Tages sind aufgebraucht. Ergebnisse aktualisieren sich um %@ wieder."
+          }
+        }
+      }
     },
     "The day's requests are used up. Try again after the reset." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Anfragen des Tages sind aufgebraucht. Versuche es nach dem Zurücksetzen erneut."
+          }
+        }
+      }
     },
     "The download was cut off, so nothing was changed." : {
       "localizations" : {
@@ -4022,16 +4647,44 @@
       }
     },
     "The key is kept in the Keychain on this device. With iCloud on it also travels, encrypted, to your other devices. Only match, league and team requests go to sportapi.ai: nothing about your playlists or what you watch." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Schlüssel liegt im Schlüsselbund dieses Geräts. Mit iCloud wird er zusätzlich verschlüsselt an deine anderen Geräte übertragen. An sportapi.ai gehen nur Anfragen zu Spielen, Ligen und Teams: nichts über deine Playlists oder was du siehst."
+          }
+        }
+      }
     },
     "The key was accepted but could not be saved on this device." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Schlüssel wurde akzeptiert, konnte aber auf diesem Gerät nicht gespeichert werden."
+          }
+        }
+      }
     },
     "The key was not accepted. Check it in Settings." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Schlüssel wurde nicht akzeptiert. Prüfe ihn in den Einstellungen."
+          }
+        }
+      }
     },
     "The leagues could not be loaded. Check the connection and try again." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Ligen konnten nicht geladen werden. Prüfe die Verbindung und versuche es erneut."
+          }
+        }
+      }
     },
     "The login details could not be saved to the Keychain." : {
       "localizations" : {
@@ -4164,7 +4817,14 @@
       }
     },
     "The reply from sportapi.ai could not be read." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Antwort von sportapi.ai konnte nicht gelesen werden."
+          }
+        }
+      }
     },
     "The screen Panop opens on." : {
       "extractionState" : "stale",
@@ -4178,10 +4838,24 @@
       }
     },
     "The service could not be reached. Check the connection and try again." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Dienst war nicht erreichbar. Prüfe die Verbindung und versuche es erneut."
+          }
+        }
+      }
     },
     "The service returned no leagues." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Dienst hat keine Ligen geliefert."
+          }
+        }
+      }
     },
     "The source has no programme information for it." : {
       "localizations" : {
@@ -4194,7 +4868,24 @@
       }
     },
     "The sports hub shows today's football matches and the channel of your playlist that has them. It uses your own free account at sportapi.ai: enter its key here. The free plan allows 2,000 requests a day." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Sport-Bereich zeigt die heutigen Fußballspiele und den Sender deiner Playlist, der sie zeigt. Er nutzt dein eigenes, kostenloses Konto bei sportapi.ai: Gib hier dessen Schlüssel ein. Der kostenlose Tarif erlaubt 2.000 Anfragen am Tag."
+          }
+        }
+      }
+    },
+    "The table could not be loaded." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Tabelle konnte nicht geladen werden."
+          }
+        }
+      }
     },
     "The TV guide address is not a valid web address." : {
       "localizations" : {
@@ -4282,6 +4973,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Diese Version von Panop kann iCloud nicht nutzen."
+          }
+        }
+      }
+    },
+    "This competition has no table." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieser Wettbewerb hat keine Tabelle."
           }
         }
       }
@@ -4407,10 +5108,24 @@
       }
     },
     "Timeline" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spielverlauf"
+          }
+        }
+      }
     },
     "to" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "zu"
+          }
+        }
+      }
     },
     "To bring your saved playlists here, sign in to iCloud in this device's system settings, then open Panop again. Or add a playlist here." : {
       "localizations" : {
@@ -4433,13 +5148,44 @@
       }
     },
     "Today" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Heute"
+          }
+        }
+      }
     },
     "Today's football matches in the leagues and for the teams you follow, with scores, tables and line-ups, and a button for the channel of your playlist that shows the match." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die heutigen Fußballspiele in den Ligen und für die Teams, denen du folgst, mit Ergebnissen, Tabellen und Aufstellungen, und einer Taste für den Sender deiner Playlist, der das Spiel zeigt."
+          }
+        }
+      }
+    },
+    "Today's matches" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spiele heute"
+          }
+        }
+      }
     },
     "Tomorrow" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Morgen"
+          }
+        }
+      }
     },
     "Too many tries. Try again at %@." : {
       "localizations" : {
@@ -4662,7 +5408,14 @@
       }
     },
     "Updated %@" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktualisiert %@"
+          }
+        }
+      }
     },
     "Use the same Apple Account on every device." : {
       "localizations" : {
@@ -4715,7 +5468,14 @@
       }
     },
     "versus" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "gegen"
+          }
+        }
+      }
     },
     "View on Simkl" : {
       "localizations" : {
@@ -4748,7 +5508,14 @@
       }
     },
     "Watch" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ansehen"
+          }
+        }
+      }
     },
     "Watch %@" : {
       "localizations" : {
@@ -4791,7 +5558,14 @@
       }
     },
     "Watch on %@" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ansehen auf %@"
+          }
+        }
+      }
     },
     "Watch something and its numbers show up here." : {
       "localizations" : {
@@ -4804,7 +5578,14 @@
       }
     },
     "Watch…" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ansehen …"
+          }
+        }
+      }
     },
     "Watched" : {
       "localizations" : {
@@ -4837,7 +5618,14 @@
       }
     },
     "What do you follow?" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wem folgst du?"
+          }
+        }
+      }
     },
     "When Panop opens" : {
       "localizations" : {
@@ -4891,7 +5679,14 @@
       }
     },
     "With iCloud on, it is removed from your other devices too. Your leagues and teams are kept." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mit iCloud wird er auch von deinen anderen Geräten entfernt. Deine Ligen und Teams bleiben erhalten."
+          }
+        }
+      }
     },
     "Wrong PIN. %lld tries left." : {
       "localizations" : {
@@ -4934,7 +5729,14 @@
       }
     },
     "Yellow cards" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gelbe Karten"
+          }
+        }
+      }
     },
     "Your content" : {
       "localizations" : {
