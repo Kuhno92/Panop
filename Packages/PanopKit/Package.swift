@@ -26,7 +26,8 @@ let package = Package(
         .library(name: "PanopCatalog", targets: ["PanopCatalog"]),
         .library(name: "PanopPlayback", targets: ["PanopPlayback"]),
         .library(name: "PanopDiscover", targets: ["PanopDiscover"]),
-        .library(name: "PanopSimkl", targets: ["PanopSimkl"])
+        .library(name: "PanopSimkl", targets: ["PanopSimkl"]),
+        .library(name: "PanopSports", targets: ["PanopSports"])
     ],
     targets: [
         .target(name: "PanopCore"),
@@ -41,6 +42,8 @@ let package = Package(
         .target(name: "PanopDiscover", dependencies: ["PanopCore"]),
         // Kept apart so a licence decision about Simkl can drop it without touching the rest.
         .target(name: "PanopSimkl", dependencies: ["PanopCore", "PanopDiscover"]),
+        // Kept apart for the same reason: sportapi.ai's terms for an app are not confirmed, so it can be dropped.
+        .target(name: "PanopSports", dependencies: ["PanopCore"]),
 
         .testTarget(name: "PanopCoreTests", dependencies: ["PanopCore"]),
         .testTarget(name: "PanopPlaylistTests", dependencies: ["PanopPlaylist"]),
@@ -52,7 +55,8 @@ let package = Package(
         ),
         .testTarget(name: "PanopPlaybackTests", dependencies: ["PanopPlayback"]),
         .testTarget(name: "PanopDiscoverTests", dependencies: ["PanopDiscover", "PanopCore"]),
-        .testTarget(name: "PanopSimklTests", dependencies: ["PanopSimkl", "PanopDiscover", "PanopCore"])
+        .testTarget(name: "PanopSimklTests", dependencies: ["PanopSimkl", "PanopDiscover", "PanopCore"]),
+        .testTarget(name: "PanopSportsTests", dependencies: ["PanopSports", "PanopCore"])
     ],
     swiftLanguageModes: [.v6]
 )

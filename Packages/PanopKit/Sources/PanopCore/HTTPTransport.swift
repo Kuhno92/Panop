@@ -33,10 +33,14 @@ public struct HTTPRequest: Sendable, Equatable {
 public struct HTTPResponse: Sendable {
     public var statusCode: Int
     public var body: Data
+    /// The response headers, names in lower case. Empty from a transport or a stub that does not carry them:
+    /// only an API that reports something in its headers (a quota, say) needs them.
+    public var headers: [String: String]
 
-    public init(statusCode: Int, body: Data) {
+    public init(statusCode: Int, body: Data, headers: [String: String] = [:]) {
         self.statusCode = statusCode
         self.body = body
+        self.headers = headers
     }
 }
 
@@ -121,6 +125,17 @@ public struct URLSessionTransport: HTTPTransport {
         self.session = session
     }
 
+    /// The headers as a plain dictionary with lower-case names, which is how HTTP defines them to be compared.
+    private static func headers(of response: HTTPURLResponse) -> [String: String] {
+        var result: [String: String] = [:]
+        for (name, value) in response.allHeaderFields {
+            if let name = name as? String, let value = value as? String {
+                result[name.lowercased()] = value
+            }
+        }
+        return result
+    }
+
     private func urlRequest(for request: HTTPRequest) -> URLRequest {
         var urlRequest = URLRequest(url: request.url, timeoutInterval: request.timeout)
         urlRequest.httpMethod = request.method
@@ -140,7 +155,9 @@ public struct URLSessionTransport: HTTPTransport {
                     if let error {
                         continuation.resume(throwing: error)
                     } else if let http = response as? HTTPURLResponse {
-                        continuation.resume(returning: HTTPResponse(statusCode: http.statusCode, body: data ?? Data()))
+                        continuation.resume(returning: HTTPResponse(
+                            statusCode: http.statusCode, body: data ?? Data(), headers: Self.headers(of: http)
+                        ))
                     } else {
                         continuation.resume(throwing: URLError(.badServerResponse))
                     }
