@@ -44,7 +44,9 @@ struct SportsSelectionView: View {
         // Read here so the screen follows the choices as they are made, and as they arrive from another device.
         let chosenLeagues = Set(sync.leagues(profile: profile).map(\.id))
         let chosenTeams = Set(sync.teams(profile: profile).map(\.id))
-        _ = sync.revision
+        // A declaration, because a view builder takes no plain statement; it makes the screen follow the choices.
+        // swiftlint:disable:next redundant_discardable_let
+        let _ = sync.revision
         Group {
             switch step {
             case .leagues: leaguePicker(chosen: chosenLeagues)

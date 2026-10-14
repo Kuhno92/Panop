@@ -211,8 +211,7 @@
                     fixture(
                         101,
                         league: 1,
-                        11,
-                        12,
+                        (11, 12),
                         kickoff: minutes(-63),
                         status: "LIVE",
                         minute: "63'",
@@ -224,8 +223,7 @@
                     fixture(
                         105,
                         league: 2,
-                        21,
-                        22,
+                        (21, 22),
                         kickoff: minutes(-12),
                         status: "LIVE",
                         minute: "12'",
@@ -267,8 +265,7 @@
             var base = fixtures(day: dayKey(.now)).first { ($0["id"] as? Int) == id } ?? fixture(
                 id,
                 league: 1,
-                11,
-                12,
+                (11, 12),
                 kickoff: .now,
                 status: "Scheduled"
             )

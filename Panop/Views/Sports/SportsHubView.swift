@@ -64,7 +64,9 @@ private struct SportsHubScroll: View {
 
     var body: some View {
         // Read, so the hub follows a change of leagues or teams from another device.
-        _ = sync.revision
+        // A declaration, because a view builder takes no plain statement; it makes the screen follow the choices.
+        // swiftlint:disable:next redundant_discardable_let
+        let _ = sync.revision
         ScrollView {
             LazyVStack(alignment: .leading, spacing: RailMetrics.rowSpacing, pinnedViews: []) {
                 header
