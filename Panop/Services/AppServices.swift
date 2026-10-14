@@ -26,7 +26,8 @@ final class AppServices {
         playlistsDirectory: URL = AppServices.defaultPlaylistsDirectory,
         defaults: UserDefaults = .standard,
         sportsKeys: any SportsKeyStore = InMemorySportsKeyStore(),
-        sportsCache: URL = SportsCacheStore.defaultDirectory
+        sportsCache: URL = SportsCacheStore.defaultDirectory,
+        sportsTransport: (any HTTPTransport)? = nil
     ) {
         let status = SyncStatusCenter()
         let store = SwiftDataCatalogStore(container: catalog)
@@ -52,7 +53,8 @@ final class AppServices {
 
         let sportsSync = SportsSyncStore(context: ModelContext(cloud))
         let account = SportsAccount(
-            keyStore: sportsKeys, sync: sportsSync, transport: transport, memory: SportsKeyMemory(defaults: defaults)
+            keyStore: sportsKeys, sync: sportsSync, transport: sportsTransport ?? transport,
+            memory: SportsKeyMemory(defaults: defaults)
         )
         let feed = SportsFeed(account: account, cache: SportsCacheStore(directory: sportsCache))
         // What was fetched with a key goes when the key does.

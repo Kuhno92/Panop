@@ -53,7 +53,8 @@ struct PanopApp: App {
                 // Tests and previews must never write to the developer's real Keychain.
                 credentials: underTest ? InMemoryCredentialStore() : KeychainCredentialStore(),
                 sportsKeys: SportsConfig.keyStore,
-                sportsCache: SportsConfig.cacheDirectory
+                sportsCache: SportsConfig.cacheDirectory,
+                sportsTransport: SportsConfig.transport
             )
             #if DEBUG
                 if UITestMode.isActive {
@@ -61,6 +62,7 @@ struct PanopApp: App {
                     UITestMode.disableAnimations()
                     let seeded = services
                     Task { await UITestMode.seed(seeded) }
+                    SportsDemo.seed(seeded)
                 }
             #endif
         } catch {

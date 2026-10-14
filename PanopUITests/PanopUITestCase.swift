@@ -29,6 +29,11 @@ class PanopUITestCase: XCTestCase {
         false
     }
 
+    /// The sports hub with the demo service: a key, leagues, teams and invented clubs (`SportsDemo`).
+    var demoSports: Bool {
+        false
+    }
+
     var startTab: String {
         "live"
     }
@@ -69,6 +74,9 @@ class PanopUITestCase: XCTestCase {
             app.launchEnvironment["PANOP_DEMO_ART_DIR"] = URL(fileURLWithPath: #filePath)
                 .deletingLastPathComponent().deletingLastPathComponent()
                 .appendingPathComponent("docs/store-art").path
+        }
+        if demoSports {
+            app.launchEnvironment["PANOP_DEMO_SPORTS"] = "1"
         }
         if showsHero {
             app.launchEnvironment["PANOP_HERO"] = "1"

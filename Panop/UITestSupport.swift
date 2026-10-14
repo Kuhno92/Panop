@@ -74,6 +74,7 @@ enum UITestMode {
             case "movies": return .movies
             case "series": return .series
             case "settings": return .settings
+            case "sports": return .sports
             default: return nil
             }
         }

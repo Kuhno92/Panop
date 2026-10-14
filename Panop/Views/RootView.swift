@@ -54,7 +54,7 @@ struct MainTabLabel: View {
 #endif
 
 nonisolated enum AppTab: Hashable {
-    case home, live, movies, series, settings, search
+    case home, live, movies, series, sports, settings, search
 }
 
 struct RootView: View {
@@ -109,6 +109,12 @@ struct RootView: View {
         ))
     }
 
+    /// Whether the person has a sportapi.ai key and has not hidden the Sports tab.
+    private var showsSports: Bool {
+        _ = sportsSync.revision
+        return sportsAccount.hasKey && sportsSync.showsTab()
+    }
+
     /// Whether Settings has a tab. A phone's bar holds five and Search takes the last, so there it is a button on Home.
     private var settingsInBar: Bool {
         #if os(iOS)
@@ -153,6 +159,18 @@ struct RootView: View {
                     .nowPlayingPanel()
                 } label: {
                     MainTabLabel("Series", systemImage: "rectangle.stack")
+                }
+            }
+            // The sports hub, for a person who has entered a key. A phone's bar is full, so there it is a button on
+            // Home.
+            if showsSports, settingsInBar {
+                Tab(value: AppTab.sports) {
+                    NavigationStack {
+                        SportsHubView()
+                    }
+                    .nowPlayingPanel()
+                } label: {
+                    MainTabLabel("Sports", systemImage: "sportscourt")
                 }
             }
             if settingsInBar {
@@ -223,6 +241,11 @@ struct RootView: View {
             .onChange(of: status.isAnySyncing) { ChannelVariantsStore.shared.reset() }
             .onChange(of: settingsInBar, initial: true) { _, inBar in
                 if !inBar, selection == .settings {
+                    selection = .home
+                }
+            }
+            .onChange(of: showsSports && settingsInBar) { _, shown in
+                if !shown, selection == .sports {
                     selection = .home
                 }
             }

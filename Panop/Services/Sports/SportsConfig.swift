@@ -1,4 +1,5 @@
 import Foundation
+import PanopCore
 import SwiftUI
 
 /// How the sports hub is set up in this build and on this device.
@@ -16,7 +17,22 @@ nonisolated enum SportsConfig {
     @MainActor
     static var keyStore: any SportsKeyStore {
         let testing = ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
+        #if DEBUG
+            if UITestMode.isActive {
+                return InMemorySportsKeyStore(SportsDemo.initialKey)
+            }
+        #endif
         return testing || UITestMode.isActive ? InMemorySportsKeyStore() : KeychainSportsKeyStore()
+    }
+
+    /// The demo service in a UI test that asks for it; the real one otherwise (nil: the app's own transport).
+    @MainActor
+    static var transport: (any HTTPTransport)? {
+        #if DEBUG
+            SportsDemo.transport
+        #else
+            nil
+        #endif
     }
 
     /// A folder of its own under tests, so a run reads nothing left by another and leaves nothing behind.

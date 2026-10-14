@@ -22,6 +22,9 @@ struct HomeView: View {
     @State private var showingAdd = false
     @State private var search = ""
     @State private var showingSettings = false
+    @State private var showingSports = false
+    @Environment(SportsAccount.self) private var sportsAccount
+    @Environment(SportsSyncStore.self) private var sportsSync
     @Environment(\.horizontalSizeClass) private var sizeClass
     @State private var playing: PlaybackTarget?
     @State private var heroReach: CGFloat = 0
@@ -49,6 +52,9 @@ struct HomeView: View {
                     #if os(iOS)
                         // On a phone Settings has no tab (the bar is full), so it is here.
                         if sizeClass == .compact {
+                            if sportsAccount.hasKey, sportsSync.showsTab() {
+                                Button("Sports", systemImage: "sportscourt") { showingSports = true }
+                            }
                             Button("Settings", systemImage: "gearshape") { showingSettings = true }
                         }
                     #endif
@@ -62,6 +68,7 @@ struct HomeView: View {
                 prompt: "Channels, movies, series"
             ))
             .navigationDestination(isPresented: $showingSettings) { SettingsView() }
+            .navigationDestination(isPresented: $showingSports) { SportsHubView() }
             .onChange(of: settingsVisits) { showingSettings = false }
             .navigationDestination(item: $openMovie) { MovieDetailView(movie: $0) }
             .navigationDestination(item: $openSeries) { SeriesDetailView(series: $0) }
