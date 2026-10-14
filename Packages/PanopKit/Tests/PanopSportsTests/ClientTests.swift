@@ -68,6 +68,15 @@ struct ClientTests {
     }
 
     @Test
+    func `the reply as it came can be kept and read again to the same value`() async throws {
+        let reply = try await client(Echo(body: SampleReplies.day)).fixtures(on: "2026-10-14")
+        #expect(!reply.raw.isEmpty)
+        #expect(try SportsParsing.fixtures(reply.raw) == reply.value)
+        let table = try await client(Echo(body: SampleReplies.standings)).standings(league: 53)
+        #expect(try SportsParsing.standings(table.raw) == table.value)
+    }
+
+    @Test
     func `a reply without budget headers has no quota, which is not an error`() async throws {
         let reply = try await client(Echo(body: SampleReplies.day)).fixtures(on: "2026-10-14")
         #expect(reply.quota == nil)

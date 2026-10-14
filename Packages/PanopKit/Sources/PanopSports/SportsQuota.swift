@@ -55,9 +55,12 @@ public struct SportsQuota: Sendable, Equatable, Codable {
 public struct SportsReply<Value: Sendable>: Sendable {
     public var value: Value
     public var quota: SportsQuota?
+    /// The reply as it came, for a cache to keep: reading it again with ``SportsParsing`` gives `value` back.
+    public var raw: Data
 
-    public init(value: Value, quota: SportsQuota?) {
+    public init(value: Value, quota: SportsQuota?, raw: Data = Data()) {
         self.value = value
         self.quota = quota
+        self.raw = raw
     }
 }
