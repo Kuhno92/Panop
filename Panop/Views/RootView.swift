@@ -84,6 +84,9 @@ struct RootView: View {
     @State private var profiles = ProfileStore()
     @Environment(CloudSyncStatus.self) private var cloudSync
     @AppStorage(CloudSync.loginsKey) private var syncsLogins = true
+    @AppStorage(SportsConfig.syncsKeyKey) private var syncsSportsKey = true
+    @Environment(SportsAccount.self) private var sportsAccount
+    @Environment(SportsSyncStore.self) private var sportsSync
     @Environment(SyncStatusCenter.self) private var status
     @AppStorage(DiscoveryModel.trendingKey) private var showsTrending = true
 
@@ -249,12 +252,20 @@ struct RootView: View {
                 library.syncsLogins = { allowed }
                 library.reconcileLogins()
             }
+            // The sportapi.ai key travels the same way, on its own switch: it is sent, taken, or withdrawn.
+            .task(id: [syncsSportsKey, cloudSync.availability == .active]) {
+                let allowed = syncsSportsKey && cloudSync.availability == .active
+                sportsAccount.syncsKey = { allowed }
+                sportsAccount.reconcile()
+            }
             // What another device changes arrives as an import: read it, and drop what was removed there.
             .task(id: cloudSync.availability == .active) {
                 guard cloudSync.availability == .active else { return }
                 for await _ in CloudChanges.imports() {
                     cloudSync.noteImport()
                     userState.reloadAfterRemoteChange()
+                    sportsSync.reloadAfterRemoteChange()
+                    sportsAccount.reconcile()
                     await library.applyRemoteChanges()
                 }
             } // Another person's profile: their state replaces this one's, and what was suggested is dropped.

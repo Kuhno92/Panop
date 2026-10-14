@@ -51,7 +51,9 @@ struct PanopApp: App {
                 catalog: catalog,
                 cloud: cloud,
                 // Tests and previews must never write to the developer's real Keychain.
-                credentials: underTest ? InMemoryCredentialStore() : KeychainCredentialStore()
+                credentials: underTest ? InMemoryCredentialStore() : KeychainCredentialStore(),
+                sportsKeys: SportsConfig.keyStore,
+                sportsCache: SportsConfig.cacheDirectory
             )
             #if DEBUG
                 if UITestMode.isActive {
@@ -90,6 +92,9 @@ struct PanopApp: App {
                 .environment(services.library)
                 .environment(services.userState)
                 .environment(services.syncStatus)
+                .environment(services.sportsAccount)
+                .environment(services.sportsSync)
+                .environment(\.sportsFeed, services.sportsFeed)
                 .environment(cloudSync)
                 .environment(\.playbackMetrics, metricsStore)
             #if os(macOS) || os(tvOS)

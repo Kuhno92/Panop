@@ -14,6 +14,9 @@ final class AppServices {
     let sync: SyncService
     let catalogStore: SwiftDataCatalogStore
     let catalogContainer: ModelContainer
+    let sportsSync: SportsSyncStore
+    let sportsAccount: SportsAccount
+    let sportsFeed: SportsFeed
 
     init(
         catalog: ModelContainer,
@@ -21,7 +24,9 @@ final class AppServices {
         credentials: any CredentialStore,
         transport: any HTTPTransport = URLSessionTransport(),
         playlistsDirectory: URL = AppServices.defaultPlaylistsDirectory,
-        defaults: UserDefaults = .standard
+        defaults: UserDefaults = .standard,
+        sportsKeys: any SportsKeyStore = InMemorySportsKeyStore(),
+        sportsCache: URL = SportsCacheStore.defaultDirectory
     ) {
         let status = SyncStatusCenter()
         let store = SwiftDataCatalogStore(container: catalog)
@@ -44,6 +49,17 @@ final class AppServices {
         )
         // A deleted playlist's favourites and history go with it.
         library.onRemoved = { id in userState.forget(playlist: id) }
+
+        let sportsSync = SportsSyncStore(context: ModelContext(cloud))
+        let account = SportsAccount(
+            keyStore: sportsKeys, sync: sportsSync, transport: transport, memory: SportsKeyMemory(defaults: defaults)
+        )
+        let feed = SportsFeed(account: account, cache: SportsCacheStore(directory: sportsCache))
+        // What was fetched with a key goes when the key does.
+        account.onKeyRemoved = { Task { await feed.clear() } }
+        self.sportsSync = sportsSync
+        sportsAccount = account
+        sportsFeed = feed
     }
 
     /// In-memory containers and Keychain, for previews and tests.
