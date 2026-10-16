@@ -36,7 +36,8 @@ has no channel data, a free plan of 2,000 requests a day **per key**, and no pub
 ## Consequences
 
 - The new records must be **deployed from the development to the production CloudKit schema** in the CloudKit Dashboard
-  before a TestFlight or App Store build, or they silently do not sync.
+  before a TestFlight or App Store build, or they silently do not sync. `Scripts/check-cloudkit-schema.sh` lists what is
+  missing, and `docs/RELEASING.md` has the steps.
 - With sync on, the key is also in the local store in plain (the same trade-off ADR 0009 accepted for playlist logins).
 - sportapi.ai's terms for use in an app are unknown: ask in writing before a release that includes the hub, and keep the
   answer in `docs/`.
