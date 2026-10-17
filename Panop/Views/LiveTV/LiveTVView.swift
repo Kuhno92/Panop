@@ -307,7 +307,53 @@ private struct LiveChannelList<Header: View>: View {
         self.header = header()
     }
 
+    #if os(tvOS)
+        @Environment(EmbeddedPlayback.self) private var embedded
+        @FocusState private var focusedRow: String?
+    #endif
+
     var body: some View {
+        ScrollViewReader { proxy in
+            list
+            #if os(tvOS)
+                .onAppear { embedded.liveListIsShowing = true }
+                .onDisappear { embedded.liveListIsShowing = false }
+                .onChange(of: embedded.listFocusRequests) { restoreFocus(proxy) }
+            #endif
+        }
+    }
+
+    #if os(tvOS)
+        /// Back from the stream: the list is where it was left, and the channel that plays has the focus.
+        private func restoreFocus(_ proxy: ScrollViewProxy) {
+            guard let playing = embedded.target,
+                  let row = shown.first(where: {
+                      $0.id == playing.id || (playing.groupKey != nil && $0.groupKey == playing.groupKey
+                          && $0.playlist == playing.playlist)
+                  })
+            else {
+                // Not in the list (another source or search, or not read yet): the panel is the way back.
+                embedded.focusPanel()
+                return
+            }
+            proxy.scrollTo(row.id, anchor: .center)
+            Task {
+                // After the scroll has laid the row out.
+                try? await Task.sleep(for: .milliseconds(120))
+                focusedRow = row.id
+            }
+        }
+    #endif
+
+    private var listFocus: FocusState<String?>.Binding? {
+        #if os(tvOS)
+            $focusedRow
+        #else
+            nil
+        #endif
+    }
+
+    private var list: some View {
         List {
             header
             // Channels are showing, but a source behind them could not be updated: say so,
@@ -324,6 +370,7 @@ private struct LiveChannelList<Header: View>: View {
                     channel: channel,
                     play: { onPlay(versionToPlay(channel)) },
                     playVersion: onPlay,
+                    listFocus: listFocus,
                     label: { row(channel, isFavorite: userState.isFavorite(key)) }
                 )
                 .onAppear {
@@ -503,42 +550,6 @@ private struct LiveChannelList<Header: View>: View {
                 Button("Add playlist", action: onAdd)
             }
         }
-    }
-}
-
-extension PlaybackTarget {
-    /// A snapshot of a list row.
-    init(row: CatalogRow) {
-        self.init(
-            playlist: row.playlist,
-            entryID: row.entryID,
-            kind: row.kind,
-            name: row.name,
-            streamURL: row.streamURL,
-            remoteID: row.remoteID,
-            containerExtension: row.containerExtension,
-            archiveDays: row.hasArchive ? row.archiveDays : nil,
-            catchupRule: row.catchupRule,
-            epgKey: row.epgKey,
-            groupKey: row.groupKey
-        )
-    }
-
-    /// A snapshot of a catalog row, so the player never holds the live record.
-    init(entry: CatalogEntryRecord) {
-        self.init(
-            playlist: entry.playlist,
-            entryID: entry.id,
-            kind: entry.kind,
-            name: entry.name,
-            streamURL: entry.streamURL,
-            remoteID: entry.remoteID,
-            containerExtension: entry.containerExtension,
-            archiveDays: entry.hasArchive ? entry.archiveDays : nil,
-            catchupRule: entry.catchupRule,
-            epgKey: entry.epgKey,
-            groupKey: entry.groupKey
-        )
     }
 }
 

@@ -30,6 +30,7 @@
 		BBBB000000000000000000A1 /* PanopSimkl in Frameworks */ = {isa = PBXBuildFile; productRef = BBBB000000000000000000A2 /* PanopSimkl */; };
 		BBBB000000000000000000B1 /* PanopSports in Frameworks */ = {isa = PBXBuildFile; productRef = BBBB000000000000000000B2 /* PanopSports */; };
 		BBBB000000000000000000C1 /* YouTubeKit in Frameworks */ = {isa = PBXBuildFile; platformFilters = (tvos, ); productRef = BBBB000000000000000000C2 /* YouTubeKit */; };
+		BBBB000000000000000000D1 /* SVGView in Frameworks */ = {isa = PBXBuildFile; productRef = BBBB000000000000000000D2 /* SVGView */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -103,6 +104,7 @@
 				BBBB000000000000000000A1 /* PanopSimkl in Frameworks */,
 				BBBB000000000000000000B1 /* PanopSports in Frameworks */,
 				BBBB000000000000000000C1 /* YouTubeKit in Frameworks */,
+				BBBB000000000000000000D1 /* SVGView in Frameworks */,
 				AAAA000000000000000000F6 /* VLCKit in Frameworks */,
 				AAAA000000000000000000F7 /* LumeEngine in Frameworks */,
 				AAAA00000000000000000120 /* AetherEngine in Frameworks */,
@@ -186,6 +188,7 @@
 				BBBB000000000000000000A2 /* PanopSimkl */,
 				BBBB000000000000000000B2 /* PanopSports */,
 				BBBB000000000000000000C2 /* YouTubeKit */,
+				BBBB000000000000000000D2 /* SVGView */,
 				AAAA000000000000000000C8 /* VLCKit */,
 				AAAA000000000000000000CB /* LumeEngine */,
 				AAAA00000000000000000122 /* AetherEngine */,
@@ -285,6 +288,7 @@
 				AAAA000000000000000000CA /* XCLocalSwiftPackageReference "vendor/LumeEngine" */,
 				AAAA00000000000000000121 /* XCRemoteSwiftPackageReference "AetherEngine" */,
 				BBBB000000000000000000C3 /* XCRemoteSwiftPackageReference "YouTubeKit" */,
+				BBBB000000000000000000D3 /* XCLocalSwiftPackageReference "Packages/SVGView" */,
 				AAAA00000000000000000125 /* XCLocalSwiftPackageReference "Packages/KSPlayerBridge" */,
 				AAAA00000000000000000123 /* XCLocalSwiftPackageReference "Packages/LibDovi" */,
 			);
@@ -635,6 +639,10 @@
 			isa = XCLocalSwiftPackageReference;
 			relativePath = Packages/KSPlayerBridge;
 		};
+		BBBB000000000000000000D3 /* XCLocalSwiftPackageReference "Packages/SVGView" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Packages/SVGView;
+		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCRemoteSwiftPackageReference section */
@@ -729,6 +737,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = BBBB000000000000000000C3 /* XCRemoteSwiftPackageReference "YouTubeKit" */;
 			productName = YouTubeKit;
+		};
+		BBBB000000000000000000D2 /* SVGView */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BBBB000000000000000000D3 /* XCLocalSwiftPackageReference "Packages/SVGView" */;
+			productName = SVGView;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

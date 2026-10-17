@@ -60,5 +60,16 @@
         func focusPanel() {
             panelFocusRequests &+= 1
         }
+
+        /// Apple TV: whether the Live TV list is the screen showing, set by the list itself.
+        var liveListIsShowing = false
+
+        /// Apple TV: goes up each time the list should put the focus on the channel that plays. The list watches it:
+        /// coming back from the stream, the person is where they chose it, not at the panel or the top.
+        private(set) var listFocusRequests = 0
+
+        func focusPlayingChannel() {
+            listFocusRequests &+= 1
+        }
     }
 #endif

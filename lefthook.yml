@@ -10,8 +10,10 @@
 pre-commit:
   parallel: false
   jobs:
+    # Packages/SVGView is a copy of someone else's package, kept as it is (see THIRD-PARTY-NOTICES.md).
     - name: swiftformat
       glob: "*.swift"
+      exclude: "Packages/SVGView/*"
       run: |
         if [ -x .build/tools/bin/swiftformat ]; then
           .build/tools/bin/swiftformat {staged_files}
@@ -22,6 +24,7 @@ pre-commit:
 
     - name: swiftlint
       glob: "*.swift"
+      exclude: "Packages/SVGView/*"
       run: |
         if [ -x .build/tools/bin/swiftlint ]; then
           .build/tools/bin/swiftlint lint --strict --quiet -- {staged_files}

@@ -9,4 +9,4 @@
 --indent 4
 --self remove
 --stripunusedargs closure-only
---exclude .build,reference,vendor,Packages/*/.build
+--exclude .build,reference,vendor,Packages/*/.build,Packages/SVGView

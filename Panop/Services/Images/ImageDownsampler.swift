@@ -25,6 +25,9 @@ nonisolated enum ImageDownsampler {
 
     /// Whether `data` begins like an image, without decoding it.
     static func isImage(_ data: Data) -> Bool {
+        if SVGRaster.isSVG(data) {
+            return true
+        }
         guard let source = CGImageSourceCreateWithData(data as CFData, nil) else { return false }
         return CGImageSourceGetCount(source) > 0
     }

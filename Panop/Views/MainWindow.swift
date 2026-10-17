@@ -64,7 +64,13 @@
                     // once it is on the screen.
                     Task {
                         try? await Task.sleep(for: .milliseconds(150))
-                        playback.focusPanel()
+                        if playback.liveListIsShowing {
+                            // The channel list puts the focus on the channel that plays, or on the panel when that
+                            // channel is not in it.
+                            playback.focusPlayingChannel()
+                        } else {
+                            playback.focusPanel()
+                        }
                     }
                 }
             }

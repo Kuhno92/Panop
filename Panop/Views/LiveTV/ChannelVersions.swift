@@ -104,6 +104,9 @@ struct ChannelListRow<Label: View>: View {
     let channel: CatalogRow
     let play: () -> Void
     let playVersion: (CatalogRow) -> Void
+    /// The list's own way to put the focus on this row: the channel that was playing, on the way back from the stream
+    /// (Apple TV).
+    var listFocus: FocusState<String?>.Binding?
     @ViewBuilder let label: () -> Label
 
     #if os(tvOS)
@@ -123,6 +126,7 @@ struct ChannelListRow<Label: View>: View {
                     .buttonStyle(BareRowButtonStyle())
                     .focusEffectDisabled()
                     .focused($focus, equals: .row)
+                    .modifier(ListFocus(binding: listFocus, id: channel.id))
                 ChannelVersionsMenu(channel: channel, onPlay: playVersion)
                     .focused($focus, equals: .versions)
             }
@@ -145,3 +149,19 @@ struct ChannelListRow<Label: View>: View {
         #endif
     }
 }
+
+#if os(tvOS)
+    /// Takes the list's focus binding for a row, when it was given one.
+    private struct ListFocus: ViewModifier {
+        let binding: FocusState<String?>.Binding?
+        let id: String
+
+        func body(content: Content) -> some View {
+            if let binding {
+                content.focused(binding, equals: id)
+            } else {
+                content
+            }
+        }
+    }
+#endif

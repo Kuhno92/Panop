@@ -168,6 +168,24 @@ final class PlayerTests: PanopUITestCase {
             )
         }
 
+        /// Back from the stream, the list is where it was left and the channel that plays has the focus: not the top of
+        /// the list, and not the panel.
+        func testBackFromTheStreamFocusesTheChannelThatPlays() {
+            waitForChannels()
+            focus(channel("Arte"))
+            XCUIRemote.shared.press(.select)
+            XCTAssertTrue(app.buttons["Pause"].waitForExistence(timeout: 15))
+
+            XCUIRemote.shared.press(.menu)
+
+            XCTAssertTrue(app.buttons["Show stream"].waitForExistence(timeout: 10))
+            XCTAssertTrue(
+                hasFocusSoon(channel("Arte")),
+                "the channel that plays does not have the focus. Screen:\n\(app.debugDescription)"
+            )
+            XCTAssertFalse(app.buttons["Show stream"].hasFocus, "the focus went to the panel")
+        }
+
         /// The panel with Show stream and Stop is down the right side, and the right arrow reaches it from the list.
         func testTheRightArrowReachesTheNowPlayingPanel() {
             openFirstChannel()
@@ -224,7 +242,9 @@ final class PlayerTests: PanopUITestCase {
             XCUIRemote.shared.press(.menu)
             let show = app.buttons["Show stream"]
             XCTAssertTrue(show.waitForExistence(timeout: 10))
-            XCTAssertTrue(show.hasFocus)
+            // The focus is on the channel that plays; the right arrow reaches the panel.
+            XCUIRemote.shared.press(.right)
+            XCTAssertTrue(hasFocusSoon(show), "the right arrow did not reach the panel")
 
             XCUIRemote.shared.press(.down)
             XCTAssertTrue(app.buttons["Stop"].hasFocus, "Down from Show stream did not reach Stop")

@@ -184,7 +184,11 @@ actor ImagePipeline {
     /// Off the actor on purpose: decoding is the expensive part, and the actor must stay
     /// free to answer the next row's cache hit.
     nonisolated static func decode(_ data: Data, maxPixel: Int) async -> CGImage? {
-        ImageDownsampler.decode(data, maxPixel: maxPixel)
+        // A vector logo is drawn rather than decoded, and drawing is for the main actor.
+        if SVGRaster.isSVG(data) {
+            return await MainActor.run { SVGRaster.render(data, maxPixel: maxPixel) }
+        }
+        return ImageDownsampler.decode(data, maxPixel: maxPixel)
     }
 
     private func leave(_ key: String, _ flight: Flight) {

@@ -70,6 +70,14 @@ relinkability, and that must remain true.
   Apple TV, where the official player cannot run, and it can stop working whenever YouTube changes its page. On iPhone, iPad
   and Mac the trailer plays in YouTube's own embedded player instead.
 
+### SVGView
+
+- **Source:** https://github.com/exyte/SVGView, version 1.0.6, MIT (`Packages/SVGView/LICENSE`). No dependencies of its own.
+- **Use:** to read a club's crest, which sportapi.ai keeps as an SVG file for many clubs, so it can be drawn to a bitmap
+  and shown like any other picture (`Panop/Services/Images/SVGRaster.swift`).
+- **Vendored:** the sources are copied as they are into `Packages/SVGView`; only `Package.swift` is changed, to declare
+  tvOS 16 (upstream declares no tvOS, so SwiftPM builds it for tvOS 9 and `TapGesture` does not compile).
+
 ### AetherEngine
 - **License:** LGPL-3.0 **with an Apple Store / DRM exception** (permits distribution through the App Store and TestFlight where LGPL sections 4 to 6 would otherwise conflict)
 - **Source:** https://github.com/superuser404notfound/AetherEngine

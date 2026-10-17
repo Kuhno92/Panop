@@ -194,7 +194,7 @@ final class SportsRealServiceTests: PanopUITestCase {
     }
 
     override var devSportsLeagues: String? {
-        "18,89,53"
+        "2,18,53"
     }
 
     /// The hub with real matches: the crests are the clubs' own, not monograms.

@@ -80,9 +80,18 @@ struct MatchRow: View {
         .frame(width: 52)
     }
 
+    /// Large enough to read the crest from the sofa on Apple TV.
+    private static var crestSize: CGFloat {
+        #if os(tvOS)
+            46
+        #else
+            26
+        #endif
+    }
+
     private func teamLine(_ name: String, logo: String?, id: Int?, goals: Int?, won: Bool?) -> some View {
         HStack(spacing: 10) {
-            TeamCrest(logo: logo, name: name, size: 26)
+            TeamCrest(logo: logo, name: name, size: Self.crestSize)
             Text(name)
                 .font(.body.weight(won == true || (id.map(followed.contains) ?? false) ? .semibold : .regular))
                 .foregroundStyle(won == false ? .secondary : .primary)

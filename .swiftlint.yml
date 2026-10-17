@@ -10,6 +10,7 @@ excluded:
   - reference
   - vendor
   - Packages/PanopKit/.build
+  - Packages/SVGView
 
 disabled_rules:
   # SwiftFormat owns brace placement and runs first in the hook. Leaving this
