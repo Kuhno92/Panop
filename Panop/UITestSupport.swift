@@ -159,6 +159,14 @@ enum UITestMode {
             if await seedDevProvider(services) {
                 return
             }
+            // A big playlist of the developer's making, to look at how the screens cope with a real catalog's size.
+            if let path = ProcessInfo.processInfo.environment["PANOP_SEED_FILE"] {
+                _ = try? await services.library.add(
+                    .m3uFile(name: "Big", fileURL: URL(fileURLWithPath: path)),
+                    includeVOD: true
+                )
+                return
+            }
             var lines = channelNames.enumerated().map { index, name in
                 // The first and third channels keep a day of archive, to look at catch-up.
                 "#EXTINF:-1 tvg-id=\"c\(index)\" group-title=\"\(index < 6 ? "Germany" : "Other")\"" +

@@ -8,6 +8,10 @@ struct PlayerControls: View {
     let model: PlayerModel
     /// Opens the TV guide over the stream, to see what is on and switch to it. Nil for a film.
     var onShowGuide: (() -> Void)?
+    /// Switches to the channel before (-1) or after (1): Up and Down on the remote, which have nowhere else to go on
+    /// the
+    /// bar, a single row. Nil for a film.
+    var onZap: ((Int) -> Void)?
     /// Opens the programmes the provider has kept, to watch one from its start. Nil where there is no archive.
     var onShowCatchup: (() -> Void)?
     /// The live channel's place in the guide, for the programme timeline. Nil for a film or a channel with no guide.
@@ -93,6 +97,18 @@ struct PlayerControls: View {
                 model.showControls()
             }
         }
+        #if os(tvOS)
+        // The bar comes up when the remote is touched while it was hidden, and the focus has to come with it: the
+        // picture behind had it, and does not hand it on by itself, which left the bar showing and out of reach.
+        .onAppear { Task { focused = .play } }
+        .onMoveCommand { direction in
+            switch direction {
+            case .up where onZap != nil: onZap?(-1)
+            case .down where onZap != nil: onZap?(1)
+            default: break
+            }
+        }
+        #endif
     }
 
     private var controlRow: some View {

@@ -52,6 +52,8 @@ struct PlayerScreen: View {
                     onShowGuide: playing.kind == .live ? (onShowGuideInApp ?? { showingGuide = true }) : nil,
                     // Only on a channel live that the provider keeps an archive of, and not while one of its aired
                     // programmes plays: that one has been chosen from this list.
+                    // Up and Down switch to the channel before or after, for a channel live (not an aired programme).
+                    onZap: playing.kind == .live && playing.catchup == nil ? { zap($0) } : nil,
                     onShowCatchup: playing.kind == .live && playing.catchup == nil && (playing.archiveDays ?? 0) > 0
                         ? { showingCatchup = true } : nil,
                     guide: guideKey,
@@ -96,6 +98,19 @@ struct PlayerScreen: View {
     private var guideKey: GuideKey? {
         guard playing.kind == .live, playing.catchup == nil, let key = playing.epgKey, !key.isEmpty else { return nil }
         return GuideKey(playlist: playing.playlist, epgKey: key)
+    }
+
+    /// The channel `step` places on in the Live list's order, played in place of this one.
+    private func zap(_ step: Int) {
+        guard let row = ChannelZapper.neighbour(
+            of: playing,
+            step: step,
+            hidden: userState.hidden,
+            leadsOnly: groupsByGuide,
+            in: catalog
+        ) else { return }
+        userState.markPlayed(row.id)
+        switchTo(PlaybackTarget(row: row))
     }
 
     /// Plays another channel in place of this one, from the guide.
@@ -189,6 +204,7 @@ struct PlayerView: View {
     var onClose: (() -> Void)?
     var onBrowse: (() -> Void)?
     var onShowGuide: (() -> Void)?
+    var onZap: ((Int) -> Void)?
     var onShowCatchup: (() -> Void)?
     var guide: GuideKey?
     /// The other versions of the channel that plays, which one plays, and what choosing another does.
@@ -293,6 +309,7 @@ struct PlayerView: View {
                 PlayerControls(
                     model: model,
                     onShowGuide: onShowGuide,
+                    onZap: onZap,
                     onShowCatchup: onShowCatchup,
                     guide: guide,
                     versions: versions,
@@ -325,7 +342,15 @@ struct PlayerView: View {
             // Select brings them up. While they are showing it must not, or it would take
             // the focus from them. Deferred out of the focus engine's animation context.
             .focusable(!model.showsControls)
-            .onMoveCommand { _ in Task { model.showControls() } }
+            // Up and Down switch channel where that is on offer; any other move brings the controls up, and the focus
+            // with them (`PlayerControls` takes it when it appears).
+            .onMoveCommand { direction in
+                switch direction {
+                case .up where onZap != nil: onZap?(-1)
+                case .down where onZap != nil: onZap?(1)
+                default: Task { model.showControls() }
+                }
+            }
             .onTapGesture { Task { model.toggleControls() } }
         #endif
     }

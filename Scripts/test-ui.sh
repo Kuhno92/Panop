@@ -53,6 +53,12 @@ if [[ -n "${PANOP_ONLY:-}" ]]; then
     done
 fi
 
+# Extra build settings, such as SWIFT_OPTIMIZATION_LEVEL=-O to look at speed (a Debug build's numbers are fiction).
+if [[ -n "${PANOP_XCFLAGS:-}" ]]; then
+    read -r -a extra <<<"$PANOP_XCFLAGS"
+    flags+=("${extra[@]}")
+fi
+
 log="$(mktemp -t panop-ui-test)"
 # Whatever happens, leave no simulator clones behind (see the script).
 trap '"$ROOT/Scripts/clean-test-clones.sh"' EXIT

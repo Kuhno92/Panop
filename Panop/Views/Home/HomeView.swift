@@ -93,14 +93,18 @@ struct HomeView: View {
     }
 
     private var rails: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: RailMetrics.rowSpacing) {
+        // Once for the whole screen: the lists below each asked for it again, and the hero a third time.
+        let shownRails = discovery.rails.filter(showsOnHome)
+        // Lazy, as the Movies and Series screens are: a rail below the fold is built when it comes near, not all of
+        // them before the first is drawn.
+        return ScrollView {
+            LazyVStack(alignment: .leading, spacing: RailMetrics.rowSpacing) {
                 if library.playlists.isEmpty || library.pendingOffer != nil {
                     SyncWelcomeView { showingAdd = true }
                 } else {
                     let hasHistory = !userState.recents.isEmpty || !userState.favorites.isEmpty
                     HeroCarousel(
-                        rows: heroRows,
+                        rows: heroRows(from: shownRails),
                         backdrop: { discovery.backdrop(for: $0) },
                         onPlay: { $0.kind == .movie ? playNow($0) : open($0) },
                         onInfo: open
@@ -135,7 +139,7 @@ struct HomeView: View {
                     // What is on today in the sports the person follows. Not there without a key, or without matches.
                     TodaysMatchesRail(fixtures: sportsToday, onOpen: { showingSports = true })
                     // Suggestions drawn from the library itself.
-                    ForEach(discovery.rails.filter(showsOnHome)) { rail in
+                    ForEach(shownRails) { rail in
                         PosterRail(
                             rail: rail,
                             rows: discovery.rows,
@@ -149,7 +153,7 @@ struct HomeView: View {
                     } else {
                         browseButton
                     }
-                    if discovery.rails.filter(showsOnHome).contains(where: RailHeading.isFromSimkl) {
+                    if shownRails.contains(where: RailHeading.isFromSimkl) {
                         SimklCredit()
                     }
                 }
@@ -165,13 +169,13 @@ struct HomeView: View {
 
     /// The titles Home leads with, one from each of the first suggestion rows. Chosen from what the rails already
     /// hold, so nothing is read or fetched for them.
-    private var heroRows: [CatalogRow] {
+    private func heroRows(from shownRails: [Rail]) -> [CatalogRow] {
         let seeded = UITestMode.heroTitles
         if !seeded.isEmpty {
             return seeded
         }
         return HeroSelection.rows(
-            rails: discovery.rails.filter(showsOnHome),
+            rails: shownRails,
             rows: discovery.rows,
             backdrop: { discovery.backdrop(for: $0) }
         )

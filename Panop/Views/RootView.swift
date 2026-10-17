@@ -71,6 +71,7 @@ struct RootView: View {
     /// Goes up each time the person leaves Settings, so coming back starts at its main screen and not wherever they
     /// had gone into it (a stack keeps its place when its tab is left).
     @State private var settingsVisits = 0
+    @State private var shownSports = true
     /// One set of rails for Home, Movies and Series, built off the main thread (see `DiscoveryModel`).
     @State private var discovery = DiscoveryModel()
     @State private var simkl: SimklAccount
@@ -111,9 +112,11 @@ struct RootView: View {
 
     /// Whether the Sports tab is shown: always, unless the person hid it. Without a key it says what is needed and
     /// leads to where the key is entered, so the feature can be found.
+    ///
+    /// Read when the choice changes and kept: the body below runs on every change of tab, and the choice lives in the
+    /// cloud container, so asking for it there was a database fetch on the main thread each time.
     private var showsSports: Bool {
-        _ = sportsSync.revision
-        return sportsSync.showsTab()
+        shownSports
     }
 
     /// Whether Settings has a tab. A phone's bar holds five and Search takes the last, so there it is a button on Home.
@@ -213,6 +216,7 @@ struct RootView: View {
             }
         #endif
             .id(profiles.currentID)
+            .task(id: sportsSync.revision) { shownSports = sportsSync.showsTab() }
         #if os(tvOS)
             // Play/Pause on the remote brings a stream playing behind the app to the front, from any screen.
             .onPlayPauseCommand {

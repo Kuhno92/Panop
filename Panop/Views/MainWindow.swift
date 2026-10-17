@@ -84,6 +84,11 @@
             #if os(tvOS)
                 content()
                     .environment(\.overStream, showsNowPlaying)
+                    // The screen is not animated while the panel makes it narrower or wider (and the stream comes in
+                    // front or goes behind): the animation above would lay the whole screen out again on every frame
+                    // of it, which on an Apple TV took seconds. Only the fade below is animated.
+                    .transaction(value: playback.isFront) { $0.animation = nil }
+                    .transaction(value: playback.isPlaying) { $0.animation = nil }
                     // The panel itself is part of each screen (`nowPlayingPanel`).
                     // Play/Pause on the remote brings the stream back, from wherever in the app it was left.
                     .onPlayPauseCommand {
@@ -100,6 +105,8 @@
             #else
                 content()
                     .environment(\.overStream, showsNowPlaying)
+                    .transaction(value: playback.isFront) { $0.animation = nil }
+                    .transaction(value: playback.isPlaying) { $0.animation = nil }
                     .opacity(playback.isFront ? 0 : 1)
                     .allowsHitTesting(!playback.isFront)
                     .accessibilityHidden(playback.isFront)

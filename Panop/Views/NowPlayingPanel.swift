@@ -28,19 +28,6 @@ extension View {
             HStack(spacing: 0) {
                 content
                     .environment(\.pageBackgroundProvided, showing)
-                    // A hero's backdrop is a band that ends where the screen does, and beside the panel that was a
-                    // hard vertical edge through the picture. It fades out over its last stretch instead.
-                    .mask(alignment: .trailing) {
-                        if showing {
-                            HStack(spacing: 0) {
-                                Rectangle()
-                                LinearGradient(colors: [.black, .clear], startPoint: .leading, endPoint: .trailing)
-                                    .frame(width: 140)
-                            }
-                        } else {
-                            Rectangle()
-                        }
-                    }
                 if showing {
                     NowPlayingPanel()
                 }

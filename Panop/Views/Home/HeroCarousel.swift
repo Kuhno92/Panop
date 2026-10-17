@@ -20,6 +20,7 @@ struct HeroCarousel: View {
     /// The navigation bar's height above the page, which the artwork reaches up through (iPhone and iPad). Measured by
     /// the screen around the scroll view: inside it the bar is a content inset, not a safe area.
     @Environment(\.heroReach) private var topInset
+    @Environment(\.overStream) private var overStream
 
     private static let interval = Duration.seconds(7)
 
@@ -46,6 +47,7 @@ struct HeroCarousel: View {
             // screen as on a film's page, and never down over the rows (where it would block them).
             .background(alignment: .bottom) {
                 HeroArtwork(address: backdrop(row) ?? row.iconURL, blurred: backdrop(row) == nil, reach: topInset)
+                    .modifier(FadesBesidePanel(active: overStream))
                     .id("art-" + row.id)
                     .transition(.opacity)
                     .allowsHitTesting(false)
@@ -191,5 +193,26 @@ struct HeroCarousel: View {
         #else
             compact ? 480 : 320
         #endif
+    }
+}
+
+/// Beside the now-playing panel (Apple TV) the artwork band would end in a hard vertical edge through the picture where
+/// the screen's column ends: it thins out over its last stretch instead. Only the artwork is masked, and only while the
+/// panel is there, so no other screen pays for an offscreen pass.
+private struct FadesBesidePanel: ViewModifier {
+    let active: Bool
+
+    func body(content: Content) -> some View {
+        if active {
+            content.mask(alignment: .trailing) {
+                HStack(spacing: 0) {
+                    Rectangle()
+                    LinearGradient(colors: [.black, .clear], startPoint: .leading, endPoint: .trailing)
+                        .frame(width: 140)
+                }
+            }
+        } else {
+            content
+        }
     }
 }
