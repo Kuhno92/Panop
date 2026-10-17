@@ -5799,6 +5799,17 @@
           }
         }
       }
+    },
+    "No matches on this day" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "An diesem Tag gibt es keine Spiele"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

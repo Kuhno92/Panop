@@ -154,14 +154,22 @@ struct SportsSkeleton: View {
 
 /// A day with nothing of what the person follows.
 struct SportsEmptyDay: View {
-    let day: SportsHubModel.Day
+    let dayOffset: Int
     let hasSelection: Bool
     var onChange: () -> Void
+
+    private static func title(for offset: Int) -> LocalizedStringKey {
+        switch offset {
+        case 0: "No matches today"
+        case 1: "No matches tomorrow"
+        default: "No matches on this day"
+        }
+    }
 
     var body: some View {
         VStack(spacing: 12) {
             Image(systemName: "calendar.badge.clock").font(.largeTitle).foregroundStyle(.secondary)
-            Text(day == .today ? "No matches today" : "No matches tomorrow").font(.title3.bold())
+            Text(Self.title(for: dayOffset)).font(.title3.bold())
             Text("Nothing is on in the leagues and for the teams you follow.")
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)

@@ -41,6 +41,11 @@ class PanopUITestCase: XCTestCase {
         nil
     }
 
+    /// The league ids to follow in a run against the real service, comma separated (`PANOP_DEV_SPORTS_LEAGUES`).
+    var devSportsLeagues: String? {
+        nil
+    }
+
     /// A YouTube id every film and series has as its trailer, to look at the trailer player (`PANOP_TRAILER`).
     var trailerID: String? {
         nil
@@ -89,6 +94,9 @@ class PanopUITestCase: XCTestCase {
         }
         if let file = devSportsKeyFile {
             app.launchEnvironment["PANOP_DEV_SPORTSAPI"] = file
+        }
+        if let devSportsLeagues {
+            app.launchEnvironment["PANOP_DEV_SPORTS_LEAGUES"] = devSportsLeagues
         }
         if let trailerID {
             app.launchEnvironment["PANOP_TRAILER"] = trailerID

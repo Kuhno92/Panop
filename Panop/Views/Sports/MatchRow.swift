@@ -75,7 +75,7 @@ struct MatchRow: View {
             }
             Text(MatchText.status(fixture))
                 .font(.subheadline.monospacedDigit().weight(fixture.isLive ? .bold : .regular))
-                .foregroundStyle(fixture.isLive ? Color.red : .secondary)
+                .foregroundStyle(fixture.isLive ? Color.liveGreen : .secondary)
         }
         .frame(width: 52)
     }
@@ -101,13 +101,18 @@ struct MatchRow: View {
 }
 
 /// The red dot of a match that is being played.
+extension Color {
+    /// What is on now: the live dot and the minute of a match.
+    static let liveGreen = Color(red: 0.22, green: 0.86, blue: 0.45)
+}
+
 struct LiveDot: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var bright = true
 
     var body: some View {
         Circle()
-            .fill(.red)
+            .fill(Color.liveGreen)
             .frame(width: 7, height: 7)
             .opacity(bright || reduceMotion ? 1 : 0.35)
             .onAppear {

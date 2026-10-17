@@ -9,15 +9,11 @@ import PanopSports
 @MainActor
 @Observable
 final class SportsHubModel {
-    enum Day: Int, CaseIterable, Identifiable {
-        case today, tomorrow
+    /// The days that can be chosen, counted from today: a few back for results, a week and more ahead.
+    static let dayRange = -3 ... 10
 
-        var id: Int {
-            rawValue
-        }
-    }
-
-    var day: Day = .today
+    /// The chosen day, in days from today.
+    var dayOffset = 0
     private(set) var layout: HubLayout = .empty
     /// When the oldest of what is shown was fetched.
     private(set) var fetchedAt: Date?
@@ -89,8 +85,8 @@ final class SportsHubModel {
         isLoading = true
         defer { isLoading = false }
 
-        let date = day == .today ? now() : now().addingTimeInterval(24 * 3600)
-        let maxAge = freshness(for: day)
+        let date = Calendar.current.date(byAdding: .day, value: dayOffset, to: now()) ?? now()
+        let maxAge = freshness(forOffset: dayOffset)
         var fixtures: [Fixture] = []
         var oldest: Date?
         var failure: SportsError?
@@ -143,9 +139,12 @@ final class SportsHubModel {
     }
 
     /// How old an answer may be before it is asked for again.
-    private func freshness(for day: Day) -> TimeInterval {
-        if day == .tomorrow {
+    private func freshness(forOffset offset: Int) -> TimeInterval {
+        if offset > 0 {
             return 6 * 3600
+        }
+        if offset < 0 {
+            return 12 * 3600
         }
         return account.quota?.refreshInterval(isLive: hasLive) ?? (hasLive ? 60 : 600)
     }

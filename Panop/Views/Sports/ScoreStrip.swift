@@ -34,7 +34,7 @@ struct ScoreStrip: View {
                 }
                 Text(MatchText.status(fixture))
                     .font(.caption.monospacedDigit().weight(.semibold))
-                    .foregroundStyle(fixture.isLive ? Color.red : .secondary)
+                    .foregroundStyle(fixture.isLive ? Color.liveGreen : .secondary)
                 Spacer(minLength: 0)
             }
             line(fixture.homeShort, logo: fixture.homeLogo, goals: fixture.homeScore, fixture: fixture)

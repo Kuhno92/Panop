@@ -33,10 +33,49 @@ class SportsScene: PanopUITestCase {
 }
 
 final class SportsHubTests: SportsScene {
+    #if os(tvOS)
+        /// The hero's buttons are reached by scrolling down from the pickers, and back up from the rows below.
+        func testTheHeroButtonsTakeTheFocusOnTheWayDownAndUp() {
+            XCTAssertTrue(
+                app.staticTexts["Northgate"].firstMatch
+                    .waitForExistence(timeout: 30)
+            )
+            func heroHasFocus() -> Bool {
+                let focused = app.descendants(matching: .any).matching(NSPredicate(format: "hasFocus == true"))
+                    .allElementsBoundByIndex
+                // The focus sits on a part inside the control, so it is found by where it is.
+                let controls = ["heroWatch", "heroMatch"].map { app.descendants(matching: .any)[$0].frame }
+                return focused.contains { element in controls.contains { !$0.isEmpty && $0.intersects(element.frame) } }
+            }
+            var reached = false
+            var trail: [String] = []
+            for _ in 0 ..< 6 where !reached {
+                XCUIRemote.shared.press(.down)
+                reached = heroHasFocus()
+                let focused = app.descendants(matching: .any).matching(NSPredicate(format: "hasFocus == true"))
+                trail
+                    .append(focused.allElementsBoundByIndex.map { "\($0.label)|\($0.identifier)" }
+                        .joined(separator: "/"))
+            }
+            XCTAssertTrue(reached, "going down never reached the hero's buttons. Focus went: \(trail)")
+            capture("sports-hero-focus")
+            XCUIRemote.shared.press(.down)
+            XCUIRemote.shared.press(.up)
+            XCTAssertTrue(heroHasFocus(), "going back up did not return to the hero's buttons")
+            XCUIRemote.shared.press(.right)
+            let match = app.descendants(matching: .any)["heroMatch"].frame
+            XCTAssertTrue(
+                app.descendants(matching: .any).matching(NSPredicate(format: "hasFocus == true"))
+                    .allElementsBoundByIndex.contains { match.intersects($0.frame) },
+                "the Match button is not reached with the right arrow"
+            )
+        }
+    #endif
+
     func testHubShowsTodaysMatches() {
         openHub()
         XCTAssertTrue(
-            app.buttons.matching(NSPredicate(format: "label CONTAINS 'Northgate'")).firstMatch
+            app.staticTexts["Northgate"].firstMatch
                 .waitForExistence(timeout: 30),
             "the demo matches never appeared. Screen:\n\(app.debugDescription)"
         )
@@ -152,6 +191,25 @@ final class SportsRealServiceTests: PanopUITestCase {
         let file = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
             .appendingPathComponent(".secrets/.sportapi").path
         return FileManager.default.fileExists(atPath: file) ? file : nil
+    }
+
+    override var devSportsLeagues: String? {
+        "18,89,53"
+    }
+
+    /// The hub with real matches: the crests are the clubs' own, not monograms.
+    func testTheHubShowsRealCrests() throws {
+        try XCTSkipIf(devSportsKeyFile == nil, "no key in .secrets/.sportapi")
+        #if !os(tvOS)
+            app.tabBars.buttons.element(boundBy: 0).tap()
+            XCTAssertTrue(app.buttons["Sports"].waitForExistence(timeout: 15))
+            app.buttons["Sports"].tap()
+        #endif
+        Thread.sleep(forTimeInterval: 25)
+        let shot = XCTAttachment(screenshot: app.screenshot())
+        shot.name = "sports-real-hub"
+        shot.lifetime = .keepAlways
+        add(shot)
     }
 
     func testThePickerShowsTheRealLeagues() throws {

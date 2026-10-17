@@ -110,7 +110,9 @@ private struct SportsHubScroll: View {
                 } else if !model.hasLoaded {
                     SportsSkeleton()
                 } else if model.layout == .empty {
-                    SportsEmptyDay(day: model.day, hasSelection: model.hasSelection) { showsSelection = true }
+                    SportsEmptyDay(dayOffset: model.dayOffset, hasSelection: model.hasSelection) {
+                        showsSelection = true
+                    }
                 } else {
                     body(for: model.layout)
                 }
@@ -150,7 +152,7 @@ private struct SportsHubScroll: View {
             .sportsSheetSize()
         }
         .modifier(PlayerPresentation(target: $playing))
-        .task(id: model.day) { await model.reload() }
+        .task(id: model.dayOffset) { await model.reload() }
         // A playlist that arrived, or a guide that was imported, may be the channel of a match.
         .task(id: [library.playlists.map(\.id).joined(separator: ","), status.isAnySyncing ? "sync" : "idle"]) {
             await model.relink()
@@ -160,22 +162,18 @@ private struct SportsHubScroll: View {
     // MARK: - Parts
 
     private var header: some View {
-        VStack(spacing: 10) {
+        VStack(spacing: 14) {
             Picker("Show", selection: $section) {
                 Text("Matches").tag(Section.matches)
                 Text("Tables").tag(Section.tables)
             }
             .pickerStyle(.segmented)
+            .padding(.horizontal)
+            .frame(maxWidth: 420)
             if section == .matches {
-                Picker("Day", selection: $model.day) {
-                    Text("Today").tag(SportsHubModel.Day.today)
-                    Text("Tomorrow").tag(SportsHubModel.Day.tomorrow)
-                }
-                .pickerStyle(.segmented)
+                DayTimeline(selection: $model.dayOffset, today: .now)
             }
         }
-        .padding(.horizontal)
-        .frame(maxWidth: 420)
     }
 
     @ViewBuilder
@@ -268,7 +266,7 @@ struct SectionHeading: View {
                     LiveDot()
                     Text("\(live)").font(.caption.monospacedDigit().weight(.bold))
                 }
-                .foregroundStyle(.red)
+                .foregroundStyle(Color.liveGreen)
             }
         }
         .padding(.horizontal)

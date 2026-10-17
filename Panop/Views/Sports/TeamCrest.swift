@@ -7,6 +7,8 @@ struct TeamCrest: View {
     let logo: String?
     let name: String
     var size: CGFloat = 36
+    /// Only the crest, with no disc behind it and no margin, for drawing it large into a background.
+    var bare = false
 
     @Environment(\.imagePipeline) private var pipeline
     @Environment(\.displayScale) private var scale
@@ -15,20 +17,25 @@ struct TeamCrest: View {
     var body: some View {
         ZStack {
             if let image = image ?? remembered {
-                Circle().fill(.white.opacity(0.10))
+                if !bare {
+                    Circle().fill(.white.opacity(0.10))
+                }
                 Image(decorative: image, scale: scale)
                     .resizable()
                     .scaledToFit()
-                    .padding(size * 0.14)
+                    .padding(bare ? 0 : size * 0.14)
+                    .transition(.opacity)
             } else {
                 Circle().fill(TeamTint.gradient(for: name))
                 Text(TeamMonogram.initials(for: name))
-                    .font(.system(size: size * 0.36, weight: .heavy, design: .rounded))
+                    .font(.system(size: size * (bare ? 0.26 : 0.36), weight: .heavy, design: .rounded))
                     .minimumScaleFactor(0.6)
-                    .foregroundStyle(.white)
+                    .foregroundStyle(.white.opacity(bare ? 0.4 : 1))
             }
         }
         .frame(width: size, height: size)
+        // The crest comes in from the monogram instead of replacing it in one frame.
+        .animation(.easeOut(duration: 0.6), value: image != nil)
         .accessibilityHidden(true)
         .task(id: logo) { await load() }
     }

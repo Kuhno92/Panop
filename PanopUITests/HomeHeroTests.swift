@@ -46,3 +46,40 @@ final class HomeHeroTests: PanopUITestCase {
         }
     #endif
 }
+
+#if os(tvOS)
+    /// A stream plays behind the app: the panel down the right side must not cut into the hero's picture.
+    final class HeroBesideNowPlayingTests: PanopUITestCase {
+        override var startTab: String {
+            "live"
+        }
+
+        override var showsHero: Bool {
+            true
+        }
+
+        func testTheHeroSitsBesideThePanelWithoutBeingCut() {
+            waitForChannels()
+            focusFirstChannel()
+            XCUIRemote.shared.press(.select)
+            XCTAssertTrue(app.buttons["Pause"].waitForExistence(timeout: 15))
+            XCUIRemote.shared.press(.menu)
+            XCTAssertTrue(app.buttons["Show stream"].waitForExistence(timeout: 10))
+            for tab in ["Movies", "Series", "Home"] {
+                let button = app.tabBars.buttons[tab]
+                for _ in 0 ..< 6 where !button.hasFocus {
+                    XCUIRemote.shared.press(.up)
+                }
+                for _ in 0 ..< 8 where !button.hasFocus {
+                    XCUIRemote.shared.press(tab == "Home" ? .left : .right)
+                }
+                XCUIRemote.shared.press(.select)
+                Thread.sleep(forTimeInterval: 6)
+                let shot = XCTAttachment(screenshot: app.screenshot())
+                shot.name = "hero-beside-panel-\(tab)"
+                shot.lifetime = .keepAlways
+                add(shot)
+            }
+        }
+    }
+#endif
