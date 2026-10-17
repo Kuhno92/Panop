@@ -113,6 +113,7 @@ struct MovieDetailView: View {
     @Environment(SimklSync.self) private var simkl
     @Environment(DiscoveryModel.self) private var discovery
     @Environment(\.openURL) private var openURL
+    @State private var trailer: TrailerRequest?
 
     @State private var info: XtreamMovieInfo?
     @State private var playing: PlaybackTarget?
@@ -144,6 +145,7 @@ struct MovieDetailView: View {
             .task { await loadInfo() }
             .onAppear { simkl.register(movie.id, as: movie.tmdbID.map { .movie(tmdb: $0) }) }
             .modifier(PlayerPresentation(target: $playing))
+            .trailerPlayer($trailer)
     }
 
     // MARK: - Pieces
@@ -181,9 +183,18 @@ struct MovieDetailView: View {
         return result
     }
 
-    private var trailerURL: URL? {
-        guard let text = info?.trailer, !text.isEmpty else { return nil }
-        return text.hasPrefix("http") ? URL(string: text) : URL(string: "https://www.youtube.com/watch?v=\(text)")
+    /// What the panel calls the trailer: a YouTube id or address, a video file, or a page.
+    private var trailerSource: TrailerSource? {
+        TrailerSource(info?.trailer ?? UITestMode.trailerOverride)
+    }
+
+    /// Plays the trailer in the app; a page that is no video is the browser's.
+    private func playTrailer(_ source: TrailerSource) {
+        if let request = TrailerRequest(source: source, title: movie.name) {
+            trailer = request
+        } else if let address = source.webAddress {
+            openURL(address)
+        }
     }
 
     private var actions: some View {
@@ -199,8 +210,8 @@ struct MovieDetailView: View {
                     .buttonStyle(.borderedProminent)
             }
             HStack {
-                if let trailerURL {
-                    Button("Trailer", systemImage: "play.rectangle") { openURL(trailerURL) }
+                if let trailerSource {
+                    Button("Trailer", systemImage: "play.rectangle") { playTrailer(trailerSource) }
                 }
                 let isFavorite = userState.isFavorite(key)
                 Button(

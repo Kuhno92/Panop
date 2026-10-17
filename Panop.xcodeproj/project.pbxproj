@@ -29,6 +29,7 @@
 		AAAA00000000000000000128 /* KSPlayerBridge in Embed Frameworks */ = {isa = PBXBuildFile; productRef = AAAA00000000000000000126 /* KSPlayerBridge */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		BBBB000000000000000000A1 /* PanopSimkl in Frameworks */ = {isa = PBXBuildFile; productRef = BBBB000000000000000000A2 /* PanopSimkl */; };
 		BBBB000000000000000000B1 /* PanopSports in Frameworks */ = {isa = PBXBuildFile; productRef = BBBB000000000000000000B2 /* PanopSports */; };
+		BBBB000000000000000000C1 /* YouTubeKit in Frameworks */ = {isa = PBXBuildFile; platformFilters = (tvos, ); productRef = BBBB000000000000000000C2 /* YouTubeKit */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -101,6 +102,7 @@
 				AAAA000000000000000000D8 /* PanopDiscover in Frameworks */,
 				BBBB000000000000000000A1 /* PanopSimkl in Frameworks */,
 				BBBB000000000000000000B1 /* PanopSports in Frameworks */,
+				BBBB000000000000000000C1 /* YouTubeKit in Frameworks */,
 				AAAA000000000000000000F6 /* VLCKit in Frameworks */,
 				AAAA000000000000000000F7 /* LumeEngine in Frameworks */,
 				AAAA00000000000000000120 /* AetherEngine in Frameworks */,
@@ -183,6 +185,7 @@
 				AAAA000000000000000000CD /* PanopDiscover */,
 				BBBB000000000000000000A2 /* PanopSimkl */,
 				BBBB000000000000000000B2 /* PanopSports */,
+				BBBB000000000000000000C2 /* YouTubeKit */,
 				AAAA000000000000000000C8 /* VLCKit */,
 				AAAA000000000000000000CB /* LumeEngine */,
 				AAAA00000000000000000122 /* AetherEngine */,
@@ -281,6 +284,7 @@
 				AAAA000000000000000000C9 /* XCRemoteSwiftPackageReference "VLCKit" */,
 				AAAA000000000000000000CA /* XCLocalSwiftPackageReference "vendor/LumeEngine" */,
 				AAAA00000000000000000121 /* XCRemoteSwiftPackageReference "AetherEngine" */,
+				BBBB000000000000000000C3 /* XCRemoteSwiftPackageReference "YouTubeKit" */,
 				AAAA00000000000000000125 /* XCLocalSwiftPackageReference "Packages/KSPlayerBridge" */,
 				AAAA00000000000000000123 /* XCLocalSwiftPackageReference "Packages/LibDovi" */,
 			);
@@ -650,6 +654,14 @@
 				version = 7.27.2;
 			};
 		};
+		BBBB000000000000000000C3 /* XCRemoteSwiftPackageReference "YouTubeKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/alexeichhorn/YouTubeKit";
+			requirement = {
+				kind = exactVersion;
+				version = 0.4.9;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -712,6 +724,11 @@
 		BBBB000000000000000000B2 /* PanopSports */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = PanopSports;
+		};
+		BBBB000000000000000000C2 /* YouTubeKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BBBB000000000000000000C3 /* XCRemoteSwiftPackageReference "YouTubeKit" */;
+			productName = YouTubeKit;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

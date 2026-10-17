@@ -24,6 +24,10 @@ with the developer, no analytics, no advertising and no tracking, and nothing is
 - **Simkl, only if you sign in to it.** If a build offers it and you sign in, Panop sends the titles you finished to your
   Simkl account and reads your lists, and it fetches Simkl's public lists of what is popular. Nothing is sent to Simkl
   without your sign-in. Simkl's own policy applies to what it holds.
+- **YouTube, only when you tap Trailer.** If your provider gives a film's trailer as a YouTube video, Panop plays it in YouTube's
+  own player (iPhone, iPad and Mac) or reads its address from YouTube (Apple TV), so YouTube sees that request and your
+  device's address, as in any visit. Nothing is loaded from YouTube until you tap the button, and no one else is told which
+  trailer you watch.
 - **sportapi.ai, only if you enter a key for it.** The sports hub (today's football matches) uses your own free account at
   sportapi.ai. Panop sends your key and what it asks for (a day's matches, a league's table, a match) to sportapi.ai, and
   loads team crests from its public files. Nothing about your playlists, channels or what you watch is sent: which channel

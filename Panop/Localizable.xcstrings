@@ -5777,6 +5777,28 @@
           }
         }
       }
+    },
+    "Open in the browser" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Im Browser öffnen"
+          }
+        }
+      }
+    },
+    "This trailer can't be played here." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieser Trailer kann hier nicht abgespielt werden."
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

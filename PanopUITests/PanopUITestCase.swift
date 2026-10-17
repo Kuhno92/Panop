@@ -41,6 +41,11 @@ class PanopUITestCase: XCTestCase {
         nil
     }
 
+    /// A YouTube id every film and series has as its trailer, to look at the trailer player (`PANOP_TRAILER`).
+    var trailerID: String? {
+        nil
+    }
+
     var startTab: String {
         "live"
     }
@@ -84,6 +89,9 @@ class PanopUITestCase: XCTestCase {
         }
         if let file = devSportsKeyFile {
             app.launchEnvironment["PANOP_DEV_SPORTSAPI"] = file
+        }
+        if let trailerID {
+            app.launchEnvironment["PANOP_TRAILER"] = trailerID
         }
         if demoSports {
             app.launchEnvironment["PANOP_DEMO_SPORTS"] = "1"

@@ -59,6 +59,17 @@ relinkability, and that must remain true.
   `Contents/Frameworks` through an explicit Embed Frameworks phase, code-signed on copy. Without
   that phase the build succeeds and the app cannot launch anywhere but the machine that built it.
 
+### YouTubeKit (Apple TV only)
+
+- **Source:** https://github.com/alexeichhorn/YouTubeKit, version 0.4.9, MIT. No dependencies of its own.
+- **Use:** on Apple TV, which has no web view, to read the address of a YouTube trailer's stream so the system player can
+  play it (`Panop/Views/Trailer/ExtractedTrailerView.swift`). Linked for tvOS only. Its optional remote helper server is
+  **not** used (`methods: [.local]`): only the device asks YouTube.
+- **Caution:** this does not use YouTube's own player, which YouTube's terms
+  (https://developers.google.com/youtube/terms) say is the only way to access its video; it was chosen by the owner for
+  Apple TV, where the official player cannot run, and it can stop working whenever YouTube changes its page. On iPhone, iPad
+  and Mac the trailer plays in YouTube's own embedded player instead.
+
 ### AetherEngine
 - **License:** LGPL-3.0 **with an Apple Store / DRM exception** (permits distribution through the App Store and TestFlight where LGPL sections 4 to 6 would otherwise conflict)
 - **Source:** https://github.com/superuser404notfound/AetherEngine
@@ -102,6 +113,7 @@ Not code in the build, but data the app fetches.
 
 | Service | Use | Terms |
 |---|---|---|
+| YouTube (https://www.youtube.com) | A film's or series' trailer, when the provider's panel gives one as a YouTube video: on iPhone, iPad and Mac in YouTube's own embedded player, from the privacy-enhanced domain youtube-nocookie.com; on Apple TV by reading the stream address from YouTube's page (see YouTubeKit above) | https://developers.google.com/youtube/terms. The trailer is only loaded when the person taps Trailer. YouTube sees the request and the address of the device, as for any visit. |
 | sportapi.ai (https://sportapi.ai) | Football fixtures, scores, tables and line-ups for the sports hub, with the person's **own** key (the app has none of its own), and the public crest files at https://sportapi.ai/logos/ | The service publishes no terms for use in an app (its terms page returns 404): written permission is to be asked for before a release that includes it. A request sends the key and what is asked for (a day, a league, a match); nothing about playlists or viewing. All of it is in `PanopSports`, which can be dropped. |
 | Simkl (https://simkl.com) | Public trending and disc-release lists, and rows made from them (Top Box Office, Best of Netflix and the like), shown with Simkl's own colored icon (the brand asset it provides at us.simkl.in/img_favicon/v2/favicon-192x192.png, in `Panop/Assets.xcassets/SimklLogo.imageset`) at the start of each heading, the word Simkl kept in the trending rails' titles, a one-line credit under the rails, and a link to each title's Simkl page | https://api.simkl.org/api-rules: free for non-commercial apps and for commercial apps earning under $150 a month; above that a commercial licence is required. All Simkl code is in `PanopSimkl`, which can be dropped. |
 

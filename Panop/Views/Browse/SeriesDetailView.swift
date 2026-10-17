@@ -24,6 +24,7 @@ struct SeriesDetailView: View {
     @Environment(DiscoveryModel.self) private var discovery
     @Environment(\.modelContext) private var catalog
     @Environment(\.openURL) private var openURL
+    @State private var trailer: TrailerRequest?
 
     /// An episode as the screen needs it, whichever playlist it came from.
     private struct Episode: Identifiable {
@@ -90,6 +91,7 @@ struct SeriesDetailView: View {
             .task { await fetch() }
             .resumeDialog($resume)
             .modifier(PlayerPresentation(target: $playing))
+            .trailerPlayer($trailer)
     }
 
     @ViewBuilder
@@ -219,8 +221,8 @@ struct SeriesDetailView: View {
                 }
                 .buttonStyle(.borderedProminent)
             }
-            if let trailer = trailerURL(details.trailer) {
-                Button { openURL(trailer) } label: {
+            if let source = TrailerSource(details.trailer ?? UITestMode.trailerOverride) {
+                Button { playTrailer(source) } label: {
                     Label("Trailer", systemImage: "play.rectangle")
                 }
                 .buttonStyle(.bordered)
@@ -329,13 +331,13 @@ struct SeriesDetailView: View {
         return all.first { !userState.isWatched(key($0)) } ?? all.first
     }
 
-    /// A YouTube id or address, as the panel writes it.
-    private func trailerURL(_ text: String?) -> URL? {
-        guard let text, !text.isEmpty else { return nil }
-        if text.hasPrefix("http") {
-            return URL(string: text)
+    /// Plays the trailer in the app; a page that is no video is the browser's.
+    private func playTrailer(_ source: TrailerSource) {
+        if let request = TrailerRequest(source: source, title: series.name) {
+            trailer = request
+        } else if let address = source.webAddress {
+            openURL(address)
         }
-        return URL(string: "https://www.youtube.com/watch?v=\(text)")
     }
 
     private static func rowID(season: Int, episode: Int) -> String {

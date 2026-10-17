@@ -41,6 +41,13 @@ enum UITestMode {
 
         static let brightArtwork = "uitest://bright"
 
+        /// A trailer for every film and series, from the environment `PANOP_TRAILER`: the seeded library has no panel
+        /// to
+        /// give one, and the trailer player is looked at with a known video.
+        static var trailerOverride: String? {
+            isActive ? ProcessInfo.processInfo.environment["PANOP_TRAILER"] : nil
+        }
+
         /// Titles for Home's hero, from the environment `PANOP_HERO`: the seeded library has no suggestion rails
         /// (they need ratings, years and a trending list), so a test that is about the hero gives it some.
         static var heroTitles: [CatalogRow] {
@@ -86,6 +93,10 @@ enum UITestMode {
         }
 
         static var startTab: AppTab? {
+            nil
+        }
+
+        static var trailerOverride: String? {
             nil
         }
 
