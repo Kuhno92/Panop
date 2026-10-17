@@ -28,6 +28,35 @@ struct PlayerControls: View {
 
     private let skip = 10.0
 
+    /// The play and pause glyphs differ in width, and on Apple TV the focus platter is drawn around the label: at 36
+    /// points it hugged the glyph and the button looked cut off in its container.
+    /// Room inside the bar for a focused button, which grows past its label: at 20 points the Pause platter stuck out
+    /// of
+    /// the bar's left edge on Apple TV.
+    private static var barInset: CGFloat {
+        #if os(tvOS)
+            44
+        #else
+            20
+        #endif
+    }
+
+    private static var playWidth: CGFloat {
+        #if os(tvOS)
+            60
+        #else
+            36
+        #endif
+    }
+
+    private static var playHeight: CGFloat? {
+        #if os(tvOS)
+            52
+        #else
+            nil
+        #endif
+    }
+
     /// A focused button on Apple TV grows, and at the usual spacing it covered its neighbour:
     /// the LIVE badge sat half under the Pause button (seen in a UI test screenshot).
     private static var spacing: CGFloat {
@@ -49,12 +78,19 @@ struct PlayerControls: View {
         }
         .buttonStyle(.plain)
         .foregroundStyle(.white)
-        .padding(.horizontal, 20)
+        .padding(.horizontal, Self.barInset)
         .padding(.vertical, 14)
         .background(.black.opacity(0.55), in: RoundedRectangle(cornerRadius: 16))
         .padding()
-        // Focus anywhere in the bar holds it up; letting go starts the countdown again.
-        .onChange(of: focused) { model.holdControls(focused != nil) }
+        // Moving the focus along the bar is use, so the countdown starts again. It is not a hold: a bar kept up for as
+        // long as a button has focus never went away on Apple TV, which is where focus always rests. Once it has
+        // hidden,
+        // the picture behind it takes the focus and the next press of the remote brings the bar back.
+        .onChange(of: focused) {
+            if focused != nil {
+                model.showControls()
+            }
+        }
     }
 
     private var controlRow: some View {
@@ -64,7 +100,7 @@ struct PlayerControls: View {
             } label: {
                 Image(systemName: model.isPaused ? "play.fill" : "pause.fill")
                     .font(.title2)
-                    .frame(width: 36)
+                    .frame(width: Self.playWidth, height: Self.playHeight)
             }
             .trackFocus($focused, .play)
             .accessibilityLabel(model.isPaused ? "Play" : "Pause")

@@ -100,18 +100,6 @@ final class PlayerTests: PanopUITestCase {
     }
 
     #if os(tvOS)
-        /// The fix this target was added to check: the bar must not vanish under the remote
-        /// while a control has focus, which it did, taking the focus with it.
-        func testControlsStayUpWhileTheRemoteHasFocusOnThem() {
-            openFirstChannel()
-            XCTAssertTrue(app.buttons["Pause"].waitForExistence(timeout: 15))
-
-            // Well past the four seconds the bar would otherwise last.
-            Thread.sleep(forTimeInterval: 8)
-
-            XCTAssertTrue(app.buttons["Pause"].exists, "the controls hid while one of them had focus")
-        }
-
         /// Menu goes back to the app and the stream plays on behind it, as on a Mac. Select on the bar over the app
         /// (where the
         /// focus lands) brings it forward again, and Stop in the bar over the app ends it.
@@ -269,13 +257,35 @@ final class PlayerTests: PanopUITestCase {
     #endif
 }
 
-#if !os(tvOS)
-    /// The controls hide on their own, so this one asks for the short timeout.
-    final class ControlsAutoHideTests: PanopUITestCase {
-        override var controlsTimeout: Int {
-            3
-        }
+/// The controls hide on their own, so this one asks for the short timeout.
+final class ControlsAutoHideTests: PanopUITestCase {
+    override var controlsTimeout: Int {
+        3
+    }
 
+    #if os(tvOS)
+        /// Focus rests on a button for good, so a bar held up by focus never closed, and came back every time the
+        /// stream
+        /// was shown again. It must go once the remote is left alone, and any press brings it back.
+        func testControlsHideWhenLeftAloneAndTheRemoteBringsThemBack() {
+            waitForChannels()
+            focusFirstChannel()
+            XCUIRemote.shared.press(.select)
+            XCTAssertTrue(app.buttons["Pause"].waitForExistence(timeout: 15))
+            let shot = XCTAttachment(screenshot: app.screenshot())
+            shot.name = "tv-controls"
+            shot.lifetime = .keepAlways
+            add(shot)
+
+            XCTAssertTrue(app.buttons["Pause"].waitForNonExistence(timeout: 20), "the controls never hid")
+
+            XCUIRemote.shared.press(.right)
+            XCTAssertTrue(
+                app.buttons["Pause"].waitForExistence(timeout: 5),
+                "the remote did not bring the controls back"
+            )
+        }
+    #else
         func testControlsHideOnTheirOwnAndATapBringsThemBack() {
             waitForChannels()
             channel("3sat").tap()
@@ -309,5 +319,5 @@ final class PlayerTests: PanopUITestCase {
             english.tap()
             XCTAssertTrue(close.waitForNonExistence(timeout: 12), "the controls never hid after the menu closed")
         }
-    }
-#endif
+    #endif
+}
