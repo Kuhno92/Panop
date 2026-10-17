@@ -126,10 +126,10 @@ struct PlayerWindowTests {
             }
 
             #expect(PlayerWindowContent
-                .streamURL(for: request("home", "42"), in: context) == "http://home.example/42.ts")
+                .known(for: request("home", "42"), in: context).streamURL == "http://home.example/42.ts")
             #expect(PlayerWindowContent
-                .streamURL(for: request("backup", "42"), in: context) == "http://backup.example/42.ts")
-            #expect(PlayerWindowContent.streamURL(for: request("home", "missing"), in: context) == nil)
+                .known(for: request("backup", "42"), in: context).streamURL == "http://backup.example/42.ts")
+            #expect(PlayerWindowContent.known(for: request("home", "missing"), in: context).streamURL == nil)
         }
     #endif
 }

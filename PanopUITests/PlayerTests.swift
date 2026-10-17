@@ -66,6 +66,50 @@ final class PlayerTests: PanopUITestCase {
         add(shot)
     }
 
+    /// A channel the playlist keeps an archive of offers catch-up in its controls: its aired programmes are listed, and
+    /// choosing one plays it, with no Catch-up button of its own any more.
+    func testCatchupListsAiredProgrammesAndPlaysOne() {
+        openFirstChannel()
+        waitForPlayerControls()
+        let catchup = app.buttons["Catch-up"]
+        XCTAssertTrue(catchup.waitForExistence(timeout: 15), "no Catch-up in the controls of a channel with an archive")
+        #if os(tvOS)
+            // The bar is a row: the button is to the right of the one that has focus.
+            for _ in 0 ..< 8 where !catchup.hasFocus {
+                XCUIRemote.shared.press(.right)
+            }
+            XCUIRemote.shared.press(.select)
+        #else
+            catchup.tap()
+        #endif
+        #if os(tvOS)
+            let earlier = "Late Night Rerun"
+        #else
+            let earlier = "Seeded Earlier"
+        #endif
+        let programme = app.descendants(matching: .any).matching(NSPredicate(format: "label CONTAINS %@", earlier))
+            .firstMatch
+        XCTAssertTrue(
+            programme.waitForExistence(timeout: 15),
+            "the aired programme is not listed. Screen:\n\(app.debugDescription)"
+        )
+        let shot = XCTAttachment(screenshot: app.screenshot())
+        shot.name = "catchup-list"
+        shot.lifetime = .keepAlways
+        add(shot)
+        #if os(tvOS)
+            focus(programme)
+            XCUIRemote.shared.press(.select)
+        #else
+            programme.tap()
+        #endif
+        XCTAssertTrue(app.buttons["Pause"].waitForExistence(timeout: 15), "the aired programme did not start")
+        XCTAssertTrue(
+            app.buttons["Catch-up"].waitForNonExistence(timeout: 5),
+            "an aired programme offers catch-up again"
+        )
+    }
+
     #if !os(tvOS)
         /// The guide opens over the stream, and choosing a channel in it switches the stream to that channel.
         func testTheGuideOpensFromThePlayerAndSwitchesChannel() {

@@ -13,6 +13,7 @@ enum EntryMapping {
 
         let attributes = playlistEntry.attributes
         let group = attributes.groupTitle.flatMap { $0.isEmpty ? nil : $0 }
+        let rule = CatchupRule(type: attributes.catchup, source: attributes.catchupSource)
         return CatalogEntry(
             id: CatalogID.m3u(url: url),
             kind: playlistEntry.mediaKind,
@@ -22,8 +23,10 @@ enum EntryMapping {
             iconURL: attributes.tvgLogo.flatMap { $0.isEmpty ? nil : $0 },
             epgKey: attributes.tvgID.flatMap { $0.isEmpty ? nil : EPGKey.normalize($0) },
             streamURL: url,
-            hasArchive: attributes.catchup.map { !$0.isEmpty } ?? false,
-            archiveDays: attributes.catchupDays.flatMap { Int($0) },
+            hasArchive: rule != nil,
+            // A list that names a way and no length is taken to keep a day, which is what most do.
+            archiveDays: rule == nil ? nil : (attributes.catchupDays.flatMap { Int($0) } ?? 1),
+            catchupRule: rule?.encoded,
             isAdult: TitleMetadata.isAdultCategory(group),
             year: TitleMetadata.year(fromTitle: playlistEntry.name)
         )

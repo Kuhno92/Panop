@@ -80,6 +80,7 @@ final class CatalogEntryRecord {
     var sortNumber: Int?
     var hasArchive: Bool
     var archiveDays: Int?
+    var catchupRule: String?
     var addedAt: Date?
     var rating: Double?
     var plot: String?
@@ -122,6 +123,7 @@ final class CatalogEntryRecord {
         sortNumber = entry.sortNumber
         hasArchive = entry.hasArchive
         archiveDays = entry.archiveDays
+        catchupRule = entry.catchupRule
         addedAt = entry.addedAt
         rating = entry.rating
         plot = entry.plot
@@ -172,6 +174,7 @@ final class CatalogEntryRecord {
         assign(\.sortNumber, entry.sortNumber)
         assign(\.hasArchive, entry.hasArchive)
         assign(\.archiveDays, entry.archiveDays)
+        assign(\.catchupRule, entry.catchupRule)
         assign(\.addedAt, entry.addedAt)
         assign(\.rating, entry.rating)
         assign(\.plot, entry.plot)

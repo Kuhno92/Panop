@@ -35,6 +35,7 @@ struct PlayerScreen: View {
     /// What plays now, once the person has switched channel from the guide; until then, `target`.
     @State private var switchedTo: PlaybackTarget?
     @State private var showingGuide = false
+    @State private var showingCatchup = false
 
     private var playing: PlaybackTarget {
         switchedTo ?? target
@@ -49,6 +50,10 @@ struct PlayerScreen: View {
                     onClose: onClose,
                     onBrowse: onBrowse,
                     onShowGuide: playing.kind == .live ? (onShowGuideInApp ?? { showingGuide = true }) : nil,
+                    // Only on a channel live that the provider keeps an archive of, and not while one of its aired
+                    // programmes plays: that one has been chosen from this list.
+                    onShowCatchup: playing.kind == .live && playing.catchup == nil && (playing.archiveDays ?? 0) > 0
+                        ? { showingCatchup = true } : nil,
                     guide: guideKey,
                     versions: versionRows.map { TrackDescriptor(id: $0.entryID, label: $0.name) },
                     currentVersion: playing.entryID,
@@ -68,6 +73,7 @@ struct PlayerScreen: View {
             }
         }
         .modifier(PlayerGuidePresentation(isPresented: $showingGuide) { switchTo($0) })
+        .modifier(PlayerCatchupPresentation(isPresented: $showingCatchup, channel: playing) { switchTo($0) })
     }
 
     /// The channels that share the playing one's guide key, without any the person hid, when the list is grouped by
@@ -95,6 +101,7 @@ struct PlayerScreen: View {
     /// Plays another channel in place of this one, from the guide.
     private func switchTo(_ new: PlaybackTarget) {
         showingGuide = false
+        showingCatchup = false
         switchedTo = new
         // The old picture goes, and with it its player; the new one is made as a first one is.
         model = nil
@@ -182,6 +189,7 @@ struct PlayerView: View {
     var onClose: (() -> Void)?
     var onBrowse: (() -> Void)?
     var onShowGuide: (() -> Void)?
+    var onShowCatchup: (() -> Void)?
     var guide: GuideKey?
     /// The other versions of the channel that plays, which one plays, and what choosing another does.
     var versions: [TrackDescriptor] = []
@@ -285,6 +293,7 @@ struct PlayerView: View {
                 PlayerControls(
                     model: model,
                     onShowGuide: onShowGuide,
+                    onShowCatchup: onShowCatchup,
                     guide: guide,
                     versions: versions,
                     currentVersion: currentVersion,

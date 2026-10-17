@@ -32,6 +32,8 @@ public struct CatalogEntry: Sendable, Equatable, Hashable {
     public var sortNumber: Int?
     public var hasArchive: Bool
     public var archiveDays: Int?
+    /// An M3U channel's way into the archive, as ``CatchupRule/encoded``. Xtream channels have none: the panel's own.
+    public var catchupRule: String?
     public var addedAt: Date?
     public var rating: Double?
     public var plot: String?
@@ -76,6 +78,7 @@ public struct CatalogEntry: Sendable, Equatable, Hashable {
         sortNumber: Int? = nil,
         hasArchive: Bool = false,
         archiveDays: Int? = nil,
+        catchupRule: String? = nil,
         addedAt: Date? = nil,
         rating: Double? = nil,
         plot: String? = nil,
@@ -105,6 +108,7 @@ public struct CatalogEntry: Sendable, Equatable, Hashable {
         self.sortNumber = sortNumber
         self.hasArchive = hasArchive
         self.archiveDays = archiveDays
+        self.catchupRule = catchupRule
         self.addedAt = addedAt
         self.rating = rating
         self.plot = plot

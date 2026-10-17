@@ -726,16 +726,21 @@ Features real users expect that the brief did not name. All *(surfaced)*.
       **Cautions:** the project says it is "only suitable for learning" and will not be maintained often;
       Metal support is experimental; it brings a third copy of FFmpeg (n9.0.1), with the same collision risk as
       Lume's. Floors are macOS 12, iOS 15, tvOS 15, below Panop's. Not started.
-- [ ] **Catch-up and timeshift** *(asked for, again 2026-10-09; what is left is below)*. Xtream supports it; the M3U attributes are already parsed.
-      **Catch-up for Xtream is built**: a channel the panel archives (`tv_archive`) lists the
-      programmes that aired within its window under "Earlier" in its guide, and tapping one plays
-      it from the start through the panel's timeshift address (`XtreamClient.catchupURL`, written
-      in the panel's time zone, read from the login answer). The aired programme travels as a
-      `CatchupWindow` (no address, no login) so a Mac player window can rebuild it. 4 package
-      tests, 5 app tests. **Not verified:** against a real panel, in particular that its archive
-      honours the advertised time zone. **Not done:** seeking (played as a stream with no
-      scrubber), M3U catch-up (`catchup-source` templates differ per provider), and timeshift
-      (pausing and rewinding live).
+- [ ] **Catch-up and timeshift** *(asked for, again 2026-10-09 and 2026-10-17; what is left is below)*.
+      **Catch-up is built for Xtream and for M3U.** A channel the provider archives shows a clock icon in the Live
+      list, and a **Catch-up** button in the player's controls (iPhone, iPad, Mac, Apple TV) that opens the programmes
+      of the last days (the channel's guide screen, aired ones first); choosing one plays it from its start. Xtream
+      goes through the panel's timeshift address (`XtreamClient.catchupURL`, written in the panel's time zone, read
+      from the login answer). An M3U channel carries `CatchupRule` (`PanopCore`: the `catchup` type and
+      `catchup-source` template; modes default, append, shift, flussonic, xc, with the placeholders `{utc}`, `{start}`,
+      `{end}`, `{duration}`, `{lutc}`, `{timestamp}`, `{offset}`, `{Y}{m}{d}{H}{M}{S}`), stored on the catalog entry
+      and made into the address from the live one. A list that names a way and no length is taken to keep a day.
+      Tests: 8 package tests for the addresses, 1 for the import, 3 app tests, UI tests on iOS and Apple TV.
+      **Not verified:** against a real panel or a real M3U provider (in particular that an Xtream archive honours its
+      advertised time zone, and the Flussonic and `xc` forms, which are written from documentation). Channels
+      imported before this need a playlist refresh to gain their rule. **Not done:** seeking (an aired programme is
+      played as a stream with no scrubber), the `${(b)...}` date forms some templates use, and timeshift (pausing and
+      rewinding live).
 - [x] **Multiple playlists** and switching between them. Several sources can be added, and Live TV shows all of them or one chosen source (M2); each can be refreshed or deleted from Playlists.
 - [x] **Profiles** *(first part)*: up to eight, each with its own favourites, history, hidden titles,
       category choices, suggestions and adult filter. Added, renamed and deleted in Settings → Profiles,

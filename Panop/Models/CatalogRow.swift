@@ -26,6 +26,7 @@ nonisolated struct CatalogRow: Identifiable, Hashable, Sendable, Codable {
     var containerExtension: String?
     var hasArchive: Bool
     var archiveDays: Int?
+    var catchupRule: String?
     var rating: Double?
     var plot: String?
     var tmdbID: Int?
@@ -55,6 +56,7 @@ nonisolated struct CatalogRow: Identifiable, Hashable, Sendable, Codable {
         containerExtension = record.containerExtension
         hasArchive = record.hasArchive
         archiveDays = record.archiveDays
+        catchupRule = record.catchupRule
         rating = record.rating
         plot = record.plot
         tmdbID = record.tmdbID == 0 ? nil : record.tmdbID

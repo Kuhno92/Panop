@@ -33,6 +33,10 @@ nonisolated struct PlaybackTarget: Identifiable, Equatable, Hashable, Sendable {
     var resumeAt: Double?
     /// Set to play an aired programme of this channel from the archive.
     var catchup: CatchupWindow?
+    /// How many days the provider keeps of this channel, when it keeps any: what the player offers catch-up on.
+    var archiveDays: Int?
+    /// An M3U channel's way into its archive (`CatchupRule.encoded`). Not saved with a window: it can carry a login.
+    var catchupRule: String?
     /// The channel's key in the guide, so the player can say what is on.
     var epgKey: String?
     /// What groups the channel with its other versions, so the player can offer them.
@@ -59,6 +63,7 @@ nonisolated struct PlayerWindowRequest: Codable, Hashable {
     var containerExtension: String?
     var resumeAt: Double?
     var catchup: CatchupWindow?
+    var archiveDays: Int?
     /// Not a secret, so it may be saved with the window: the key the guide files the channel under.
     var epgKey: String?
     var groupKey: String?
@@ -72,23 +77,28 @@ nonisolated struct PlayerWindowRequest: Codable, Hashable {
         containerExtension = target.containerExtension
         resumeAt = target.resumeAt
         catchup = target.catchup
+        archiveDays = target.archiveDays
         epgKey = target.epgKey
         groupKey = target.groupKey
     }
 
     /// The target to play, given the address if the catalog has one for this item.
-    func target(streamURL: String?) -> PlaybackTarget {
+    func target(streamURL: String?, catchupRule: String? = nil) -> PlaybackTarget {
         PlaybackTarget(
             playlist: playlist,
             entryID: entryID,
             kind: kind,
             name: name,
-            // The live address the catalog holds is not the archive's.
-            streamURL: catchup == nil ? streamURL : nil,
+            // The live address the catalog holds is not an Xtream panel's archive address, but it is what a playlist's
+            // own
+            // catch-up rule is made from.
+            streamURL: catchup == nil || catchupRule != nil ? streamURL : nil,
             remoteID: remoteID,
             containerExtension: containerExtension,
             resumeAt: resumeAt,
             catchup: catchup,
+            archiveDays: archiveDays,
+            catchupRule: catchupRule,
             epgKey: epgKey,
             groupKey: groupKey
         )
@@ -118,6 +128,9 @@ nonisolated enum PlaybackRequestBuilder {
         source: PlaylistSource?,
         transport: any HTTPTransport
     ) throws -> PlaybackRequest {
+        if let catchup = target.catchup, let live = target.streamURL, !live.isEmpty {
+            return try playlistArchiveRequest(for: target, catchup: catchup, live: live)
+        }
         if let url = target.streamURL, !url.isEmpty {
             // A path with no scheme and host reaches an engine as a failure that
             // looks like a network problem. Say what is wrong instead.
@@ -196,6 +209,30 @@ nonisolated enum PlaybackRequestBuilder {
         case .series, .unknown:
             throw PlaybackTargetError.notPlayable(String(localized: "Open the series to pick an episode."))
         }
+    }
+
+    /// A playlist's own archive: the address is made from the live one by the channel's rule. Not for an Xtream panel,
+    /// whose archive has its own address (``liveRequest(for:client:remote:)``).
+    private static func playlistArchiveRequest(
+        for target: PlaybackTarget,
+        catchup: CatchupWindow,
+        live: String
+    ) throws -> PlaybackRequest {
+        guard let rule = CatchupRule(encoded: target.catchupRule),
+              let url = rule.url(
+                  live: live,
+                  start: catchup.start,
+                  end: catchup.start.addingTimeInterval(Double(catchup.minutes) * 60)
+              )
+        else {
+            throw PlaybackTargetError.notPlayable(
+                String(
+                    localized: "This programme's catch-up address could not be made. Refresh the playlist and try again."
+                )
+            )
+        }
+        let item = PlaybackItem(url: url.absoluteString, title: target.name, mediaKind: .live)
+        return PlaybackRequest(mediaKind: .live) { _ in item }
     }
 
     /// A channel live, or, when the target names an aired programme, from the panel's archive.

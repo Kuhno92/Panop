@@ -18,7 +18,8 @@
         @Environment(\.modelContext) private var catalog
 
         var body: some View {
-            PlayerScreen(target: request.target(streamURL: Self.streamURL(for: request, in: catalog)))
+            let known = Self.known(for: request, in: catalog)
+            PlayerScreen(target: request.target(streamURL: known.streamURL, catchupRule: known.catchupRule))
                 .frame(minWidth: 640, minHeight: 400)
                 .background(.black)
                 .background(WindowCloseWatcher())
@@ -27,14 +28,18 @@
         /// The address the catalog holds for this item, or nil if it holds none (an episode, or
         /// an item that has since gone). The playlist is matched as well as the id, since an id
         /// can repeat across playlists.
-        static func streamURL(for request: PlayerWindowRequest, in context: ModelContext) -> String? {
+        static func known(
+            for request: PlayerWindowRequest,
+            in context: ModelContext
+        ) -> (streamURL: String?, catchupRule: String?) {
             let playlist = request.playlist
             let id = request.entryID
             var descriptor = FetchDescriptor<CatalogEntryRecord>(
                 predicate: #Predicate { $0.playlist == playlist && $0.id == id }
             )
             descriptor.fetchLimit = 1
-            return (try? context.fetch(descriptor))?.first?.streamURL
+            let record = (try? context.fetch(descriptor))?.first
+            return (record?.streamURL, record?.catchupRule)
         }
     }
 

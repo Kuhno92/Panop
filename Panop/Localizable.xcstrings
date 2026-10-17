@@ -5810,6 +5810,39 @@
           }
         }
       }
+    },
+    "Catch-up" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Catch-up"
+          }
+        }
+      }
+    },
+    "Catch-up available" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Catch-up verfügbar"
+          }
+        }
+      }
+    },
+    "This programme's catch-up address could not be made. Refresh the playlist and try again." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Catch-up-Adresse dieser Sendung konnte nicht erstellt werden. Aktualisiere die Playlist und versuche es erneut."
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

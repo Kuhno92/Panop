@@ -428,6 +428,11 @@ private struct LiveChannelList<Header: View>: View {
                         .foregroundStyle(.yellow)
                         .accessibilityLabel("Favourite")
                 }
+                if channel.hasArchive, (channel.archiveDays ?? 0) > 0 {
+                    Image(systemName: "clock.arrow.circlepath")
+                        .foregroundStyle(.secondary)
+                        .accessibilityLabel("Catch-up available")
+                }
             }
         }
     }
@@ -512,6 +517,8 @@ extension PlaybackTarget {
             streamURL: row.streamURL,
             remoteID: row.remoteID,
             containerExtension: row.containerExtension,
+            archiveDays: row.hasArchive ? row.archiveDays : nil,
+            catchupRule: row.catchupRule,
             epgKey: row.epgKey,
             groupKey: row.groupKey
         )
@@ -527,6 +534,8 @@ extension PlaybackTarget {
             streamURL: entry.streamURL,
             remoteID: entry.remoteID,
             containerExtension: entry.containerExtension,
+            archiveDays: entry.hasArchive ? entry.archiveDays : nil,
+            catchupRule: entry.catchupRule,
             epgKey: entry.epgKey,
             groupKey: entry.groupKey
         )

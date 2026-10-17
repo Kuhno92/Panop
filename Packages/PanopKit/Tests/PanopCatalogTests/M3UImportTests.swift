@@ -18,6 +18,34 @@ struct M3UImportTests {
     // MARK: - Basics
 
     @Test
+    func `a channel that names a catch-up way keeps it, with a day when none is given`() async throws {
+        let store = InMemoryCatalogStore()
+        let text = """
+        #EXTM3U
+        #EXTINF:-1 tvg-id="a" catchup="append" catchup-source="?utc={utc}" catchup-days="3",With
+        http://host/live/1.ts
+        #EXTINF:-1 tvg-id="b" catchup="shift",Shifted
+        http://host/live/2.ts
+        #EXTINF:-1 tvg-id="c" catchup="append",NoTemplate
+        http://host/live/3.ts
+        #EXTINF:-1 tvg-id="d",Plain
+        http://host/live/4.ts
+        """
+        let path = try writeTemporaryFile(text)
+
+        _ = try await importer(store).importM3U(playlist: playlistID, source: .file(path: path))
+
+        let entries = await store.allEntries(playlist: playlistID)
+        let with = try #require(entries.first { $0.name == "With" })
+        #expect(with.hasArchive && with.archiveDays == 3)
+        #expect(CatchupRule(encoded: with.catchupRule) == CatchupRule(mode: .append, source: "?utc={utc}"))
+        let shifted = try #require(entries.first { $0.name == "Shifted" })
+        #expect(shifted.hasArchive && shifted.archiveDays == 1)
+        #expect(try #require(entries.first { $0.name == "NoTemplate" }).hasArchive == false)
+        #expect(try #require(entries.first { $0.name == "Plain" }).catchupRule == nil)
+    }
+
+    @Test
     func `imports entries, categories and guide URLs`() async throws {
         let store = InMemoryCatalogStore()
         let path = try writeTemporaryFile(livePlaylist(0 ..< 3, group: "News", epgURL: "http://epg/guide.xml.gz"))

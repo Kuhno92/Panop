@@ -38,6 +38,46 @@ struct CatchupTests {
     }
 
     @Test
+    func `a playlist's own archive is made from the live address by the channel's rule`() throws {
+        var target = target()
+        target.streamURL = "http://host/live/u/p/42.ts"
+        target.catchupRule = CatchupRule(mode: .append, source: "?utc={utc}&d={duration}").encoded
+
+        let request = try PlaybackRequestBuilder.request(
+            for: target,
+            source: nil,
+            transport: StubTransport { _ in (200, "") }
+        )
+
+        #expect(request.item(.avPlayer).url == "http://host/live/u/p/42.ts?utc=1777660200&d=2700")
+        #expect(request.item(.avPlayer).mediaKind == .live)
+    }
+
+    @Test
+    func `a playlist's channel with no usable rule says so instead of playing live`() {
+        var target = target()
+        target.streamURL = "http://host/live/u/p/42.ts"
+
+        #expect(throws: PlaybackTargetError.self) {
+            _ = try PlaybackRequestBuilder.request(
+                for: target,
+                source: nil,
+                transport: StubTransport { _ in (200, "") }
+            )
+        }
+    }
+
+    @Test
+    func `a window keeps the live address for a playlist's own archive`() {
+        let window = PlayerWindowRequest(target())
+
+        let rebuilt = window.target(streamURL: "http://host/live/u/p/42.ts", catchupRule: "append\n?x={utc}")
+
+        #expect(rebuilt.streamURL == "http://host/live/u/p/42.ts")
+        #expect(rebuilt.catchupRule == "append\n?x={utc}")
+    }
+
+    @Test
     func `a window's value carries the programme but no address, and ignores the catalog's live one`() throws {
         let window = PlayerWindowRequest(target())
 

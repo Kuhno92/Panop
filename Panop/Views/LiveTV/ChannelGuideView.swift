@@ -81,6 +81,8 @@ struct ChannelGuideView: View {
     let channel: CatalogRow
     let onPlay: (CatalogRow) -> Void
     let onPlayTarget: (PlaybackTarget) -> Void
+    /// Opened from the player's Catch-up button: the aired programmes come before the schedule.
+    var catchupFirst = false
 
     @Environment(PlaylistLibrary.self) private var library
     @Environment(\.modelContext) private var catalog
@@ -103,6 +105,9 @@ struct ChannelGuideView: View {
                     onPlay(channel)
                 }
             }
+            if catchupFirst {
+                airedSection
+            }
             if !programmes.isEmpty {
                 Section("Schedule") {
                     ForEach(programmes) { programme in
@@ -112,24 +117,8 @@ struct ChannelGuideView: View {
                     }
                 }
             }
-            if !aired.isEmpty {
-                Section {
-                    ForEach(aired) { programme in
-                        Button { watch(programme) } label: {
-                            row(programme).contentShape(Rectangle())
-                        }
-                        .buttonStyle(.plain)
-                        .accessibilityHint("Watch from the start")
-                    }
-                } header: {
-                    Text("Earlier")
-                } footer: {
-                    if catchupFailed {
-                        Text("The provider could not be reached for this programme.")
-                    } else {
-                        Text("Tap a programme to watch it from the start.")
-                    }
-                }
+            if !catchupFirst {
+                airedSection
             }
         }
         .pageBackdrop()
@@ -158,15 +147,45 @@ struct ChannelGuideView: View {
             }
     }
 
+    /// The programmes that aired within the provider's archive, to watch from their start.
+    @ViewBuilder
+    private var airedSection: some View {
+        if !aired.isEmpty {
+            Section {
+                ForEach(aired) { programme in
+                    Button { watch(programme) } label: {
+                        row(programme).contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityHint("Watch from the start")
+                }
+            } header: {
+                Text("Earlier")
+            } footer: {
+                if catchupFailed {
+                    Text("The provider could not be reached for this programme.")
+                } else {
+                    Text("Tap a programme to watch it from the start.")
+                }
+            }
+        }
+    }
+
     // MARK: - Catch-up
 
-    /// A channel the panel archives: the programmes that aired within its window, and the
-    /// panel's time zone to address them in. Xtream only: an M3U playlist's catch-up is a
-    /// template that differs from provider to provider.
+    /// A channel with an archive: the programmes that aired within its window. An Xtream panel is also asked for its
+    /// time zone, to address them in; a playlist's own channel carries the rule for its address.
     private func loadArchive() async {
-        guard channel.hasArchive, let days = channel.archiveDays, days > 0,
-              case let .xtream(credentials)? = try? library.descriptor(for: channel.playlist)?.source
-        else { return }
+        guard channel.hasArchive, let days = channel.archiveDays, days > 0 else { return }
+        let source = try? library.descriptor(for: channel.playlist)?.source
+        let xtream: ProviderCredentials?
+        if case let .xtream(credentials)? = source {
+            xtream = credentials
+        } else if channel.catchupRule != nil, channel.streamURL != nil {
+            xtream = nil
+        } else {
+            return
+        }
         aired = GuideLookup.aired(
             playlist: channel.playlist,
             epgKey: channel.epgKey,
@@ -174,8 +193,8 @@ struct ChannelGuideView: View {
             limit: Self.limit,
             in: catalog
         )
-        guard !aired.isEmpty,
-              let client = try? XtreamClient(credentials: credentials, transport: URLSessionTransport())
+        guard !aired.isEmpty, let xtream,
+              let client = try? XtreamClient(credentials: xtream, transport: URLSessionTransport())
         else { return }
         panelTimeZone = try? await client.authenticate().timeZoneID
     }

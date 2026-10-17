@@ -160,7 +160,11 @@ enum UITestMode {
                 return
             }
             var lines = channelNames.enumerated().map { index, name in
-                "#EXTINF:-1 tvg-id=\"c\(index)\" group-title=\"\(index < 6 ? "Germany" : "Other")\",\(name)\n" +
+                // The first and third channels keep a day of archive, to look at catch-up.
+                "#EXTINF:-1 tvg-id=\"c\(index)\" group-title=\"\(index < 6 ? "Germany" : "Other")\"" +
+                    (index == 0 || index == 2 ? " catchup=\"append\" catchup-source=\"?utc={utc}\" catchup-days=\"1\"" :
+                        "") +
+                    ",\(name)\n" +
                     "http://127.0.0.1:9/live/\(index).ts"
             }
             // A second version of the first channel, sharing its guide: with `PANOP_VERSIONS` the list can group them.
@@ -203,6 +207,8 @@ enum UITestMode {
                     )
                 }
                 _ = try await services.catalogStore.upsertProgrammes([
+                    programme("c2", "Seeded Earlier", ["News"], from: -150, to: -30),
+                    programme("c0", "Late Night Rerun", ["Magazine"], from: -180, to: -60),
                     programme("c2", "Seeded News", ["News"], from: -30, to: 30),
                     programme("c2", "Seeded Film", ["Movie"], from: 30, to: 120),
                     programme("c2", "Seeded Late Show", ["Talk-Show"], from: 120, to: 180),

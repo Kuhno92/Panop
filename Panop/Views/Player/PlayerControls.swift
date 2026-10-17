@@ -8,6 +8,8 @@ struct PlayerControls: View {
     let model: PlayerModel
     /// Opens the TV guide over the stream, to see what is on and switch to it. Nil for a film.
     var onShowGuide: (() -> Void)?
+    /// Opens the programmes the provider has kept, to watch one from its start. Nil where there is no archive.
+    var onShowCatchup: (() -> Void)?
     /// The live channel's place in the guide, for the programme timeline. Nil for a film or a channel with no guide.
     var guide: GuideKey?
     /// The other versions of the channel that plays (HD, SD...), when the list groups them, and the one that plays.
@@ -21,7 +23,7 @@ struct PlayerControls: View {
 
     /// Which control has focus, on Apple TV, so the bar can stay up while it is being used.
     private enum Control: Hashable {
-        case play, back, forward, audio, subtitles, guide, versions
+        case play, back, forward, audio, subtitles, guide, catchup, versions
     }
 
     @FocusState private var focused: Control?
@@ -136,6 +138,15 @@ struct PlayerControls: View {
                 .accessibilityLabel("TV Guide")
                 // The Live TV screen behind a full-screen player has a button of the same name.
                 .accessibilityIdentifier("playerGuide")
+            }
+
+            if let onShowCatchup {
+                Button(action: onShowCatchup) {
+                    Image(systemName: "clock.arrow.circlepath").font(.title3)
+                }
+                .trackFocus($focused, .catchup)
+                .accessibilityLabel("Catch-up")
+                .accessibilityIdentifier("playerCatchup")
             }
 
             tracks
