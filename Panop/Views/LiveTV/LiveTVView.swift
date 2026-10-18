@@ -356,6 +356,10 @@ private struct LiveChannelList<Header: View>: View {
     private var list: some View {
         List {
             header
+                .listRowBackground(Color.clear)
+            #if !os(tvOS)
+                .listRowSeparator(.hidden)
+            #endif
             // Channels are showing, but a source behind them could not be updated: say so,
             // and offer the retry, rather than let the list look current.
             if !shown.isEmpty, !problems.isEmpty {

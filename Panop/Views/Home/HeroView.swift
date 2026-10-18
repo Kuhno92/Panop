@@ -27,7 +27,7 @@ struct HeroView: View {
         content
             .padding(.horizontal, Self.inset)
             .padding(.top, Self.inset)
-            .padding(.bottom, 20)
+            .padding(.bottom, sizeClass == .compact ? 36 : 20)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             .background {
                 if showsBackdrop {
@@ -39,19 +39,35 @@ struct HeroView: View {
     @ViewBuilder
     private var content: some View {
         if sizeClass == .compact {
-            VStack(spacing: 14) {
-                poster
-                text(alignment: .center)
+            // The poster is the page's artwork (`HeroArtwork`, full width), so what is left is the title and the way
+            // in,
+            // at the bottom, over it.
+            VStack(alignment: .leading, spacing: 14) {
+                Spacer(minLength: 0)
+                text(alignment: .leading)
                 buttons
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
         } else {
+            // The words on the left and the poster on the right, large, with a glow of the accent behind it: what a
+            // screen across the room reads first.
             HStack(alignment: .bottom, spacing: 28) {
-                poster
-                VStack(alignment: .leading, spacing: 14) {
+                VStack(alignment: .leading, spacing: 18) {
                     text(alignment: .leading)
                     buttons
                 }
                 Spacer(minLength: 0)
+                poster
+                    .background {
+                        Circle()
+                            .fill(RadialGradient(
+                                colors: [Theme.violet.opacity(0.7), .clear],
+                                center: .center,
+                                startRadius: 10,
+                                endRadius: Self.posterWidth * 1.1
+                            ))
+                            .frame(width: Self.posterWidth * 2.4, height: Self.posterWidth * 2.4)
+                    }
             }
         }
     }
@@ -63,15 +79,16 @@ struct HeroView: View {
     }
 
     private func text(alignment: HorizontalAlignment) -> some View {
-        VStack(alignment: alignment, spacing: 6) {
+        VStack(alignment: alignment, spacing: 8) {
             Text(RailHeading.display(row.name))
                 .font(Self.titleFont)
                 .multilineTextAlignment(alignment == .center ? .center : .leading)
                 .lineLimit(2)
+                .shadow(color: .black.opacity(0.45), radius: 8, y: 2)
             if let meta {
                 Text(meta)
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .font(.subheadline.weight(.medium))
+                    .foregroundStyle(.white.opacity(0.78))
             }
         }
     }
@@ -99,18 +116,18 @@ struct HeroView: View {
                 Button(action: onPlay) {
                     Label("Play", systemImage: "play.fill").frame(minWidth: 90)
                 }
-                .buttonStyle(.borderedProminent)
+                .heroButton(prominent: true)
                 .focused($focus, equals: .play)
                 Button(action: onInfo) {
                     Label("More info", systemImage: "info.circle").frame(minWidth: 90)
                 }
-                .buttonStyle(.bordered)
+                .heroButton(prominent: false)
                 .focused($focus, equals: .info)
             } else {
                 Button(action: onInfo) {
                     Label("More info", systemImage: "info.circle").frame(minWidth: 90)
                 }
-                .buttonStyle(.borderedProminent)
+                .heroButton(prominent: true)
                 .focused($focus, equals: .info)
             }
         }
@@ -141,7 +158,7 @@ struct HeroView: View {
 
     private static var posterWidth: CGFloat {
         #if os(tvOS)
-            260
+            300
         #else
             150
         #endif
@@ -179,18 +196,41 @@ struct HeroArtwork: View {
     /// does not do it on iPhone and iPad: the content starts below the navigation bar, and so did the artwork.
     var reach: CGFloat = 0
 
+    @Environment(\.horizontalSizeClass) private var sizeClass
+
+    /// A phone's hero is the poster itself, full width and sharp, since it is the picture there is; elsewhere the
+    /// artwork is a soft wash behind the poster.
+    private var fullBleed: Bool {
+        sizeClass == .compact && blurred
+    }
+
     var body: some View {
-        BackdropView(address: address, blurred: blurred)
-            .opacity(0.55)
+        BackdropView(address: address, blurred: blurred && !fullBleed, alignsTop: fullBleed)
+            .opacity(fullBleed ? 0.95 : 0.8)
+            .saturation(fullBleed ? 1 : 1.35)
             .mask(LinearGradient(
                 stops: [
                     .init(color: .black, location: 0),
-                    .init(color: .black, location: 0.45),
-                    .init(color: .clear, location: 1)
+                    .init(color: .black, location: fullBleed ? 0.42 : 0.45),
+                    .init(color: .clear, location: fullBleed ? 0.98 : 1)
                 ],
                 startPoint: .top,
                 endPoint: .bottom
             ))
+            // Dark behind the clock and the title above the picture, and under the title and buttons below it, where
+            // a poster's own small print would otherwise run through them.
+            .overlay {
+                if fullBleed {
+                    VStack(spacing: 0) {
+                        LinearGradient(colors: [.black.opacity(0.55), .clear], startPoint: .top, endPoint: .bottom)
+                            .frame(height: 140)
+                        Spacer(minLength: 0)
+                        LinearGradient(colors: [.clear, .black.opacity(0.8)], startPoint: .top, endPoint: .bottom)
+                            .frame(height: 260)
+                    }
+                    .allowsHitTesting(false)
+                }
+            }
         // Edge to edge: on Apple TV the safe area is a margin of the screen's own, and the artwork stopped short of
         // it.
         #if os(iOS)
@@ -201,5 +241,21 @@ struct HeroArtwork: View {
             .ignoresSafeArea(edges: [.top, .horizontal])
         #endif
             .padding(.top, -reach)
+    }
+}
+
+private extension View {
+    /// The hero's two buttons: Panop's pills, and on Apple TV the system's, which carry the focus effect.
+    @ViewBuilder
+    func heroButton(prominent: Bool) -> some View {
+        #if os(tvOS)
+            if prominent {
+                buttonStyle(.borderedProminent)
+            } else {
+                buttonStyle(.bordered)
+            }
+        #else
+            buttonStyle(PillButtonStyle(prominent: prominent))
+        #endif
     }
 }

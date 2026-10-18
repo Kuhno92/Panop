@@ -191,7 +191,7 @@ struct HeroCarousel: View {
         #if os(tvOS)
             540
         #else
-            compact ? 480 : 320
+            compact ? 560 : 320
         #endif
     }
 }

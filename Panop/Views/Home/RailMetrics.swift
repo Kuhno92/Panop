@@ -38,5 +38,5 @@ enum RailMetrics {
         #endif
     }
 
-    static let posterRadius: CGFloat = 10
+    static let posterRadius: CGFloat = Theme.posterRadius
 }

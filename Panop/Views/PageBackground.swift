@@ -40,6 +40,14 @@ struct PageBackground: View {
                 startRadius: 10,
                 endRadius: 560
             )
+            // A violet one high on the right, which the other two leave dark: the page has light in three places, not
+            // two, and reads as a space rather than a fade.
+            RadialGradient(
+                colors: [glow(Theme.violet, 0.22), .clear],
+                center: UnitPoint(x: 0.92, y: 0.08),
+                startRadius: 10,
+                endRadius: 480
+            )
         }
         // Over a stream: enough of the page stays to read the text on, and the rest lets the picture through.
         .opacity(overStream ? 0.58 : 1)

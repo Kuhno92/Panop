@@ -433,6 +433,14 @@ struct ContinueBanner: View {
         channels.first { UserStateStore.key(playlist: $0.playlist, entry: $0.id) == key }
     }
 
+    private static var playSize: CGFloat {
+        #if os(tvOS)
+            64
+        #else
+            44
+        #endif
+    }
+
     var body: some View {
         if let channel {
             Button { onPlay(channel) } label: {
@@ -448,14 +456,21 @@ struct ContinueBanner: View {
                     }
                     Spacer(minLength: 8)
                     Image(systemName: "play.fill")
-                        .font(.title2)
+                        .font(.headline)
+                        .foregroundStyle(.white)
+                        .frame(width: Self.playSize, height: Self.playSize)
+                        .background(Theme.accent, in: Circle())
                 }
                 .padding(16)
                 // The artwork, enlarged and softened, as the hero's background.
                 .background {
                     BackdropView(address: channel.iconURL, blurred: true)
                         .opacity(0.35)
-                        .clipShape(RoundedRectangle(cornerRadius: 18))
+                        .clipShape(RoundedRectangle(cornerRadius: Theme.cardRadius, style: .continuous))
+                        .overlay {
+                            RoundedRectangle(cornerRadius: Theme.cardRadius, style: .continuous)
+                                .strokeBorder(.white.opacity(0.14), lineWidth: 1)
+                        }
                 }
                 .contentShape(Rectangle())
             }

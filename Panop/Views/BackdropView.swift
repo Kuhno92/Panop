@@ -8,6 +8,9 @@ struct BackdropView: View {
     /// Soft enough to sit behind text. For small artwork such as a logo, which would otherwise
     /// show its pixels.
     var blurred = false
+    /// Filled to the frame and pinned to its top, so a portrait picture shows its upper part (a poster's title and
+    /// faces) rather than the middle.
+    var alignsTop = false
 
     @Environment(\.imagePipeline) private var pipeline
     @Environment(\.displayScale) private var scale
@@ -20,6 +23,7 @@ struct BackdropView: View {
                 Image(decorative: image, scale: scale)
                     .resizable()
                     .scaledToFill()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: alignsTop ? .top : .center)
                     .blur(radius: blurred ? 24 : 0)
                     .transition(.opacity)
             }

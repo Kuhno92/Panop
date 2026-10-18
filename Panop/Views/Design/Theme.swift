@@ -1,0 +1,83 @@
+import SwiftUI
+
+/// The look the app shares: one accent, one card, one pair of buttons. Everything here is a flat fill, a gradient or a
+/// hairline, which cost nothing to scroll over: no blur and no shadow on anything that repeats down a list.
+enum Theme {
+    /// The accent, a blue that leans to violet. Not `Color.accentColor`, which is white on Apple TV.
+    static let blue = Color(red: 0.30, green: 0.52, blue: 1.0)
+    static let violet = Color(red: 0.55, green: 0.40, blue: 1.0)
+
+    static var accent: LinearGradient {
+        LinearGradient(colors: [blue, violet], startPoint: .topLeading, endPoint: .bottomTrailing)
+    }
+
+    /// The corner of a card, and of a poster.
+    static var cardRadius: CGFloat {
+        #if os(tvOS)
+            24
+        #else
+            18
+        #endif
+    }
+
+    static var posterRadius: CGFloat {
+        #if os(tvOS)
+            16
+        #else
+            14
+        #endif
+    }
+}
+
+/// A translucent card with a hairline that catches the light at its top edge: a surface on the page, not a box.
+struct GlassCard: ViewModifier {
+    var radius: CGFloat = Theme.cardRadius
+    @Environment(\.colorScheme) private var scheme
+
+    func body(content: Content) -> some View {
+        content.background {
+            let shape = RoundedRectangle(cornerRadius: radius, style: .continuous)
+            shape
+                .fill(scheme == .dark ? Color.white.opacity(0.06) : Color.black.opacity(0.04))
+                .overlay {
+                    shape.strokeBorder(
+                        LinearGradient(
+                            colors: [.white.opacity(scheme == .dark ? 0.20 : 0.5), .white.opacity(0.03)],
+                            startPoint: .top,
+                            endPoint: .bottom
+                        ),
+                        lineWidth: 1
+                    )
+                }
+        }
+    }
+}
+
+extension View {
+    func glassCard(radius: CGFloat = Theme.cardRadius) -> some View {
+        modifier(GlassCard(radius: radius))
+    }
+}
+
+/// The two buttons of a hero and of a page's main choice: the accent gradient with white text, and the glass one. On
+/// Apple TV the system's own styles are kept, since they carry the focus effect.
+struct PillButtonStyle: ButtonStyle {
+    var prominent = true
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(.subheadline.weight(.semibold))
+            .foregroundStyle(prominent ? Color.white : .primary)
+            .padding(.horizontal, 20)
+            .padding(.vertical, 12)
+            .background {
+                if prominent {
+                    Capsule().fill(Theme.accent)
+                } else {
+                    Capsule().fill(.white.opacity(0.12)).overlay(Capsule().strokeBorder(.white.opacity(0.18)))
+                }
+            }
+            .scaleEffect(configuration.isPressed ? 0.96 : 1)
+            .animation(.spring(duration: 0.25, bounce: 0.3), value: configuration.isPressed)
+    }
+}

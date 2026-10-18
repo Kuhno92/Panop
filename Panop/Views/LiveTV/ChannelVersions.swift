@@ -146,6 +146,13 @@ struct ChannelListRow<Label: View>: View {
                 ChannelVersionsMenu(channel: channel, onPlay: playVersion)
                     .buttonStyle(.plain)
             }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .glassCard(radius: 16)
+            // Cards on the page, not rows in a table: no row background, no separator, a little air between them.
+            .listRowBackground(Color.clear)
+            .listRowSeparator(.hidden)
+            .listRowInsets(EdgeInsets(top: 4, leading: 12, bottom: 4, trailing: 12))
         #endif
     }
 }

@@ -24,7 +24,12 @@ struct PosterView: View {
             }
         }
         .aspectRatio(2.0 / 3.0, contentMode: .fit)
-        .clipShape(RoundedRectangle(cornerRadius: 10))
+        .clipShape(RoundedRectangle(cornerRadius: Theme.posterRadius, style: .continuous))
+        // A hairline that lifts the poster off a dark page, and keeps a dark poster from melting into it.
+        .overlay {
+            RoundedRectangle(cornerRadius: Theme.posterRadius, style: .continuous)
+                .strokeBorder(.white.opacity(0.14), lineWidth: 1)
+        }
         .accessibilityHidden(true)
         .task(id: address) { await load() }
     }
