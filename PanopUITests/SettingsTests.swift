@@ -110,13 +110,16 @@ final class SettingsTests: PanopUITestCase {
             waitForChannels()
             openSettings()
 
-            for heading in ["Your content", "Playing", "Home screen"] {
-                XCTAssertTrue(app.staticTexts[heading].waitForExistence(timeout: 10), "no \(heading) group")
-            }
+            // The first screen holds the first groups; a long Settings keeps the rest below it.
+            XCTAssertTrue(app.staticTexts["Your content"].waitForExistence(timeout: 10), "no Your content group")
             let shot = XCTAttachment(screenshot: app.screenshot())
             shot.name = "settings-top"
             shot.lifetime = .keepAlways
             add(shot)
+            for heading in ["Playing", "Home screen"] {
+                scrollTo(app.staticTexts[heading])
+                XCTAssertTrue(app.staticTexts[heading].exists, "no \(heading) group")
+            }
 
             let family = app.staticTexts["Family and safety"]
             scrollTo(family)
