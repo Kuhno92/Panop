@@ -14,6 +14,47 @@ struct DetailHeader<Badge: View>: View {
     @Environment(\.horizontalSizeClass) private var sizeClass
 
     var body: some View {
+        if sizeClass == .compact {
+            compact
+        } else {
+            wide
+        }
+    }
+
+    /// A phone: the picture across the top, as on Home, with the title, the facts and the chips over its lower part.
+    private var compact: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Spacer(minLength: 0)
+            Text(title)
+                .font(.largeTitle.bold())
+                .lineLimit(3)
+                .shadow(color: .black.opacity(0.45), radius: 8, y: 2)
+            if !meta.isEmpty {
+                Text(meta).font(.subheadline.weight(.medium)).foregroundStyle(.white.opacity(0.78))
+            }
+            badge
+        }
+        .padding(.horizontal, Self.inset)
+        .padding(.bottom, 20)
+        .frame(maxWidth: .infinity, minHeight: 460, alignment: .bottomLeading)
+        .background {
+            BackdropView(address: backdrop ?? poster, blurred: false, alignsTop: true)
+                .mask(LinearGradient(
+                    stops: [.init(color: .black, location: 0), .init(color: .black, location: 0.5),
+                            .init(color: .clear, location: 1)],
+                    startPoint: .top,
+                    endPoint: .bottom
+                ))
+                .overlay(alignment: .bottom) {
+                    LinearGradient(colors: [.clear, .black.opacity(0.75)], startPoint: .top, endPoint: .bottom)
+                        .frame(height: 240)
+                }
+                // Up under the bar, where the picture begins.
+                .ignoresSafeArea(edges: .top)
+        }
+    }
+
+    private var wide: some View {
         HStack(alignment: .bottom, spacing: Self.gap) {
             PosterView(address: poster, symbol: symbol)
                 .frame(width: Self.posterWidth)

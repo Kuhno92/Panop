@@ -113,6 +113,7 @@ struct MovieDetailView: View {
     @Environment(SimklSync.self) private var simkl
     @Environment(DiscoveryModel.self) private var discovery
     @Environment(\.openURL) private var openURL
+    @Environment(\.horizontalSizeClass) private var sizeClass
     @State private var trailer: TrailerRequest?
 
     @State private var info: XtreamMovieInfo?
@@ -138,9 +139,16 @@ struct MovieDetailView: View {
             }
         }
         .background { PageBackground() }
-        .navigationTitle(movie.name)
+        #if os(iOS)
+            // The page begins at the top of the screen, so the picture does too, behind the clock and the back button.
+            .ignoresSafeArea(edges: sizeClass == .compact ? .top : [])
+        #endif
+            // On a phone the title is large, over the picture: the bar has none of its own.
+            .navigationTitle(sizeClass == .compact ? "" : movie.name)
         #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
+            // The picture runs up under the bar, which shows nothing of its own.
+            .toolbarBackground(.hidden, for: .navigationBar)
         #endif
             .task { await loadInfo() }
             .onAppear { simkl.register(movie.id, as: movie.tmdbID.map { .movie(tmdb: $0) }) }
@@ -157,9 +165,11 @@ struct MovieDetailView: View {
             title: movie.name,
             meta: MovieMeta.line(
                 year: info?.year,
-                genre: info?.genre ?? movie.groupName,
+                // The genres are chips below; the line is for the year and the length.
+                genre: nil,
                 durationSeconds: info?.durationSeconds,
-                rating: info?.rating ?? movie.rating
+                // The rating is a chip of its own below.
+                rating: nil
             )
         ) {
             VStack(alignment: .leading, spacing: 8) {
@@ -198,32 +208,44 @@ struct MovieDetailView: View {
     }
 
     private var actions: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 12) {
             if let position = userState.resumePosition(for: key) {
                 Button("Resume from \(PlayerTime.text(position))", systemImage: "play.fill") {
                     play(at: position)
                 }
-                .buttonStyle(.borderedProminent)
-                Button("Start over", systemImage: "arrow.counterclockwise") { play(at: nil) }
+                .pageButton(prominent: true)
             } else {
                 Button("Play", systemImage: "play.fill") { play(at: nil) }
-                    .buttonStyle(.borderedProminent)
+                    .pageButton(prominent: true)
             }
-            HStack {
-                if let trailerSource {
-                    Button("Trailer", systemImage: "play.rectangle") { playTrailer(trailerSource) }
+            // One line that scrolls where it does not fit, each choice as wide as its words: wrapped inside a
+            // column they ran to two lines.
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 10) {
+                    if userState.resumePosition(for: key) != nil {
+                        Button("Start over", systemImage: "arrow.counterclockwise") { play(at: nil) }
+                            .pageButton()
+                    }
+                    if let trailerSource {
+                        Button("Trailer", systemImage: "play.rectangle") { playTrailer(trailerSource) }
+                            .pageButton()
+                    }
+                    let isFavorite = userState.isFavorite(key)
+                    Button(
+                        isFavorite ? "Remove from Favourites" : "Add to Favourites",
+                        systemImage: isFavorite ? "star.fill" : "star"
+                    ) { userState.toggleFavorite(key) }
+                        .pageButton()
+                    let seen = userState.isWatched(key)
+                    Button(
+                        seen ? "Mark as Not Watched" : "Mark as Watched",
+                        systemImage: seen ? "eye.slash" : "eye"
+                    ) { userState.setWatched(!seen, for: key) }
+                        .pageButton()
                 }
-                let isFavorite = userState.isFavorite(key)
-                Button(
-                    isFavorite ? "Remove from Favourites" : "Add to Favourites",
-                    systemImage: isFavorite ? "star.fill" : "star"
-                ) { userState.toggleFavorite(key) }
-                let seen = userState.isWatched(key)
-                Button(
-                    seen ? "Mark as Not Watched" : "Mark as Watched",
-                    systemImage: seen ? "eye.slash" : "eye"
-                ) { userState.setWatched(!seen, for: key) }
+                .padding(.vertical, 4)
             }
+            .scrollClipDisabled()
         }
     }
 

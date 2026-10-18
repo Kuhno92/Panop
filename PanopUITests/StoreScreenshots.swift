@@ -83,4 +83,20 @@ final class StoreMoviesScene: StoreScene {
         #endif
         capture("06-movie-grid")
     }
+
+    /// A film's own page.
+    func testMovieDetail() {
+        #if os(tvOS)
+            _ = app.buttons["Sintel"].waitForExistence(timeout: 30)
+            for _ in 0 ..< 4 {
+                XCUIRemote.shared.press(.down)
+            }
+            XCUIRemote.shared.press(.select)
+        #else
+            XCTAssertTrue(app.buttons["Sintel"].waitForExistence(timeout: 30))
+            app.buttons["Sintel"].firstMatch.tap()
+        #endif
+        _ = app.buttons["Play"].waitForExistence(timeout: 20)
+        capture("07-movie-detail")
+    }
 }

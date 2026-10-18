@@ -67,6 +67,8 @@ struct PillButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .font(.subheadline.weight(.semibold))
+            .lineLimit(1)
+            .fixedSize()
             .foregroundStyle(prominent ? Color.white : .primary)
             .padding(.horizontal, 20)
             .padding(.vertical, 12)
@@ -107,3 +109,20 @@ struct PillButtonStyle: ButtonStyle {
         }
     }
 #endif
+
+extension View {
+    /// The main and the other choices on a page: Panop's pills, and on Apple TV the system's, which carry the focus
+    /// effect.
+    @ViewBuilder
+    func pageButton(prominent: Bool = false) -> some View {
+        #if os(tvOS)
+            if prominent {
+                buttonStyle(.borderedProminent)
+            } else {
+                buttonStyle(.bordered)
+            }
+        #else
+            buttonStyle(PillButtonStyle(prominent: prominent))
+        #endif
+    }
+}

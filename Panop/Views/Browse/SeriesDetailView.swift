@@ -219,13 +219,13 @@ struct SeriesDetailView: View {
                 } label: {
                     Label(nextLabel(next, key: key), systemImage: "play.fill")
                 }
-                .buttonStyle(.borderedProminent)
+                .pageButton(prominent: true)
             }
             if let source = TrailerSource(details.trailer ?? UITestMode.trailerOverride) {
                 Button { playTrailer(source) } label: {
                     Label("Trailer", systemImage: "play.rectangle")
                 }
-                .buttonStyle(.bordered)
+                .pageButton()
             }
             Spacer(minLength: 0)
         }
