@@ -252,7 +252,7 @@ private struct RailPoster: View {
             .contentShape(Rectangle())
         }
         #if os(tvOS)
-        .buttonStyle(.card)
+        .buttonStyle(PosterFocusStyle())
         #else
         .buttonStyle(.plain)
         #endif

@@ -81,3 +81,29 @@ struct PillButtonStyle: ButtonStyle {
             .animation(.spring(duration: 0.25, bounce: 0.3), value: configuration.isPressed)
     }
 }
+
+#if os(tvOS)
+    /// A poster on Apple TV when the remote is on it: it rises, brightens a touch and glows in the accent. The system's
+    /// card style gave a grey plate and a small lift; this is the app's own, and just as cheap: one scale and one
+    /// shadow on the one card in focus.
+    struct PosterFocusStyle: ButtonStyle {
+        func makeBody(configuration: Configuration) -> some View {
+            PosterFocusLabel(label: configuration.label, pressed: configuration.isPressed)
+        }
+    }
+
+    private struct PosterFocusLabel: View {
+        let label: ButtonStyleConfiguration.Label
+        let pressed: Bool
+        @Environment(\.isFocused) private var focused
+
+        var body: some View {
+            label
+                .scaleEffect(pressed ? 1.02 : (focused ? 1.08 : 1))
+                .brightness(focused ? 0.05 : 0)
+                .shadow(color: focused ? Theme.violet.opacity(0.6) : .clear, radius: 28, y: 12)
+                .animation(.spring(duration: 0.3, bounce: 0.25), value: focused)
+                .focusEffectDisabled()
+        }
+    }
+#endif
