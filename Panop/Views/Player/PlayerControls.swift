@@ -68,6 +68,9 @@ struct PlayerControls: View {
     private static var spacing: CGFloat {
         #if os(tvOS)
             48
+        #elseif os(iOS)
+            // Six controls and the badge in a phone's width, each with a finger's room of its own (`barTarget`).
+            8
         #else
             20
         #endif
@@ -120,6 +123,10 @@ struct PlayerControls: View {
                     .font(.title2)
                     .frame(width: Self.playWidth, height: Self.playHeight)
             }
+            #if !os(tvOS)
+            // The main button is a circle in the accent: the one thing on the bar that is not a plain glyph.
+            .buttonStyle(PlayCircleStyle())
+            #endif
             .trackFocus($focused, .play)
             .accessibilityLabel(model.isPaused ? "Play" : "Pause")
 
@@ -127,7 +134,7 @@ struct PlayerControls: View {
                 Button {
                     model.skip(by: -skip)
                 } label: {
-                    Image(systemName: "gobackward.10").font(.title3)
+                    Image(systemName: "gobackward.10").font(.title3).barTarget()
                 }
                 .trackFocus($focused, .back)
                 .accessibilityLabel("Back 10 seconds")
@@ -137,7 +144,7 @@ struct PlayerControls: View {
                 Button {
                     model.skip(by: skip)
                 } label: {
-                    Image(systemName: "goforward.10").font(.title3)
+                    Image(systemName: "goforward.10").font(.title3).barTarget()
                 }
                 .trackFocus($focused, .forward)
                 .accessibilityLabel("Forward 10 seconds")
@@ -148,7 +155,7 @@ struct PlayerControls: View {
 
             if let onShowGuide {
                 Button(action: onShowGuide) {
-                    Image(systemName: "calendar").font(.title3)
+                    Image(systemName: "calendar").font(.title3).barTarget()
                 }
                 .trackFocus($focused, .guide)
                 .accessibilityLabel("TV Guide")
@@ -158,7 +165,7 @@ struct PlayerControls: View {
 
             if let onShowCatchup {
                 Button(action: onShowCatchup) {
-                    Image(systemName: "clock.arrow.circlepath").font(.title3)
+                    Image(systemName: "clock.arrow.circlepath").font(.title3).barTarget()
                 }
                 .trackFocus($focused, .catchup)
                 .accessibilityLabel("Catch-up")
@@ -179,7 +186,7 @@ struct PlayerControls: View {
                 Button {
                     model.togglePictureInPicture()
                 } label: {
-                    Image(systemName: "pip.enter").font(.title3)
+                    Image(systemName: "pip.enter").font(.title3).barTarget()
                 }
                 .accessibilityLabel("Picture in Picture")
             }
@@ -192,6 +199,8 @@ struct PlayerControls: View {
             .padding(.horizontal, 8)
             .padding(.vertical, 3)
             .background(.red, in: Capsule())
+            // Never squeezed into a column of letters when the bar is full.
+            .fixedSize()
             .accessibilityLabel("Live")
     }
 
@@ -292,7 +301,7 @@ struct PlayerControls: View {
                     Button { choice.select(track.id) } label: { checked(track.label, choice.selected == track.id) }
                 }
             } label: {
-                Image(systemName: choice.symbol).font(.title3)
+                Image(systemName: choice.symbol).font(.title3).barTarget()
             }
             .trackFocus($focused, choice.focus)
             .accessibilityLabel(choice.label)
@@ -385,6 +394,33 @@ private extension View {
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
+        }
+    }
+#endif
+
+private extension View {
+    /// A bar's icon is about twenty points wide, which is a hard thing to hit with a thumb: its button answers over at
+    /// least a finger's width and height (44 points, Apple's minimum), with the glyph still centred. Not on Apple TV,
+    /// where the remote moves focus and the target is the button's own platter.
+    @ViewBuilder
+    func barTarget() -> some View {
+        #if os(tvOS)
+            self
+        #else
+            frame(minWidth: 44, minHeight: 44).contentShape(Rectangle())
+        #endif
+    }
+}
+
+#if !os(tvOS)
+    /// The play and pause button on a phone, tablet or Mac: its glyph in a circle of the accent.
+    private struct PlayCircleStyle: ButtonStyle {
+        func makeBody(configuration: Configuration) -> some View {
+            configuration.label
+                .foregroundStyle(.white)
+                .padding(8)
+                .background(Theme.accent, in: Circle())
+                .scaleEffect(configuration.isPressed ? 0.94 : 1)
         }
     }
 #endif
