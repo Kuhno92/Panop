@@ -279,6 +279,20 @@ struct PlayerView: View {
         }
     }
 
+    /// The picture fading to black at the top and the bottom, behind the controls, so they read over any picture.
+    private var scrims: some View {
+        VStack(spacing: 0) {
+            LinearGradient(colors: [.black.opacity(0.7), .clear], startPoint: .top, endPoint: .bottom)
+                .frame(height: 170)
+            Spacer(minLength: 0)
+            LinearGradient(colors: [.clear, .black.opacity(0.85)], startPoint: .top, endPoint: .bottom)
+                .frame(height: 300)
+        }
+        .ignoresSafeArea()
+        .allowsHitTesting(false)
+        .transition(.opacity)
+    }
+
     private var overlay: some View {
         VStack {
             if model.showsControls {
@@ -317,6 +331,11 @@ struct PlayerView: View {
                     onPickVersion: onPickVersion
                 )
                 .transition(.opacity)
+            }
+        }
+        .background {
+            if model.showsControls {
+                scrims
             }
         }
         .animation(.default, value: model.notice)

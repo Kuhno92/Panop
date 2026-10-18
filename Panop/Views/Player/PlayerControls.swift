@@ -86,7 +86,9 @@ struct PlayerControls: View {
         .foregroundStyle(.white)
         .padding(.horizontal, Self.barInset)
         .padding(.vertical, 14)
-        .background(.black.opacity(0.55), in: RoundedRectangle(cornerRadius: 16))
+        // No box: the bar sits on a fade of the picture to black (`PlayerView`), as in a streaming app, and the
+        // controls
+        // read as part of the picture's edge.
         .padding()
         // Moving the focus along the bar is use, so the countdown starts again. It is not a hold: a bar kept up for as
         // long as a button has focus never went away on Apple TV, which is where focus always rests. Once it has
@@ -119,6 +121,11 @@ struct PlayerControls: View {
                 Image(systemName: model.isPaused ? "play.fill" : "pause.fill")
                     .font(.title2)
                     .frame(width: Self.playWidth, height: Self.playHeight)
+                #if !os(tvOS)
+                    // The main button is a circle in the accent: the one thing on the bar that is not a plain glyph.
+                    .frame(width: 46, height: 46)
+                    .background(Theme.accent, in: Circle())
+                #endif
             }
             .trackFocus($focused, .play)
             .accessibilityLabel(model.isPaused ? "Play" : "Pause")
