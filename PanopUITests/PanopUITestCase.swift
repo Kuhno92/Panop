@@ -188,8 +188,29 @@ class PanopUITestCase: XCTestCase {
                 XCUIElement.ElementType.button.rawValue,
                 XCUIElement.ElementType.cell.rawValue
             ))
-            for _ in 0 ..< 12 where !matches.allElementsBoundByIndex.contains(where: \.hasFocus) {
-                XCUIRemote.shared.press(.down)
+            // The focus can sit on a part inside the button (its icon, its text), which does not report its parent as
+            // focused: it is found by where it is.
+            func focusIsOnOne() -> Bool {
+                let buttons = matches.allElementsBoundByIndex
+                if buttons.contains(where: \.hasFocus) {
+                    return true
+                }
+                let frames = buttons.map(\.frame).filter { !$0.isEmpty }
+                let focused = app.descendants(matching: .any).matching(NSPredicate(format: "hasFocus == true"))
+                    .allElementsBoundByIndex
+                return focused.contains { element in frames.contains { $0.intersects(element.frame) } }
+            }
+            for _ in 0 ..< 14 where !focusIsOnOne() {
+                // Down from a wide control lands on whatever is nearest below its middle, which can be another button
+                // of the row the one wanted is in (Sort, for TV Guide): then it is to the left.
+                let target = matches.allElementsBoundByIndex.map(\.frame).first { !$0.isEmpty }
+                let focused = app.descendants(matching: .any).matching(NSPredicate(format: "hasFocus == true"))
+                    .allElementsBoundByIndex.map(\.frame)
+                if let target, focused.contains(where: { abs($0.minY - target.minY) < 40 && $0.minX > target.maxX }) {
+                    XCUIRemote.shared.press(.left)
+                } else {
+                    XCUIRemote.shared.press(.down)
+                }
             }
         }
 

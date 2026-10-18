@@ -46,8 +46,10 @@ struct GuideGridView: View {
         #if os(tvOS)
         // A full-screen cover shows what is under it unless it is told not to, and the channel column
         // must reach the edge of the screen or the programmes show in the gap beside it.
-        .background(Color.black.ignoresSafeArea())
+        .background(GuideGround().ignoresSafeArea())
         .ignoresSafeArea(edges: .horizontal)
+        #else
+        .background(GuideGround().ignoresSafeArea())
         #endif
         .overlay {
             if rows.isEmpty, list.phase == .loaded {
@@ -208,11 +210,7 @@ private extension View {
 /// Solid behind the channel column, so programmes scrolled under it do not show through.
 private struct GuideColumnBackground: View {
     var body: some View {
-        #if os(tvOS)
-            Rectangle().fill(Color(white: 0.12))
-        #else
-            Rectangle().fill(.background)
-        #endif
+        Rectangle().fill(GuideGround.column)
     }
 }
 
@@ -488,7 +486,7 @@ private struct GuideProgrammeCell: View {
         let over = programme.stop <= now
         let kind = programme.kind
         let tint = kind.color
-        let shape = RoundedRectangle(cornerRadius: 8)
+        let shape = RoundedRectangle(cornerRadius: 12, style: .continuous)
         Button(action: action) {
             HStack(spacing: 0) {
                 // The colour of the kind, down the left edge.
@@ -521,7 +519,7 @@ private struct GuideProgrammeCell: View {
             .clipShape(shape)
             // What is on now is ringed, so it stands out from everything round it.
             .overlay(shape.strokeBorder(
-                onAir ? Color.white.opacity(0.9) : tint.opacity(over ? 0.10 : 0.30), lineWidth: onAir ? 2 : 1
+                onAir ? Color.white.opacity(0.7) : tint.opacity(over ? 0.10 : 0.30), lineWidth: onAir ? 1.5 : 1
             ))
             .overlay(alignment: .bottomLeading) {
                 if onAir {
@@ -538,7 +536,7 @@ private struct GuideProgrammeCell: View {
             .opacity(over ? 0.7 : 1)
             .contentShape(Rectangle())
         }
-        .guideButtonStyle(cornerRadius: 8, onFocus: onFocus)
+        .guideButtonStyle(cornerRadius: 12, onFocus: onFocus)
         .padding(.leading, 1.5)
         .padding(.top, 3)
         .accessibilityLabel("\(programme.title), \(Self.range(programme)), \(channel.name)")
@@ -548,10 +546,11 @@ private struct GuideProgrammeCell: View {
     /// Strong for what is on, a light wash of the kind's colour for what is coming, fainter for what is over.
     private static func fill(tint: Color, onAir: Bool, over: Bool, dark: Bool) -> AnyShapeStyle {
         if onAir {
+            // A diagonal from the kind's colour to a deeper one of the same hue: lit, not flat.
             return AnyShapeStyle(LinearGradient(
-                colors: [tint, tint.opacity(0.78)],
-                startPoint: .top,
-                endPoint: .bottom
+                colors: [tint, tint.opacity(0.62)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
             ))
         }
         // A wash that is enough to tell the kind on a dark screen, where the same tint is muddier.
@@ -562,5 +561,19 @@ private struct GuideProgrammeCell: View {
         let from = programme.start.formatted(date: .omitted, time: .shortened)
         let to = programme.stop.formatted(date: .omitted, time: .shortened)
         return "\(from) – \(to)"
+    }
+}
+
+/// The ground of the guide: the page's own deep blue, in place of black, and a solid tint of it for the channel column,
+/// which programmes scroll under and which therefore cannot be see-through.
+private struct GuideGround: View {
+    static let column = Color(red: 0.07, green: 0.08, blue: 0.16)
+
+    var body: some View {
+        LinearGradient(
+            colors: [Color(red: 0.05, green: 0.06, blue: 0.13), Color(red: 0.02, green: 0.02, blue: 0.06)],
+            startPoint: .top,
+            endPoint: .bottom
+        )
     }
 }
