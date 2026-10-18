@@ -66,6 +66,8 @@ struct PillButtonStyle: ButtonStyle {
 
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
+            // A list row would show a button's icon alone.
+            .labelStyle(.titleAndIcon)
             .font(.subheadline.weight(.semibold))
             .lineLimit(1)
             .fixedSize()

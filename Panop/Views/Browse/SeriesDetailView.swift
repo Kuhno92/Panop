@@ -143,8 +143,10 @@ struct SeriesDetailView: View {
                     facts(details)
                     watchedSummary(seasons)
                 }
+                .listRowBackground(Color.clear)
                 if seasons.count > 1 {
                     Section { seasonPicker(seasons, shown) }
+                        .listRowBackground(Color.clear)
                 }
                 Section(shown.title) {
                     ForEach(shown.episodes) { episode in
@@ -152,6 +154,8 @@ struct SeriesDetailView: View {
                             .id(Self.rowID(season: shown.number, episode: episode.number))
                     }
                 }
+                // Rows on the page, not on the list's own black.
+                .listRowBackground(Color.clear)
             }
             .pageBackdrop()
             // Flat rows, so the header's artwork runs to the edges instead of sitting in a rounded card.
