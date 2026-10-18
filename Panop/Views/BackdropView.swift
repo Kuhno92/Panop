@@ -11,6 +11,8 @@ struct BackdropView: View {
     /// Filled to the frame and pinned to its top, so a portrait picture shows its upper part (a poster's title and
     /// faces) rather than the middle.
     var alignsTop = false
+    /// Told the picture's dominant colour once it has arrived, for a glow of the same tint.
+    var onTint: ((Color) -> Void)?
 
     @Environment(\.imagePipeline) private var pipeline
     @Environment(\.displayScale) private var scale
@@ -58,6 +60,9 @@ struct BackdropView: View {
         guard let address, let url = URL(string: address), url.scheme?.hasPrefix("http") == true else { return }
         // One size for every backdrop, so each is decoded once however it is shown.
         let loaded = await pipeline.image(for: url, maxPixel: Self.pixels)
+        if let loaded, let onTint, let tint = AmbientColor.of(loaded) {
+            onTint(tint)
+        }
         withAnimation(.easeIn(duration: 0.2)) { image = loaded }
     }
 

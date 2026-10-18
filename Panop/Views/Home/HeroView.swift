@@ -197,6 +197,7 @@ struct HeroArtwork: View {
     var reach: CGFloat = 0
 
     @Environment(\.horizontalSizeClass) private var sizeClass
+    @State private var tint = Theme.violet
 
     /// A phone's hero is the poster itself, full width and sharp, since it is the picture there is; elsewhere the
     /// artwork is a soft wash behind the poster.
@@ -205,7 +206,7 @@ struct HeroArtwork: View {
     }
 
     var body: some View {
-        BackdropView(address: address, blurred: blurred && !fullBleed, alignsTop: fullBleed)
+        BackdropView(address: address, blurred: blurred && !fullBleed, alignsTop: fullBleed) { tint = $0 }
             .opacity(fullBleed ? 0.95 : 0.8)
             .saturation(fullBleed ? 1 : 1.35)
             .mask(LinearGradient(
@@ -217,6 +218,17 @@ struct HeroArtwork: View {
                 startPoint: .top,
                 endPoint: .bottom
             ))
+            // The title's own colour, glowing from the top corner: the page takes on the look of what is shown.
+            .background(alignment: .topTrailing) {
+                RadialGradient(
+                    colors: [tint.opacity(fullBleed ? 0.25 : 0.45), .clear],
+                    center: .topTrailing,
+                    startRadius: 0,
+                    endRadius: 520
+                )
+                .animation(.easeInOut(duration: 0.6), value: tint)
+                .allowsHitTesting(false)
+            }
             // Dark behind the clock and the title above the picture, and under the title and buttons below it, where
             // a poster's own small print would otherwise run through them.
             .overlay {

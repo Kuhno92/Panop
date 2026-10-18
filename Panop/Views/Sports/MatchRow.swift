@@ -49,7 +49,7 @@ struct MatchRow: View {
             }
         }
         #if !os(tvOS)
-        .background(.quaternary.opacity(0.45), in: RoundedRectangle(cornerRadius: 16))
+        .glassCard(radius: 16)
         #endif
         .opacity(fixture.status == .cancelled || fixture.status == .postponed ? 0.6 : 1)
     }

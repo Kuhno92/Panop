@@ -43,7 +43,7 @@ struct ScoreStrip: View {
         .padding(12)
         .frame(width: 168)
         #if !os(tvOS)
-            .background(.quaternary.opacity(0.5), in: RoundedRectangle(cornerRadius: 14))
+            .glassCard(radius: 14)
         #endif
     }
 
