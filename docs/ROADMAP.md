@@ -741,6 +741,9 @@ Features real users expect that the brief did not name. All *(surfaced)*.
       imported before this need a playlist refresh to gain their rule. **Not done:** seeking (an aired programme is
       played as a stream with no scrubber), the `${(b)...}` date forms some templates use, and timeshift (pausing and
       rewinding live).
+- [x] **A modern look** *(asked for 2026-10-18; ADR 0012)*: cinematic hero, glass cards, accent pills, a richer page
+      ground, the TV guide and the film and series pages restyled, Apple TV posters that rise and glow. **Not looked at on
+      a Mac**, and Settings was left as it was.
 - [x] **Multiple playlists** and switching between them. Several sources can be added, and Live TV shows all of them or one chosen source (M2); each can be refreshed or deleted from Playlists.
 - [x] **Profiles** *(first part)*: up to eight, each with its own favourites, history, hidden titles,
       category choices, suggestions and adult filter. Added, renamed and deleted in Settings → Profiles,

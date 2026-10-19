@@ -21,7 +21,9 @@ final class HomeHeroTests: PanopUITestCase {
 
     #if !os(tvOS)
         /// Opening search floats a field over the page. It must not rebuild the page: the carousel keeps its title.
-        func testOpeningSearchLeavesTheCarouselWhereItWas() {
+        func testOpeningSearchLeavesTheCarouselWhereItWas() throws {
+            // A phone's bar is at the bottom; an iPad's and a Mac's tabs are along the top, outside `tabBars`.
+            try XCTSkipIf(!app.tabBars.firstMatch.waitForExistence(timeout: 10), "no bottom tab bar on this device")
             XCTAssertTrue(app.staticTexts["Dune"].waitForExistence(timeout: 30))
             app.staticTexts["Dune"].swipeLeft()
             XCTAssertTrue(app.staticTexts["Arrival"].waitForExistence(timeout: 5))
