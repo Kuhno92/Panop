@@ -25,7 +25,8 @@ struct HeroView: View {
 
     var body: some View {
         content
-            .padding(.horizontal, Self.inset)
+            // Room at the sides for the carousel's arrows, where a pointer has no swipe (iPad and Mac).
+            .padding(.horizontal, sizeClass == .compact ? Self.inset : Self.sideInset)
             .padding(.top, Self.inset)
             .padding(.bottom, sizeClass == .compact ? 36 : 20)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
@@ -146,6 +147,14 @@ struct HeroView: View {
             }
         #endif
             .onChange(of: focus) { _, now in engaged.wrappedValue = now != nil }
+    }
+
+    private static var sideInset: CGFloat {
+        #if os(tvOS)
+            60
+        #else
+            68
+        #endif
     }
 
     private static var inset: CGFloat {
