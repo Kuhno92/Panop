@@ -463,14 +463,17 @@ struct ContinueBanner: View {
                 }
                 .padding(16)
                 // The artwork, enlarged and softened, as the hero's background.
+                // The shape fixes the size: the blurred artwork is larger than the banner, and as the background it
+                // reported that size, so a hairline drawn round it ran the height of the screen on a wide display.
                 .background {
-                    BackdropView(address: channel.iconURL, blurred: true)
-                        .opacity(0.35)
+                    RoundedRectangle(cornerRadius: Theme.cardRadius, style: .continuous)
+                        .fill(.clear)
+                        .overlay { BackdropView(address: channel.iconURL, blurred: true).opacity(0.35) }
                         .clipShape(RoundedRectangle(cornerRadius: Theme.cardRadius, style: .continuous))
-                        .overlay {
-                            RoundedRectangle(cornerRadius: Theme.cardRadius, style: .continuous)
-                                .strokeBorder(.white.opacity(0.14), lineWidth: 1)
-                        }
+                }
+                .overlay {
+                    RoundedRectangle(cornerRadius: Theme.cardRadius, style: .continuous)
+                        .strokeBorder(.white.opacity(0.14), lineWidth: 1)
                 }
                 .contentShape(Rectangle())
             }
