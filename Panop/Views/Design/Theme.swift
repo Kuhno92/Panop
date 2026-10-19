@@ -63,17 +63,19 @@ extension View {
 /// Apple TV the system's own styles are kept, since they carry the focus effect.
 struct PillButtonStyle: ButtonStyle {
     var prominent = true
+    /// A smaller pill, for a row of several.
+    var compact = false
 
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             // A list row would show a button's icon alone.
             .labelStyle(.titleAndIcon)
-            .font(.subheadline.weight(.semibold))
+            .font((compact ? Font.footnote : .subheadline).weight(.semibold))
             .lineLimit(1)
             .fixedSize()
             .foregroundStyle(prominent ? Color.white : .primary)
-            .padding(.horizontal, 20)
-            .padding(.vertical, 12)
+            .padding(.horizontal, compact ? 14 : 20)
+            .padding(.vertical, compact ? 8 : 12)
             .background {
                 if prominent {
                     Capsule().fill(Theme.accent)
@@ -125,6 +127,26 @@ extension View {
             }
         #else
             buttonStyle(PillButtonStyle(prominent: prominent))
+        #endif
+    }
+}
+
+extension View {
+    /// A label drawn as a small glass pill, for a row of actions in a list row, where a button's own style would wrap
+    /// its
+    /// words. Not on Apple TV, whose buttons carry their own look and focus.
+    @ViewBuilder
+    func pillLabel() -> some View {
+        #if os(tvOS)
+            self
+        #else
+            labelStyle(.titleAndIcon)
+                .font(.footnote.weight(.semibold))
+                .lineLimit(1)
+                .fixedSize()
+                .padding(.horizontal, 14)
+                .padding(.vertical, 8)
+                .background(Capsule().fill(.white.opacity(0.12)).overlay(Capsule().strokeBorder(.white.opacity(0.18))))
         #endif
     }
 }

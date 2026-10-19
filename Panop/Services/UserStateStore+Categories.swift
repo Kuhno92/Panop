@@ -51,12 +51,49 @@ extension UserStateStore {
     /// places them all, in the order now shown, so the result does not depend on how the
     /// provider orders the rest.
     func moveCategory(_ name: String, by step: Int, among providerOrder: [String], kind: MediaKind) {
-        var order = arranged(providerOrder, kind: kind)
-        guard let index = order.firstIndex(of: name), order.indices.contains(index + step) else { return }
-        order.swapAt(index, index + step)
-        for (position, category) in order.enumerated() {
-            let row = preference(name: category, kind: kind) ?? insertPreference(name: category, kind: kind)
+        moveCategories([name], by: step, among: providerOrder, kind: kind)
+    }
+
+    /// Several categories one place earlier or later at once, as a block (see ``CategoryOrder/moved``).
+    func moveCategories(_ names: Set<String>, by step: Int, among providerOrder: [String], kind: MediaKind) {
+        let order = arranged(providerOrder, kind: kind)
+        let moved = CategoryOrder.moved(order, chosen: names, by: step)
+        if moved != order {
+            placeCategories(moved, kind: kind)
+        }
+    }
+
+    /// Several categories to the top or the bottom of the list, in the order they already have.
+    func moveCategoriesToEdge(_ names: Set<String>, atTop: Bool, among providerOrder: [String], kind: MediaKind) {
+        let order = arranged(providerOrder, kind: kind)
+        let placed = CategoryOrder.placed(order, chosen: names, atTop: atTop)
+        if placed != order {
+            placeCategories(placed, kind: kind)
+        }
+    }
+
+    /// The whole order, as it is now to be: every category gets its place. One read of what is kept and one save, so
+    /// that a list of hundreds is as quick to arrange as a list of ten.
+    func placeCategories(_ order: [String], kind: MediaKind) {
+        var rows = Dictionary(preferences(kind: kind).map { ($0.name, $0) }, uniquingKeysWith: { first, _ in first })
+        for (position, name) in order.enumerated() {
+            let row = rows[name] ?? insertPreference(name: name, kind: kind)
+            rows[name] = row
             row.position = position
+        }
+        commit()
+    }
+
+    /// Hides or shows several categories at once, in one read and one save.
+    func setCategoriesHidden(_ names: some Collection<String>, hidden: Bool, kind: MediaKind) {
+        var rows = Dictionary(preferences(kind: kind).map { ($0.name, $0) }, uniquingKeysWith: { first, _ in first })
+        for name in names {
+            // Showing what was never hidden or placed has nothing to record.
+            guard hidden || rows[name] != nil else { continue }
+            let row = rows[name] ?? insertPreference(name: name, kind: kind)
+            rows[name] = row
+            row.isHidden = hidden
+            removeIfDefault(row)
         }
         commit()
     }

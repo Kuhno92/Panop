@@ -57,6 +57,33 @@ struct CategoryPreferencesTests {
     }
 
     @Test
+    func `several categories move together, and go to the top or the bottom`() throws {
+        let store = try makeStore()
+
+        store.moveCategories(["Sport", "Music"], by: -1, among: provider, kind: .live)
+        #expect(store.arranged(provider, kind: .live) == ["Sport", "News", "Music", "Kids"])
+
+        store.moveCategoriesToEdge(["Kids", "News"], atTop: true, among: provider, kind: .live)
+        #expect(store.arranged(provider, kind: .live) == ["News", "Kids", "Sport", "Music"])
+
+        store.moveCategoriesToEdge(["News"], atTop: false, among: provider, kind: .live)
+        #expect(store.arranged(provider, kind: .live) == ["Kids", "Sport", "Music", "News"])
+    }
+
+    @Test
+    func `several categories are hidden or shown at once, and a shown one leaves nothing behind`() throws {
+        let store = try makeStore()
+
+        store.setCategoriesHidden(["Sport", "Kids"], hidden: true, kind: .live)
+        #expect(store.userHiddenCategories(of: .live) == ["Sport", "Kids"])
+        #expect(store.visibleCategories(provider, kind: .live) == ["News", "Music"])
+
+        store.setCategoriesHidden(["Sport", "Kids", "News"], hidden: false, kind: .live)
+        #expect(store.userHiddenCategories(of: .live).isEmpty)
+        #expect(store.visibleCategories(provider, kind: .live) == provider)
+    }
+
+    @Test
     func `the first cannot move up and the last cannot move down`() throws {
         let store = try makeStore()
 
