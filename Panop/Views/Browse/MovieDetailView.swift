@@ -178,6 +178,10 @@ struct MovieDetailView: View {
                     Label("Watched", systemImage: "checkmark.circle.fill")
                         .font(.subheadline)
                         .foregroundStyle(.green)
+                } else if discovery.isSeenOnSimkl(kind: .movie, tmdbID: movie.tmdbID) {
+                    Label("Watched on Simkl", systemImage: "checkmark.circle.fill")
+                        .font(.subheadline)
+                        .foregroundStyle(.green)
                 }
             }
         }

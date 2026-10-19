@@ -43,6 +43,20 @@ final class DiscoveryModel {
     /// The next episode to watch of each followed show, by `linkKey`, for the caption under its poster.
     private(set) var nextEpisodes: [String: SimklNextEpisode] = [:]
     @ObservationIgnored private var finishedElsewhere: Set<Int> = []
+    /// The titles the person's Simkl account says they have finished, by `linkKey` (a film's and a show's ids are
+    /// separate numberings, so the kind is part of the key). Read by the screens that draw a Watched badge, so unlike
+    /// the
+    /// rest it is observed.
+    private(set) var seenOnSimkl: Set<String> = []
+
+    /// Whether Simkl says the person has finished this title. Nothing without a TMDB id, which is how a title is joined
+    /// to
+    /// Simkl's.
+    func isSeenOnSimkl(kind: MediaKind, tmdbID: Int?) -> Bool {
+        guard let tmdbID, !seenOnSimkl.isEmpty else { return false }
+        return seenOnSimkl.contains(Self.linkKey(kind: kind, tmdbID: tmdbID))
+    }
+
     @ObservationIgnored private var trendingStore: TrendingStore?
 
     static func linkKey(kind: MediaKind, tmdbID: Int) -> String {
@@ -88,6 +102,10 @@ final class DiscoveryModel {
             },
             uniquingKeysWith: { first, _ in first }
         )
+        let seen = Set(items.filter { $0.status == .completed }.map { Self.linkKey(kind: $0.kind, tmdbID: $0.tmdbID) })
+        if seen != seenOnSimkl {
+            seenOnSimkl = seen
+        }
         let finished = Set(items.filter { $0.status == .completed }.map(\.tmdbID))
         guard planned != self.planned || watching != self.watching || finished != finishedElsewhere else { return }
         self.planned = planned

@@ -182,7 +182,14 @@ struct SeriesDetailView: View {
             meta: stats(seasons, details),
             symbol: "rectangle.stack"
         ) {
-            DetailChips(chips: chips(details))
+            VStack(alignment: .leading, spacing: 8) {
+                DetailChips(chips: chips(details))
+                if discovery.isSeenOnSimkl(kind: .series, tmdbID: series.tmdbID) {
+                    Label("Watched on Simkl", systemImage: "checkmark.circle.fill")
+                        .font(.subheadline)
+                        .foregroundStyle(.green)
+                }
+            }
         }
     }
 

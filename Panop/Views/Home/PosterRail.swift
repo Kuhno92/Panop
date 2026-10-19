@@ -228,6 +228,7 @@ struct PosterRail: View {
 }
 
 private struct RailPoster: View {
+    @Environment(DiscoveryModel.self) private var discovery
     let row: CatalogRow
     let link: URL?
     let caption: String?
@@ -238,6 +239,11 @@ private struct RailPoster: View {
             VStack(alignment: .leading, spacing: 6) {
                 PosterView(address: row.iconURL, symbol: row.kind == .series ? "rectangle.stack" : "film")
                     .frame(width: Self.width)
+                    .overlay(alignment: .topLeading) {
+                        if discovery.isSeenOnSimkl(kind: row.kind, tmdbID: row.tmdbID) {
+                            SeenBadge()
+                        }
+                    }
                 Text(RailHeading.display(row.name))
                     .font(.caption)
                     .lineLimit(2)

@@ -150,3 +150,13 @@ extension View {
         #endif
     }
 }
+
+/// The check on a poster of a title that has been watched, here or on the person's Simkl account.
+struct SeenBadge: View {
+    var body: some View {
+        Image(systemName: "checkmark.circle.fill")
+            .foregroundStyle(.white, .green)
+            .padding(6)
+            .accessibilityLabel("Watched")
+    }
+}

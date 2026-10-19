@@ -8,6 +8,7 @@ struct VODCard: View {
     let action: () -> Void
 
     @Environment(UserStateStore.self) private var userState
+    @Environment(DiscoveryModel.self) private var discovery
 
     private var key: String {
         item.id
@@ -24,7 +25,10 @@ struct VODCard: View {
     var body: some View {
         let isFavorite = userState.isFavorite(key)
         let fraction = userState.progress[key]?.fraction
-        let isWatched = userState.isWatched(key)
+        // Watched here, or finished according to the person's Simkl account: the badge shows either. The menu below
+        // changes only what is kept here.
+        let seenHere = userState.isWatched(key)
+        let isWatched = seenHere || discovery.isSeenOnSimkl(kind: item.kind, tmdbID: item.tmdbID)
         Button(action: action) {
             VStack(alignment: .leading, spacing: 6) {
                 PosterView(address: item.iconURL, symbol: kind == .movie ? "film" : "rectangle.stack")
@@ -60,10 +64,7 @@ struct VODCard: View {
                     }
                     .overlay(alignment: .topLeading) {
                         if isWatched {
-                            Image(systemName: "checkmark.circle.fill")
-                                .foregroundStyle(.white, .green)
-                                .padding(6)
-                                .accessibilityLabel("Watched")
+                            SeenBadge()
                         }
                     }
                 Text(item.name)
@@ -101,11 +102,11 @@ struct VODCard: View {
             }
             if kind == .movie {
                 Button {
-                    userState.setWatched(!isWatched, for: key)
+                    userState.setWatched(!seenHere, for: key)
                 } label: {
                     Label(
-                        isWatched ? "Mark as Not Watched" : "Mark as Watched",
-                        systemImage: isWatched ? "eye.slash" : "eye"
+                        seenHere ? "Mark as Not Watched" : "Mark as Watched",
+                        systemImage: seenHere ? "eye.slash" : "eye"
                     )
                 }
             }

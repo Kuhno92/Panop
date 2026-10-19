@@ -5975,6 +5975,17 @@
           }
         }
       }
+    },
+    "Watched on Simkl" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auf Simkl gesehen"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"
