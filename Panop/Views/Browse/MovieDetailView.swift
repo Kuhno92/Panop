@@ -285,7 +285,7 @@ struct MovieDetailView: View {
     private func loadInfo() async {
         guard let remote = movie.remoteID.flatMap(Int.init),
               case let .xtream(credentials)? = try? library.descriptor(for: movie.playlist)?.source,
-              let client = try? XtreamClient(credentials: credentials, transport: URLSessionTransport())
+              let client = try? XtreamClient(credentials: credentials, transport: ProviderNetwork.shared.transport)
         else { return }
         info = try? await client.movieInfo(streamID: remote)
     }

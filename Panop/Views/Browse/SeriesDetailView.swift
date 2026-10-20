@@ -538,7 +538,7 @@ extension SeriesDetailView {
             return
         }
         do {
-            let client = try XtreamClient(credentials: credentials, transport: URLSessionTransport())
+            let client = try XtreamClient(credentials: credentials, transport: ProviderNetwork.shared.transport)
             let info = try await client.seriesInfo(seriesID: remote)
             let episodes = info.episodes.map { episode in
                 (

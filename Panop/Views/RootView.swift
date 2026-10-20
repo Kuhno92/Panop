@@ -96,7 +96,7 @@ struct RootView: View {
         // The screen it opens on is known from the settings alone, so the first frame is the
         // right one. `applyStartupPlan` corrects it if that screen turns out not to be offered.
         _selection = State(initialValue: UITestMode.startTab ?? StartupPreference.current(offersVOD: true).tab)
-        let transport = URLSessionTransport()
+        let transport = ProviderNetwork.shared.transport
         let account = SimklAccount(
             auth: SimklAuth(transport: transport, app: SimklConfig.app),
             store: SimklConfig.tokenStore

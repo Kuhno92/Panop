@@ -132,7 +132,7 @@ struct PlayerScreen: View {
             let request = try PlaybackRequestBuilder.request(
                 for: target,
                 source: source,
-                transport: URLSessionTransport()
+                transport: ProviderNetwork.shared.transport
             )
             model = PlayerModel(
                 title: target.name,

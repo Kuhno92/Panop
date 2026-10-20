@@ -255,6 +255,15 @@ KSPlayer and AetherEngine bring in, producing `enum AVPixelFormat` redefinition 
 **This is the mistake an agent is most likely to make.** "Simplify the submodule to a version
 dependency" looks like tidying and is a build break. Do not do it. See `docs/engines.md`.
 
+### Provider traffic goes through `ProviderNetwork`
+
+Playlists, guides, artwork, Simkl and stream-page requests use `ProviderNetwork.shared`
+(`Panop/Services/Network`): `.transport`, `.data(for:)`, `.makeSession(_:)`. A SwiftLint rule bans
+`URLSession`, `URLSession.shared` and `URLSessionTransport(` elsewhere in `Panop/`.
+
+**Why:** a VPN rule (required, or tunnel only; see the VPN plan) is applied in that one place and fails
+closed. A request made any other way would leak around it.
+
 ### Every test ModelConfiguration sets `cloudKitDatabase: .none`
 
 **Why:** the catalog container is local-only and uses uniqueness constraints on its small tables,

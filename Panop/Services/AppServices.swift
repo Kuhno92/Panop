@@ -22,7 +22,7 @@ final class AppServices {
         catalog: ModelContainer,
         cloud: ModelContainer,
         credentials: any CredentialStore,
-        transport: any HTTPTransport = URLSessionTransport(),
+        transport: any HTTPTransport = ProviderNetwork.shared.transport,
         playlistsDirectory: URL = AppServices.defaultPlaylistsDirectory,
         defaults: UserDefaults = .standard,
         sportsKeys: any SportsKeyStore = InMemorySportsKeyStore(),

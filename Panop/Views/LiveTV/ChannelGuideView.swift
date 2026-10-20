@@ -194,7 +194,7 @@ struct ChannelGuideView: View {
             in: catalog
         )
         guard !aired.isEmpty, let xtream,
-              let client = try? XtreamClient(credentials: xtream, transport: URLSessionTransport())
+              let client = try? XtreamClient(credentials: xtream, transport: ProviderNetwork.shared.transport)
         else { return }
         panelTimeZone = try? await client.authenticate().timeZoneID
     }

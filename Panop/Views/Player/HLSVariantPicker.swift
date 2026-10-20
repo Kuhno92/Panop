@@ -56,7 +56,7 @@ nonisolated enum HLSVariantPicker {
     }
 
     private static func fetchData(_ request: URLRequest) async throws -> Data {
-        let (data, response) = try await URLSession.shared.data(for: request)
+        let (data, response) = try await ProviderNetwork.shared.data(for: request)
         guard (response as? HTTPURLResponse)?.statusCode == 200 else { throw URLError(.badServerResponse) }
         return data
     }

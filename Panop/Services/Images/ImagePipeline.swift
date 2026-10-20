@@ -240,8 +240,10 @@ extension ImagePipeline {
         configuration.urlCache = nil
         configuration.httpMaximumConnectionsPerHost = 4
         configuration.timeoutIntervalForRequest = 15
-        let session = URLSession(configuration: configuration)
+        let network = ProviderNetwork.shared
+        let session = network.makeSession(configuration)
         return { url in
+            try network.requireOpen()
             var request = URLRequest(url: url)
             request.setValue("image/*", forHTTPHeaderField: "Accept")
             let (data, response) = try await session.data(for: request)

@@ -33,6 +33,6 @@ extension SimklTrendingSource {
     static var panop: SimklTrendingSource? {
         let testing = ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil || UITestMode.isActive
         guard SimklConfig.isConfigured, !testing else { return nil }
-        return SimklTrendingSource(transport: URLSessionTransport(), app: SimklConfig.app)
+        return SimklTrendingSource(transport: ProviderNetwork.shared.transport, app: SimklConfig.app)
     }
 }

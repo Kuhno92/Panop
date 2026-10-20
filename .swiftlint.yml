@@ -69,6 +69,15 @@ custom_rules:
     included: "Packages/PanopKit/Sources/.*\\.swift"
     message: "PanopKit is the portable core and must not import Apple-only frameworks. Put this in the app target instead."
     severity: error
+  provider_traffic_through_provider_network:
+    name: "Provider traffic outside ProviderNetwork"
+    # One door for provider traffic, so a VPN rule (required, or tunnel only) is applied once and a
+    # new screen cannot bypass it. Use ProviderNetwork.shared.transport / .data(for:) / .makeSession.
+    regex: '\bURLSessionTransport\s*\(|\bURLSession\.shared\b|\bURLSession\s*\('
+    included: "Panop/.*\\.swift"
+    excluded: ".*(Tests|Services/Network)/.*"
+    message: "Route provider traffic through ProviderNetwork (Panop/Services/Network)."
+    severity: error
   no_logging:
     name: "Logging"
     # A stream address and a playlist link usually carry the account's login. Nothing here logs,
