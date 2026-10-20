@@ -133,4 +133,42 @@ struct SimklClientTests {
         #expect(query?.contains { $0.name == "extended" } == false, "ids_only would drop the status")
         #expect(query?.contains { $0.name == "next_watch_info" && $0.value == "yes" } == true)
     }
+
+    @Test
+    func `the episodes watched come back by show and season, and a half-made entry is skipped`() async throws {
+        let body = """
+        {"shows": [
+          {"show": {"ids": {"tmdb": 1399}}, "seasons": [
+             {"number": 1, "episodes": [{"number": 1, "watched_at": "2026-05-01T10:00:00Z"}, {"number": 2}]},
+             {"number": 2, "episodes": [{"number": 1}]},
+             {"number": 3, "episodes": []}]},
+          {"show": {"ids": {"tmdb": "66732"}}, "seasons": [{"number": 1, "episodes": [{"number": 4}]}]},
+          {"show": {"ids": {}}, "seasons": [{"number": 1, "episodes": [{"number": 1}]}]},
+          {"show": {"ids": {"tmdb": 5}}},
+          "garbage"
+        ]}
+        """
+        let transport = Echo(body: body)
+
+        let shows = try await client(transport).watchedEpisodes()
+
+        #expect(shows == [
+            SimklWatchedShow(tmdbID: 1399, seasons: [
+                SimklWatchedSeason(number: 1, episodes: [1, 2]),
+                SimklWatchedSeason(number: 2, episodes: [1])
+            ]),
+            SimklWatchedShow(tmdbID: 66732, seasons: [SimklWatchedSeason(number: 1, episodes: [4])])
+        ])
+        let url = try #require(transport.requests.first?.url.absoluteString)
+        #expect(url.contains("/sync/all-items/shows"))
+        #expect(url.contains("episode_watched_at=yes"))
+    }
+
+    @Test
+    func `an answer with no episodes in it gives no shows, so no badges, and not an error`() async throws {
+        let plain = #"{"shows": [{"show": {"ids": {"tmdb": 1399}}, "status": "completed"}]}"#
+
+        #expect(try await client(Echo(body: plain)).watchedEpisodes().isEmpty)
+        await #expect(throws: SimklError.self) { _ = try await client(Echo(body: "[]")).watchedEpisodes() }
+    }
 }

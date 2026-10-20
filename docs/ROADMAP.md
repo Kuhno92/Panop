@@ -587,6 +587,12 @@ The brief called performance a key concept. For IPTV this concentrates in one nu
       account: built from Simkl's documentation and tested against stubbed replies.
       Free below $150 a month of revenue, a licence above (see THIRD-PARTY-NOTICES.md); all of it is in
       `PanopSimkl`, which can be dropped.
+      **Watched badges from Simkl** *(asked for 2026-10-20)*: a green check on a film or show the account has finished
+      (from the library already read for the rails: no new requests), and on each episode of a show's page (a bigger call,
+      `watchedEpisodes()`: `extended=full` with `episode_watched_at=yes`, asked for only when a series page opens and only
+      when Simkl's activity stamp changed; kept on disk, cleared on disconnect). **Not verified against a live account**:
+      the shape of the episode reply is from documentation, and an answer without episodes shows no badges. Episode numbers
+      are matched as the provider numbers them, so a provider that numbers absolutely will not line up.
 - [ ] **Enable CloudKit mirroring** *(asked for, as "iCloud sync")* (ADR 0009). **Built, not yet run against
       iCloud.** The entitlements (`Config/Panop.entitlements`: CloudKit and the container
       `iCloud.com.panop.Panop`, push) are in the project, mirroring is chosen at launch from facts

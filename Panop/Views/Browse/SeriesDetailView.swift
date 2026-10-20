@@ -5,16 +5,10 @@ import PanopXtream
 import SwiftData
 import SwiftUI
 
-/// A series' seasons and episodes.
-///
-/// Where they come from depends on the playlist. A provider panel lists series as shells, so
-/// the episodes are fetched here, when someone opens one, rather than for every series in the
-/// catalog. A series built from an M3U file already has its episodes in the catalog, linked to
-/// it when the playlist was imported, so they are read from there and need no network.
-///
-/// The page opens on the artwork and the facts about the show (rating, year, genres, how many seasons and
-/// episodes, cast), a button for what to watch next, and then one season at a time with a picture, a date, a length,
-/// the file's quality and a line of plot for each episode.
+/// A series' seasons and episodes. A provider panel lists series as shells, so their episodes are fetched here when one
+/// is opened; an M3U series has its episodes in the catalog already. The page opens on the artwork and the facts about
+/// the show, a button for what to watch next, then one season at a time, each episode with its picture, date, length,
+/// quality and plot.
 struct SeriesDetailView: View {
     let series: SeriesReference
 
@@ -22,6 +16,7 @@ struct SeriesDetailView: View {
     @Environment(UserStateStore.self) private var userState
     @Environment(SimklSync.self) private var simkl
     @Environment(DiscoveryModel.self) private var discovery
+    @Environment(SimklEpisodes.self) private var simklEpisodes
     @Environment(\.modelContext) private var catalog
     @Environment(\.openURL) private var openURL
     @State private var trailer: TrailerRequest?
@@ -89,6 +84,7 @@ struct SeriesDetailView: View {
             .navigationBarTitleDisplayMode(.inline)
         #endif
             .task { await fetch() }
+            .task { await simklEpisodes.refresh() } // nothing happens without a connected account
             .resumeDialog($resume)
             .modifier(PlayerPresentation(target: $playing))
             .trailerPlayer($trailer)
@@ -287,12 +283,19 @@ struct SeriesDetailView: View {
         }
     }
 
+    /// Watched here, or on the person's Simkl account (only the first can be changed from here).
+    private func isSeen(_ episode: Episode, in season: Season) -> Bool {
+        userState.isWatched(UserStateStore.key(playlist: series.playlist, entry: episode.entryID))
+            || simklEpisodes.isWatched(show: series.tmdbID, season: season.number, episode: episode.number)
+    }
+
     /// `12 of 28 watched`, with a bar.
     @ViewBuilder
     private func watchedSummary(_ seasons: [Season]) -> some View {
         let all = seasons.flatMap(\.episodes)
-        let seen = all.filter { userState.isWatched(UserStateStore.key(playlist: series.playlist, entry: $0.entryID)) }
-            .count
+        let seen = seasons.reduce(0) { total, season in
+            total + season.episodes.filter { isSeen($0, in: season) }.count
+        }
         if seen > 0, !all.isEmpty {
             VStack(alignment: .leading, spacing: 4) {
                 Text("\(seen) of \(all.count) watched").font(.caption.weight(.semibold)).foregroundStyle(.secondary)
@@ -336,10 +339,12 @@ struct SeriesDetailView: View {
         {
             return found
         }
-        if let partway = all.first(where: { userState.progress[key($0)] != nil && !userState.isWatched(key($0)) }) {
+        if let partway = all
+            .first(where: { userState.progress[key($0)] != nil && !isSeen($0.episode, in: $0.season) })
+        {
             return partway
         }
-        return all.first { !userState.isWatched(key($0)) } ?? all.first
+        return all.first { !isSeen($0.episode, in: $0.season) } ?? all.first
     }
 
     /// Plays the trailer in the app; a page that is no video is the browser's.
@@ -384,7 +389,7 @@ extension SeriesDetailView {
                                 .background(.tint.opacity(0.2), in: Capsule())
                         }
                         Spacer(minLength: 4)
-                        if userState.isWatched(key) {
+                        if isSeen(episode, in: season) {
                             Image(systemName: "checkmark.circle.fill")
                                 .foregroundStyle(.green)
                                 .accessibilityLabel("Watched")
@@ -430,8 +435,7 @@ extension SeriesDetailView {
         return parts.isEmpty ? nil : parts.joined(separator: " · ")
     }
 
-    /// The episode's picture, with how far through it the person is as a bar along the bottom. Without a picture, a
-    /// tile of the same size so the rows line up.
+    /// The episode's picture with a progress bar along the bottom; without one, a tile of the same size.
     private func thumbnail(_ episode: Episode, progress: Double?) -> some View {
         BackdropView(address: episode.imageURL)
             .frame(width: Self.thumbnailWidth, height: Self.thumbnailWidth * 9 / 16)

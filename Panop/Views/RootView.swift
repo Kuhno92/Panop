@@ -78,6 +78,7 @@ struct RootView: View {
     @State private var parental = ParentalControls.live()
     @State private var simklSync: SimklSync
     @State private var simklLibrary: SimklLibrary
+    @State private var simklEpisodes: SimklEpisodes
     private let simklClient: SimklClient
     @AppStorage(SimklAccountListsStore.customKey) private var showsCustomLists = true
     @AppStorage(SimklSync.enabledKey) private var sendsWatched = true
@@ -107,6 +108,10 @@ struct RootView: View {
         _simklLibrary = State(initialValue: SimklLibrary(
             activities: { try await client.activities() },
             library: { try await client.library() }
+        ))
+        _simklEpisodes = State(initialValue: SimklEpisodes(
+            activities: { try await client.activities() },
+            fetch: { try await client.watchedEpisodes() }
         ))
     }
 
@@ -318,6 +323,7 @@ struct RootView: View {
             .environment(simkl)
             .environment(parental)
             .environment(simklSync)
+            .environment(simklEpisodes)
             // What is finished goes to Simkl only while connected and switched on; the queue belongs to the
             // account it was made for, so signing out drops it.
             .task(id: [sendsWatched, simkl.isConnected, showsTrending, showsSuggestions, showsCustomLists]) {
@@ -339,6 +345,7 @@ struct RootView: View {
                 } else {
                     simklSync.discardQueue()
                     simklLibrary.clear()
+                    simklEpisodes.clear()
                     await discovery.clearAccountLists()
                 }
             }
