@@ -5986,6 +5986,83 @@
           }
         }
       }
+    },
+    "Require a VPN" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "VPN verlangen"
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
+    "Privacy" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Datenschutz"
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
+    "Off. A VPN is active on this device." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aus. Auf diesem Gerät ist ein VPN aktiv."
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
+    "Off. Panop connects directly." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aus. Panop verbindet sich direkt."
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
+    "On. A VPN is active, so Panop connects." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "An. Ein VPN ist aktiv, daher verbindet sich Panop."
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
+    "On, and no VPN is active. Panop is not connecting." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "An, aber kein VPN ist aktiv. Panop stellt keine Verbindung her."
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
+    "With this on, Panop does not load playlists, guides or artwork, and does not start a stream, unless a VPN is active on this device. Turn the VPN on in its own app or in the system settings." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ist dies an, lädt Panop keine Playlists, Programmführer oder Bilder und startet keinen Stream, solange auf diesem Gerät kein VPN aktiv ist. Schalte das VPN in dessen eigener App oder in den Systemeinstellungen ein."
+          }
+        }
+      },
+      "extractionState" : "manual"
     }
   },
   "version" : "1.0"

@@ -33,6 +33,7 @@ public final class PlaybackCoordinator {
     private let policy: PlaybackPolicy
     private let priority: [PlaybackEngineKind]
     private let makeEngine: EngineFactory
+    private let gate: @Sendable () -> NetworkBlock?
     let sleep: Sleeper
 
     private var generation = 0
@@ -54,13 +55,17 @@ public final class PlaybackCoordinator {
     ///   - priority: engines to try, in order. Use ``PlaybackEngineKind/order(preferred:)``.
     ///   - makeEngine: returns a **new** instance, or nil for an engine that is
     ///     not available in this build (which is skipped, not counted as a failure).
+    ///   - gate: names a reason when no stream may open now (a VPN is required and none is active). Read before
+    ///     every attempt, so a reconnect cannot slip out after the VPN dropped. A precondition, not a retry.
     ///   - sleep: injectable so tests do not wait in real time.
     public init(
         policy: PlaybackPolicy = PlaybackPolicy(),
         priority: [PlaybackEngineKind] = PlaybackEngineKind.defaultPriority,
         makeEngine: @escaping EngineFactory,
+        gate: @escaping @Sendable () -> NetworkBlock? = { nil },
         sleep: @escaping Sleeper = { try await Task.sleep(for: $0) }
     ) {
+        self.gate = gate
         self.policy = policy
         self.priority = priority
         self.makeEngine = makeEngine
@@ -122,6 +127,12 @@ public final class PlaybackCoordinator {
 
     /// Tries engines from `start` onwards until one starts playing.
     private func connect(from start: Int, resume: Double?, generation token: Int) async {
+        if let block = gate() {
+            let error = PlaybackError(code: .network, message: block.description)
+            attempts.append(PlaybackAttempt(engine: priority.first ?? .avPlayer, error: error))
+            setStatus(.failed(PlaybackFailure(attempts: attempts)))
+            return
+        }
         var index = start
         while index < priority.count {
             let kind = priority[index]

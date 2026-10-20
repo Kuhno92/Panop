@@ -11,6 +11,8 @@ struct PanopApp: App {
     private let metricsStore: PlaybackMetricsStore?
 
     init() {
+        // Before the first request, so a required VPN holds from the start.
+        SystemVPNMonitor.shared.start()
         // A hosted test run launches this app first. It must not open, or worse
         // migrate, the developer's real stores.
         let underTest = ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil

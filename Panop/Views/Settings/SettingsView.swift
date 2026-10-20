@@ -249,6 +249,7 @@ struct SettingsView: View {
     @ViewBuilder
     private var accounts: some View {
         CloudSyncSection()
+        VPNSection()
         SportsSettingsSection()
         if SimklConfig.isConfigured {
             SimklSettingsSection()
