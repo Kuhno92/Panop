@@ -6063,6 +6063,248 @@
         }
       },
       "extractionState" : "manual"
+    },
+    "Send Panop's traffic through this VPN" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Den Datenverkehr von Panop durch dieses VPN leiten"
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
+    "Server" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Server"
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
+    "Received" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Empfangen"
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
+    "Sent" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gesendet"
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
+    "Test connection" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verbindung testen"
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
+    "No answer" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Antwort"
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
+    "Replace configuration" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Konfiguration ersetzen"
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
+    "Remove configuration" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Konfiguration entfernen"
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
+    "Add the configuration on an iPhone, iPad or Mac." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Füge die Konfiguration auf einem iPhone, iPad oder Mac hinzu."
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
+    "Add a WireGuard configuration" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WireGuard-Konfiguration hinzufügen"
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
+    "VPN built into Panop" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In Panop eingebautes VPN"
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
+    "Paste the WireGuard configuration your VPN provider gives you (Proton, Mullvad and others). With it on, Panop sends its own playlists, guides, artwork and streams through that VPN, and nothing else on this device. The private key stays in this device's Keychain. If the VPN is down, Panop does not connect." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Füge die WireGuard-Konfiguration ein, die dein VPN-Anbieter dir gibt (Proton, Mullvad und andere). Ist es an, leitet Panop seine eigenen Playlists, Programmführer, Bilder und Streams durch dieses VPN, und sonst nichts auf diesem Gerät. Der private Schlüssel bleibt im Schlüsselbund dieses Geräts. Ist das VPN nicht erreichbar, verbindet sich Panop nicht."
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
+    "Remove the VPN configuration?" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "VPN-Konfiguration entfernen?"
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
+    "Remove" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entfernen"
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
+    "Connecting …" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verbinde …"
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
+    "Connected. Panop's traffic goes through the VPN." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verbunden. Der Datenverkehr von Panop läuft durch das VPN."
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
+    "No configuration. Panop is not connecting." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Konfiguration. Panop stellt keine Verbindung her."
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
+    "The VPN did not answer. Panop is not connecting." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das VPN antwortet nicht. Panop stellt keine Verbindung her."
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
+    "The configuration is not valid. Panop is not connecting." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Konfiguration ist ungültig. Panop stellt keine Verbindung her."
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
+    "Choose a .conf file" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ".conf-Datei wählen"
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
+    "Paste the whole file, from [Interface] to the end of [Peer]." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Füge die ganze Datei ein, von [Interface] bis zum Ende von [Peer]."
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
+    "WireGuard configuration" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WireGuard-Konfiguration"
+          }
+        }
+      },
+      "extractionState" : "manual"
     }
   },
   "version" : "1.0"

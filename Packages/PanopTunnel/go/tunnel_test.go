@@ -58,6 +58,7 @@ func startServer(t *testing.T, serverPriv, clientPub [32]byte) (port int) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	serveDNS(t, tnet)
 	go http.Serve(l, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		io.WriteString(w, "through the tunnel to "+r.Host)
 	}))
@@ -187,5 +188,51 @@ func TestConfigErrorsNameTheLineNotTheKey(t *testing.T) {
 		if _, err := parseConfig(conf); err == nil {
 			t.Errorf("%s was accepted", name)
 		}
+	}
+}
+
+// serveDNS answers every UDP packet on port 53 with its own header marked as a response, which is all the
+// readiness probe needs.
+func serveDNS(t *testing.T, tnet *netstack.Net) {
+	t.Helper()
+	pc, err := tnet.ListenUDP(&net.UDPAddr{Port: 53})
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { pc.Close() })
+	go func() {
+		buf := make([]byte, 512)
+		for {
+			n, addr, err := pc.ReadFrom(buf)
+			if err != nil {
+				return
+			}
+			if n >= 12 {
+				buf[2] |= 0x80
+				pc.WriteTo(buf[:n], addr)
+			}
+		}
+	}()
+}
+
+func TestWaitReadyReturnsOnceTheServerAnswers(t *testing.T) {
+	tun := startClient(t)
+	if err := tun.WaitReady(10); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestWaitReadyGivesUpWhenNothingAnswers(t *testing.T) {
+	_, pub := keypair(t)
+	priv, _ := keypair(t)
+	tun := NewTunnel()
+	conf := fmt.Sprintf("[Interface]\nPrivateKey = %s\nAddress = 10.9.0.2/32\nDNS = 10.9.0.1\n\n[Peer]\nPublicKey = %s\nAllowedIPs = 10.9.0.0/24\nEndpoint = 127.0.0.1:9\n",
+		base64.StdEncoding.EncodeToString(priv[:]), base64.StdEncoding.EncodeToString(pub[:]))
+	if err := tun.Start(conf); err != nil {
+		t.Fatal(err)
+	}
+	defer tun.Stop()
+	if err := tun.WaitReady(2); err == nil {
+		t.Fatal("reported ready with no server")
 	}
 }

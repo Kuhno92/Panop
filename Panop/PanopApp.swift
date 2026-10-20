@@ -9,10 +9,12 @@ struct PanopApp: App {
     private let cloudSync: CloudSyncStatus
     private let services: AppServices
     private let metricsStore: PlaybackMetricsStore?
+    @Environment(\.scenePhase) private var scenePhase
 
     init() {
         // Before the first request, so a required VPN holds from the start.
         SystemVPNMonitor.shared.start()
+        TunnelController.shared.launch()
         // A hosted test run launches this app first. It must not open, or worse
         // migrate, the developer's real stores.
         let underTest = ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
@@ -101,13 +103,19 @@ struct PanopApp: App {
                 .environment(\.sportsFeed, services.sportsFeed)
                 .environment(cloudSync)
                 .environment(\.playbackMetrics, metricsStore)
+                .onChange(of: scenePhase) { _, phase in
+                    // Coming back, the system may have cut the tunnel's sockets or changed the network.
+                    guard phase == .active else { return }
+                    SystemVPNMonitor.shared.refresh()
+                    TunnelController.shared.appBecameActive()
+                }
             #if os(macOS) || os(tvOS)
                 .environment(embeddedPlayback)
             #endif
             #if os(iOS)
             // Dark like Apple TV and the Mac, where the page is a dark gradient and the posters and logos stand out
             // on it; on a light page the lists were glaring.
-            .preferredColorScheme(.dark)
+                .preferredColorScheme(.dark)
             #endif
         }
         .modelContainer(catalogContainer)

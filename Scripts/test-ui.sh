@@ -17,6 +17,7 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
+"$ROOT/Scripts/ensure-tunnel.sh"
 
 SHARED_SPM="${PANOP_SPM:-$HOME/Library/Developer/Panop-SharedSPM}"
 DD_BASE="${PANOP_DD:-/tmp/panop-dd}"

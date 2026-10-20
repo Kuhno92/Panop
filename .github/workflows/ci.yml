@@ -60,6 +60,16 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Cache the VPN tunnel (Go toolchain and framework)
+        uses: actions/cache@v4
+        with:
+          path: |
+            .build/tools/go
+            .build/tools/gopath
+            .build/tools/gocache
+            Packages/PanopTunnel/build
+          key: tunnel-${{ runner.os }}-${{ hashFiles('Packages/PanopTunnel/go/**', 'Scripts/build-tunnel.sh') }}
+
       # The store and importer tests need SwiftData, so they cannot run in the
       # portable package. They use real on-disk SQLite, which is what catches
       # collation and paging bugs that an in-memory store hides.

@@ -11,6 +11,7 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
+"$ROOT/Scripts/ensure-tunnel.sh"
 
 PROJECT="Panop.xcodeproj"
 SCHEME="${PANOP_SCHEME:-Panop}"

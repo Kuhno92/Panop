@@ -46,7 +46,7 @@ final class SystemVPNMonitor {
         isVPNActive = VPNDetector.isActive(interfaces: interfaces)
         let reason = VPNDetector.block(requireVPN: defaults.bool(forKey: Self.requireKey), interfaces: interfaces)
         block = reason
-        network.setBlock(reason)
+        network.setSystemBlock(reason)
     }
 
     private nonisolated static func scopedInterfaces() -> [String] { // swiftlint:disable:this modifier_order

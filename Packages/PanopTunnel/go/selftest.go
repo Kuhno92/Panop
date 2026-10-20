@@ -57,6 +57,24 @@ func SelfTest() string {
 	if err != nil {
 		return "server listen: " + err.Error()
 	}
+	pc, err := tnet.ListenUDP(&net.UDPAddr{Port: 53})
+	if err != nil {
+		return "server dns: " + err.Error()
+	}
+	defer pc.Close()
+	go func() {
+		buf := make([]byte, 512)
+		for {
+			n, addr, err := pc.ReadFrom(buf)
+			if err != nil {
+				return
+			}
+			if n >= 12 {
+				buf[2] |= 0x80
+				pc.WriteTo(buf[:n], addr)
+			}
+		}
+	}()
 	go http.Serve(l, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { io.WriteString(w, "through the tunnel") }))
 	var port int
 	text, _ := dev.IpcGet()
@@ -72,6 +90,9 @@ func SelfTest() string {
 		return "client start: " + err.Error()
 	}
 	defer t.Stop()
+	if err := t.WaitReady(10); err != nil {
+		return "ready: " + err.Error()
+	}
 
 	check := func(name string, c *http.Client) string {
 		resp, err := c.Get("http://10.9.0.1/")

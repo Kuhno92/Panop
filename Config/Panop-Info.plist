@@ -2,54 +2,16 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<!-- IPTV providers overwhelmingly serve playlists, Xtream APIs and streams over plain
-	     http, on hostnames the user types in and the app cannot know in advance. ATS blocks
-	     all of that by default (error -1022), so the app cannot work without this. It is a
-	     deliberate exception, to be justified in App Store review; see docs/ARCHITECTURE.md. -->
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
 	</dict>
-	<!-- Lets playback continue when the app is not in front, and lets the system's media
-	     controls and Picture in Picture work. The build setting INFOPLIST_KEY_UIBackgroundModes
-	     does not produce this: it was set to "audio" for a long time and the built app had no
-	     such key. It has to be an array, so it lives here. -->
-	<!-- Whether the build carries the iCloud entitlements (Config/Panop.entitlements); CloudSync reads it because an
-	     iPhone or Apple TV app cannot read its own entitlements. NO where the scripts build without them. -->
 	<key>PanopICloudEntitled</key>
 	<string>$(PANOP_ICLOUD_ENTITLED)</string>
-	<!-- Providers and playlists are often on the home network (an address like 192.168.x.x). Since iOS and tvOS 14 an app
-	     may only talk to such a device after the person has allowed it, and the system asks only for an app that says
-	     why. Without this the request fails at once, which the app reports as "could not reach the provider". -->
-	<!-- Panop uses only the encryption the system provides (HTTPS to a provider, Keychain, CloudKit), which is exempt. Said
-	     here so that an upload to App Store Connect does not stop to ask. -->
-	<key>ITSAppUsesNonExemptEncryption</key>
-	<false/>
-	<!-- The Mac App Store (and so TestFlight for the Mac) requires a category. -->
-	<key>LSApplicationCategoryType</key>
-	<string>public.app-category.entertainment</string>
-	<key>NSLocalNetworkUsageDescription</key>
-	<string>Panop connects to your IPTV provider or playlist when it is on your home network.</string>
-	<!-- Every orientation on iPad, which App Store Connect requires of an app that runs in iPad multitasking; a phone
-	     is held upright or on its side. -->
-	<key>UISupportedInterfaceOrientations</key>
-	<array>
-		<string>UIInterfaceOrientationPortrait</string>
-		<string>UIInterfaceOrientationLandscapeLeft</string>
-		<string>UIInterfaceOrientationLandscapeRight</string>
-	</array>
-	<key>UISupportedInterfaceOrientations~ipad</key>
-	<array>
-		<string>UIInterfaceOrientationPortrait</string>
-		<string>UIInterfaceOrientationPortraitUpsideDown</string>
-		<string>UIInterfaceOrientationLandscapeLeft</string>
-		<string>UIInterfaceOrientationLandscapeRight</string>
-	</array>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>audio</string>
-		<!-- CloudKit wakes the app with a silent push when another device changes something. -->
 		<string>remote-notification</string>
 	</array>
 </dict>

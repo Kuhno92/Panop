@@ -235,18 +235,12 @@ extension ImagePipeline {
     }()
 
     nonisolated static func networkFetch() -> Fetch {
-        let configuration = URLSessionConfiguration.ephemeral
-        // The disk cache is ours; a second one in URLSession would only double the storage.
-        configuration.urlCache = nil
-        configuration.httpMaximumConnectionsPerHost = 4
-        configuration.timeoutIntervalForRequest = 15
         let network = ProviderNetwork.shared
-        let session = network.makeSession(configuration)
         return { url in
             try network.requireOpen()
             var request = URLRequest(url: url)
             request.setValue("image/*", forHTTPHeaderField: "Accept")
-            let (data, response) = try await session.data(for: request)
+            let (data, response) = try await network.imageSession.data(for: request)
             guard (response as? HTTPURLResponse)?.statusCode == 200 else {
                 throw URLError(.badServerResponse)
             }

@@ -31,6 +31,7 @@
 		BBBB000000000000000000B1 /* PanopSports in Frameworks */ = {isa = PBXBuildFile; productRef = BBBB000000000000000000B2 /* PanopSports */; };
 		BBBB000000000000000000C1 /* YouTubeKit in Frameworks */ = {isa = PBXBuildFile; platformFilters = (tvos, ); productRef = BBBB000000000000000000C2 /* YouTubeKit */; };
 		BBBB000000000000000000D1 /* SVGView in Frameworks */ = {isa = PBXBuildFile; productRef = BBBB000000000000000000D2 /* SVGView */; };
+		BBBB000000000000000000E1 /* PanopTunnelKit in Frameworks */ = {isa = PBXBuildFile; productRef = BBBB000000000000000000E2 /* PanopTunnelKit */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -105,6 +106,7 @@
 				BBBB000000000000000000B1 /* PanopSports in Frameworks */,
 				BBBB000000000000000000C1 /* YouTubeKit in Frameworks */,
 				BBBB000000000000000000D1 /* SVGView in Frameworks */,
+				BBBB000000000000000000E1 /* PanopTunnelKit in Frameworks */,
 				AAAA000000000000000000F6 /* VLCKit in Frameworks */,
 				AAAA000000000000000000F7 /* LumeEngine in Frameworks */,
 				AAAA00000000000000000120 /* AetherEngine in Frameworks */,
@@ -189,6 +191,7 @@
 				BBBB000000000000000000B2 /* PanopSports */,
 				BBBB000000000000000000C2 /* YouTubeKit */,
 				BBBB000000000000000000D2 /* SVGView */,
+				BBBB000000000000000000E2 /* PanopTunnelKit */,
 				AAAA000000000000000000C8 /* VLCKit */,
 				AAAA000000000000000000CB /* LumeEngine */,
 				AAAA00000000000000000122 /* AetherEngine */,
@@ -289,6 +292,7 @@
 				AAAA00000000000000000121 /* XCRemoteSwiftPackageReference "AetherEngine" */,
 				BBBB000000000000000000C3 /* XCRemoteSwiftPackageReference "YouTubeKit" */,
 				BBBB000000000000000000D3 /* XCLocalSwiftPackageReference "Packages/SVGView" */,
+				BBBB000000000000000000E3 /* XCLocalSwiftPackageReference "Packages/PanopTunnel" */,
 				AAAA00000000000000000125 /* XCLocalSwiftPackageReference "Packages/KSPlayerBridge" */,
 				AAAA00000000000000000123 /* XCLocalSwiftPackageReference "Packages/LibDovi" */,
 			);
@@ -449,7 +453,12 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Config/Panop-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = Panop;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.entertainment";
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Panop connects to your IPTV provider or playlist when it is on your home network.";
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -487,7 +496,12 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Config/Panop-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = Panop;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.entertainment";
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Panop connects to your IPTV provider or playlist when it is on your home network.";
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -643,6 +657,10 @@
 			isa = XCLocalSwiftPackageReference;
 			relativePath = Packages/SVGView;
 		};
+		BBBB000000000000000000E3 /* XCLocalSwiftPackageReference "Packages/PanopTunnel" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Packages/PanopTunnel;
+		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCRemoteSwiftPackageReference section */
@@ -742,6 +760,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = BBBB000000000000000000D3 /* XCLocalSwiftPackageReference "Packages/SVGView" */;
 			productName = SVGView;
+		};
+		BBBB000000000000000000E2 /* PanopTunnelKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BBBB000000000000000000E3 /* XCLocalSwiftPackageReference "Packages/PanopTunnel" */;
+			productName = PanopTunnelKit;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
