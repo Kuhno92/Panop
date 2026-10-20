@@ -59,7 +59,7 @@ final class KSPlayerEngine: PlaybackEngine {
 
         let bridge = KSBridge(
             url: url, userAgent: agent, referer: referer, headers: extra,
-            startAt: item.startPosition, isLive: isLive
+            startAt: item.startPosition, isLive: isLive, httpProxy: item.proxy?.httpURL
         )
         bridge.onReady = { [weak self] in self?.readyToPlay() }
         bridge.onLoadChanged = { [weak self] in self?.loadStateChanged() }

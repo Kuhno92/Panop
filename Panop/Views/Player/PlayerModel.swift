@@ -86,7 +86,8 @@ final class PlayerModel {
         coordinator = PlaybackCoordinator(
             priority: learned.map { PlaybackEngineKind.order(preferred: $0, for: request) } ?? settingOrder,
             makeEngine: makeEngine,
-            gate: { ProviderNetwork.shared.block }
+            gate: { ProviderNetwork.shared.block },
+            proxy: { ProviderNetwork.shared.proxy }
         )
     }
 

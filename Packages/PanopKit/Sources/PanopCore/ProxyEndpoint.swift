@@ -22,14 +22,30 @@ public struct ProxyEndpoint: Sendable, Equatable, CustomStringConvertible {
         "http://\(username):\(password)@\(host):\(httpPort)"
     }
 
-    /// Whether a stream address should go through the proxy. Loopback and local files do not: the tunnel
-    /// leads out to the internet, and a local address has nothing to do there.
+    /// Whether a stream address should go through the proxy. Loopback, private-network addresses and local
+    /// files do not: the tunnel leads out to the internet, and a local address has nothing to do there (and
+    /// URLSession itself skips a proxy for them, so they would not be consistent).
     public static func applies(to address: String) -> Bool {
         guard let url = URL(string: address), let scheme = url.scheme?.lowercased(),
               scheme == "http" || scheme == "https"
         else { return false }
         let host = url.host?.lowercased() ?? ""
-        return !(host == "localhost" || host == "127.0.0.1" || host == "::1" || host.isEmpty)
+        return !(host.isEmpty || host == "localhost" || host.hasSuffix(".local") || isLocalAddress(host))
+    }
+
+    private static func isLocalAddress(_ host: String) -> Bool {
+        if host == "::1" || host.hasPrefix("fe80:") || host.hasPrefix("fc") || host
+            .hasPrefix("fd")
+        {
+            return host.contains(":")
+        }
+        let parts = host.split(separator: ".").compactMap { Int($0) }
+        guard parts.count == 4 else { return false }
+        switch (parts[0], parts[1]) {
+        case (127, _), (10, _), (192, 168), (169, 254): return true
+        case (172, 16 ... 31): return true
+        default: return false
+        }
     }
 
     /// Never shows the login.

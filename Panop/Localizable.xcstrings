@@ -6305,6 +6305,17 @@
         }
       },
       "extractionState" : "manual"
+    },
+    "While it is on, streams play with LumeEngine or KSPlayer. AVPlayer, VLC and AetherEngine cannot use it, so Picture in Picture and AirPlay are not available." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solange es an ist, spielen Streams mit LumeEngine oder KSPlayer. AVPlayer, VLC und AetherEngine können es nicht nutzen, daher sind Bild-in-Bild und AirPlay nicht verfügbar."
+          }
+        }
+      },
+      "extractionState" : "manual"
     }
   },
   "version" : "1.0"

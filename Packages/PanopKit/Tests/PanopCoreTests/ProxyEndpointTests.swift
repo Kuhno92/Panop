@@ -32,4 +32,10 @@ struct ProxyEndpointTests {
     func `local and non-HTTP addresses do not`(address: String) {
         #expect(!ProxyEndpoint.applies(to: address))
     }
+
+    @Test func `addresses just outside the private ranges are internet addresses`() {
+        #expect(ProxyEndpoint.applies(to: "http://172.32.0.1/a"))
+        #expect(ProxyEndpoint.applies(to: "http://192.169.0.1/a"))
+        #expect(ProxyEndpoint.applies(to: "http://11.0.0.1/a"))
+    }
 }

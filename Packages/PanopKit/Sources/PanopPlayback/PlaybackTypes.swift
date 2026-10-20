@@ -13,6 +13,9 @@ public struct PlaybackItem: Sendable, Equatable {
     /// in-flight connection makes some providers drop the stream entirely.
     public var startPosition: Double?
     public var mediaKind: MediaKind
+    /// Where to send the stream's connections when the app's own VPN tunnel is on, or nil to connect as usual.
+    /// Set by the coordinator, never by a caller, so every engine gets the same answer.
+    public var proxy: ProxyEndpoint?
 
     public init(
         url: String,
@@ -20,8 +23,10 @@ public struct PlaybackItem: Sendable, Equatable {
         headers: [String: String] = [:],
         userAgent: String? = nil,
         startPosition: Double? = nil,
-        mediaKind: MediaKind = .unknown
+        mediaKind: MediaKind = .unknown,
+        proxy: ProxyEndpoint? = nil
     ) {
+        self.proxy = proxy
         self.url = url
         self.title = title
         self.headers = headers

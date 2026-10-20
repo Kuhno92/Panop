@@ -34,6 +34,7 @@ public final class PlaybackCoordinator {
     private let priority: [PlaybackEngineKind]
     private let makeEngine: EngineFactory
     private let gate: @Sendable () -> NetworkBlock?
+    private let proxy: @Sendable () -> ProxyEndpoint?
     let sleep: Sleeper
 
     private var generation = 0
@@ -57,15 +58,19 @@ public final class PlaybackCoordinator {
     ///     not available in this build (which is skipped, not counted as a failure).
     ///   - gate: names a reason when no stream may open now (a VPN is required and none is active). Read before
     ///     every attempt, so a reconnect cannot slip out after the VPN dropped. A precondition, not a retry.
+    ///   - proxy: where the app's VPN tunnel listens, while it is on. Stream connections to the internet go there,
+    ///     and an engine that cannot use a proxy is skipped rather than left to connect directly.
     ///   - sleep: injectable so tests do not wait in real time.
     public init(
         policy: PlaybackPolicy = PlaybackPolicy(),
         priority: [PlaybackEngineKind] = PlaybackEngineKind.defaultPriority,
         makeEngine: @escaping EngineFactory,
         gate: @escaping @Sendable () -> NetworkBlock? = { nil },
+        proxy: @escaping @Sendable () -> ProxyEndpoint? = { nil },
         sleep: @escaping Sleeper = { try await Task.sleep(for: $0) }
     ) {
         self.gate = gate
+        self.proxy = proxy
         self.policy = policy
         self.priority = priority
         self.makeEngine = makeEngine
@@ -154,6 +159,12 @@ public final class PlaybackCoordinator {
         resume: Double?,
         generation token: Int
     ) async -> Bool {
+        // With the tunnel on, an engine that cannot use it must not run: it would connect directly.
+        if !kind.supportsProxy, item(for: kind, resume: resume).proxy != nil {
+            let reason = PlaybackError(code: .unsupportedFormat, message: "\(kind.displayName) cannot use the VPN.")
+            attempts.append(PlaybackAttempt(engine: kind, error: reason))
+            return false
+        }
         guard var engine = makeEngine(kind) else {
             attempts.append(PlaybackAttempt(engine: kind, error: nil))
             return false
@@ -196,6 +207,7 @@ public final class PlaybackCoordinator {
         if let resume {
             item.startPosition = resume
         }
+        item.proxy = ProxyEndpoint.applies(to: item.url) ? proxy() : nil
         return item
     }
 

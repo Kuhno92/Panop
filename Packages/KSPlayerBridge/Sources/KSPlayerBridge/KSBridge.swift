@@ -46,9 +46,13 @@ public final class KSBridge {
 
     public init(
         url: URL, userAgent: String?, referer: String?, headers: [String: String],
-        startAt: Double?, isLive: Bool
+        startAt: Double?, isLive: Bool, httpProxy: String? = nil
     ) {
         let options = KSOptions()
+        // FFmpeg's own option: every connection of this playback, HLS parts included, goes through the proxy.
+        if let httpProxy {
+            options.formatContextOptions["http_proxy"] = httpProxy
+        }
         if let userAgent {
             options.userAgent = userAgent
         }

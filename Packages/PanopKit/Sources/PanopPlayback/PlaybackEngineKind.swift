@@ -34,6 +34,22 @@ public enum PlaybackEngineKind: String, Sendable, Codable, CaseIterable, Identif
         }
     }
 
+    /// Whether the engine can send its connections through the app's VPN proxy. While the tunnel is on, an
+    /// engine that cannot is left out rather than allowed to connect directly.
+    ///
+    /// - AVPlayer has no per-app proxy setting; only a system VPN would carry it.
+    /// - AetherEngine opens its own `URLSession`s with no way to give them a proxy (measured: it ignores
+    ///   `http_proxy` and connects straight to the origin).
+    /// - VLC (4.0.0-a24) ignores `http-proxy` as a media option, as an instance option and as the
+    ///   `http_proxy` variable (measured the same way: it connects straight to the origin).
+    /// - LumeEngine and KSPlayer take FFmpeg's `http_proxy` option, and were measured to use it.
+    public var supportsProxy: Bool {
+        switch self {
+        case .avPlayer, .aetherEngine, .vlcKit: false
+        case .lumeEngine, .ksPlayer: true
+        }
+    }
+
     /// Engines actually available to the user in this build.
     ///
     /// Prefer this over `allCases` anywhere a list is shown or a fallback order

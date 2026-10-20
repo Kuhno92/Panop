@@ -4,7 +4,7 @@ import Network
 import PanopCore
 import Testing
 
-private final class Counter: @unchecked Sendable {
+final class ConnectionCounter: @unchecked Sendable {
     private let lock = NSLock()
     private var count = 0
 
@@ -18,9 +18,9 @@ private final class Counter: @unchecked Sendable {
 }
 
 /// A TCP server that only counts who connected, on every interface. Nothing is ever answered.
-private final class CountingServer: @unchecked Sendable {
+final class CountingServer: @unchecked Sendable {
     private let listener: NWListener
-    private let counter: Counter
+    private let counter: ConnectionCounter
     let port: UInt16
 
     init() throws {
@@ -32,7 +32,7 @@ private final class CountingServer: @unchecked Sendable {
                 ready.signal()
             }
         }
-        let counter = Counter()
+        let counter = ConnectionCounter()
         self.counter = counter
         listener.newConnectionHandler = { connection in
             counter.bump()
@@ -54,7 +54,7 @@ private final class CountingServer: @unchecked Sendable {
 
 /// An address of this machine that is not loopback: a system proxy setting may skip loopback, which would
 /// make a leak test pass for the wrong reason.
-private func lanAddress() -> String? {
+func lanAddress() -> String? {
     var list: UnsafeMutablePointer<ifaddrs>?
     guard getifaddrs(&list) == 0, let first = list else { return nil }
     defer { freeifaddrs(list) }
@@ -101,17 +101,25 @@ struct ProviderNetworkLeakTests {
         #expect(server.connections == 0)
     }
 
-    @Test func `a dead tunnel proxy fails the request instead of going direct`() async throws {
-        guard let lan = lanAddress() else { return }
-        let server = try CountingServer()
+    /// A documentation-range address (RFC 5737): public as far as the system is concerned, and nothing answers there.
+    /// URLSession skips a proxy for private-network addresses, so those cannot show where a request went.
+    private static let publicLooking = "198.51.100.7"
+
+    @Test func `with the tunnel up, a request goes to the tunnel's proxy and not out directly`() async throws {
+        let proxy = try CountingServer()
         let network = ProviderNetwork()
-        // A proxy nobody listens on: if anything went direct, the server would see it.
+        network.setRoute(.tunnel(ProxyEndpoint(socksPort: Int(proxy.port), httpPort: 1, username: "u", password: "p")))
+        _ = try? await network.transport.send(request(Self.publicLooking, 8080))
+        try? await Task.sleep(for: .milliseconds(500))
+        #expect(proxy.connections >= 1)
+    }
+
+    @Test func `a dead tunnel proxy fails the request`() async {
+        let network = ProviderNetwork()
         network.setRoute(.tunnel(ProxyEndpoint(socksPort: 1, httpPort: 1, username: "u", password: "p")))
         await #expect(throws: (any Error).self) {
-            try await network.transport.send(request(lan, server.port))
+            try await network.transport.send(request(Self.publicLooking, 8080))
         }
-        try? await Task.sleep(for: .milliseconds(500))
-        #expect(server.connections == 0)
     }
 
     @Test func `a direct route does reach the server (the test would otherwise prove nothing)`() async throws {

@@ -23,6 +23,18 @@ struct VPNTunnelSection: View {
                 Label(statusText, systemImage: statusSymbol)
                     .font(.footnote)
                     .foregroundStyle(statusTint)
+                if isOn {
+                    Label {
+                        Text("""
+                        While it is on, streams play with LumeEngine or KSPlayer. AVPlayer, VLC and AetherEngine \
+                        cannot use it, so Picture in Picture and AirPlay are not available.
+                        """)
+                    } icon: {
+                        Image(systemName: "info.circle")
+                    }
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                }
                 if isOn, tunnel.state == .connected {
                     LabeledContent("Received", value: bytes(tunnel.counters.received))
                     LabeledContent("Sent", value: bytes(tunnel.counters.sent))

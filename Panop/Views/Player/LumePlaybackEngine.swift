@@ -92,6 +92,10 @@ final class LumePlaybackEngine: PlaybackEngine {
             default: configuration.demuxer.httpHeaders[name] = value
             }
         }
+        // The app's VPN tunnel, when it is on: FFmpeg's own option, so HLS parts follow it too.
+        if let proxy = item.proxy {
+            configuration.demuxer.formatOptions["http_proxy"] = proxy.httpURL
+        }
         // Applied while the pipeline is built, before the demuxer streams a byte:
         // seeking a running IPTV connection is what some providers cannot survive.
         if let start = item.startPosition, start > 0 {
