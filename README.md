@@ -112,9 +112,11 @@ Full detail in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), with decisions reco
 Full detail, including requirements traceability and open decisions, is in
 [docs/ROADMAP.md](docs/ROADMAP.md).
 
-Not planned for v1: VPN integration (see
-[ADR 0006](docs/adr/0006-no-vpn-in-v1.md) for why auto-enabling a third-party VPN is not
-possible on Apple platforms), and non-Apple UIs.
+Not planned for v1: non-Apple UIs. A VPN: Panop cannot start another app's VPN
+([ADR 0006](docs/adr/0006-no-vpn-in-v1.md)), so it offers two things instead (Settings, Privacy): "Require a VPN",
+which holds all provider traffic while no VPN is active on the device, and a **built-in WireGuard tunnel** for Panop's
+own traffic, from the configuration your VPN provider gives you
+([ADR 0013](docs/adr/0013-in-process-wireguard-tunnel.md)).
 
 ---
 

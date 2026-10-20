@@ -35,6 +35,12 @@ with the developer, no analytics, no advertising and no tracking, and nothing is
   iCloud is on, also travels to your other devices in an end-to-end encrypted field of your own iCloud; you can turn that off
   in Settings, and removing the key removes it from your devices. The leagues and teams you follow and the channels you chose
   for a league travel through your iCloud as well. sportapi.ai's own policy applies to what it holds.
+- **A VPN, only if you set one up.** Panop can hold its connections until a VPN is active on your device, and can send its own
+  playlist, guide, artwork and stream connections through a WireGuard configuration you add in Settings (the one your VPN
+  provider gives you). The configuration, which includes a private key, is kept in the Keychain of that device only: it is
+  not sent to the developer, not put in iCloud and not shared with the other devices. Panop does not run a VPN service and
+  has no servers of its own; the VPN provider you choose sees what any VPN provider sees. If you tap "Test connection",
+  Panop asks https://api.ipify.org for the address it sees and shows it to you.
 - **Artwork and guide data** are fetched from the addresses your provider gives.
 
 ## Children

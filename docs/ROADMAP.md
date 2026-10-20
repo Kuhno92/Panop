@@ -24,7 +24,7 @@ The original brief, and where each requirement is satisfied.
 | 3 | Snappy interface | Ongoing constraint | M1, M6. Streaming parser already done |
 | 4 | Good streaming performance | Not started | M3, M6. Channel zapping is the metric that matters |
 | 5 | Settings sync across devices | Not started | M5. CloudKit, currently disabled |
-| 6 | VPN auto-enable on launch | **Cut from v1** | Not achievable as described. ADR 0006 |
+| 6 | VPN auto-enable on launch | **Done differently** | A third-party VPN cannot be started (ADR 0006). Panop instead holds its traffic until a VPN is active ("Require a VPN"), or runs its own WireGuard tunnel from the person's configuration for its own traffic (ADR 0013). Verified on simulators; not yet with a real provider |
 | 7 | Live TV and VOD | Not started | M2 |
 | 8 | M3U support | Done | M0. `PanopPlaylist`, tested at 8 chunk sizes |
 | 8b | Xtream Codes API | Not started | M1 |

@@ -1,4 +1,6 @@
 #if !os(tvOS)
+    import Network
+    import PanopCore
     import SwiftUI
     import WebKit
 
@@ -76,8 +78,18 @@
             """
         }
 
-        static func makeWebView(videoID: String, bridge: YouTubeEmbedBridge) -> WKWebView {
+        /// - Parameter proxy: the app's VPN tunnel, when it is on. The page and the video then load through it, on a
+        ///   store of their own that keeps nothing, and never fall back to a direct connection.
+        static func makeWebView(videoID: String, bridge: YouTubeEmbedBridge, proxy: ProxyEndpoint? = nil) -> WKWebView {
             let configuration = WKWebViewConfiguration()
+            if let proxy, let port = NWEndpoint.Port(rawValue: UInt16(proxy.socksPort)) {
+                var route = ProxyConfiguration(socksv5Proxy: .hostPort(host: .init(proxy.host), port: port))
+                route.applyCredential(username: proxy.username, password: proxy.password)
+                route.allowFailover = false
+                let store = WKWebsiteDataStore.nonPersistent()
+                store.proxyConfigurations = [route]
+                configuration.websiteDataStore = store
+            }
             configuration.userContentController.add(bridge, name: "trailer")
             #if os(iOS)
                 configuration.allowsInlineMediaPlayback = true
@@ -99,6 +111,7 @@
     #if os(iOS)
         struct YouTubeEmbedView: UIViewRepresentable {
             let videoID: String
+            var proxy: ProxyEndpoint?
             var onFailure: () -> Void
 
             func makeCoordinator() -> YouTubeEmbedBridge {
@@ -108,7 +121,7 @@
             func makeUIView(context: Context) -> WKWebView {
                 TrailerAudio.activate()
                 context.coordinator.onFailure = onFailure
-                return YouTubeEmbed.makeWebView(videoID: videoID, bridge: context.coordinator)
+                return YouTubeEmbed.makeWebView(videoID: videoID, bridge: context.coordinator, proxy: proxy)
             }
 
             func updateUIView(_ view: WKWebView, context: Context) {
@@ -124,6 +137,7 @@
     #else
         struct YouTubeEmbedView: NSViewRepresentable {
             let videoID: String
+            var proxy: ProxyEndpoint?
             var onFailure: () -> Void
 
             func makeCoordinator() -> YouTubeEmbedBridge {
@@ -132,7 +146,7 @@
 
             func makeNSView(context: Context) -> WKWebView {
                 context.coordinator.onFailure = onFailure
-                return YouTubeEmbed.makeWebView(videoID: videoID, bridge: context.coordinator)
+                return YouTubeEmbed.makeWebView(videoID: videoID, bridge: context.coordinator, proxy: proxy)
             }
 
             func updateNSView(_ view: WKWebView, context: Context) {

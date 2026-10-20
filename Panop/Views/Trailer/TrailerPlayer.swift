@@ -68,7 +68,7 @@ struct TrailerScreen: View {
     var body: some View {
         ZStack {
             Color.black.ignoresSafeArea()
-            if failed {
+            if failed || tunnelBlocks {
                 unavailable
             } else {
                 player
@@ -87,6 +87,22 @@ struct TrailerScreen: View {
             }
     }
 
+    /// With the app's VPN tunnel on, only what can be sent through it is played: YouTube's web view (on an iPhone,
+    /// iPad and Mac, once the tunnel is up). A video file goes to the system player and an Apple TV's trailer is
+    /// read by YouTubeKit and played by AVPlayer; neither can use the tunnel, and neither may go out directly.
+    private var tunnelBlocks: Bool {
+        let network = ProviderNetwork.shared
+        guard network.tunnelIsOn else { return false }
+        #if os(tvOS)
+            return true
+        #else
+            if case .youtube = request.source {
+                return network.proxy == nil
+            }
+            return true
+        #endif
+    }
+
     @ViewBuilder
     private var player: some View {
         switch request.source {
@@ -94,7 +110,7 @@ struct TrailerScreen: View {
             #if os(tvOS)
                 ExtractedYouTubeTrailer(videoID: id) { failed = true }
             #else
-                YouTubeEmbedView(videoID: id) { failed = true }
+                YouTubeEmbedView(videoID: id, proxy: ProviderNetwork.shared.proxy) { failed = true }
             #endif
         case let .media(url):
             MediaTrailerView(url: url) { failed = true }
@@ -107,13 +123,14 @@ struct TrailerScreen: View {
     private var unavailable: some View {
         VStack(spacing: 18) {
             Image(systemName: "play.slash").font(.system(size: 44)).foregroundStyle(.secondary)
-            Text("This trailer can't be played here.")
+            Text(tunnelBlocks ? "Trailers are not available while the VPN is on." :
+                "This trailer can't be played here.")
                 .font(.title3.weight(.semibold))
                 .multilineTextAlignment(.center)
             #if os(tvOS)
                 Button("Close") { dismiss() }
             #else
-                if let address = request.source.webAddress {
+                if !tunnelBlocks, let address = request.source.webAddress {
                     Button("Open in the browser") { openURL(address) }
                         .buttonStyle(.borderedProminent)
                 }

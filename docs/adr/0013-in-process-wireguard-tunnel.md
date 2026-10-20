@@ -34,8 +34,50 @@ Panop points its own connections at those proxies. Nothing else on the device is
 - Stripped framework: **11.7 MB** per device slice (iOS, tvOS), arm64 only.
 - `TunnelSelfTests` (a stand-in VPN server and the real client in one process, a page fetched through
   both proxies, wrong login refused) **passes on the macOS host, the iOS simulator and the tvOS simulator**.
-- Not yet measured: throughput and memory on a real Apple TV, a real provider handshake, and each
-  engine's proxy support (VLC `http-proxy`, FFmpeg `http_proxy`, AVPlayer has none).
+- Not yet measured: throughput and memory on a real Apple TV, and a handshake with a real provider.
+
+## What was measured about the players (macOS, a stand-in proxy that refuses, an origin on a LAN address)
+
+| Engine | Result | So |
+|---|---|---|
+| LumeEngine | asks the proxy for the origin, with the login; never contacts the origin | supported (`formatOptions["http_proxy"]`) |
+| KSPlayer | the same | supported (`formatContextOptions["http_proxy"]`) |
+| VLC 4.0.0-a24 | connects straight to the origin, whether `http-proxy` is a media option, an instance option (`VLCMediaPlayer(options:)`) or the `http_proxy` variable | skipped while the tunnel is on |
+| AetherEngine | connects straight to the origin: it opens its own `URLSession`s and ignores `http_proxy` | skipped while the tunnel is on |
+| AVPlayer | has no per-app proxy | skipped while the tunnel is on |
+
+An engine that cannot use the tunnel is left out of the order (`PlaybackEngineKind.supportsProxy`); if none is left, the
+stream fails. Nothing falls back to a direct connection. Consequences: Picture in Picture and AirPlay (AVPlayer) are
+unavailable while the tunnel is on.
+
+URLSession was measured too: with a proxy configured it sends public destinations to the proxy and, with the proxy
+dead, fails them (no direct fallback). **It bypasses the proxy for private-network addresses** (192.168/16 and the
+like), so a provider on a LAN address would connect directly; the tunnel could not reach it anyway.
+
+## Trailers
+
+YouTube's web view (iPhone, iPad, Mac) is given the proxy through its own non-persistent data store. On Apple TV the
+trailer is read by YouTubeKit with its own session and played by AVPlayer; neither can use the tunnel, so trailers are
+unavailable on Apple TV, and file trailers everywhere, while it is on. CloudKit is the system's and stays outside it.
+
+## Entering the configuration
+
+iPhone, iPad and Mac: paste the whole file, or choose it. Apple TV has no multi-line entry, so it has a form with one
+field per setting, filled with the iPhone as the keyboard. Bringing a configuration across through iCloud (as the
+sportapi.ai key travels) is possible but needs a new record type in the CloudKit schema; not done.
+
+## Release notes for the owner
+
+- `ITSAppUsesNonExemptEncryption` is `NO` today. WireGuard's own cryptography is not covered by the exemptions for
+  TLS and OS-provided encryption, so **before a build with the tunnel goes to TestFlight or the store it must be
+  `YES`**, and App Store Connect will ask the export-compliance questions for each build (mass-market
+  self-classification under BIS 740.17(b)(1), an annual self-classification report, and France's declaration for
+  distribution there). The tunnel is linked into every build, so a build flag would not avoid this.
+- App Review may read the tunnel as VPN functionality (Guideline 5.4). Suggested wording for the review notes: *"Panop
+  can optionally send its own connections (playlists, guides, streams) through the user's own WireGuard configuration.
+  It is a per-app proxy inside the app; it creates no system VPN, uses no Network Extension and offers no VPN service."*
+- `PRIVACY.md` says what the feature keeps (the private key, in this device's Keychain) and sends (the exit-address
+  check, when the person taps the button, asks https://api.ipify.org).
 
 ## Consequences
 

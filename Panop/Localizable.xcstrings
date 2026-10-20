@@ -6316,6 +6316,116 @@
         }
       },
       "extractionState" : "manual"
+    },
+    "Trailers are not available while the VPN is on." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trailer sind nicht verfügbar, solange das VPN an ist."
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
+    "Private key" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privater Schlüssel"
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
+    "Address, for example 10.2.0.2/32" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adresse, zum Beispiel 10.2.0.2/32"
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
+    "DNS, for example 10.2.0.1" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DNS, zum Beispiel 10.2.0.1"
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
+    "Your device" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dein Gerät"
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
+    "Public key" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Öffentlicher Schlüssel"
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
+    "Server, for example 185.159.157.10:51820" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Server, zum Beispiel 185.159.157.10:51820"
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
+    "Preshared key (if your provider gives one)" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vorab geteilter Schlüssel (falls dein Anbieter einen angibt)"
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
+    "The VPN server" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der VPN-Server"
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
+    "Copy these from your provider's WireGuard file. In each field, choose your iPhone as the keyboard and paste." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kopiere diese aus der WireGuard-Datei deines Anbieters. Wähle in jedem Feld dein iPhone als Tastatur und füge den Wert ein."
+          }
+        }
+      },
+      "extractionState" : "manual"
     }
   },
   "version" : "1.0"

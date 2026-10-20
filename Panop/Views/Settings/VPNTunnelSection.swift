@@ -42,17 +42,10 @@ struct VPNTunnelSection: View {
                         testRow
                     #endif
                 }
-                #if !os(tvOS)
-                    Button("Replace configuration") { adding = true }
-                #endif
+                Button("Replace configuration") { adding = true }
                 Button("Remove configuration", role: .destructive) { confirmsRemoval = true }
             } else {
-                #if os(tvOS)
-                    Label("Add the configuration on an iPhone, iPad or Mac.", systemImage: "iphone")
-                        .foregroundStyle(.secondary)
-                #else
-                    Button("Add a WireGuard configuration") { adding = true }
-                #endif
+                Button("Add a WireGuard configuration") { adding = true }
             }
         } header: {
             Text("VPN built into Panop")
@@ -63,7 +56,9 @@ struct VPNTunnelSection: View {
             device. The private key stays in this device's Keychain. If the VPN is down, Panop does not connect.
             """)
         }
-        #if !os(tvOS)
+        #if os(tvOS)
+        .fullScreenCover(isPresented: $adding) { WireGuardFieldsForm(tunnel: tunnel) }
+        #else
         .sheet(isPresented: $adding) { AddWireGuardSheet(tunnel: tunnel) }
         #endif
         .confirmationDialog("Remove the VPN configuration?", isPresented: $confirmsRemoval) {

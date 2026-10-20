@@ -70,6 +70,28 @@ relinkability, and that must remain true.
   Apple TV, where the official player cannot run, and it can stop working whenever YouTube changes its page. On iPhone, iPad
   and Mac the trailer plays in YouTube's own embedded player instead.
 
+### PanopTunnel (the built-in WireGuard tunnel)
+
+Go code (`Packages/PanopTunnel/go`, Panop's own, GPL-3.0) built into `PanopTunnel.xcframework` by `Scripts/build-tunnel.sh`,
+which links these into the app:
+
+| Component | License | Source |
+|---|---|---|
+| wireguard-go (`golang.zx2c4.com/wireguard`, with its userspace network `tun/netstack`) | MIT | https://git.zx2c4.com/wireguard-go |
+| gVisor (`gvisor.dev/gvisor`, the TCP/IP stack under `netstack`) | Apache-2.0 | https://github.com/google/gvisor |
+| google/btree | Apache-2.0 | https://github.com/google/btree |
+| golang.org/x/crypto, x/net, x/sys, x/time | BSD-3-Clause | https://go.googlesource.com/ |
+| The Go runtime and standard library | BSD-3-Clause | https://go.dev |
+| SagerNet's gomobile fork (`github.com/sagernet/gomobile`, build tool and its small runtime) | BSD-3-Clause | https://github.com/SagerNet/gomobile |
+
+- **Use:** with the person's own WireGuard configuration, Panop's own playlists, guides, artwork and streams are sent
+  through their VPN (ADR 0013). No system VPN is created and no Network Extension is used.
+- **Trademark:** "WireGuard" is a registered trademark of Jason A. Donenfeld. Panop says "WireGuard configuration" to
+  name the file format and uses no WireGuard logo; it is not affiliated with or endorsed by the WireGuard project.
+- **Encryption:** WireGuard uses ChaCha20-Poly1305, Curve25519 and BLAKE2s. See the export-compliance note in
+  `docs/adr/0013-in-process-wireguard-tunnel.md`.
+- **Fork note:** the gomobile fork is the one sing-box uses to build for tvOS; stock gomobile has no tvOS target.
+
 ### SVGView
 
 - **Source:** https://github.com/exyte/SVGView, version 1.0.6, MIT (`Packages/SVGView/LICENSE`). No dependencies of its own.

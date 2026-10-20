@@ -22,6 +22,7 @@ command works because it is documented below.
 - [x] VLCKit adapter (4.0.0-a24, the only SwiftPM line; an alpha). Plays raw MPEG-TS over HTTP, so M3U live streams now work, verified on real transport-stream bytes through the coordinator
 - [x] LumeEngine adapter (submodule `vendor/LumeEngine`, pinned to v0.2.2, dynamic and embedded). Plays raw MPEG-TS and HLS; verified on macOS, iOS and tvOS. PiP and the AirPlay picker are wired for AVPlayer (iOS, macOS) but neither is seen working on a device 
 - [x] Playlist import wired to the catalog container: add by Xtream login, M3U link or M3U file, Keychain credentials, background sync. The screens launch and are covered by service-level tests, but have not been driven by hand or by UI tests yet
+- [x] VPN, two ways (Settings, Privacy; ADR 0013). **Require a VPN** holds all provider traffic while no VPN is active on the device. A **built-in WireGuard tunnel** (`Packages/PanopTunnel`, Go; wireguard-go over its userspace netstack with loopback SOCKS5 and HTTP proxies) sends Panop's own traffic through the person's own config, on iOS, tvOS and macOS, with no Network Extension. Verified on simulators (self-test on macOS, iOS, tvOS) and with fakes; **not yet with a real provider, nor on a real Apple TV** (memory and throughput unmeasured). Only LumeEngine and KSPlayer can use the tunnel (VLC, Aether and AVPlayer were measured to connect directly, so they are skipped while it is on). `ITSAppUsesNonExemptEncryption` is still NO and must become YES before a build with the tunnel is distributed (see the ADR)
 - [x] Discovery rails on Home, Movies and Series, computed on the device from the library and the viewing history (`PanopDiscover`, `Panop/Services/Discovery`; ADR 0008). Simkl is wired in (`PanopSimkl`: public trending list, device-flow sign-in, finished titles sent, the person's lists read) but **dormant until `SimklConfig.clientID` is set**, and none of it has run against Simkl's live API with an account
 
 `docs/ROADMAP.md` is the full feature list, ordered into milestones and traced back to the
@@ -85,6 +86,11 @@ Scripts/check-portability.sh
 
 # App build, all three platforms
 Scripts/build-all-platforms.sh
+
+# The Go tunnel framework (Packages/PanopTunnel/build, not committed). App scripts call ensure-tunnel.sh themselves.
+# Open Panop.xcodeproj in Xcode only after it has run once, or the package cannot resolve.
+Scripts/ensure-tunnel.sh                  # build it if missing or stale (fetches Go into .build/tools; minutes the first time)
+Scripts/test-tunnel.sh [macos|ios|tvos]   # end-to-end self-test of the tunnel on the Mac or a simulator
 
 # Parallel work: a worktree wired for hooks, submodules and a private DerivedData
 Scripts/worktree.sh add feat/epg-parser
@@ -263,6 +269,15 @@ Playlists, guides, artwork, Simkl and stream-page requests use `ProviderNetwork.
 
 **Why:** a VPN rule (required, or tunnel only; see the VPN plan) is applied in that one place and fails
 closed. A request made any other way would leak around it.
+
+### Provider traffic that must not leave the tunnel
+
+Anything that carries Panop's own traffic has to use the tunnel's proxy when it is on, or be skipped: a player that
+cannot use a proxy must not run (`PlaybackEngineKind.supportsProxy`), and a new engine is unsupported until a test like
+`EngineProxyTests` shows it asks the proxy and never the origin. **Measure, do not assume:** VLC and Aether looked
+configurable and were not. URLSession skips a proxy for private-network addresses (192.168/16 and so on).
+
+**Why:** a leak around a VPN is worse than no VPN, because the person believes they are covered.
 
 ### Every test ModelConfiguration sets `cloudKitDatabase: .none`
 
