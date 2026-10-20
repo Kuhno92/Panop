@@ -160,3 +160,23 @@ struct SeenBadge: View {
             .accessibilityLabel("Watched")
     }
 }
+
+/// The rating on a poster's lower corner: a star and the number on a dark pill, the same on the grid and in the rails.
+struct RatingBadge: View {
+    let rating: Double
+    /// Room under it, for a progress bar along the poster's bottom.
+    var bottomInset: CGFloat = 6
+
+    var body: some View {
+        let text = rating.formatted(.number.precision(.fractionLength(1)))
+        Label(text, systemImage: "star.fill")
+            .font(.caption.weight(.semibold))
+            .foregroundStyle(.white)
+            .padding(.horizontal, 7)
+            .padding(.vertical, 3)
+            .background(.black.opacity(0.65), in: Capsule())
+            .padding(.leading, 6)
+            .padding(.bottom, bottomInset)
+            .accessibilityLabel("Rated \(text)")
+    }
+}

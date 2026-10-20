@@ -99,4 +99,25 @@ final class StoreMoviesScene: StoreScene {
         _ = app.buttons["Play"].waitForExistence(timeout: 20)
         capture("07-movie-detail")
     }
+
+    /// A film seen to the end is marked on its poster in the suggestion rails too, not only in the grid.
+    func testSuggestionRailsMarkWhatWasWatched() {
+        _ = app.buttons["Sintel"].waitForExistence(timeout: 30)
+        #if !os(tvOS)
+            // On Apple TV a poster is one button and its badges are not elements of their own: the picture shows them.
+            XCTAssertTrue(
+                app.images["Watched"].firstMatch.waitForExistence(timeout: 15),
+                "no poster in the rails is marked watched. Screen:\n\(app.debugDescription)"
+            )
+        #endif
+        // Down to the rails, which are below the hero.
+        #if os(tvOS)
+            for _ in 0 ..< 3 {
+                XCUIRemote.shared.press(.down)
+            }
+        #else
+            app.swipeUp(velocity: .slow)
+        #endif
+        capture("08-rails-watched")
+    }
 }

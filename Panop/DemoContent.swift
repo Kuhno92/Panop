@@ -197,6 +197,10 @@
                 for index in [5, 1, 3, 0] {
                     services.userState.markPlayed(key("http://127.0.0.1:9/live/\(index).ts"))
                 }
+                // Two films seen to the end, which the posters mark.
+                for index in [2, 5] {
+                    services.userState.setWatched(true, for: key("http://127.0.0.1:9/movie/u/p/\(index).mp4"))
+                }
                 for (index, position) in [(0, 2900.0), (1, 1500.0), (3, 3900.0)] {
                     let film = key("http://127.0.0.1:9/movie/u/p/\(index).mp4")
                     services.userState.markPlayed(film)

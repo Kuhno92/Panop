@@ -50,16 +50,8 @@ struct VODCard: View {
                     }
                     .overlay(alignment: .bottomLeading) {
                         if let rating = item.rating, rating > 0 {
-                            Label(rating.formatted(.number.precision(.fractionLength(1))), systemImage: "star.fill")
-                                .font(.caption.weight(.semibold))
-                                .foregroundStyle(.white)
-                                .padding(.horizontal, 7)
-                                .padding(.vertical, 3)
-                                .background(.black.opacity(0.65), in: Capsule())
-                                // Above the progress bar when there is one.
-                                .padding(.leading, 6)
-                                .padding(.bottom, fraction == nil ? 6 : 22)
-                                .accessibilityLabel("Rated \(rating.formatted(.number.precision(.fractionLength(1))))")
+                            // Above the progress bar when there is one.
+                            RatingBadge(rating: rating, bottomInset: fraction == nil ? 6 : 22)
                         }
                     }
                     .overlay(alignment: .topLeading) {

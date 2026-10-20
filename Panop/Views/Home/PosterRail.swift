@@ -229,6 +229,7 @@ struct PosterRail: View {
 
 private struct RailPoster: View {
     @Environment(DiscoveryModel.self) private var discovery
+    @Environment(UserStateStore.self) private var userState
     let row: CatalogRow
     let link: URL?
     let caption: String?
@@ -239,8 +240,16 @@ private struct RailPoster: View {
             VStack(alignment: .leading, spacing: 6) {
                 PosterView(address: row.iconURL, symbol: row.kind == .series ? "rectangle.stack" : "film")
                     .frame(width: Self.width)
+                    .overlay(alignment: .bottomLeading) {
+                        if let rating = row.rating, rating > 0 {
+                            RatingBadge(rating: rating)
+                        }
+                    }
                     .overlay(alignment: .topLeading) {
-                        if discovery.isSeenOnSimkl(kind: row.kind, tmdbID: row.tmdbID) {
+                        // Watched here, or finished according to the person's Simkl account.
+                        if userState.isWatched(UserStateStore.key(playlist: row.playlist, entry: row.entryID))
+                            || discovery.isSeenOnSimkl(kind: row.kind, tmdbID: row.tmdbID)
+                        {
                             SeenBadge()
                         }
                     }
