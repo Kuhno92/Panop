@@ -94,27 +94,6 @@ final class PlayerModel {
         )
     }
 
-    /// "MPEG-TS · 1080p50 · H.264 · Dolby Digital 5.1", from what the engine reports and, for the container, the
-    /// address when the engine does not say. Nil until there is something to show.
-    var streamSummary: String? {
-        var info = streamInfo ?? StreamInfo()
-        if info.container == nil, let url = currentAddress {
-            info.container = StreamInfoText.containerHint(address: url)
-        }
-        var parts = StreamInfoText.parts(info)
-        // Whether this stream goes through the app's VPN: with the tunnel on, an address on the local network does not
-        // (the tunnel leads out to the internet), and that is worth saying rather than leaving a person to wonder.
-        let network = ProviderNetwork.shared
-        if network.tunnelIsOn, let url = currentAddress {
-            parts.append(
-                network.proxy != nil && ProxyEndpoint.applies(to: url)
-                    ? String(localized: "via VPN")
-                    : String(localized: "not via VPN (local network)")
-            )
-        }
-        return parts.isEmpty ? nil : parts.joined(separator: " · ")
-    }
-
     var currentAddress: String? {
         guard let kind = coordinator.activeKind ?? PlaybackEngineKind.defaultPriority.first else { return nil }
         return request.item(kind).url

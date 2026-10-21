@@ -3401,17 +3401,6 @@
         }
       }
     },
-    "not via VPN (local network)" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "nicht über VPN (lokales Netzwerk)"
-          }
-        }
-      }
-    },
     "Nothing from iCloud yet" : {
       "localizations" : {
         "de" : {
@@ -6818,17 +6807,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "gegen"
-          }
-        }
-      }
-    },
-    "via VPN" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "über VPN"
           }
         }
       }
