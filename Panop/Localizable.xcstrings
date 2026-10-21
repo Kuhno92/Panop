@@ -6483,6 +6483,28 @@
         }
       },
       "extractionState" : "manual"
+    },
+    "via VPN" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "über VPN"
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
+    "not via VPN (local network)" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "nicht über VPN (lokales Netzwerk)"
+          }
+        }
+      },
+      "extractionState" : "manual"
     }
   },
   "version" : "1.0"

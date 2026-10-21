@@ -1,5 +1,6 @@
 import Foundation
 import Observation
+import PanopCore
 import PanopPlayback
 
 /// Observable state for the player screen, driven by a `PlaybackCoordinator`.
@@ -100,7 +101,18 @@ final class PlayerModel {
         if info.container == nil, let url = currentAddress {
             info.container = StreamInfoText.containerHint(address: url)
         }
-        return StreamInfoText.summary(info)
+        var parts = StreamInfoText.parts(info)
+        // Whether this stream goes through the app's VPN: with the tunnel on, an address on the local network does not
+        // (the tunnel leads out to the internet), and that is worth saying rather than leaving a person to wonder.
+        let network = ProviderNetwork.shared
+        if network.tunnelIsOn, let url = currentAddress {
+            parts.append(
+                network.proxy != nil && ProxyEndpoint.applies(to: url)
+                    ? String(localized: "via VPN")
+                    : String(localized: "not via VPN (local network)")
+            )
+        }
+        return parts.isEmpty ? nil : parts.joined(separator: " · ")
     }
 
     private var currentAddress: String? {

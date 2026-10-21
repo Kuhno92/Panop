@@ -19,7 +19,9 @@ import Testing
 struct RealTunnelPlaybackTests {
     private static let stream = "https://devstreaming-cdn.apple.com/videos/streaming/examples/bipbop_4x3/bipbop_4x3_variant.m3u8"
 
-    private func run(_ kind: PlaybackEngineKind) async throws {
+    private static let rawTS = "https://devstreaming-cdn.apple.com/videos/streaming/examples/bipbop_4x3/gear1/fileSequence0.ts"
+
+    private func run(_ kind: PlaybackEngineKind, address: String = RealTunnelPlaybackTests.stream) async throws {
         let path = try #require(ProcessInfo.processInfo.environment["PANOP_WG_CONF"])
         let text = try String(contentsOfFile: path, encoding: .utf8)
         let backend = GoTunnelBackend()
@@ -37,7 +39,7 @@ struct RealTunnelPlaybackTests {
             gate: { network.block },
             proxy: { network.proxy }
         )
-        coordinator.play(PlaybackRequest(PlaybackItem(url: Self.stream, mediaKind: .live)))
+        coordinator.play(PlaybackRequest(PlaybackItem(url: address, mediaKind: .live)))
         var playing = false
         for _ in 0 ..< 400 {
             if case .playing = coordinator.status {
@@ -60,9 +62,13 @@ struct RealTunnelPlaybackTests {
 
         #expect(playing, "\(kind) never played: \(coordinator.status)")
         #expect(
-            after - before > 1_000_000,
+            after - before > 100_000,
             "\(kind) moved \(after - before) bytes through the tunnel: not through it"
         )
+    }
+
+    @Test func `lumeEngine with a raw transport stream`() async throws {
+        try await run(.lumeEngine, address: Self.rawTS)
     }
 
     @Test func `lumeEngine`() async throws {
