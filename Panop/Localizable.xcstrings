@@ -6461,6 +6461,28 @@
         }
       },
       "extractionState" : "manual"
+    },
+    "On. Panop's built-in VPN is connected, so Panop connects." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "An. Das in Panop eingebaute VPN ist verbunden, daher verbindet sich Panop."
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
+    "On. Panop's built-in VPN is not connected, so Panop is not connecting." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "An. Das in Panop eingebaute VPN ist nicht verbunden, daher stellt Panop keine Verbindung her."
+          }
+        }
+      },
+      "extractionState" : "manual"
     }
   },
   "version" : "1.0"
