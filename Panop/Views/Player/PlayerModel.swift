@@ -120,6 +120,10 @@ final class PlayerModel {
         return request.item(kind).url
     }
 
+    var coordinatorKind: PlaybackEngineKind? {
+        coordinator.activeKind
+    }
+
     var engineName: String? {
         coordinator.activeKind?.displayName
     }
@@ -151,7 +155,8 @@ final class PlayerModel {
         #if os(tvOS)
             false
         #else
-            engine is AVPlayerEngine
+            // Through the VPN's relay the address is one on this device, which an AirPlay receiver cannot reach.
+            engine is AVPlayerEngine && !ProviderNetwork.shared.tunnelIsOn
         #endif
     }
 

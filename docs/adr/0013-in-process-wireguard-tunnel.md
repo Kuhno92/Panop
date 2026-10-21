@@ -52,7 +52,17 @@ FFmpeg's HLS reader takes `http_proxy` from an `http` input, so with a file the 
 tunnel on, the picker is skipped. `RealTunnelPlaybackTests` (needs a real WireGuard file) plays a public HLS stream
 through each supported engine and checks the tunnel's own byte counter.
 
-An engine that cannot use the tunnel is left out of the order (`PlaybackEngineKind.supportsProxy`); if none is left, the
+**The relay** (`relay.go`) carries the engines that cannot take a proxy. They are given
+`http://127.0.0.1:<port>/<secret>/<base64url address>/<name>`; the relay fetches the real address through the
+tunnel, hands redirects back rewritten, rewrites HLS playlists (variants, segments, keys, init segments) so
+everything stays inside, passes `Range` and headers, and answers a ranged playlist whole with 200 (VLC asks for
+`bytes=0-` and a 206 with the range dropped made it loop). The secret is random per run, so no other app on the
+device can use it. Measured with the real tunnel on a public HLS stream: AVPlayer 7.7 MB, VLC 4.4 MB (HLS) and
+0.7 MB (raw TS), AetherEngine 97 MB in 13 s, over the 13 s of playback. AirPlay cannot work through it (the
+receiver cannot reach a loopback address); Picture in Picture can. DASH is not rewritten.
+
+(Superseded by the relay, kept for the record of what each engine does with a proxy:) An engine that cannot use
+the tunnel is left out of the order (`PlaybackEngineKind.supportsProxy`); if none is left, the
 stream fails. Nothing falls back to a direct connection. Consequences: Picture in Picture and AirPlay (AVPlayer) are
 unavailable while the tunnel is on.
 

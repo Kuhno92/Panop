@@ -65,6 +65,12 @@ enum StreamDetails {
         if network.tunnelIsOn {
             let through = network.proxy != nil && ProxyEndpoint.applies(to: address)
             rows.append(row("Through the VPN", through ? String(localized: "yes") : String(localized: "no")))
+            if through, let kind = model.coordinatorKind {
+                rows.append(row(
+                    "Through",
+                    kind.supportsProxy ? String(localized: "the proxy") : String(localized: "the relay inside Panop")
+                ))
+            }
             if !through {
                 rows.append(row("Why not", whyNot(locality: locality, hasProxy: network.proxy != nil)))
             }

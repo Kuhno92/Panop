@@ -30,12 +30,21 @@ struct RealTunnelPlaybackTests {
         try backend.waitReady(seconds: 20)
 
         let network = ProviderNetwork()
+        var windows: [SurfaceWindow] = []
+        defer { windows.forEach { $0.close() } }
         network.setRoute(.tunnel(endpoint))
         let before = backend.counters.received
 
         let coordinator = PlaybackCoordinator(
             priority: [kind],
-            makeEngine: { EngineRegistry.make($0) },
+            makeEngine: { kind in
+                let engine = EngineRegistry.make(kind)
+                // libVLC only starts with its video surface on screen.
+                if let vlc = engine as? VLCEngine {
+                    windows.append(SurfaceWindow(vlc.surface))
+                }
+                return engine
+            },
             gate: { network.block },
             proxy: { network.proxy }
         )
@@ -65,6 +74,22 @@ struct RealTunnelPlaybackTests {
             after - before > 100_000,
             "\(kind) moved \(after - before) bytes through the tunnel: not through it"
         )
+    }
+
+    @Test func `avPlayer by way of the relay`() async throws {
+        try await run(.avPlayer)
+    }
+
+    @Test func `vlc by way of the relay`() async throws {
+        try await run(.vlcKit)
+    }
+
+    @Test func `vlc by way of the relay with a raw transport stream`() async throws {
+        try await run(.vlcKit, address: Self.rawTS)
+    }
+
+    @Test func `aetherEngine by way of the relay`() async throws {
+        try await run(.aetherEngine)
     }
 
     @Test func `lumeEngine with a raw transport stream`() async throws {

@@ -32,6 +32,10 @@ type Tunnel struct {
 	socks     net.Listener
 	httpL     net.Listener
 	httpSrv   *http.Server
+	relayL    net.Listener
+	relaySrv  *http.Server
+	secret    string
+	relayPort int
 	tnet      *netstack.Net
 	dns       netip.Addr
 	user      string
@@ -81,7 +85,18 @@ func (t *Tunnel) Start(config string) error {
 		dev.Close()
 		return err
 	}
-	t.dev, t.socks, t.httpL = dev, socks, httpL
+	relayL, err := net.Listen("tcp", "127.0.0.1:0")
+	if err != nil {
+		_ = socks.Close()
+		_ = httpL.Close()
+		dev.Close()
+		return err
+	}
+	t.dev, t.socks, t.httpL, t.relayL = dev, socks, httpL, relayL
+	t.secret = randomHex(16)
+	t.relayPort = relayL.Addr().(*net.TCPAddr).Port
+	t.relaySrv = newRelay(t.secret, tnet.DialContext).server()
+	go func() { _ = t.relaySrv.Serve(relayL) }()
 	t.tnet, t.dns = tnet, cfg.dns[0]
 	t.socksPort = socks.Addr().(*net.TCPAddr).Port
 	t.httpPort = httpL.Addr().(*net.TCPAddr).Port
@@ -100,9 +115,11 @@ func (t *Tunnel) Stop() {
 	}
 	_ = t.socks.Close()
 	_ = t.httpSrv.Close()
+	_ = t.relaySrv.Close()
 	t.dev.Close()
 	t.dev, t.socks, t.httpL, t.httpSrv, t.tnet = nil, nil, nil, nil, nil
-	t.socksPort, t.httpPort = 0, 0
+	t.socksPort, t.httpPort, t.relayPort = 0, 0, 0
+	t.relayL, t.relaySrv, t.secret = nil, nil, ""
 }
 
 // WaitReady returns nil once a DNS query sent through the tunnel is answered, which needs the handshake
@@ -141,10 +158,14 @@ func probe(tnet *netstack.Net, dns netip.Addr) bool {
 	return err == nil && n >= 12
 }
 
-func (t *Tunnel) SocksPort() int   { t.mu.Lock(); defer t.mu.Unlock(); return t.socksPort }
-func (t *Tunnel) HTTPPort() int    { t.mu.Lock(); defer t.mu.Unlock(); return t.httpPort }
-func (t *Tunnel) Username() string { t.mu.Lock(); defer t.mu.Unlock(); return t.user }
-func (t *Tunnel) Password() string { t.mu.Lock(); defer t.mu.Unlock(); return t.pass }
+func (t *Tunnel) SocksPort() int { t.mu.Lock(); defer t.mu.Unlock(); return t.socksPort }
+func (t *Tunnel) HTTPPort() int  { t.mu.Lock(); defer t.mu.Unlock(); return t.httpPort }
+
+// RelayPort and RelaySecret make the address a player is given for a stream (see relay.go).
+func (t *Tunnel) RelayPort() int      { t.mu.Lock(); defer t.mu.Unlock(); return t.relayPort }
+func (t *Tunnel) RelaySecret() string { t.mu.Lock(); defer t.mu.Unlock(); return t.secret }
+func (t *Tunnel) Username() string    { t.mu.Lock(); defer t.mu.Unlock(); return t.user }
+func (t *Tunnel) Password() string    { t.mu.Lock(); defer t.mu.Unlock(); return t.pass }
 
 // LastHandshakeUnix is the time of the last completed handshake with the server, in Unix seconds, or 0.
 func (t *Tunnel) LastHandshakeUnix() int64 { return t.stat("last_handshake_time_sec") }

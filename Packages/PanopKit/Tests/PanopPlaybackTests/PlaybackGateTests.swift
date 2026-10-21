@@ -66,22 +66,46 @@ struct PlaybackGateTests {
         #expect(factory.created.first?.engine.loadedItems.first?.proxy == nil)
     }
 
+    private let relayEndpoint = ProxyEndpoint(
+        socksPort: 1080, httpPort: 8080, username: "u", password: "p", relayPort: 9000, relaySecret: "abc123"
+    )
+
     @Test
-    func `AVPlayer is skipped while the tunnel is on, and the next engine plays`() async {
+    func `an engine that cannot take a proxy is given the relay's address, not the real one`() async throws {
         let factory = EngineFactory([:])
         let coordinator = PlaybackCoordinator(
-            priority: [.avPlayer, .lumeEngine],
+            priority: [.avPlayer],
             makeEngine: { factory.make($0) },
-            proxy: { endpoint }
+            proxy: { relayEndpoint }
+        )
+        coordinator.play(stream)
+        let log = EventLog(coordinator)
+        #expect(await log.waitForStatus(.playing(.avPlayer)))
+        let item = try #require(factory.created.first?.engine.loadedItems.first)
+        #expect(item.url == relayEndpoint.relayURL(for: "http://host/live/1.ts"))
+        #expect(item.url.hasPrefix("http://127.0.0.1:9000/abc123/"))
+        #expect(item.proxy == nil)
+    }
+
+    @Test
+    func `an engine that takes a proxy still gets the real address and the proxy`() async throws {
+        let factory = EngineFactory([:])
+        let coordinator = PlaybackCoordinator(
+            priority: [.lumeEngine],
+            makeEngine: { factory.make($0) },
+            proxy: { relayEndpoint }
         )
         coordinator.play(stream)
         let log = EventLog(coordinator)
         #expect(await log.waitForStatus(.playing(.lumeEngine)))
-        #expect(!factory.created.contains { $0.kind == .avPlayer })
+        let item = try #require(factory.created.first?.engine.loadedItems.first)
+        #expect(item.url == "http://host/live/1.ts")
+        #expect(item.proxy == relayEndpoint)
     }
 
     @Test
-    func `if only AVPlayer is left, the stream fails rather than connecting directly`() async {
+    func `with no relay, an engine that cannot take a proxy is given nothing rather than the real address`(
+    ) async throws {
         let factory = EngineFactory([:])
         let coordinator = PlaybackCoordinator(
             priority: [.avPlayer],
@@ -90,13 +114,7 @@ struct PlaybackGateTests {
         )
         coordinator.play(stream)
         let log = EventLog(coordinator)
-        #expect(await log.wait {
-            if case .status(.failed) = $0 {
-                true
-            } else {
-                false
-            }
-        } != nil)
-        #expect(factory.created.isEmpty)
+        #expect(await log.waitForStatus(.playing(.avPlayer)))
+        #expect(try #require(factory.created.first?.engine.loadedItems.first).url.isEmpty)
     }
 }

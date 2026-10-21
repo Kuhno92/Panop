@@ -159,12 +159,6 @@ public final class PlaybackCoordinator {
         resume: Double?,
         generation token: Int
     ) async -> Bool {
-        // With the tunnel on, an engine that cannot use it must not run: it would connect directly.
-        if !kind.supportsProxy, item(for: kind, resume: resume).proxy != nil {
-            let reason = PlaybackError(code: .unsupportedFormat, message: "\(kind.displayName) cannot use the VPN.")
-            attempts.append(PlaybackAttempt(engine: kind, error: reason))
-            return false
-        }
         guard var engine = makeEngine(kind) else {
             attempts.append(PlaybackAttempt(engine: kind, error: nil))
             return false
@@ -207,7 +201,18 @@ public final class PlaybackCoordinator {
         if let resume {
             item.startPosition = resume
         }
-        item.proxy = ProxyEndpoint.applies(to: item.url) ? proxy() : nil
+        // With the tunnel on, an internet address goes through it: an engine that takes a proxy is given the proxy,
+        // and one that does not is given an address on this device, which the tunnel's relay answers. An engine is
+        // never left to connect directly.
+        if ProxyEndpoint.applies(to: item.url), let endpoint = proxy() {
+            if kind.supportsProxy {
+                item.proxy = endpoint
+            } else if let relayed = endpoint.relayURL(for: item.url) {
+                item.url = relayed
+            } else {
+                item.url = ""
+            }
+        }
         return item
     }
 

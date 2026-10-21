@@ -32,8 +32,8 @@ struct VPNTunnelSection: View {
                 if isOn {
                     Label {
                         Text("""
-                        While it is on, streams play with LumeEngine or KSPlayer. AVPlayer, VLC and AetherEngine \
-                        cannot use it, so Picture in Picture and AirPlay are not available.
+                        LumeEngine and KSPlayer send their streams through the VPN directly. AVPlayer, VLC and \
+                        AetherEngine play them through a local relay inside Panop. AirPlay is not available.
                         """)
                     } icon: {
                         Image(systemName: "info.circle")

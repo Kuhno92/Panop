@@ -34,8 +34,8 @@ public enum PlaybackEngineKind: String, Sendable, Codable, CaseIterable, Identif
         }
     }
 
-    /// Whether the engine can send its connections through the app's VPN proxy. While the tunnel is on, an
-    /// engine that cannot is left out rather than allowed to connect directly.
+    /// Whether the engine can send its connections through the app's VPN proxy. One that cannot is given an
+    /// address on this device instead, which the tunnel's relay answers (see `ProxyEndpoint.relayURL`).
     ///
     /// - AVPlayer has no per-app proxy setting; only a system VPN would carry it.
     /// - AetherEngine opens its own `URLSession`s with no way to give them a proxy (measured: it ignores

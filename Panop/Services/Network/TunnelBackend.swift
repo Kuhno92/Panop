@@ -37,7 +37,8 @@ nonisolated class GoTunnelBackend: TunnelBackend, @unchecked Sendable {
         try tunnel.start(config)
         return ProxyEndpoint(
             socksPort: tunnel.socksPort(), httpPort: tunnel.httpPort(),
-            username: tunnel.username(), password: tunnel.password()
+            username: tunnel.username(), password: tunnel.password(),
+            relayPort: tunnel.relayPort(), relaySecret: tunnel.relaySecret()
         )
     }
 

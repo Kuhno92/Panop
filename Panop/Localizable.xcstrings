@@ -7254,6 +7254,50 @@
           }
         }
       }
+    },
+    "LumeEngine and KSPlayer send their streams through the VPN directly. AVPlayer, VLC and AetherEngine play them through a local relay inside Panop. AirPlay is not available." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "LumeEngine und KSPlayer senden ihre Streams direkt durch das VPN. AVPlayer, VLC und AetherEngine spielen sie über ein lokales Relay in Panop ab. AirPlay ist nicht verfügbar."
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
+    "Through" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weg"
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
+    "the proxy" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "der Proxy"
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
+    "the relay inside Panop" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "das Relay in Panop"
+          }
+        }
+      },
+      "extractionState" : "manual"
     }
   },
   "version" : "1.0"

@@ -8,13 +8,45 @@ public struct ProxyEndpoint: Sendable, Equatable, CustomStringConvertible {
     public var httpPort: Int
     public var username: String
     public var password: String
+    /// The relay (see `relayURL`): zero where the tunnel has none.
+    public var relayPort: Int
+    public var relaySecret: String
 
-    public init(host: String = "127.0.0.1", socksPort: Int, httpPort: Int, username: String, password: String) {
+    public init(
+        host: String = "127.0.0.1",
+        socksPort: Int,
+        httpPort: Int,
+        username: String,
+        password: String,
+        relayPort: Int = 0,
+        relaySecret: String = ""
+    ) {
         self.host = host
         self.socksPort = socksPort
         self.httpPort = httpPort
         self.username = username
         self.password = password
+        self.relayPort = relayPort
+        self.relaySecret = relaySecret
+    }
+
+    /// The address to give a player that cannot use a proxy (AVPlayer, VLC, AetherEngine): an address on this
+    /// device, which the tunnel's relay answers by fetching the real one through the VPN.
+    /// `http://127.0.0.1:<port>/<secret>/<base64url of the address>/<name>`, the name being the address's last path
+    /// component so the player still sees `.m3u8` or `.ts`. Nil where there is no relay or the address is not http(s).
+    public func relayURL(for address: String) -> String? {
+        guard relayPort > 0, !relaySecret.isEmpty, let url = URL(string: address),
+              let scheme = url.scheme?.lowercased(), scheme == "http" || scheme == "https"
+        else { return nil }
+        let encoded = Data(address.utf8).base64EncodedString()
+            .replacingOccurrences(of: "+", with: "-")
+            .replacingOccurrences(of: "/", with: "_")
+            .replacingOccurrences(of: "=", with: "")
+        let last = url.path.split(separator: "/").last.map(String.init) ?? ""
+        let name = last.isEmpty ? "stream" : last
+        let safe = name.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed)?
+            .replacingOccurrences(of: "/", with: "%2F") ?? "stream"
+        return "http://\(host):\(relayPort)/\(relaySecret)/\(encoded)/\(safe)"
     }
 
     /// `http://user:pass@127.0.0.1:port`, the form FFmpeg's `http_proxy` option and libVLC take.
@@ -88,6 +120,6 @@ public struct ProxyEndpoint: Sendable, Equatable, CustomStringConvertible {
 
     /// Never shows the login.
     public var description: String {
-        "ProxyEndpoint(\(host):\(socksPort)/\(httpPort), login: redacted)"
+        "ProxyEndpoint(\(host):\(socksPort)/\(httpPort)/\(relayPort), login: redacted)"
     }
 }

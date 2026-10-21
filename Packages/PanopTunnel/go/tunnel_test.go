@@ -59,9 +59,26 @@ func startServer(t *testing.T, serverPriv, clientPub [32]byte) (port int) {
 		t.Fatal(err)
 	}
 	serveDNS(t, tnet)
-	go http.Serve(l, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		io.WriteString(w, "through the tunnel to "+r.Host)
-	}))
+	})
+	mux.HandleFunc("/redirect", func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, "/final.ts", http.StatusFound)
+	})
+	mux.HandleFunc("/final.ts", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "video/mp2t")
+		io.WriteString(w, "TS-BYTES user-agent="+r.Header.Get("User-Agent"))
+	})
+	mux.HandleFunc("/live/index.m3u8", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/vnd.apple.mpegurl")
+		// ServeContent honours Range, as the real servers do (VLC asks for "bytes=0-" and gets a 206).
+		http.ServeContent(w, r, "index.m3u8", time.Unix(0, 0), strings.NewReader("#EXTM3U\n#EXT-X-VERSION:3\n#EXT-X-KEY:METHOD=AES-128,URI=\"key.bin\"\n#EXTINF:4,\nseg1.ts\n#EXTINF:4,\nhttp://10.9.0.1/live/abs.ts?token=a&b=1\n#EXT-X-ENDLIST\n"))
+	})
+	mux.HandleFunc("/live/seg1.ts", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeContent(w, r, "seg1.ts", time.Unix(0, 0), strings.NewReader("0123456789"))
+	})
+	go http.Serve(l, mux)
 	text, _ := dev.IpcGet()
 	for _, line := range strings.Split(text, "\n") {
 		if v, ok := strings.CutPrefix(line, "listen_port="); ok {
@@ -234,5 +251,120 @@ func TestWaitReadyGivesUpWhenNothingAnswers(t *testing.T) {
 	defer tun.Stop()
 	if err := tun.WaitReady(2); err == nil {
 		t.Fatal("reported ready with no server")
+	}
+}
+
+// relayFetch asks the relay for an upstream address, without following redirects.
+func relayFetch(t *testing.T, tun *Tunnel, upstream string, header map[string]string) (*http.Response, string) {
+	t.Helper()
+	u, _ := url.Parse(upstream)
+	r := newRelay(tun.RelaySecret(), nil)
+	address := r.address(fmt.Sprintf("127.0.0.1:%d", tun.RelayPort()), u)
+	return relayGet(t, address, header)
+}
+
+func relayGet(t *testing.T, address string, header map[string]string) (*http.Response, string) {
+	t.Helper()
+	req, _ := http.NewRequest("GET", address, nil)
+	for k, v := range header {
+		req.Header.Set(k, v)
+	}
+	client := &http.Client{Timeout: 15 * time.Second, CheckRedirect: func(*http.Request, []*http.Request) error { return http.ErrUseLastResponse }}
+	resp, err := client.Do(req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer resp.Body.Close()
+	b, _ := io.ReadAll(resp.Body)
+	return resp, string(b)
+}
+
+func TestRelayFetchesThroughTheTunnelAndPassesHeaders(t *testing.T) {
+	tun := startClient(t)
+	resp, body := relayFetch(t, tun, "http://10.9.0.1/final.ts", map[string]string{"User-Agent": "TestPlayer/1"})
+	if resp.StatusCode != 200 || body != "TS-BYTES user-agent=TestPlayer/1" {
+		t.Fatalf("%d %q", resp.StatusCode, body)
+	}
+	if resp.Header.Get("Content-Type") != "video/mp2t" {
+		t.Fatalf("content type %q", resp.Header.Get("Content-Type"))
+	}
+}
+
+func TestRelayHandsRedirectsBackThroughItself(t *testing.T) {
+	tun := startClient(t)
+	resp, _ := relayFetch(t, tun, "http://10.9.0.1/redirect", nil)
+	loc := resp.Header.Get("Location")
+	if resp.StatusCode != 302 || !strings.HasPrefix(loc, fmt.Sprintf("http://127.0.0.1:%d/", tun.RelayPort())) {
+		t.Fatalf("%d %q", resp.StatusCode, loc)
+	}
+	_, body := relayGet(t, loc, nil)
+	if !strings.HasPrefix(body, "TS-BYTES") {
+		t.Fatalf("followed redirect gave %q", body)
+	}
+}
+
+func TestRelayRewritesAPlaylistSoSegmentsComeBackThroughIt(t *testing.T) {
+	tun := startClient(t)
+	_, playlist := relayFetch(t, tun, "http://10.9.0.1/live/index.m3u8", nil)
+	prefix := fmt.Sprintf("http://127.0.0.1:%d/", tun.RelayPort())
+	var segment, absolute, key string
+	for _, line := range strings.Split(playlist, "\n") {
+		switch {
+		case strings.HasPrefix(line, "#EXT-X-KEY"):
+			key = line
+		case strings.HasPrefix(line, prefix) && strings.HasSuffix(line, "/seg1.ts"):
+			segment = line
+		case strings.HasPrefix(line, prefix) && strings.Contains(line, "abs.ts"):
+			absolute = line
+		case line != "" && !strings.HasPrefix(line, "#"):
+			t.Fatalf("a line was left pointing past the relay: %q", line)
+		}
+	}
+	if segment == "" || absolute == "" || !strings.Contains(key, `URI="`+prefix) {
+		t.Fatalf("not rewritten:\n%s", playlist)
+	}
+	if strings.Contains(playlist, "10.9.0.1") {
+		t.Fatalf("the upstream address is still in the playlist:\n%s", playlist)
+	}
+	_, body := relayGet(t, segment, nil)
+	if body != "0123456789" {
+		t.Fatalf("segment %q", body)
+	}
+	_, abs := relayGet(t, absolute, nil)
+	if !strings.HasPrefix(abs, "through the tunnel") {
+		t.Fatalf("absolute segment %q", abs)
+	}
+}
+
+func TestRelayPassesRanges(t *testing.T) {
+	tun := startClient(t)
+	resp, body := relayFetch(t, tun, "http://10.9.0.1/live/seg1.ts", map[string]string{"Range": "bytes=2-5"})
+	if resp.StatusCode != 206 || body != "2345" || resp.Header.Get("Content-Range") != "bytes 2-5/10" {
+		t.Fatalf("%d %q %q", resp.StatusCode, body, resp.Header.Get("Content-Range"))
+	}
+}
+
+func TestRelayRefusesAWrongSecretAndOtherSchemes(t *testing.T) {
+	tun := startClient(t)
+	u, _ := url.Parse("http://10.9.0.1/final.ts")
+	wrong := newRelay("not-the-secret", nil).address(fmt.Sprintf("127.0.0.1:%d", tun.RelayPort()), u)
+	if resp, _ := relayGet(t, wrong, nil); resp.StatusCode != 404 {
+		t.Fatalf("wrong secret gave %d", resp.StatusCode)
+	}
+	file, _ := url.Parse("file:///etc/hosts")
+	bad := newRelay(tun.RelaySecret(), nil).address(fmt.Sprintf("127.0.0.1:%d", tun.RelayPort()), file)
+	if resp, _ := relayGet(t, bad, nil); resp.StatusCode != 404 {
+		t.Fatalf("a file address gave %d", resp.StatusCode)
+	}
+}
+
+func TestRelayAnswersARangedPlaylistWhole(t *testing.T) {
+	tun := startClient(t)
+	resp, body := relayFetch(t, tun, "http://10.9.0.1/live/index.m3u8", map[string]string{"Range": "bytes=0-"})
+	if resp.StatusCode != 200 || resp.Header.Get("Content-Range") != "" {
+		t.Fatalf("%d %q", resp.StatusCode, resp.Header.Get("Content-Range"))
+	}
+	if !strings.HasPrefix(body, "#EXTM3U") || strings.Contains(body, "10.9.0.1/live") {
+		t.Fatalf("%q", body)
 	}
 }
