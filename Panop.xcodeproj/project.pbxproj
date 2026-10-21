@@ -453,7 +453,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Config/Panop-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = Panop;
-				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = YES;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.entertainment";
 				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Panop connects to your IPTV provider or playlist when it is on your home network.";
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -496,7 +496,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Config/Panop-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = Panop;
-				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = YES;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.entertainment";
 				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Panop connects to your IPTV provider or playlist when it is on your home network.";
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

@@ -68,7 +68,7 @@ sportapi.ai key travels) is possible but needs a new record type in the CloudKit
 
 ## Release notes for the owner
 
-- `ITSAppUsesNonExemptEncryption` is `NO` today. WireGuard's own cryptography is not covered by the exemptions for
+- `ITSAppUsesNonExemptEncryption` is now `YES` (it was `NO`). WireGuard's own cryptography is not covered by the exemptions for
   TLS and OS-provided encryption, so **before a build with the tunnel goes to TestFlight or the store it must be
   `YES`**, and App Store Connect will ask the export-compliance questions for each build (mass-market
   self-classification under BIS 740.17(b)(1), an annual self-classification report, and France's declaration for
