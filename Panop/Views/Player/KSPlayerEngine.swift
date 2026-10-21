@@ -34,6 +34,21 @@ final class KSPlayerEngine: PlaybackEngine {
     private(set) var subtitleTracks: [TrackDescriptor] = []
 
     private var bridge: KSBridge?
+
+    var streamInfo: StreamInfo? {
+        guard let bridge else { return nil }
+        let found = bridge.streamInfo
+        var info = StreamInfo()
+        StreamInfoReader.fill(
+            &info,
+            video: found.videoFormat,
+            frameRate: found.frameRate,
+            isDolbyVision: found.isDolbyVision
+        )
+        StreamInfoReader.fill(&info, audio: found.audioFormat)
+        return info.isEmpty ? nil : info
+    }
+
     private var ticker: Task<Void, Never>?
     private var isLive = false
     private var isStopping = false

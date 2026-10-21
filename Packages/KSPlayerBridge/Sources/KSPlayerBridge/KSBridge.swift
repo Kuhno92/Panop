@@ -1,3 +1,4 @@
+public import CoreMedia
 import AVFoundation
 import Foundation
 import KSPlayer
@@ -28,6 +29,14 @@ public struct KSBridgeFailure: Error, Sendable {
     public var domain: String
     public var code: Int
     public var message: String
+}
+
+/// What KSPlayer says of the stream, as the system's own format descriptions.
+public struct KSBridgeStreamInfo {
+    public var videoFormat: CMFormatDescription?
+    public var frameRate: Double
+    public var isDolbyVision: Bool
+    public var audioFormat: CMFormatDescription?
 }
 
 /// One KSPlayer playback. Everything the app needs of KSPlayer, and nothing of its types.
@@ -118,6 +127,19 @@ public final class KSBridge {
 
     public var subtitleTracks: [KSBridgeTrack] {
         Self.tracks(player.tracks(mediaType: .subtitle))
+    }
+
+    public var streamInfo: KSBridgeStreamInfo {
+        let videos = player.tracks(mediaType: .video)
+        let audios = player.tracks(mediaType: .audio)
+        let video = videos.first { $0.isEnabled } ?? videos.first
+        let audio = audios.first { $0.isEnabled } ?? audios.first
+        return KSBridgeStreamInfo(
+            videoFormat: video?.formatDescription,
+            frameRate: Double(video?.nominalFrameRate ?? 0),
+            isDolbyVision: video?.dovi != nil,
+            audioFormat: audio?.formatDescription
+        )
     }
 
     public func selectAudio(id: Int32) {

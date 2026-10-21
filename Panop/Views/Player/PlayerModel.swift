@@ -21,6 +21,8 @@ final class PlayerModel {
     private(set) var position: Double = 0
     /// Nil for a live stream, and before the engine knows.
     private(set) var duration: Double?
+    /// What the engine says of the stream playing: the picture, the codecs, the sound.
+    private(set) var streamInfo: StreamInfo?
     private(set) var audioTracks: [TrackDescriptor] = []
     private(set) var subtitleTracks: [TrackDescriptor] = []
     /// What the user picked. Engines do not report their own choice, and nil is the
@@ -89,6 +91,21 @@ final class PlayerModel {
             gate: { ProviderNetwork.shared.block },
             proxy: { ProviderNetwork.shared.proxy }
         )
+    }
+
+    /// "MPEG-TS · 1080p50 · H.264 · Dolby Digital 5.1", from what the engine reports and, for the container, the
+    /// address when the engine does not say. Nil until there is something to show.
+    var streamSummary: String? {
+        var info = streamInfo ?? StreamInfo()
+        if info.container == nil, let url = currentAddress {
+            info.container = StreamInfoText.containerHint(address: url)
+        }
+        return StreamInfoText.summary(info)
+    }
+
+    private var currentAddress: String? {
+        guard let kind = coordinator.activeKind else { return nil }
+        return request.item(kind).url
     }
 
     var engineName: String? {
@@ -305,6 +322,7 @@ final class PlayerModel {
             status = new
             engine = coordinator.activeEngine
             duration = engine?.duration
+            refreshStreamInfo()
             if case .connecting = new {
                 // A new engine starts with its own tracks and none of the old choices.
                 audioTracks = []
@@ -331,6 +349,8 @@ final class PlayerModel {
             position = seconds
             let known = duration
             duration = coordinator.activeEngine?.duration
+            // The resolution of an adaptive stream can change while it plays.
+            refreshStreamInfo()
             reportProgressIfDue(at: seconds)
             if duration != known {
                 publishNowPlaying()
@@ -338,6 +358,15 @@ final class PlayerModel {
         case let .tracks(audio, subtitle):
             audioTracks = audio
             subtitleTracks = subtitle
+            refreshStreamInfo()
+        }
+    }
+
+    /// Only written when it changed, so a position tick a second does not redraw the overlay.
+    private func refreshStreamInfo() {
+        let found = coordinator.activeEngine?.streamInfo
+        if found != streamInfo {
+            streamInfo = found
         }
     }
 

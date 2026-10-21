@@ -51,6 +51,26 @@ final class AetherPlaybackEngine: PlaybackEngine {
         (events, output) = AsyncStream.makeStream()
     }
 
+    var streamInfo: StreamInfo? {
+        let audio = player.activeAudioTrackIndex.flatMap { index in player.audioTracks.first { $0.id == index } }
+            ?? player.audioTracks.first
+        let transfer = player.sourceVideoStreamFormat?.transfer?.lowercased() ?? ""
+        var info = StreamInfo(
+            videoCodec: player.sourceVideoCodecName,
+            width: player.sourceVideoWidth > 0 ? Int(player.sourceVideoWidth) : nil,
+            height: player.sourceVideoHeight > 0 ? Int(player.sourceVideoHeight) : nil,
+            audioCodec: audio?.codec,
+            audioChannels: (audio?.channels ?? 0) > 0 ? audio?.channels : nil,
+            audioIsAtmos: audio?.isAtmos ?? false
+        )
+        if transfer.contains("2084") {
+            info.hdr = "HDR10"
+        } else if transfer.contains("b67") || transfer.contains("hlg") {
+            info.hdr = "HLG"
+        }
+        return info.isEmpty ? nil : info
+    }
+
     // MARK: - Loading
 
     func load(_ item: PlaybackItem) async throws {

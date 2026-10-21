@@ -419,6 +419,13 @@ struct PlayerView: View {
                 if let engineName = model.engineName {
                     Text(engineName).font(.caption).foregroundStyle(.secondary)
                 }
+                if let summary = model.streamSummary {
+                    Text(summary)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
+                }
             }
             Spacer()
             clock

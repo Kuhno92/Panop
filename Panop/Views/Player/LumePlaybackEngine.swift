@@ -59,6 +59,9 @@ final class LumePlaybackEngine: PlaybackEngine {
     private let commandSink: AsyncStream<Command>.Continuation
 
     private var session: PlayerSession?
+    /// What the demuxer found when the source opened, and the audio stream the person chose (nil: the default).
+    private(set) var mediaInfo: MediaInfo?
+    private(set) var chosenAudioIndex: Int32?
     /// The one-variant playlist made for this stream, deleted when playback ends.
     private(set) var playlistFile: URL?
     private var tasks: [Task<Void, Never>] = []
@@ -123,6 +126,7 @@ final class LumePlaybackEngine: PlaybackEngine {
 
         do {
             let info = try await session.open(url: choice.address)
+            mediaInfo = info
             duration = info.duration.map(MediaTime.seconds)
             audioTracks = info.audioTracks.map(Self.descriptor)
             subtitleTracks = info.subtitleTracks.map(Self.descriptor)
@@ -177,6 +181,7 @@ final class LumePlaybackEngine: PlaybackEngine {
     }
 
     func selectAudioTrack(id: String?) {
+        chosenAudioIndex = id.flatMap { Int32($0) }
         commandSink.yield(.audio(id.flatMap { Int32($0) }))
     }
 

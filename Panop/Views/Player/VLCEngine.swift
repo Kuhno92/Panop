@@ -106,6 +106,29 @@ final class VLCEngine: PlaybackEngine {
         return milliseconds > 0 ? milliseconds / 1000 : nil
     }
 
+    /// From the tracks libVLC found once the stream is open.
+    var streamInfo: StreamInfo? {
+        guard let media = player.media else { return nil }
+        var info = StreamInfo()
+        if let track = media.videoTracks.first {
+            info.videoCodec = StreamInfoReader.fourCC(track.fourcc, littleEndian: true)
+            if let video = track.video, video.width > 0, video.height > 0 {
+                info.width = Int(video.width)
+                info.height = Int(video.height)
+                if video.frameRateDenominator > 0, video.frameRate > 0 {
+                    info.frameRate = Double(video.frameRate) / Double(video.frameRateDenominator)
+                }
+            }
+        }
+        if let track = media.audioTracks.first {
+            info.audioCodec = StreamInfoReader.fourCC(track.fourcc, littleEndian: true)
+            if let audio = track.audio, audio.channelsNumber > 0 {
+                info.audioChannels = Int(audio.channelsNumber)
+            }
+        }
+        return info.isEmpty ? nil : info
+    }
+
     // MARK: - Loading
 
     func load(_ item: PlaybackItem) async throws {

@@ -30,6 +30,10 @@ public protocol PlaybackEngine: AnyObject {
     var duration: Double? { get }
 
     var audioTracks: [TrackDescriptor] { get }
+
+    /// What the engine knows of the stream it plays (picture, codecs, sound), or nil while it knows nothing.
+    /// Read again as the stream changes; an adaptive stream may change its resolution.
+    var streamInfo: StreamInfo? { get }
     var subtitleTracks: [TrackDescriptor] { get }
 
     /// Opens an item and prepares it for playback.
@@ -51,4 +55,11 @@ public protocol PlaybackEngine: AnyObject {
     /// Some engines cannot reopen a session, so switching channels means a full
     /// teardown and a fresh instance rather than loading a second item.
     func stop() async
+}
+
+public extension PlaybackEngine {
+    /// An engine that does not report it says nothing.
+    var streamInfo: StreamInfo? {
+        nil
+    }
 }

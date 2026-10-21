@@ -53,8 +53,9 @@ struct RealTunnelPlaybackTests {
         let early = backend.counters.received - before
         try? await Task.sleep(for: .seconds(10))
         let after = backend.counters.received
-        try? "\(kind): \(early) bytes after 3 s, \(after - before) after 13 s, status \(coordinator.status)\n"
-            .appendLine(to: "/tmp/real-tunnel.txt")
+        let info = coordinator.activeEngine?.streamInfo.flatMap(StreamInfoText.summary) ?? "none"
+        let line = "\(kind): \(early) bytes after 3 s, \(after - before) after 13 s, info: \(info)\n"
+        try? line.appendLine(to: "/tmp/real-tunnel.txt")
         await coordinator.stop()
 
         #expect(playing, "\(kind) never played: \(coordinator.status)")
