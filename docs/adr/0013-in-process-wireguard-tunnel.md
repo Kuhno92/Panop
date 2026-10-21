@@ -46,6 +46,12 @@ Panop points its own connections at those proxies. Nothing else on the device is
 | AetherEngine | connects straight to the origin: it opens its own `URLSession`s and ignores `http_proxy` | skipped while the tunnel is on |
 | AVPlayer | has no per-app proxy | skipped while the tunnel is on |
 
+**An engine's first request going to the proxy is not enough.** LumeEngine's first request went to the proxy, yet an HLS
+stream moved 336 bytes through the tunnel in 13 s: the variant picker rewrites the playlist into a local file, and
+FFmpeg's HLS reader takes `http_proxy` from an `http` input, so with a file the segments went out directly. With the
+tunnel on, the picker is skipped. `RealTunnelPlaybackTests` (needs a real WireGuard file) plays a public HLS stream
+through each supported engine and checks the tunnel's own byte counter.
+
 An engine that cannot use the tunnel is left out of the order (`PlaybackEngineKind.supportsProxy`); if none is left, the
 stream fails. Nothing falls back to a direct connection. Consequences: Picture in Picture and AirPlay (AVPlayer) are
 unavailable while the tunnel is on.

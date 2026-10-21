@@ -104,7 +104,12 @@ final class LumePlaybackEngine: PlaybackEngine {
         stallThreshold = configuration.stallThreshold
 
         // A multivariant HLS playlist makes the engine open every variant before it starts.
-        let choice = await HLSVariantPicker.choose(for: item)
+        // Not through the app's VPN tunnel: the picker hands FFmpeg a local file, and FFmpeg's HLS reader takes its
+        // proxy from an `http` input, so with a file the segments would be fetched directly (measured). The original
+        // address is opened instead, and the playlist's own variants are read as they are.
+        let choice = item.proxy == nil
+            ? await HLSVariantPicker.choose(for: item)
+            : HLSVariantPicker.Choice(address: item.url, file: nil)
         playlistFile = choice.file
         if choice.file != nil {
             configuration.demuxer.formatOptions.merge(HLSVariantPicker.formatOptions) { _, new in new }
