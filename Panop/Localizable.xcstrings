@@ -6450,6 +6450,17 @@
           }
         }
       }
+    },
+    "The VPN could not start: %@. Panop is not connecting." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das VPN konnte nicht gestartet werden: %@. Panop stellt keine Verbindung her."
+          }
+        }
+      },
+      "extractionState" : "manual"
     }
   },
   "version" : "1.0"

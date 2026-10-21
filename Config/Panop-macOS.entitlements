@@ -12,6 +12,10 @@
 	<true/>
 	<key>com.apple.security.network.client</key>
 	<true/>
+	<!-- The built-in VPN tunnel listens on 127.0.0.1 (a SOCKS5 and an HTTP proxy that only this app uses). Without
+	     this the sandbox refuses the listening sockets and the tunnel cannot start. -->
+	<key>com.apple.security.network.server</key>
+	<true/>
 	<key>com.apple.security.files.user-selected.read-only</key>
 	<true/>
 	<key>com.apple.developer.icloud-container-identifiers</key>

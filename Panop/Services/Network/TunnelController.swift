@@ -27,6 +27,8 @@ final class TunnelController {
         case noConfiguration
         case unreachable
         case invalid(String)
+        /// The tunnel could not be started at all (not a silent server): what the system or the tunnel said.
+        case startFailed(String)
     }
 
     private(set) var state = State.off
@@ -212,7 +214,13 @@ final class TunnelController {
             fresh.stop()
             backend = nil
             let detail = error.localizedDescription
-            state = .failed(detail.hasPrefix("line ") || detail.contains("needs") ? .invalid(detail) : .unreachable)
+            if detail.hasPrefix("line ") || detail.contains("needs") {
+                state = .failed(.invalid(detail))
+            } else if detail.contains("did not answer") {
+                state = .failed(.unreachable)
+            } else {
+                state = .failed(.startFailed(detail))
+            }
         }
     }
 

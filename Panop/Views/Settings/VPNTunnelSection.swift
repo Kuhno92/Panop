@@ -127,6 +127,8 @@ struct VPNTunnelSection: View {
         case .failed(.noConfiguration): String(localized: "No configuration. Panop is not connecting.")
         case .failed(.unreachable): String(localized: "The VPN did not answer. Panop is not connecting.")
         case .failed(.invalid): String(localized: "The configuration is not valid. Panop is not connecting.")
+        case let .failed(.startFailed(detail)):
+            String(localized: "The VPN could not start: \(detail). Panop is not connecting.")
         }
     }
 
