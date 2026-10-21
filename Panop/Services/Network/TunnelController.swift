@@ -12,6 +12,9 @@ import PanopCore
 final class TunnelController {
     static let shared = TunnelController()
     nonisolated static let enabledKey = "panop.vpn.tunnel.enabled"
+    /// Whether the configuration travels through iCloud (when iCloud is on). Not whether the tunnel is used.
+    nonisolated static let syncsKey = "panop.vpn.tunnel.syncs"
+    nonisolated static let digestKey = "panop.vpn.tunnel.digest"
 
     enum State: Equatable {
         case off
@@ -36,6 +39,9 @@ final class TunnelController {
     @ObservationIgnored private let defaults: UserDefaults
     @ObservationIgnored private var backend: (any TunnelBackend)?
     @ObservationIgnored private var attempt = 0
+    @ObservationIgnored private var sync: VPNSyncStore?
+    /// Whether the configuration is to travel: the person's switch, and iCloud being on. Set by the app.
+    @ObservationIgnored var syncsConfig: @MainActor () -> Bool = { true }
 
     init(
         store: any VPNConfigStore = KeychainVPNConfigStore(),
@@ -71,12 +77,17 @@ final class TunnelController {
         let parsed = try WireGuardConfig.parse(text)
         store.save(parsed.text)
         config = parsed
+        reconcile()
         if isEnabled {
             Task { await connect() }
         }
     }
 
     func removeConfiguration() {
+        if syncsConfig() {
+            sync?.setBlob(nil, removed: true)
+        }
+        defaults.removeObject(forKey: Self.digestKey)
         disconnect()
         defaults.set(false, forKey: Self.enabledKey)
         store.delete()
@@ -91,6 +102,58 @@ final class TunnelController {
             Task { await connect() }
         } else {
             disconnect()
+        }
+    }
+
+    func attach(sync: VPNSyncStore) {
+        self.sync = sync
+    }
+
+    /// Brings this device's configuration and the record into line, as the person's setting says: a configuration
+    /// goes to the record so other devices have it, one that arrived is taken into the Keychain (and the tunnel
+    /// restarts on it if it is on), one taken out elsewhere is taken out here, and with the setting off the record is
+    /// emptied. The decision is `SportsKeySync.decide`, which is not specific to that key. Safe to run any number of
+    /// times.
+    func reconcile() {
+        guard let sync else { return }
+        let record = sync.record
+        let action = SportsKeySync.decide(
+            local: store.load(),
+            blob: record.blob,
+            removed: record.removed,
+            remembered: defaults.string(forKey: Self.digestKey),
+            uploading: syncsConfig()
+        )
+        switch action {
+        case .none:
+            if let blob = record.blob {
+                defaults.set(SportsKeySync.digest(blob), forKey: Self.digestKey)
+            }
+        case let .upload(blob):
+            sync.setBlob(blob)
+            defaults.set(SportsKeySync.digest(blob), forKey: Self.digestKey)
+        case let .adopt(text):
+            // Only a configuration this device can read is taken; anything else is left on the record.
+            guard let parsed = try? WireGuardConfig.parse(text) else { return }
+            store.save(parsed.text)
+            config = parsed
+            if let blob = record.blob {
+                defaults.set(SportsKeySync.digest(blob), forKey: Self.digestKey)
+            }
+            if isEnabled {
+                Task { await connect() }
+            }
+        case .removeLocal:
+            store.delete()
+            config = nil
+            defaults.removeObject(forKey: Self.digestKey)
+            if isEnabled {
+                defaults.set(false, forKey: Self.enabledKey)
+                disconnect()
+            }
+        case .withdraw:
+            sync.setBlob(nil)
+            defaults.removeObject(forKey: Self.digestKey)
         }
     }
 

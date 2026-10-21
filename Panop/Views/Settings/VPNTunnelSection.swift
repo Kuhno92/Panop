@@ -7,6 +7,8 @@ import UniformTypeIdentifiers
 /// is involved; other apps on the device are not affected.
 struct VPNTunnelSection: View {
     @State private var tunnel = TunnelController.shared
+    @Environment(CloudSyncStatus.self) private var cloud
+    @AppStorage(TunnelController.syncsKey) private var syncs = true
     @AppStorage(TunnelController.enabledKey) private var isOn = false
     @State private var adding = false
     @State private var testing = false
@@ -20,6 +22,10 @@ struct VPNTunnelSection: View {
                 Toggle("Send Panop's traffic through this VPN", isOn: $isOn)
                     .onChange(of: isOn) { _, nowOn in tunnel.setEnabled(nowOn) }
                 LabeledContent("Server", value: config.endpointHost)
+                if cloud.availability == .active {
+                    Toggle("Sync the configuration with iCloud", isOn: $syncs)
+                        .onChange(of: syncs) { _, _ in tunnel.reconcile() }
+                }
                 Label(statusText, systemImage: statusSymbol)
                     .font(.footnote)
                     .foregroundStyle(statusTint)
@@ -46,6 +52,15 @@ struct VPNTunnelSection: View {
                 Button("Remove configuration", role: .destructive) { confirmsRemoval = true }
             } else {
                 Button("Add a WireGuard configuration") { adding = true }
+                if cloud.availability == .active, syncs {
+                    Label {
+                        Text("One added on another of your devices arrives here by itself.")
+                    } icon: {
+                        Image(systemName: "icloud")
+                    }
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                }
             }
         } header: {
             Text("VPN built into Panop")

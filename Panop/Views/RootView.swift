@@ -87,6 +87,8 @@ struct RootView: View {
     @Environment(CloudSyncStatus.self) private var cloudSync
     @AppStorage(CloudSync.loginsKey) private var syncsLogins = true
     @AppStorage(SportsConfig.syncsKeyKey) private var syncsSportsKey = true
+    @AppStorage(TunnelController.syncsKey) private var syncsVPN = true
+    @Environment(VPNSyncStore.self) private var vpnSync
     @Environment(SportsAccount.self) private var sportsAccount
     @Environment(SportsSyncStore.self) private var sportsSync
     @Environment(SyncStatusCenter.self) private var status
@@ -291,6 +293,13 @@ struct RootView: View {
                 sportsAccount.syncsKey = { allowed }
                 sportsAccount.reconcile()
             }
+            // The VPN configuration too, on its own switch.
+            .task(id: [syncsVPN, cloudSync.availability == .active]) {
+                let allowed = syncsVPN && cloudSync.availability == .active
+                TunnelController.shared.attach(sync: vpnSync)
+                TunnelController.shared.syncsConfig = { allowed }
+                TunnelController.shared.reconcile()
+            }
             // What another device changes arrives as an import: read it, and drop what was removed there.
             .task(id: cloudSync.availability == .active) {
                 guard cloudSync.availability == .active else { return }
@@ -299,6 +308,7 @@ struct RootView: View {
                     userState.reloadAfterRemoteChange()
                     sportsSync.reloadAfterRemoteChange()
                     sportsAccount.reconcile()
+                    TunnelController.shared.reconcile()
                     await library.applyRemoteChanges()
                 }
             } // Another person's profile: their state replaces this one's, and what was suggested is dropped.

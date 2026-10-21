@@ -100,6 +100,7 @@ struct PanopApp: App {
                 .environment(services.syncStatus)
                 .environment(services.sportsAccount)
                 .environment(services.sportsSync)
+                .environment(services.vpnSync)
                 .environment(\.sportsFeed, services.sportsFeed)
                 .environment(cloudSync)
                 .environment(\.playbackMetrics, metricsStore)

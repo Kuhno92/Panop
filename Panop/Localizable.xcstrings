@@ -6426,6 +6426,28 @@
         }
       },
       "extractionState" : "manual"
+    },
+    "Sync the configuration with iCloud" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Konfiguration mit iCloud synchronisieren"
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
+    "One added on another of your devices arrives here by itself." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eine auf einem deiner anderen Geräte hinzugefügte Konfiguration kommt hier von selbst an."
+          }
+        }
+      },
+      "extractionState" : "manual"
     }
   },
   "version" : "1.0"

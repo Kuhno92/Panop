@@ -65,6 +65,7 @@ The record types are the model's class names with the prefix `CD_`, and every at
 | `CategoryPreference` | `CD_CategoryPreference` | category order and hiding |
 | `SportsPreference` | `CD_SportsPreference` | leagues, teams, setup flag, tab, channels chosen |
 | `SportsKeyRecord` | `CD_SportsKeyRecord` | `CD_encryptedKey` is an encrypted field; `CD_removed` marks a key taken out |
+| `VPNConfigRecord` | `CD_VPNConfigRecord` | `CD_encryptedConfig` is an encrypted field (the WireGuard file, private key included); `CD_removed` marks one taken out. **New: deploy the schema to production before a TestFlight build, or it does not sync** |
 
 ### Once: let `cktool` read the schemas
 

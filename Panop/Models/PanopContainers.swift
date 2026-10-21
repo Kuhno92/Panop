@@ -67,6 +67,8 @@ nonisolated enum PanopContainers {
         SyncStateRecord.self
     ])
     static let cloudSchema = Schema([
-        UserContentState.self, PlaylistRecord.self, CategoryPreference.self, SportsPreference.self, SportsKeyRecord.self
+        UserContentState.self, PlaylistRecord.self, CategoryPreference.self, SportsPreference.self,
+        SportsKeyRecord.self,
+        VPNConfigRecord.self
     ])
 }

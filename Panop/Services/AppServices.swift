@@ -15,6 +15,7 @@ final class AppServices {
     let catalogStore: SwiftDataCatalogStore
     let catalogContainer: ModelContainer
     let sportsSync: SportsSyncStore
+    let vpnSync: VPNSyncStore
     let sportsAccount: SportsAccount
     let sportsFeed: SportsFeed
 
@@ -60,6 +61,7 @@ final class AppServices {
         // What was fetched with a key goes when the key does.
         account.onKeyRemoved = { Task { await feed.clear() } }
         self.sportsSync = sportsSync
+        vpnSync = VPNSyncStore(context: ModelContext(cloud))
         sportsAccount = account
         sportsFeed = feed
     }
