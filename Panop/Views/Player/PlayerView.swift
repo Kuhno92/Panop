@@ -241,6 +241,8 @@ struct PlayerView: View {
             }
             // Escape goes back to the app where the stream is in the main window.
             .onExitCommand { onBrowse?() }
+            // Up and Down switch channel, as on the Apple TV remote.
+            .background(ChannelKeys(isEnabled: onZap != nil && !isBehind) { onZap?($0) })
         #endif
         #if os(tvOS)
         .onPlayPauseCommand { model.togglePause() }
