@@ -115,8 +115,8 @@ final class PlayerModel {
         return parts.isEmpty ? nil : parts.joined(separator: " · ")
     }
 
-    private var currentAddress: String? {
-        guard let kind = coordinator.activeKind else { return nil }
+    var currentAddress: String? {
+        guard let kind = coordinator.activeKind ?? PlaybackEngineKind.defaultPriority.first else { return nil }
         return request.item(kind).url
     }
 

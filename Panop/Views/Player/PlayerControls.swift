@@ -27,7 +27,7 @@ struct PlayerControls: View {
 
     /// Which control has focus, on Apple TV, so the bar can stay up while it is being used.
     private enum Control: Hashable {
-        case play, back, forward, audio, subtitles, guide, catchup, versions
+        case play, back, forward, audio, subtitles, guide, catchup, versions, details
     }
 
     @FocusState private var focused: Control?
@@ -173,6 +173,11 @@ struct PlayerControls: View {
             }
 
             tracks
+
+            #if os(tvOS)
+                // The header has nothing to focus on Apple TV, so the details are here.
+                StreamDetailsButton(model: model).trackFocus($focused, .details)
+            #endif
 
             #if !os(tvOS)
                 if model.supportsAirPlay {

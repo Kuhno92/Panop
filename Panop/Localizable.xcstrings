@@ -367,6 +367,17 @@
         }
       }
     },
+    "a name (only a lookup shows where it leads)" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ein Name (nur eine Abfrage zeigt, wohin er führt)"
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
     "A PIN is 4 to 6 digits." : {
       "localizations" : {
         "de" : {
@@ -539,6 +550,17 @@
         }
       }
     },
+    "Address" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adresse"
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
     "Address, for example 10.2.0.2/32" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -641,6 +663,17 @@
         }
       }
     },
+    "Asks this device's own resolver, outside any VPN, where the name leads. It shows whether a name such as a router's is on your local network." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fragt den eigenen Resolver dieses Geräts, außerhalb jedes VPNs, wohin der Name führt. So siehst du, ob ein Name, etwa der eines Routers, in deinem lokalen Netzwerk liegt."
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
     "Assist: %@" : {
       "localizations" : {
         "de" : {
@@ -660,6 +693,39 @@
           }
         }
       }
+    },
+    "Audio channels" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Audiokanäle"
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
+    "Audio codec" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Audio-Codec"
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
+    "Audio tracks" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tonspuren"
+          }
+        }
+      },
+      "extractionState" : "manual"
     },
     "Back 10 seconds" : {
       "localizations" : {
@@ -761,6 +827,28 @@
           }
         }
       }
+    },
+    "buffering" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "puffert"
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
+    "Built-in VPN" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eingebautes VPN"
+          }
+        }
+      },
+      "extractionState" : "manual"
     },
     "By name" : {
       "localizations" : {
@@ -1158,6 +1246,17 @@
         }
       }
     },
+    "connected" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "verbunden"
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
     "Connected. Panop's traffic goes through the VPN." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1169,6 +1268,17 @@
         }
       }
     },
+    "connecting" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "verbindet"
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
     "Connecting …" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1179,6 +1289,28 @@
           }
         }
       }
+    },
+    "Connections held" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verbindungen angehalten"
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
+    "Container" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Container"
+          }
+        }
+      },
+      "extractionState" : "manual"
     },
     "Continue" : {
       "localizations" : {
@@ -1219,6 +1351,17 @@
           }
         }
       }
+    },
+    "Copy" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kopieren"
+          }
+        }
+      },
+      "extractionState" : "manual"
     },
     "Copy these from your provider's WireGuard file. In each field, choose your iPhone as the keyboard and paste." : {
       "extractionState" : "manual",
@@ -1484,6 +1627,17 @@
         }
       }
     },
+    "Dolby Atmos" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dolby Atmos"
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
     "Done" : {
       "localizations" : {
         "de" : {
@@ -1544,6 +1698,17 @@
           }
         }
       }
+    },
+    "ended" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "beendet"
+          }
+        }
+      },
+      "extractionState" : "manual"
     },
     "Engine" : {
       "localizations" : {
@@ -1614,6 +1779,17 @@
           }
         }
       }
+    },
+    "failed" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "fehlgeschlagen"
+          }
+        }
+      },
+      "extractionState" : "manual"
     },
     "Family and safety" : {
       "localizations" : {
@@ -1787,6 +1963,17 @@
         }
       }
     },
+    "Format" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Format"
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
     "Forward 10 seconds" : {
       "localizations" : {
         "de" : {
@@ -1816,6 +2003,17 @@
           }
         }
       }
+    },
+    "Frame rate" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bildrate"
+          }
+        }
+      },
+      "extractionState" : "manual"
     },
     "FT" : {
       "localizations" : {
@@ -1926,6 +2124,17 @@
           }
         }
       }
+    },
+    "HDR" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HDR"
+          }
+        }
+      },
+      "extractionState" : "manual"
     },
     "Hidden" : {
       "localizations" : {
@@ -2047,6 +2256,17 @@
         }
       }
     },
+    "Host is" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Host ist"
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
     "How fast channels start and how often they stall. Kept on this device only." : {
       "extractionState" : "stale",
       "localizations" : {
@@ -2118,6 +2338,17 @@
         }
       }
     },
+    "idle" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "bereit"
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
     "If a video will not start, change the engine. Panop tries your choice first and then the others by itself, and remembers which one played a title so it starts there next time. On a Mac a stream plays in the main window, and you can still use the rest of the app over it." : {
       "localizations" : {
         "de" : {
@@ -2177,6 +2408,39 @@
           }
         }
       }
+    },
+    "internet" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Internet"
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
+    "it is not an http address" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "sie ist keine http-Adresse"
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
+    "it is on the local network, which the VPN does not reach" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "sie liegt im lokalen Netzwerk, das das VPN nicht erreicht"
+          }
+        }
+      },
+      "extractionState" : "manual"
     },
     "It starts with adult content hidden." : {
       "localizations" : {
@@ -2268,6 +2532,17 @@
         }
       }
     },
+    "Last handshake" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Letzter Handshake"
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
     "Last update from iCloud" : {
       "localizations" : {
         "de" : {
@@ -2287,6 +2562,17 @@
           }
         }
       }
+    },
+    "Leads to" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Führt zu"
+          }
+        }
+      },
+      "extractionState" : "manual"
     },
     "Leagues" : {
       "localizations" : {
@@ -2328,6 +2614,17 @@
           }
         }
       }
+    },
+    "Length" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Länge"
+          }
+        }
+      },
+      "extractionState" : "manual"
     },
     "Less" : {
       "localizations" : {
@@ -2440,6 +2737,17 @@
         }
       }
     },
+    "local network" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "lokales Netzwerk"
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
     "Look again" : {
       "localizations" : {
         "de" : {
@@ -2449,6 +2757,28 @@
           }
         }
       }
+    },
+    "Look up the address on this device" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adresse auf diesem Gerät abfragen"
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
+    "Lookup on this device" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abfrage auf diesem Gerät"
+          }
+        }
+      },
+      "extractionState" : "manual"
     },
     "M3U · %@" : {
       "localizations" : {
@@ -2791,6 +3121,39 @@
         }
       }
     },
+    "no" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "nein"
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
+    "no (the built-in VPN is off)" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "nein (das eingebaute VPN ist aus)"
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
+    "no answer" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "keine Antwort"
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
     "No answer" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2821,6 +3184,17 @@
           }
         }
       }
+    },
+    "no configuration" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "keine Konfiguration"
+          }
+        }
+      },
+      "extractionState" : "manual"
     },
     "No configuration. Panop is not connecting." : {
       "extractionState" : "manual",
@@ -2964,6 +3338,17 @@
         }
       }
     },
+    "none yet" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "noch keiner"
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
     "None yet" : {
       "localizations" : {
         "de" : {
@@ -2973,6 +3358,17 @@
           }
         }
       }
+    },
+    "Not a network address" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Netzwerkadresse"
+          }
+        }
+      },
+      "extractionState" : "manual"
     },
     "Not accepted" : {
       "localizations" : {
@@ -2984,12 +3380,34 @@
         }
       }
     },
+    "not an http address" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "keine http-Adresse"
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
     "Not updated yet" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Noch nicht aktualisiert"
+          }
+        }
+      }
+    },
+    "not via VPN (local network)" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "nicht über VPN (lokales Netzwerk)"
           }
         }
       }
@@ -3074,6 +3492,17 @@
         }
       }
     },
+    "Notice" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hinweis"
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
     "NOW" : {
       "localizations" : {
         "de" : {
@@ -3121,6 +3550,17 @@
           }
         }
       }
+    },
+    "off" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "aus"
+          }
+        }
+      },
+      "extractionState" : "manual"
     },
     "Off" : {
       "localizations" : {
@@ -3194,6 +3634,17 @@
         }
       }
     },
+    "on" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "an"
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
     "On now" : {
       "localizations" : {
         "de" : {
@@ -3252,6 +3703,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "An. Ein VPN ist aktiv, daher verbindet sich Panop."
+          }
+        }
+      }
+    },
+    "On. Panop's built-in VPN is connected, so Panop connects." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "An. Das in Panop eingebaute VPN ist verbunden, daher verbindet sich Panop."
+          }
+        }
+      }
+    },
+    "On. Panop's built-in VPN is not connected, so Panop is not connecting." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "An. Das in Panop eingebaute VPN ist nicht verbunden, daher stellt Panop keine Verbindung her."
           }
         }
       }
@@ -3533,6 +4006,17 @@
         }
       }
     },
+    "paused" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "pausiert"
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
     "Pens" : {
       "localizations" : {
         "de" : {
@@ -3562,6 +4046,17 @@
           }
         }
       }
+    },
+    "Picture size" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bildgröße"
+          }
+        }
+      },
+      "extractionState" : "manual"
     },
     "Play" : {
       "localizations" : {
@@ -3663,7 +4158,19 @@
             "value" : "Player"
           }
         }
-      }
+      },
+      "extractionState" : "manual"
+    },
+    "playing" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "läuft"
+          }
+        }
+      },
+      "extractionState" : "manual"
     },
     "Playing" : {
       "localizations" : {
@@ -3799,6 +4306,17 @@
         }
       }
     },
+    "Problem" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Problem"
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
     "Profile" : {
       "localizations" : {
         "de" : {
@@ -3848,6 +4366,17 @@
           }
         }
       }
+    },
+    "Proxy on this device" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Proxy auf diesem Gerät"
+          }
+        }
+      },
+      "extractionState" : "manual"
     },
     "Pts" : {
       "localizations" : {
@@ -3921,6 +4450,17 @@
         }
       }
     },
+    "Received through the VPN" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Über das VPN empfangen"
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
     "Recently added" : {
       "localizations" : {
         "de" : {
@@ -3950,6 +4490,17 @@
           }
         }
       }
+    },
+    "reconnecting" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "verbindet neu"
+          }
+        }
+      },
+      "extractionState" : "manual"
     },
     "Refresh" : {
       "localizations" : {
@@ -4187,6 +4738,17 @@
         }
       }
     },
+    "Route" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Route"
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
     "Save key" : {
       "localizations" : {
         "de" : {
@@ -4381,6 +4943,17 @@
           }
         }
       }
+    },
+    "Sent through the VPN" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Über das VPN gesendet"
+          }
+        }
+      },
+      "extractionState" : "manual"
     },
     "Series" : {
       "localizations" : {
@@ -4777,6 +5350,17 @@
         }
       }
     },
+    "State" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zustand"
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
     "Statistics" : {
       "localizations" : {
         "de" : {
@@ -4819,6 +5403,28 @@
         }
       }
     },
+    "Stream" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stream"
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
+    "Stream details" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stream-Details"
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
     "Substitutes · %@" : {
       "localizations" : {
         "de" : {
@@ -4828,6 +5434,17 @@
           }
         }
       }
+    },
+    "Subtitle tracks" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Untertitelspuren"
+          }
+        }
+      },
+      "extractionState" : "manual"
     },
     "Subtitles" : {
       "localizations" : {
@@ -5164,6 +5781,17 @@
         }
       }
     },
+    "the internet" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "das Internet"
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
     "The key is kept in the Keychain on this device. With iCloud on it also travels, encrypted, to your other devices. Only match, league and team requests go to sportapi.ai: nothing about your playlists or what you watch." : {
       "localizations" : {
         "de" : {
@@ -5203,6 +5831,28 @@
           }
         }
       }
+    },
+    "the local network (a .local name)" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "das lokale Netzwerk (ein .local-Name)"
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
+    "the local network (a private address)" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "das lokale Netzwerk (eine private Adresse)"
+          }
+        }
+      },
+      "extractionState" : "manual"
     },
     "The login details could not be saved to the Keychain." : {
       "localizations" : {
@@ -5355,6 +6005,17 @@
         }
       }
     },
+    "the server did not answer" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "der Server antwortet nicht"
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
     "The service could not be reached. Check the connection and try again." : {
       "localizations" : {
         "de" : {
@@ -5465,6 +6126,17 @@
         }
       }
     },
+    "The VPN could not start: %@. Panop is not connecting." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das VPN konnte nicht gestartet werden: %@. Panop stellt keine Verbindung her."
+          }
+        }
+      }
+    },
     "The VPN did not answer. Panop is not connecting." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -5475,6 +6147,17 @@
           }
         }
       }
+    },
+    "the VPN is not connected, so nothing is sent" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "das VPN ist nicht verbunden, daher wird nichts gesendet"
+          }
+        }
+      },
+      "extractionState" : "manual"
     },
     "The VPN server" : {
       "extractionState" : "manual",
@@ -5526,6 +6209,17 @@
           }
         }
       }
+    },
+    "this device" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "dieses Gerät"
+          }
+        }
+      },
+      "extractionState" : "manual"
     },
     "This item has no stream address. Refresh the playlist and try again." : {
       "localizations" : {
@@ -5639,6 +6333,17 @@
         }
       }
     },
+    "Through the VPN" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Über das VPN"
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
     "Time spent waiting for data" : {
       "localizations" : {
         "de" : {
@@ -5668,6 +6373,17 @@
           }
         }
       }
+    },
+    "Time to the first picture" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zeit bis zum ersten Bild"
+          }
+        }
+      },
+      "extractionState" : "manual"
     },
     "Timeline" : {
       "localizations" : {
@@ -5983,6 +6699,28 @@
         }
       }
     },
+    "Type from the address" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Typ laut Adresse"
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
+    "unknown" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "unbekannt"
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
     "Up" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -6084,6 +6822,28 @@
         }
       }
     },
+    "via VPN" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "über VPN"
+          }
+        }
+      }
+    },
+    "Video codec" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Video-Codec"
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
     "View on Simkl" : {
       "localizations" : {
         "de" : {
@@ -6104,6 +6864,17 @@
         }
       }
     },
+    "VPN active on the device" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "VPN auf dem Gerät aktiv"
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
     "VPN built into Panop" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -6114,6 +6885,17 @@
           }
         }
       }
+    },
+    "VPN server" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "VPN-Server"
+          }
+        }
+      },
+      "extractionState" : "manual"
     },
     "Waiting for approval…" : {
       "localizations" : {
@@ -6307,6 +7089,17 @@
         }
       }
     },
+    "Why not" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Warum nicht"
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
     "WireGuard configuration" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -6400,6 +7193,17 @@
         }
       }
     },
+    "yes" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ja"
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
     "Your content" : {
       "localizations" : {
         "de" : {
@@ -6450,61 +7254,6 @@
           }
         }
       }
-    },
-    "The VPN could not start: %@. Panop is not connecting." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Das VPN konnte nicht gestartet werden: %@. Panop stellt keine Verbindung her."
-          }
-        }
-      },
-      "extractionState" : "manual"
-    },
-    "On. Panop's built-in VPN is connected, so Panop connects." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "An. Das in Panop eingebaute VPN ist verbunden, daher verbindet sich Panop."
-          }
-        }
-      },
-      "extractionState" : "manual"
-    },
-    "On. Panop's built-in VPN is not connected, so Panop is not connecting." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "An. Das in Panop eingebaute VPN ist nicht verbunden, daher stellt Panop keine Verbindung her."
-          }
-        }
-      },
-      "extractionState" : "manual"
-    },
-    "via VPN" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "über VPN"
-          }
-        }
-      },
-      "extractionState" : "manual"
-    },
-    "not via VPN (local network)" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "nicht über VPN (lokales Netzwerk)"
-          }
-        }
-      },
-      "extractionState" : "manual"
     }
   },
   "version" : "1.0"

@@ -428,6 +428,9 @@ struct PlayerView: View {
                 }
             }
             Spacer()
+            #if !os(tvOS)
+                StreamDetailsButton(model: model)
+            #endif
             clock
         }
         .padding()

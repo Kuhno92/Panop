@@ -54,8 +54,10 @@ struct ScaleTests {
                 found += MatchChannelResolver.resolve(match, programmes: lines, channels: channels).count
             }
         }
-        // Generous for an unoptimised test build: a release build takes about a tenth of a second.
-        #expect(elapsed < .seconds(8), "took \(elapsed)")
+        // A bound for a slow algorithm, not a stopwatch. A release build takes about a tenth of a second; an
+        // unoptimised test build on a busy machine or a shared CI runner (this failed CI at 8 s, and took 37 s on a
+        // machine with a load average over 300) takes far longer. A quadratic matcher would still miss this by minutes.
+        #expect(elapsed < .seconds(30), "took \(elapsed)")
         #expect(found > 0)
     }
 }
