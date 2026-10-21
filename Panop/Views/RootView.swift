@@ -303,6 +303,8 @@ struct RootView: View {
             // What another device changes arrives as an import: read it, and drop what was removed there.
             .task(id: cloudSync.availability == .active) {
                 guard cloudSync.availability == .active else { return }
+                // An import that finished before this started was not heard: read what is in the store now.
+                await library.applyRemoteChanges()
                 for await _ in CloudChanges.imports() {
                     cloudSync.noteImport()
                     userState.reloadAfterRemoteChange()

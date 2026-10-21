@@ -109,6 +109,8 @@ struct PanopApp: App {
                     guard phase == .active else { return }
                     SystemVPNMonitor.shared.refresh()
                     TunnelController.shared.appBecameActive()
+                    // Changes from other devices may have been imported while the app was in the background.
+                    Task { await services.library.applyRemoteChanges() }
                 }
             #if os(macOS) || os(tvOS)
                 .environment(embeddedPlayback)
