@@ -8,6 +8,12 @@ struct CloudSyncSection: View {
     @Environment(PlaylistLibrary.self) private var library
     @AppStorage(CloudSync.enabledKey) private var isOn = true
     @AppStorage(CloudSync.loginsKey) private var syncsLogins = true
+    @Environment(UserStateStore.self) private var userState
+    @Environment(SportsAccount.self) private var sportsAccount
+    @Environment(SportsSyncStore.self) private var sportsSync
+    @State private var confirmsClear = false
+    @State private var isClearing = false
+    @State private var clearResult: SyncedDataResetResult?
 
     var body: some View {
         // A test run never uses iCloud, so there is nothing to set.
@@ -20,6 +26,7 @@ struct CloudSyncSection: View {
                 Label(message, systemImage: symbol)
                     .font(.footnote)
                     .foregroundStyle(tint)
+                clearRow
                 if isOn, status.availability == .active {
                     LabeledContent("Playlists on this device", value: String(library.playlists.count))
                     LabeledContent("Last update from iCloud") {
@@ -57,6 +64,93 @@ struct CloudSyncSection: View {
                 }
             }
         }
+    }
+
+    // MARK: - Clear synced data
+
+    /// Wipes what is synced, here and (as the switch says) in iCloud. See `SyncedDataReset`.
+    @ViewBuilder
+    private var clearRow: some View {
+        Button(role: .destructive) {
+            confirmsClear = true
+        } label: {
+            HStack {
+                Text("Clear synced data")
+                if isClearing {
+                    Spacer()
+                    ProgressView()
+                }
+            }
+        }
+        .disabled(isClearing)
+        .accessibilityIdentifier("clearSyncedData")
+        .confirmationDialog("Clear all synced data?", isPresented: $confirmsClear, titleVisibility: .visible) {
+            Button("Clear", role: .destructive) { clear() }
+        } message: {
+            Text(clearWarning)
+        }
+        if let clearResult {
+            Label(
+                resultText(clearResult),
+                systemImage: clearResult.isComplete ? "checkmark.circle" : "exclamationmark.triangle"
+            )
+            .font(.footnote)
+            .foregroundStyle(clearResult.isComplete ? Color.secondary : Color.orange)
+        }
+    }
+
+    private var clearWarning: String {
+        let what = String(localized: """
+        Your playlists with their logins, favourites, what you watched, hidden titles, category and sports choices, \
+        the sports key and the VPN configuration are deleted from this device.
+        """)
+        switch ICloudWipeRoute.route(for: status.availability) {
+        case .mirrored:
+            return what + " " + String(localized: "iCloud sync is on, so your other devices are cleared too.")
+        case .wipe:
+            return what + " " +
+                String(localized: "iCloud sync is off here, but the data in your iCloud is deleted as well.")
+        case .unavailable:
+            return what
+        }
+    }
+
+    private func clear() {
+        isClearing = true
+        clearResult = nil
+        let reset = SyncedDataReset(
+            library: library, userState: userState, sportsSync: sportsSync, sportsAccount: sportsAccount
+        )
+        let availability = status.availability
+        Task {
+            clearResult = await reset.run(availability: availability)
+            isClearing = false
+        }
+    }
+
+    private func resultText(_ result: SyncedDataResetResult) -> String {
+        var parts: [String] = []
+        if !result.playlistsKept.isEmpty {
+            parts
+                .append(
+                    String(
+                        localized: "These playlists could not be deleted: \(result.playlistsKept.joined(separator: ", "))."
+                    )
+                )
+        }
+        switch result.iCloud {
+        case .carriedBySync:
+            parts.append(String(localized: "Cleared. Your other devices follow through iCloud."))
+        case let .wiped(zones):
+            parts.append(zones > 0
+                ? String(localized: "Cleared here and in iCloud.")
+                : String(localized: "Cleared here. There was nothing in iCloud."))
+        case .nothingToWipe:
+            parts.append(String(localized: "Cleared on this device."))
+        case let .failed(reason):
+            parts.append(String(localized: "Cleared here, but iCloud could not be wiped: \(reason)"))
+        }
+        return parts.joined(separator: " ")
     }
 
     private var message: String {

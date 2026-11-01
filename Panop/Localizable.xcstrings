@@ -1153,7 +1153,8 @@
             "value" : "Löschen"
           }
         }
-      }
+      },
+      "extractionState" : "manual"
     },
     "Clear Statistics" : {
       "localizations" : {
@@ -7272,6 +7273,149 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "das Relay in Panop"
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
+    "Clear synced data" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronisierte Daten löschen"
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
+    "Clear all synced data?" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle synchronisierten Daten löschen?"
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
+    "Your playlists with their logins, favourites, what you watched, hidden titles, category and sports choices, the sports key and the VPN configuration are deleted from this device." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deine Playlists mit ihren Logins, Favoriten, Gesehenes, ausgeblendete Titel, Kategorie- und Sportauswahl, der Sport-Schlüssel und die VPN-Konfiguration werden von diesem Gerät gelöscht."
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
+    "iCloud sync is on, so your other devices are cleared too." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die iCloud-Synchronisierung ist an, daher werden auch deine anderen Geräte geleert."
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
+    "iCloud sync is off here, but the data in your iCloud is deleted as well." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die iCloud-Synchronisierung ist hier aus, aber die Daten in deiner iCloud werden ebenfalls gelöscht."
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
+    "These playlists could not be deleted: %@." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Playlists konnten nicht gelöscht werden: %@."
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
+    "Cleared. Your other devices follow through iCloud." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gelöscht. Deine anderen Geräte folgen über iCloud."
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
+    "Cleared here and in iCloud." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hier und in iCloud gelöscht."
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
+    "Cleared here. There was nothing in iCloud." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hier gelöscht. In iCloud war nichts."
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
+    "Cleared on this device." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auf diesem Gerät gelöscht."
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
+    "Cleared here, but iCloud could not be wiped: %@" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hier gelöscht, aber iCloud konnte nicht geleert werden: %@"
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
+    "No iCloud account is signed in on this device." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auf diesem Gerät ist kein iCloud-Account angemeldet."
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
+    "iCloud could not be reached. Try again with a connection." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloud ist nicht erreichbar. Versuche es mit einer Verbindung erneut."
           }
         }
       },

@@ -139,6 +139,14 @@ final class SportsSyncStore {
         }
     }
 
+    /// Every choice of every profile, for "Clear synced data". The key has its own record and its own removal.
+    func deleteEverything() {
+        for row in (try? context.fetch(FetchDescriptor<SportsPreference>())) ?? [] {
+            context.delete(row)
+        }
+        save()
+    }
+
     /// A profile's choices go with the profile.
     func forget(profile: String) {
         for kind in [Kind.league, Kind.team, Kind.setupDone, Kind.channel] {
