@@ -59,6 +59,7 @@ private struct Fixture {
     let wiper: FakeWiper
     let reset: SyncedDataReset
     let vpnSync: VPNSyncStore
+    let snapshotFile: URL
 
     init(syncs: Bool, wiper: FakeWiper = FakeWiper()) throws {
         app = try TestApp(transport: FakePanel(live: 3, movies: 1).transport())
@@ -101,9 +102,12 @@ private struct Fixture {
         tunnel.attach(sync: vpnSync)
         tunnel.syncsConfig = { syncs }
 
+        snapshotFile = FileManager.default.temporaryDirectory
+            .appendingPathComponent("snapshot-\(UUID().uuidString).json")
         reset = SyncedDataReset(
             library: app.services.library, userState: app.services.userState, sportsSync: app.services.sportsSync,
-            sportsAccount: account, tunnel: tunnel, wiper: wiper, defaults: defaults
+            sportsAccount: account, cloud: app.cloud, tunnel: tunnel, wiper: wiper, defaults: defaults,
+            snapshotFile: snapshotFile, settleDelay: .zero
         )
     }
 
@@ -115,12 +119,14 @@ private struct Fixture {
 @Suite("Clear synced data", .serialized)
 @MainActor
 struct SyncedDataResetTests {
+    // MARK: - Sync off: everything is cleared
+
     @Test func `everything that syncs is gone afterwards, on this device`() async throws {
-        let fixture = try Fixture(syncs: true)
+        let fixture = try Fixture(syncs: false)
         defer { fixture.app.cleanUp() }
         #expect(try fixture.count(PlaylistRecord.self) == 2)
 
-        let result = await fixture.reset.run(availability: .active)
+        let result = await fixture.reset.run(availability: .off)
 
         #expect(result.isComplete)
         #expect(fixture.app.services.library.playlists.isEmpty)
@@ -135,21 +141,6 @@ struct SyncedDataResetTests {
         #expect(fixture.app.services.userState.favorites.isEmpty)
     }
 
-    @Test func `with sync on, the cleared state is what iCloud holds: markers, and no direct wipe`() async throws {
-        let fixture = try Fixture(syncs: true)
-        defer { fixture.app.cleanUp() }
-
-        let result = await fixture.reset.run(availability: .active)
-
-        #expect(result.iCloud == .carriedBySync)
-        #expect(fixture.wiper.callCount == 0)
-        // The other devices must be told to let go, not left to send their own copy back.
-        #expect(fixture.app.services.sportsSync.keyRecord.removed)
-        #expect(fixture.app.services.sportsSync.keyRecord.blob == nil)
-        #expect(fixture.vpnSync.record.removed)
-        #expect(fixture.vpnSync.record.blob == nil)
-    }
-
     @Test func `with sync off, iCloud is wiped directly, once`() async throws {
         let fixture = try Fixture(syncs: false)
         defer { fixture.app.cleanUp() }
@@ -159,7 +150,6 @@ struct SyncedDataResetTests {
         #expect(result.iCloud == .wiped(zones: 1))
         #expect(fixture.wiper.callCount == 1)
         #expect(result.isComplete)
-        #expect(try fixture.count(PlaylistRecord.self) == 0)
     }
 
     @Test func `a wipe that fails is reported and leaves this device cleared`() async throws {
@@ -188,39 +178,173 @@ struct SyncedDataResetTests {
         #expect(result.isComplete)
     }
 
-    @Test func `where iCloud cannot be used the wiper is not called`() async throws {
+    @Test func `where iCloud cannot be used the wiper is not called, and this device is cleared`() async throws {
         for availability in [CloudSync.Availability.noAccount, .notEntitled, .testing] {
             let fixture = try Fixture(syncs: false)
             defer { fixture.app.cleanUp() }
             let result = await fixture.reset.run(availability: availability)
             #expect(result.iCloud == .nothingToWipe)
             #expect(fixture.wiper.callCount == 0)
+            #expect(try fixture.count(PlaylistRecord.self) == 0)
         }
     }
 
     @Test func `the next playlists to arrive from iCloud are offered again, as on a first launch`() async throws {
-        let fixture = try Fixture(syncs: true)
+        let fixture = try Fixture(syncs: false)
         defer { fixture.app.cleanUp() }
         #expect(fixture.defaults.bool(forKey: PlaylistLibrary.offerDecidedKey))
 
-        _ = await fixture.reset.run(availability: .active)
+        _ = await fixture.reset.run(availability: .off)
 
         #expect(fixture.defaults.object(forKey: PlaylistLibrary.offerDecidedKey) == nil)
     }
 
     @Test func `running it again, with nothing left, is harmless`() async throws {
-        let fixture = try Fixture(syncs: true)
+        let fixture = try Fixture(syncs: false)
         defer { fixture.app.cleanUp() }
-        _ = await fixture.reset.run(availability: .active)
+        _ = await fixture.reset.run(availability: .off)
 
-        let again = await fixture.reset.run(availability: .active)
+        let again = await fixture.reset.run(availability: .off)
 
         #expect(again.isComplete)
         #expect(try fixture.count(PlaylistRecord.self) == 0)
     }
 
+    // MARK: - Sync on: iCloud takes this device's data
+
+    @Test func `with sync on, iCloud is wiped once and nothing on this device is cleared`() async throws {
+        let fixture = try Fixture(syncs: true)
+        defer { fixture.app.cleanUp() }
+
+        let result = await fixture.reset.run(availability: .active)
+        await fixture.reset.settling?.value
+
+        #expect(result.iCloud == .replaced)
+        #expect(result.isComplete)
+        #expect(fixture.wiper.callCount == 1)
+        #expect(try fixture.count(PlaylistRecord.self) == 2)
+        #expect(try fixture.count(UserContentState.self) == 2)
+        #expect(try fixture.count(CategoryPreference.self) == 1)
+        #expect(try fixture.count(SportsPreference.self) == 1)
+        #expect(fixture.app.services.library.playlists.map(\.id).sorted() == ["p1", "p2"])
+        #expect(try fixture.app.credentials.load(for: "p1") != nil, "the logins stay in the Keychain")
+        #expect(fixture.account.hasKey)
+        #expect(fixture.tunnel.hasConfiguration)
+        #expect(fixture.app.services.userState.favorites.count == 2)
+    }
+
+    @Test func `the rows are written again, so mirroring has something to send to the new zone`() async throws {
+        let fixture = try Fixture(syncs: true)
+        defer { fixture.app.cleanUp() }
+        let before = try Set(ModelContext(fixture.app.cloud).fetch(FetchDescriptor<UserContentState>())
+            .map(\.persistentModelID))
+
+        _ = await fixture.reset.run(availability: .active)
+        await fixture.reset.settling?.value
+
+        let after = try Set(ModelContext(fixture.app.cloud).fetch(FetchDescriptor<UserContentState>())
+            .map(\.persistentModelID))
+        #expect(after.count == 2)
+        #expect(before.isDisjoint(with: after), "new rows, not the old ones left as they were")
+    }
+
+    @Test func `if mirroring empties this device when the zone goes, what was here is put back`() async throws {
+        let fixture = try Fixture(syncs: true)
+        defer { fixture.app.cleanUp() }
+        _ = await fixture.reset.run(availability: .active)
+
+        // What a mirror may do on seeing its zone deleted.
+        let context = ModelContext(fixture.app.cloud)
+        try context.delete(model: PlaylistRecord.self)
+        try context.delete(model: UserContentState.self)
+        try context.delete(model: CategoryPreference.self)
+        try context.delete(model: SportsPreference.self)
+        try context.save()
+        await fixture.reset.settling?.value
+
+        #expect(try fixture.count(PlaylistRecord.self) == 2)
+        #expect(try fixture.count(UserContentState.self) == 2)
+        #expect(try fixture.count(CategoryPreference.self) == 1)
+        #expect(try fixture.count(SportsPreference.self) == 1)
+        #expect(fixture.app.services.library.playlists.count == 2)
+    }
+
+    @Test func `putting back never makes a second copy`() async throws {
+        let fixture = try Fixture(syncs: true)
+        defer { fixture.app.cleanUp() }
+        _ = await fixture.reset.run(availability: .active)
+        await fixture.reset.settling?.value
+        let snapshot = SyncedSnapshot.capture(from: ModelContext(fixture.app.cloud))
+
+        #expect(snapshot.insertMissing(into: ModelContext(fixture.app.cloud)) == 0)
+        #expect(try fixture.count(PlaylistRecord.self) == 2)
+        #expect(try fixture.count(UserContentState.self) == 2)
+    }
+
+    @Test func `the snapshot on disk is kept until the write-back is done, then removed`() async throws {
+        let fixture = try Fixture(syncs: true)
+        defer { fixture.app.cleanUp() }
+        let result = await fixture.reset.run(availability: .active)
+        #expect(result.iCloud == .replaced)
+        await fixture.reset.settling?.value
+
+        #expect(!FileManager.default.fileExists(atPath: fixture.snapshotFile.path))
+    }
+
+    @Test func `if the wipe fails, nothing was touched and no snapshot is left behind`() async throws {
+        let fixture = try Fixture(syncs: true, wiper: FakeWiper(.failure(.unreachable)))
+        defer { fixture.app.cleanUp() }
+        let before = SyncedSnapshot.capture(from: ModelContext(fixture.app.cloud))
+
+        let result = await fixture.reset.run(availability: .active)
+
+        guard case .failed = result.iCloud else {
+            Issue.record("expected a failure, got \(result.iCloud)")
+            return
+        }
+        #expect(SyncedSnapshot.capture(from: ModelContext(fixture.app.cloud)) == before)
+        #expect(!FileManager.default.fileExists(atPath: fixture.snapshotFile.path))
+        #expect(fixture.app.services.library.playlists.count == 2)
+    }
+
+    @Test func `an interrupted replace is finished at the next launch`() async throws {
+        let fixture = try Fixture(syncs: true)
+        defer { fixture.app.cleanUp() }
+        let snapshot = SyncedSnapshot.capture(from: ModelContext(fixture.app.cloud))
+        try snapshot.save(to: fixture.snapshotFile)
+        let context = ModelContext(fixture.app.cloud)
+        try context.delete(model: PlaylistRecord.self)
+        try context.delete(model: UserContentState.self)
+        try context.save()
+
+        var refreshed = false
+        SyncedDataReset.finishInterrupted(cloud: fixture.app.cloud, file: fixture.snapshotFile, delay: .zero) {
+            refreshed = true
+        }
+        for _ in 0 ..< 100 where FileManager.default.fileExists(atPath: fixture.snapshotFile.path) {
+            try? await Task.sleep(for: .milliseconds(20))
+        }
+
+        #expect(refreshed)
+        #expect(try fixture.count(PlaylistRecord.self) == 2)
+        #expect(try fixture.count(UserContentState.self) == 2)
+    }
+
+    // MARK: - The pieces
+
+    @Test func `a snapshot survives a round trip through the file`() throws {
+        let fixture = try Fixture(syncs: true)
+        defer { fixture.app.cleanUp() }
+        let snapshot = SyncedSnapshot.capture(from: ModelContext(fixture.app.cloud))
+        try snapshot.save(to: fixture.snapshotFile)
+        defer { SyncedSnapshot.discard(at: fixture.snapshotFile) }
+
+        #expect(SyncedSnapshot.load(from: fixture.snapshotFile) == snapshot)
+        #expect(!snapshot.isEmpty)
+    }
+
     @Test func `which way iCloud is handled follows the availability`() {
-        #expect(ICloudWipeRoute.route(for: .active) == .mirrored)
+        #expect(ICloudWipeRoute.route(for: .active) == .replace)
         #expect(ICloudWipeRoute.route(for: .off) == .wipe)
         #expect(ICloudWipeRoute.route(for: .failed("x")) == .wipe)
         #expect(ICloudWipeRoute.route(for: .noAccount) == .unavailable)

@@ -7311,17 +7311,6 @@
       },
       "extractionState" : "manual"
     },
-    "iCloud sync is on, so your other devices are cleared too." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Die iCloud-Synchronisierung ist an, daher werden auch deine anderen Geräte geleert."
-          }
-        }
-      },
-      "extractionState" : "manual"
-    },
     "iCloud sync is off here, but the data in your iCloud is deleted as well." : {
       "localizations" : {
         "de" : {
@@ -7339,17 +7328,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Diese Playlists konnten nicht gelöscht werden: %@."
-          }
-        }
-      },
-      "extractionState" : "manual"
-    },
-    "Cleared. Your other devices follow through iCloud." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gelöscht. Deine anderen Geräte folgen über iCloud."
           }
         }
       },
@@ -7388,17 +7366,6 @@
       },
       "extractionState" : "manual"
     },
-    "Cleared here, but iCloud could not be wiped: %@" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hier gelöscht, aber iCloud konnte nicht geleert werden: %@"
-          }
-        }
-      },
-      "extractionState" : "manual"
-    },
     "No iCloud account is signed in on this device." : {
       "localizations" : {
         "de" : {
@@ -7416,6 +7383,72 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "iCloud ist nicht erreichbar. Versuche es mit einer Verbindung erneut."
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
+    "Replace iCloud data with this device" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloud-Daten durch dieses Gerät ersetzen"
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
+    "Replace the data in iCloud?" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Daten in iCloud ersetzen?"
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
+    "Replace" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ersetzen"
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
+    "What is in your iCloud is deleted and replaced with what is on this device: your playlists, favourites, what you watched, choices and keys. Your other devices take this device's data over, and what only they had is gone. Nothing on this device is deleted." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Was in deiner iCloud liegt, wird gelöscht und durch das ersetzt, was auf diesem Gerät ist: Playlists, Favoriten, Gesehenes, Auswahl und Schlüssel. Deine anderen Geräte übernehmen die Daten dieses Geräts, und was nur dort war, ist weg. Auf diesem Gerät wird nichts gelöscht."
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
+    "iCloud was wiped and now takes this device's data. Your other devices follow." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloud wurde geleert und übernimmt jetzt die Daten dieses Geräts. Deine anderen Geräte folgen."
+          }
+        }
+      },
+      "extractionState" : "manual"
+    },
+    "iCloud could not be wiped: %@" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloud konnte nicht geleert werden: %@"
           }
         }
       },

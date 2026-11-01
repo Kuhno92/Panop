@@ -60,6 +60,15 @@ struct PanopApp: App {
                 sportsCache: SportsConfig.cacheDirectory,
                 sportsTransport: SportsConfig.transport
             )
+            // A "replace iCloud with this device" that the app was quit in the middle of is finished.
+            if !underTest {
+                let finished = services
+                SyncedDataReset.finishInterrupted(cloud: cloud) {
+                    finished.library.reload()
+                    finished.userState.reloadAfterRemoteChange()
+                    finished.sportsSync.reloadAfterRemoteChange()
+                }
+            }
             #if DEBUG
                 if UITestMode.isActive {
                     UITestMode.resetPreferences()
